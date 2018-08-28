@@ -38,7 +38,7 @@
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
+#include "AAFWideString.h"
 #include <string.h>
 
 #include "AAFStoredObjectIDs.h"
@@ -49,7 +49,7 @@ using namespace std;
 
 #include "CAAFBuiltinDefs.h"
 
-static const aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
+static aafWChar *slotNames[5] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4", L"SLOT5" };
 
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
@@ -387,8 +387,8 @@ extern "C" HRESULT CAAFMobSlot_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following AAFMobSlot tests have not been implemented:" << endl; 
-//		cout << "     GetDataDef" << endl; 
+//		cout << "The following AAFMobSlot tests have not been implemented:" << endl;
+//		cout << "     GetDataDef" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 	

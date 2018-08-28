@@ -120,6 +120,20 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+void ImplAAFCommentMarker::Accept(
+	AAFComponentVisitor& visitor)
+{
 
+	ImplAAFSourceReference* pAnnotation = NULL;
+	GetAnnotation(&pAnnotation);
+	if (pAnnotation)
+	{
+		pAnnotation->Accept(visitor);
+		pAnnotation->ReleaseReference();
+		pAnnotation = NULL;
+	}
 
+	// TODO
+	// visitor.VisitCommentMarker(this);
+}
 

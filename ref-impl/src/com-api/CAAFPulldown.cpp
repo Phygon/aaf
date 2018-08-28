@@ -144,8 +144,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppInputSegment->ReleaseReference(); // We are through with this pointer.
+          internalppInputSegment = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppInputSegment should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppInputSegment == 0);
+
   return hr;
 }
 

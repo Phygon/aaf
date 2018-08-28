@@ -167,6 +167,16 @@ void OMWrappedRawStorage::writeAt(OMUInt64 position,
   _store->writeAt(position, bytes, byteCount, bytesWritten);
 }
 
+void OMWrappedRawStorage::writeCopyByteAt(OMUInt64 position,
+                                         OMByte theByte,
+                                         OMUInt32 byteCount,
+                                         OMUInt32& bytesWritten)
+{
+  TRACE("OMWrappedRawStorage::writeCopyByteAt");
+
+  _store->writeCopyByteAt(position, theByte, byteCount, bytesWritten);
+}
+
   // @mfunc May this <c OMWrappedRawStorage> be changed in size ?
   //  @rdesc True if this <c OMWrappedRawStorage> is extendible,
   //         false otherwise.
@@ -260,4 +270,96 @@ void OMWrappedRawStorage::setPosition(OMUInt64 newPosition) const
   TRACE("OMWrappedRawStorage::setPosition");
 
   _store->setPosition(newPosition);
+}
+
+void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
+                                       OMByte* bytes,
+                                       OMUInt32 byteCount,
+                                       OMUInt32& bytesRead) const
+{
+  TRACE("OMWrappedRawStorage::");
+
+  _store->streamReadAt(position, bytes, byteCount, bytesRead);
+}
+
+void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
+                                       OMIOBufferDescriptor* buffers,
+                                       OMUInt32 bufferCount,
+                                       OMUInt32& bytesRead) const
+{
+  TRACE("OMWrappedRawStorage::streamReadAt");
+
+  _store->streamReadAt(position, buffers, bufferCount, bytesRead);
+}
+
+void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
+                                       OMByte* buffer,
+                                       const OMUInt32 bytes,
+                                       void* /* */ completion,
+                                       const void* clientArgument) const
+{
+  TRACE("OMWrappedRawStorage::streamReadAt");
+
+  _store->streamReadAt(position, buffer, bytes, completion, clientArgument);
+}
+
+void OMWrappedRawStorage::streamReadAt(OMUInt64 position,
+                                       OMIOBufferDescriptor* buffers,
+                                       OMUInt32 bufferCount,
+                                       void* /* */ completion,
+                                       const void* clientArgument) const
+{
+  TRACE("OMWrappedRawStorage::streamReadAt");
+
+  _store->streamReadAt(position,
+                       buffers,
+                       bufferCount,
+                       completion,
+                       clientArgument);
+}
+
+void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
+                                        const OMByte* bytes,
+                                        OMUInt32 byteCount,
+                                        OMUInt32& bytesWritten)
+{
+  TRACE("OMWrappedRawStorage::streamWriteAt");
+
+  _store->streamWriteAt(position, bytes, byteCount, bytesWritten);
+}
+
+void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
+                                        OMIOBufferDescriptor* buffers,
+                                        OMUInt32 bufferCount,
+                                        OMUInt32& bytesWritten)
+{
+  TRACE("OMWrappedRawStorage::streamWriteAt");
+
+  _store->streamWriteAt(position, buffers, bufferCount, bytesWritten);
+}
+
+void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
+                                        const OMByte* buffer,
+                                        const OMUInt32 bytes,
+                                        void* /* */ completion,
+                                        const void* clientArgument)
+{
+  TRACE("OMWrappedRawStorage::streamWriteAt");
+
+  _store->streamWriteAt(position, buffer, bytes, completion, clientArgument);
+}
+
+void OMWrappedRawStorage::streamWriteAt(OMUInt64 position,
+                                        const OMIOBufferDescriptor* buffers,
+                                        OMUInt32 bufferCount,
+                                        void* /* */ completion,
+                                        const void* clientArgument)
+{
+  TRACE("OMWrappedRawStorage::streamWriteAt");
+
+  _store->streamWriteAt(position,
+                        buffers,
+                        bufferCount,
+                        completion,
+                        clientArgument);
 }

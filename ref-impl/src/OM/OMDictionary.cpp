@@ -125,6 +125,19 @@ void OMDictionary::newClass(const OMUniqueObjectIdentification& /* id */,
   ASSERT("Unimplemented code not reached.", false);
 }
 
+void OMDictionary::newProperty(
+                            const OMUniqueObjectIdentification& /* id */,
+                            const wchar_t* /* name */,
+                            const wchar_t* /* description */,
+                            const OMUniqueObjectIdentification& /* type */,
+                            bool& /* isRequired */,
+                            const OMUniqueObjectIdentification& /* memberOf */)
+{
+  TRACE("OMDictionary::newProperty");
+
+  ASSERT("Unimplemented code not reached.", false);
+}
+
 const OMPropertyDefinition* OMDictionary::newProperty(const OMUniqueObjectIdentification& /*id*/,
                        const wchar_t* /*name*/,
                        const wchar_t* /*description*/,
@@ -278,6 +291,19 @@ void OMDictionary::newStringType(
 void OMDictionary::newExtendibleEnumeratedType(
                              const OMObjectIdentification& /* id */,
                              const wchar_t* /* name */,
+                             const wchar_t* /* description */,
+                             const wchar_t** /* elementNames */,
+                             const OMObjectIdentification* /* elementValues */,
+                             OMUInt32 /* elementCount */)
+{
+  TRACE("OMDictionary::newExtendibleEnumeratedType");
+
+  ASSERT("Unimplemented code not reached.", false);
+}
+
+void OMDictionary::newExtendibleEnumeratedType(
+                             const OMObjectIdentification& /* id */,
+                             const wchar_t* /* name */,
                              const wchar_t* /* description */)
 {
   TRACE("OMDictionary::newExtendibleEnumeratedType");
@@ -408,6 +434,8 @@ bool OMDictionary::isConcreteMeta(const OMObjectIdentification& id) const
   } else if (id == Class_TypeDefinitionIndirect) {
     result = true;
   } else if (id == Class_TypeDefinitionOpaque) {
+    result = true;
+  } else if (id == Class_TypeDefinitionGenericCharacter) {
     result = true;
   } else if (id == Class_TypeDefinitionCharacter) {
     result = true;

@@ -95,7 +95,7 @@ public:
 
     // @cmember The number of <c OMProperty>s in the associated
     //          <c OMPropertySet>.
-  virtual size_t count(void) const;
+  virtual OMUInt32 count(void) const;
 
     // @cmember Advance this <c OMPropertySetIterator> to the next
     //          <c OMProperty>, if any.

@@ -323,7 +323,10 @@ public:
 	virtual bool IsFixedArrayable () const;
 	virtual bool IsVariableArrayable () const;
 	virtual bool IsStringable () const;
-	
+
+	// Merge of metadata definitions of the source file to
+	// metadata dictionary of the destination file.
+	virtual AAFRESULT MergeTo( ImplAAFDictionary* pDestDictionary );
 	
 	// override from OMStorable.
 	virtual const OMClassId& classId(void) const;

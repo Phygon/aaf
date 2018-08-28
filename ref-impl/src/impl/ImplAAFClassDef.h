@@ -213,17 +213,13 @@ public:
   const OMPropertyDefinition* propertyDefinition(
                                  const OMUniqueObjectIdentification& id) const;
 
-  const OMPropertyDefinition* propertyDefinition(
-			     const OMStorable* pDstStorable,
-				 const OMPropertyDefinition* pSrcPropertyDef );
-
   virtual PropertyDefinitionsIterator* propertyDefinitions(void) const;
 
-  virtual const OMUniqueObjectIdentification& identification(void) const;
-  virtual const wchar_t* name(void) const;
-  virtual bool hasDescription(void) const;
-  virtual const wchar_t* description(void) const;
-  virtual bool isPredefined(void) const;
+  virtual bool hasParent(void) const;
+
+  virtual const OMClassDefinition* parent(void) const;
+
+  virtual bool isConcrete(void) const;
 
   virtual bool omIsConcrete(void) const;
   virtual OMClassDefinition* omParentClass(void) const;
@@ -323,11 +319,21 @@ public:
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
 
+  // Overrides from OMDefinition
+  virtual const OMUniqueObjectIdentification& identification(void) const;
+  virtual const wchar_t* name(void) const;
+  virtual bool hasDescription(void) const;
+  virtual const wchar_t* description(void) const;
+  virtual bool isPredefined(void) const;
+
 
   // Method is called after associated class has been added to MetaDictionary.
   // If this method fails the class is removed from the MetaDictionary and the
   // registration method will fail.
   virtual HRESULT CompleteClassRegistration(void);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+	InitOMPropertiesForObject(ImplAAFObject *obj);
 
   // Merge this class definition to the destination dictionary.
   // If the class definition doesn't exist in the destination

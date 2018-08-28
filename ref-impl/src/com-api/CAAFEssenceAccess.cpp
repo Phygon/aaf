@@ -708,8 +708,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalopsResult->ReleaseReference(); // We are through with this pointer.
+          internalopsResult = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalopsResult should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalopsResult == 0);
+
   return hr;
 }
 
@@ -786,8 +797,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalops->ReleaseReference(); // We are through with this pointer.
+          internalops = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalops should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalops == 0);
+
   return hr;
 }
 
@@ -864,8 +886,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalops->ReleaseReference(); // We are through with this pointer.
+          internalops = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalops should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalops == 0);
+
   return hr;
 }
 

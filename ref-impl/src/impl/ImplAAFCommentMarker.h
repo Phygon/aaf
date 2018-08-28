@@ -78,6 +78,14 @@ public:
         // @parm [in] Annotation property value
         (ImplAAFSourceReference * pAnnotation);
 
+public:
+	// SDK-internal
+
+	// Visit this component and its sub-components
+	// with the specified visitor.
+	virtual void Accept(AAFComponentVisitor& visitor);
+
+
 protected:
   // The stored object model defines the annotation to be a 
   // an optional strong reference.

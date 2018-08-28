@@ -45,13 +45,14 @@ using namespace std;
 #include "AAFResult.h"
 #include "ModuleTest.h"
 #include "AAFDefUIDs.h"
+#include "AAFWideString.h"
 
 #include "CAAFBuiltinDefs.h"
 
 
 const aafUInt32 gMaxMobCount = 5;
 
-//--cf  //5 mobid's need to be genererated 
+//--cf  //5 mobid's need to be genererated
 static const aafMobID_t  _mobID[gMaxMobCount] = 
 {//start mobid block
 	//first id
@@ -81,9 +82,37 @@ static const aafMobID_t  _mobID[gMaxMobCount] =
 	
 }; //end mobid block
 
-const aafUID_t descSchID_1 = { 0x070D, 0x4400, 0xA00B, { 0x06, 0x07, 0x07, 0x08, 0x00, 0x08, 0x09, 0x09 } };
-const aafUID_t descSchID_2 = { 0xAF45, 0x3221, 0xA05C, { 0x05, 0x05, 0x06, 0x07, 0x08, 0x08, 0x09, 0x10 } };
 const aafUID_t setOpPatternID = {0x4e8404ff, 0x0f29, 0x11f4, {0xf3, 0x59, 0x0f, 0x90, 0x27, 0xdf, 0xca, 0x6a}};
+
+
+// Descriptiove scheme IDs to be added to the Header
+static const aafUID_t  descriptiveSchemes[] =
+{
+    // {93C0C960-8C89-4050-81AA-4B540C372A54}
+    { 0x93c0c960, 0x8c89, 0x4050, { 0x81, 0xaa, 0x4b, 0x54, 0x0c, 0x37, 0x2a, 0x54 } },
+    // {A731B402-D563-4de8-B2E8-1A812A3F6F98}
+    { 0xa731b402, 0xd563, 0x4de8, { 0xb2, 0xe8, 0x1a, 0x81, 0x2a, 0x3f, 0x6f, 0x98 } },
+    // {B8BFA1BC-A605-4a62-AA79-A430CC9DE4B3}
+    { 0xb8bfa1bc, 0xa605, 0x4a62, { 0xaa, 0x79, 0xa4, 0x30, 0xcc, 0x9d, 0xe4, 0xb3 } }
+};
+
+const aafUInt32 gMaxDescriptiveSchemesCount =
+                    sizeof(descriptiveSchemes) / sizeof(descriptiveSchemes[0]);
+
+
+// Descriptiove scheme IDs to be added to and then removed from the Header
+static const aafUID_t  tempDescriptiveSchemes[] =
+{
+    // {A9020C2F-0659-4cb0-8135-5AB3D9E8B793}
+    { 0xa9020c2f, 0x0659, 0x4cb0, { 0x81, 0x35, 0x5a, 0xb3, 0xd9, 0xe8, 0xb7, 0x93 } },
+    // {F69ABEF0-A871-41cf-BC7C-F5763CA22E53}
+    { 0xf69abef0, 0xa871, 0x41cf, { 0xbc, 0x7c, 0xf5, 0x76, 0x3c, 0xa2, 0x2e, 0x53 } },
+    // {DB6305D3-092C-4c31-9A7E-F8D558E8035E}
+    { 0xdb6305d3, 0x092c, 0x4c31, { 0x9a, 0x7e, 0xf8, 0xd5, 0x58, 0xe8, 0x03, 0x5e } }
+};
+
+const aafUInt32 gMaxTempDescriptiveSchemesCount =
+                    sizeof(tempDescriptiveSchemes) / sizeof(tempDescriptiveSchemes[0]);
 
 
 // {B8CF441F-F2F5-11d4-8040-00104BC9156D}
@@ -106,10 +135,21 @@ struct HeaderTest
   HeaderTest(aafProductIdentification_constref productID);
   ~HeaderTest();
 
+  void createEmptyDMSchemesSetFile(wchar_t *pFileName,
+                  aafUID_constref fileKind,
+                  testRawStorageType_t rawStorageType);
+  void openEmptyDMSchemesSetFile(wchar_t *pFileName);
+
   void createFile(wchar_t *pFileName,
                   aafUID_constref fileKind,
                   testRawStorageType_t rawStorageType);
   void openFile(wchar_t *pFileName);
+
+  void writeDescriptiveSchemes();
+  void readDescriptiveSchemes();
+
+  void writeEmptyDescriptiveSchemes();
+  void readEmptyDescriptiveSchemes();
 
   void writeOptionalProperties();
   void readOptionalProperties();
@@ -117,11 +157,13 @@ struct HeaderTest
   void checkByteOrder();
   void checkOperationalPattern();
   void checkEssenceContainer();
-  void checkDescriptiveSchemes();
   void createFileMob(aafUInt32 itemNumber);
   void createEssenceData(IAAFSourceMob *pSourceMob);
   void openMobs();
   void openEssenceData();
+
+  void setPrimaryMob(aafUInt32 itemNumber);
+  void readPrimaryMob(aafUInt32 itemNumber);
 
   int formatMobName(aafUInt32 itemNumber, wchar_t* mobName);
   aafUID_t getMobContainerFormatID(aafUInt32 itemNumber);
@@ -175,11 +217,28 @@ extern "C" HRESULT CAAFHeader_test(
   GenerateTestFileName( productID.productName, fileKind, fileNameBufLen, fileName );
   HeaderTest ht(productID);
 
+  aafWChar nameExtension[] = L"Empty";
+  size_t strSize = wcslen(productID.productName) + wcslen(nameExtension) + 1;//For the '\0'
+  aafWChar *productName2 = new aafWChar[strSize];  
+  wcscpy(productName2, productID.productName);
+  wcscat(productName2, nameExtension);
+  aafWChar fileName2[ fileNameBufLen  ] = L"";
+  GenerateTestFileName( productName2, fileKind, fileNameBufLen, fileName2 );
+  delete [] productName2; productName2 = 0;
+  
+
   try
   {
 	if(mode == kAAFUnitTestReadWrite)
 	   ht.createFile(fileName, fileKind, rawStorageType);
     ht.openFile(fileName);
+
+	if(!isSSFileKind(EffectiveTestFileEncoding(fileKind)))
+	{
+		if(mode == kAAFUnitTestReadWrite)
+			ht.createEmptyDMSchemesSetFile(fileName2, fileKind, rawStorageType);
+		ht.openEmptyDMSchemesSetFile(fileName2);
+	}
   }
   catch (HRESULT& ehr)
   {
@@ -367,6 +426,43 @@ void HeaderTest::removeTestFile(const wchar_t* pFileName)
   }
 }
 
+void HeaderTest::createEmptyDMSchemesSetFile(
+    wchar_t* pFileName,
+    aafUID_constref fileKind,
+    testRawStorageType_t rawStorageType)
+{
+  // Remove the previous test file if any.
+  removeTestFile(pFileName);
+
+  check(CreateTestFile( pFileName, fileKind, rawStorageType, _productInfo, &_pFile ));
+
+  _bFileOpen = true;
+  check(_pFile->GetHeader(&_pHeader));
+
+  // GetDictionary
+  checkhr(_pHeader->GetDictionary(NULL), AAFRESULT_NULL_PARAM);
+  check(_pHeader->GetDictionary(&_pDictionary));
+  
+  CAAFBuiltinDefs defs (_pDictionary);
+
+  writeEmptyDescriptiveSchemes(); 
+ 
+  check(_pFile->Save());
+  cleanupReferences();
+
+}
+
+void HeaderTest::openEmptyDMSchemesSetFile(wchar_t *pFileName)
+{
+  check(AAFFileOpenExistingRead(pFileName, 0, &_pFile));
+  _bFileOpen = true;
+  check(_pFile->GetHeader(&_pHeader));
+  check(_pHeader->GetDictionary(&_pDictionary));
+
+  readEmptyDescriptiveSchemes();
+
+  cleanupReferences();
+}
 
 void HeaderTest::createFile(
     wchar_t *pFileName,
@@ -485,9 +581,16 @@ void HeaderTest::createFile(
   for (aafUInt32 item = 0; item < gMaxMobCount; ++item)
     createFileMob(item);
  
+
+  writeDescriptiveSchemes(); 
+  readDescriptiveSchemes();
+
   writeOptionalProperties();
   readOptionalProperties();
- 
+
+  setPrimaryMob(0);
+  readPrimaryMob(0);
+
   check(_pFile->Save());
   cleanupReferences();
 }
@@ -503,12 +606,154 @@ void HeaderTest::openFile(wchar_t *pFileName)
 
   openEssenceData();
   openMobs();
+  readDescriptiveSchemes();
   readOptionalProperties();
+  readPrimaryMob(0);
+
   checkByteOrder();
   checkOperationalPattern();
   checkEssenceContainer();
-  checkDescriptiveSchemes();
   cleanupReferences();
+}
+
+void HeaderTest::writeEmptyDescriptiveSchemes()
+{
+  assert(_pHeader && _pDictionary);
+
+  IAAFHeader3 *pHeader3 = NULL;
+  if (SUCCEEDED(_pHeader->QueryInterface(IID_IAAFHeader3, (void **)&pHeader3)))
+  {
+	check(pHeader3->CreateEmptyDescriptiveSchemes());
+	pHeader3->Release();
+    pHeader3 = NULL;
+  }
+  return;
+}
+
+void HeaderTest::readEmptyDescriptiveSchemes()
+{
+  assert(_pHeader && _pDictionary);
+
+  IAAFHeader3 *pHeader3 = NULL;
+  if (SUCCEEDED(_pHeader->QueryInterface(IID_IAAFHeader3, (void **)&pHeader3)))
+  {
+	aafUInt32 descriptiveSchemesCount = 1;
+    check(pHeader3->CountDescriptiveSchemes(&descriptiveSchemesCount));
+
+    if (descriptiveSchemesCount != 0)
+	{
+		pHeader3->Release();
+		pHeader3 = NULL;
+        check(AAFRESULT_TEST_FAILED);
+	}
+
+	check(pHeader3->RemoveDescriptiveSchemes());
+
+	if(pHeader3->CountDescriptiveSchemes(&descriptiveSchemesCount) != AAFRESULT_PROP_NOT_PRESENT) check(AAFRESULT_TEST_FAILED);
+
+	pHeader3->Release();
+    pHeader3 = NULL;
+  }
+  return;
+}
+
+void HeaderTest::writeDescriptiveSchemes()
+{
+  assert(_pHeader && _pDictionary);
+
+ 
+
+  IAAFHeader2 *pHeader2 = NULL;
+  if (SUCCEEDED(_pHeader->QueryInterface(IID_IAAFHeader2, (void **)&pHeader2)))
+  {
+    assert(pHeader2);
+    assert(gMaxDescriptiveSchemesCount == gMaxTempDescriptiveSchemesCount);
+
+    for (aafUInt32 i = 0; i < gMaxDescriptiveSchemesCount; ++i)
+    {
+      check(pHeader2->AddDescriptiveScheme(descriptiveSchemes[i]));
+      check(pHeader2->AddDescriptiveScheme(tempDescriptiveSchemes[i]));
+    }
+
+    aafUInt32 descriptiveSchemesCount = 0;
+    check(pHeader2->CountDescriptiveSchemes(&descriptiveSchemesCount));
+    if (descriptiveSchemesCount !=
+        (gMaxDescriptiveSchemesCount + gMaxTempDescriptiveSchemesCount))
+      check(AAFRESULT_TEST_FAILED);
+
+    for (aafUInt32 j = 0; j < gMaxTempDescriptiveSchemesCount; ++j)
+    {
+      check(pHeader2->RemoveDescriptiveScheme(tempDescriptiveSchemes[j]));
+    }
+
+    descriptiveSchemesCount = 0;
+    check(pHeader2->CountDescriptiveSchemes(&descriptiveSchemesCount));
+    if (descriptiveSchemesCount != gMaxDescriptiveSchemesCount)
+      check(AAFRESULT_TEST_FAILED);
+
+	IAAFHeader3 *pHeader3 = NULL;
+	if (SUCCEEDED(_pHeader->QueryInterface(IID_IAAFHeader3, (void **)&pHeader3)))
+	{
+		if(pHeader3->CreateEmptyDescriptiveSchemes() != AAFRESULT_PROP_ALREADY_PRESENT) check(AAFRESULT_TEST_FAILED);
+
+		pHeader3->Release();
+		pHeader3 = NULL;
+	}
+
+    pHeader2->Release();
+    pHeader2 = NULL;
+  }
+}
+
+
+void HeaderTest::readDescriptiveSchemes()
+{
+  assert(_pHeader && _pDictionary);
+
+  IAAFHeader2 *pHeader2 = NULL;
+  if (SUCCEEDED(_pHeader->QueryInterface(IID_IAAFHeader2, (void **)&pHeader2)))
+  {
+    assert(pHeader2);
+
+    aafUInt32 descriptiveSchemesCount = 0;
+    check(pHeader2->CountDescriptiveSchemes(&descriptiveSchemesCount));
+    if (descriptiveSchemesCount != gMaxDescriptiveSchemesCount)
+      check(AAFRESULT_TEST_FAILED);
+
+    for (aafUInt32 i = 0; i < gMaxDescriptiveSchemesCount; ++i)
+    {
+      aafBoolean_t descriptiveSchemesPresent = kAAFFalse;
+      check(pHeader2->IsDescriptiveSchemePresent(descriptiveSchemes[i],
+                                                 &descriptiveSchemesPresent));
+      if (!descriptiveSchemesPresent)
+        check(AAFRESULT_TEST_FAILED);
+    }
+
+
+    aafUID_t* pDescriptiveSchemesFound = new aafUID_t[descriptiveSchemesCount];
+    assert(pDescriptiveSchemesFound);
+    check(pHeader2->GetDescriptiveSchemes(descriptiveSchemesCount,
+                                          pDescriptiveSchemesFound));
+    for (aafUInt32 j = 0; j < gMaxDescriptiveSchemesCount; ++j)
+    {
+      bool found = false;
+      for (aafUInt32 i = 0; i < descriptiveSchemesCount; ++i)
+      {
+        if (memcmp(descriptiveSchemes+j, pDescriptiveSchemesFound+i, sizeof(aafUID_t)) == 0)
+        {
+          found = true;
+          break;
+        }
+      }
+      if (!found)
+        check(AAFRESULT_TEST_FAILED);
+    }
+
+    delete[] pDescriptiveSchemesFound;
+    pDescriptiveSchemesFound = NULL;
+    pHeader2->Release();
+    pHeader2 = NULL;
+  }
 }
 
 
@@ -537,17 +782,6 @@ void HeaderTest::writeOptionalProperties()
                                     sizeof(Header_OptionalPropertyValue),
                                     &_pOptionalPropValue));
     check(_pHeaderObject->SetPropertyValue(_pOptionalPropDef, _pOptionalPropValue));
-
-    //add some descriptive schemes
-    if(_pHeader2->AddDescriptiveScheme(descSchID_1) != AAFRESULT_SUCCESS)
-      check(AAFRESULT_TEST_FAILED);
-
-    if(_pHeader2->AddDescriptiveScheme(descSchID_2) != AAFRESULT_SUCCESS)
-      check(AAFRESULT_TEST_FAILED);
-
-    //now remove one descriptive scheme
-    if(_pHeader2->RemoveDescriptiveScheme(descSchID_2) != AAFRESULT_SUCCESS)
-      check(AAFRESULT_TEST_FAILED);
 
     //test setOperationalPattern method
     if(_pHeader2->SetOperationalPattern(setOpPatternID) != AAFRESULT_SUCCESS)
@@ -1053,27 +1287,40 @@ aafUID_t HeaderTest::getMobContainerFormatID(aafUInt32 itemNumber)
   return containerDefID;
 }
 
-void HeaderTest::checkDescriptiveSchemes()
+void HeaderTest::setPrimaryMob(aafUInt32 itemNumber)
 {
-  assert(_pHeader2);
+  assert(_pHeader && _pDictionary);
 
-  aafUInt32 count;
+  IAAFMob* pMob = NULL;
+  check(_pHeader->LookupMob(_mobID[itemNumber], &pMob));
 
-  //ensure there is only one desc scheme present
-  if(_pHeader2->CountDescriptiveSchemes(&count) != AAFRESULT_SUCCESS)
+  IAAFHeader2 *pHeader2 = NULL;
+  check(_pHeader->QueryInterface(IID_IAAFHeader2, (void **)&pHeader2));
+  check(pHeader2->SetPrimaryMob(pMob));
+
+  pMob->Release();
+  pMob = NULL;
+
+  pHeader2->Release();
+  pHeader2 = NULL;
+}
+
+void HeaderTest::readPrimaryMob(aafUInt32 itemNumber)
+{
+  IAAFHeader2 *pHeader2 = NULL;
+  check(_pHeader->QueryInterface(IID_IAAFHeader2, (void **)&pHeader2));
+ 
+  IAAFMob* pPrimaryMob = NULL;
+  check(pHeader2->GetPrimaryMob(&pPrimaryMob));
+
+  aafMobID_t primaryMobID = {0};
+  check(pPrimaryMob->GetMobID(&primaryMobID));
+  if (0 != memcmp(&primaryMobID, &(_mobID[itemNumber]), sizeof(aafMobID_t)))
     check(AAFRESULT_TEST_FAILED);
 
-  if(count != 1)
-    check(AAFRESULT_TEST_FAILED);
+  pPrimaryMob->Release();
+  pPrimaryMob = NULL;
 
-  aafUID_t* pDescIDs = new aafUID_t [count];
-  if(_pHeader2->GetDescriptiveSchemes(count, pDescIDs) != AAFRESULT_SUCCESS) 
-    check(AAFRESULT_TEST_FAILED);
-
-  aafBoolean_t isPresent = false;
-  if(_pHeader2->IsDescriptiveSchemePresent( pDescIDs[0], &isPresent) != AAFRESULT_SUCCESS)
-    check(AAFRESULT_TEST_FAILED);
-
-  delete [] pDescIDs;
-
+  pHeader2->Release();
+  pHeader2 = NULL;
 }

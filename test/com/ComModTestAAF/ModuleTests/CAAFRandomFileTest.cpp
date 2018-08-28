@@ -70,6 +70,10 @@ static HRESULT TestGetSetFileBits (
     aafProductIdentification_constref productID)
 {
   HRESULT hr;
+
+  // Determine the file encoding to be used.
+  aafUID_t effectiveFileKind = EffectiveTestFileEncoding( fileKind );
+
   // Create a disk raw storage and a file on it, to be opened for
   // writing.
   IAAFRawStorageSP pWriteStg;
@@ -81,8 +85,8 @@ static HRESULT TestGetSetFileBits (
   checkResult
 	(AAFCreateAAFFileOnRawStorage (pWriteStg,
 								   kAAFFileExistence_new,
-								   kAAFFileAccess_modify,
-								   &kAAFFileKind_Aaf4KBinary,
+								   kAAFFileAccess_write,
+								   &effectiveFileKind,
 								   0,
 								   &productID,
 								   &pWriteFile));
@@ -125,7 +129,7 @@ static HRESULT TestGetSetFileBits (
   // be opened for reading.
   IAAFRawStorageSP pReadStg;
   checkResult
-	(AAFCreateRawStorageMemory (kAAFFileAccess_read,
+	(AAFCreateRawStorageMemory (kAAFFileAccess_modify,
 								&pReadStg));
 
   IAAFFileSP pReadFile;

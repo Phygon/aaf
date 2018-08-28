@@ -165,6 +165,12 @@ public:
 										ImplAAFOperationGroup **effeObject, aafInt32	*nestDepth,
 										ImplAAFComponent **foundObj, aafBool *foundTransition);
 
+	virtual AAFRESULT FindSubSegment( aafPosition_t offset,
+									  aafMediaCriteria_t *mediaCrit,
+									  aafPosition_t *sequPosPtr,
+									  ImplAAFSegment **subseg,
+									  aafBool *found);
+
 	AAFRESULT GetCriteriaSegment(
 			aafMediaCriteria_t *criteria,
 			ImplAAFSegment		**retSrcClip);

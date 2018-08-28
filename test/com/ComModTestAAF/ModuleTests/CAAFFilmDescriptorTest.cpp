@@ -1,4 +1,3 @@
-
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -38,8 +37,8 @@
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
 
+#include "AAFWideString.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
@@ -243,21 +242,21 @@ extern "C" HRESULT CAAFFilmDescriptor_test(
 
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IEnumAAFPluginDescriptor methods have not been tested:" << endl;       
-//		cout << "     SetFilmManufacturer" << endl; 
-//		cout << "     SetFilmModel" << endl; 
-//		cout << "     SetFilmFormat" << endl; 
-//		cout << "     SetFrameRate" << endl; 
-//		cout << "     SetPerfPerFrame" << endl; 
-//		cout << "     SetFilmAspectRatio" << endl; 
-//		cout << "     GetFilmManufacturer" << endl; 
-//		cout << "     GetFilmManufacturerBufLen" << endl; 
-//		cout << "     GetFilmModel" << endl; 
-//		cout << "     GetFilmModelBufLen" << endl; 
-//		cout << "     GetFilmFormat" << endl; 
-//		cout << "     GetFrameRate" << endl; 
-//		cout << "     GetPerfPerFrame" << endl; 
-//		cout << "     GetFilmAspectRatio" << endl; 
+//		cout << "The following IAAFFilmDescriptor methods have not been tested:" << endl;
+//		cout << "     SetFilmManufacturer" << endl;
+//		cout << "     SetFilmModel" << endl;
+//		cout << "     SetFilmFormat" << endl;
+//		cout << "     SetFrameRate" << endl;
+//		cout << "     SetPerfPerFrame" << endl;
+//		cout << "     SetFilmAspectRatio" << endl;
+//		cout << "     GetFilmManufacturer" << endl;
+//		cout << "     GetFilmManufacturerBufLen" << endl;
+//		cout << "     GetFilmModel" << endl;
+//		cout << "     GetFilmModelBufLen" << endl;
+//		cout << "     GetFilmFormat" << endl;
+//		cout << "     GetFrameRate" << endl;
+//		cout << "     GetPerfPerFrame" << endl;
+//		cout << "     GetFilmAspectRatio" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

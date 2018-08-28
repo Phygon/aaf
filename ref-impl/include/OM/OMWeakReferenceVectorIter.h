@@ -103,7 +103,7 @@ public:
 
     // @cmember The number of <p ReferencedObject>s in the associated
     //          <c OMWeakReferenceVectorProperty>.
-  virtual size_t count(void) const;
+  virtual OMUInt32 count(void) const;
 
     // @cmember Advance this <c OMWeakReferenceVectorIterator> to the
     //          next <p ReferencedObject>, if any.
@@ -159,7 +159,7 @@ public:
     //          associated <c OMWeakReferenceVectorProperty> at the position
     //          currently designated by this
     //          <c OMWeakReferenceVectorIterator>.
-  virtual size_t index(void) const;
+  virtual OMUInt32 index(void) const;
 
     // @cmember Return the <p Key> of the <p ReferencedObject> in the
     //          associated <c OMWeakReferenceVectorProperty> at the position

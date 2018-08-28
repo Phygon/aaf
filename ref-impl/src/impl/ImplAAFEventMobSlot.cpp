@@ -243,6 +243,9 @@ ImplAAFEventMobSlot::SetSegment (/*[in]*/ ImplAAFSegment * pSegment)
 
     // Call the parent class to set the segment...
     CHECK(ImplAAFMobSlot::SetSegment(pSegment));
+
+    // Specify type of the containing MobSlot
+    pSegment->SetMobSlotType(ImplAAFComponent::MobSlotType_Event);
   }
   XEXCEPT
   {

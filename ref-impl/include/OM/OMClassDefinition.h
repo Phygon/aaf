@@ -39,7 +39,6 @@
 #include "OMDefinition.h"
 
 class OMPropertyDefinition;
-class OMStorable;
 
 class OMReferenceContainerIterator;
 typedef OMReferenceContainerIterator PropertyDefinitionsIterator;
@@ -58,12 +57,13 @@ public:
   virtual const OMPropertyDefinition* propertyDefinition(
                              const OMUniqueObjectIdentification& id) const = 0;
 
-
-  virtual const OMPropertyDefinition* propertyDefinition(
-			     const  OMStorable* pDstStorable,
-			     const OMPropertyDefinition* pSrcProperty ) = 0;
-
   virtual PropertyDefinitionsIterator* propertyDefinitions(void) const = 0;
+
+  virtual bool hasParent(void) const = 0;
+
+  virtual const OMClassDefinition* parent(void) const = 0;
+
+  virtual bool isConcrete(void) const = 0;
 
   virtual bool omIsConcrete(void) const = 0;
   virtual OMClassDefinition* omParentClass(void) const = 0;

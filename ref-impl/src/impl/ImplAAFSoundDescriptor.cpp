@@ -82,14 +82,14 @@ ImplAAFSoundDescriptor::~ImplAAFSoundDescriptor()
 
 AAFRESULT STDMETHODCALLTYPE ImplAAFSoundDescriptor::Initialize()
 {
-	// ImplAAFSoundDescriptor::Initialize() cannot be called directly by a client
-	// application because an Initialize() method was omitted from
-	// IAAFSoundDescriptor.
-	// As a result, this implementation does not require the object to be
-	// initialized. However, to support derived classes, which may have
-	// public Initialize() methods that wish in turn to initialize this
-	// class, this Initialize() method is provided.
-	// It doesn't do anything beyond that done in the constructor.
+    // ImplAAFSoundDescriptor::Initialize() cannot be called directly by a client
+    // application because an Initialize() method was omitted from
+    // IAAFSoundDescriptor.
+    // As a result, this implementation does not require the object to be
+    // initialized. However, to support derived classes, which may have
+    // public Initialize() methods that wish in turn to initialize this
+    // class, this Initialize() method is provided.
+    // It doesn't do anything beyond that done in the constructor.
 
     ASSERTU( !isInitialized() );
 

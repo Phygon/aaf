@@ -166,8 +166,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppMob->ReleaseReference(); // We are through with this pointer.
+          internalppMob = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppMob should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppMob == 0);
+
   return hr;
 }
 
@@ -305,8 +316,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEnum->ReleaseReference(); // We are through with this pointer.
+          internalppEnum = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppEnum should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEnum == 0);
+
   return hr;
 }
 
@@ -642,8 +664,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEnum->ReleaseReference(); // We are through with this pointer.
+          internalppEnum = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppEnum should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEnum == 0);
+
   return hr;
 }
 
@@ -866,8 +899,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEssenceData->ReleaseReference(); // We are through with this pointer.
+          internalppEssenceData = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppEssenceData should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEssenceData == 0);
+
   return hr;
 }
 
@@ -943,8 +987,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppDictionary->ReleaseReference(); // We are through with this pointer.
+          internalppDictionary = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppDictionary should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppDictionary == 0);
+
   return hr;
 }
 
@@ -1021,8 +1076,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppIdentification->ReleaseReference(); // We are through with this pointer.
+          internalppIdentification = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppIdentification should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppIdentification == 0);
+
   return hr;
 }
 
@@ -1101,8 +1167,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppIdentification->ReleaseReference(); // We are through with this pointer.
+          internalppIdentification = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppIdentification should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppIdentification == 0);
+
   return hr;
 }
 
@@ -1231,8 +1308,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEnum->ReleaseReference(); // We are through with this pointer.
+          internalppEnum = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppEnum should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEnum == 0);
+
   return hr;
 }
 
@@ -1384,8 +1472,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppIdentification->ReleaseReference(); // We are through with this pointer.
+          internalppIdentification = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppIdentification should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppIdentification == 0);
+
   return hr;
 }
 
@@ -1618,8 +1717,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppStorage->ReleaseReference(); // We are through with this pointer.
+          internalppStorage = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppStorage should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppStorage == 0);
+
   return hr;
 }
 
@@ -1796,8 +1906,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalpPrimaryMob->ReleaseReference(); // We are through with this pointer.
+          internalpPrimaryMob = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalpPrimaryMob should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalpPrimaryMob == 0);
+
 
   return hr;
 }
@@ -2405,6 +2526,30 @@ HRESULT STDMETHODCALLTYPE
   return hr;
 }
 
+HRESULT STDMETHODCALLTYPE
+    CAAFHeader::CreateEmptyDescriptiveSchemes ()
+{
+  ImplAAFHeader * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFHeader*> (pO);
+  assert (ptr);
+  return ptr->CreateEmptyDescriptiveSchemes();
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFHeader::RemoveDescriptiveSchemes ()
+{
+  ImplAAFHeader * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFHeader*> (pO);
+  assert (ptr);
+  return ptr->RemoveDescriptiveSchemes();
+}
+
 
 
 //
@@ -2442,6 +2587,12 @@ HRESULT CAAFHeader::InternalQueryInterface
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
+    if (EQUAL_UID(riid,IID_IAAFHeader3)) 
+    { 
+        *ppvObj = (IAAFHeader3 *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
 
     // Always delegate back to base implementation.
     return CAAFObject::InternalQueryInterface(riid, ppvObj);
@@ -2451,3 +2602,4 @@ HRESULT CAAFHeader::InternalQueryInterface
 // Define the contrete object support implementation.
 // 
 AAF_DEFINE_FACTORY(AAFHeader)
+

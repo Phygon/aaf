@@ -104,6 +104,9 @@ public:
 	Save ();
 
   virtual AAFRESULT STDMETHODCALLTYPE
+	SaveIntermediate ();
+
+  virtual AAFRESULT STDMETHODCALLTYPE
 	SaveCopyAs (ImplAAFFile * pDestFile);
 
   virtual AAFRESULT STDMETHODCALLTYPE
@@ -143,6 +146,8 @@ protected:
   bool IsClosed () const;
   OMRawStorage * RawStorage ();
 
+  AAFRESULT Save (bool finalize);
+
 private:
 
   void InternalReleaseObjects();
@@ -160,9 +165,9 @@ private:
   // of the public API set and get values for this metadata. The following
   // functions ensure that the data are synchronized.
 
-  void saveMirroredMetadata(void);
+  AAFRESULT saveMirroredMetadata(void);
 
-  void restoreMirroredMetadata(void);
+  AAFRESULT restoreMirroredMetadata(void);
 
   aafInt32			_cookie;
   OMFile			*_file;

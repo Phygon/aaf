@@ -69,8 +69,10 @@ static void SetStringProperty (IAAFObject * pObj,
 
     check (td->QueryInterface (IID_IAAFTypeDefString, (void **)&tds));
 
+    const size_t stringSize = wcslen (strValue) * sizeof (aafCharacter);
+    assert (stringSize <= (aafUInt32)-1);
     check (tds->CreateValueFromCString ( (aafMemPtr_t) strValue,
-										   wcslen (strValue) * sizeof (aafCharacter), 
+										   static_cast<aafUInt32>(stringSize), 
 										   &pv));
 
     check (pObj->SetPropertyValue (pd, pv));
@@ -664,7 +666,7 @@ ostream& operator<< (ostream& s,
 {
   assert (wstring);
 
-  const aafUInt32 numChars = wcslen (wstring);
+  const size_t numChars = wcslen (wstring);
 
   char * cstring = new char [numChars+1];
   assert (cstring);

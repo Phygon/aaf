@@ -53,10 +53,16 @@
 #include "CAAFRoot.h"
 #endif
 
+//
+// Forward declaration
+//
+class ImplAAFPlainStreamData;
+
 
 class CAAFPlainStreamData
   : public IAAFPlainStreamData,
     public IAAFKLVStreamParameters,
+	public IAAFPlainStreamData2,
     public CAAFRoot
 {
 protected:
@@ -686,6 +692,300 @@ public:
 
     // @parm [in, ref] aafUID_constref | key | essence element key
     aafUID_constref  key
+  );
+
+  //***********************************************************
+  // METHOD NAME: ReadScatter()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFPlainStreamData2 | ReadScatter |
+  // Sequential access, multiple buffers.
+  /// Copies the data at the position of the stream to the given
+  /// buffers.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pStreamPropertyValue pointer is valid.
+  /// - the pBufs pointer is valid.
+  /// - the pBytesRead pointer is valid.
+  /// - the indicated bytes exist in the stream.
+  ///
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize() called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - Either pStreamPropertyValue or pBufs or pBytesRead arg is NULL.
+  // @end
+  // 
+  STDMETHOD (ReadScatter)
+   (
+    // @parm [in] AAFPropertyValue | pStreamPropertyValue | stream property value to read
+    IAAFPropertyValue * pStreamPropertyValue,
+
+    // @parm [in] aafUInt32 | bufCount | number of buffers
+    aafUInt32  bufCount,
+
+    // @parm [out, size_is(bufCount)] aafIOBufferDesc_t * | pBufs | buffers into which bytes from the stream are read
+    aafIOBufferDesc_t *  pBufs,
+
+    // @parm [out,ref] aafUInt32 * | pBytesRead | number of bytes actually read
+    aafUInt32 *  pBytesRead
+  );
+
+  //***********************************************************
+  // METHOD NAME: WriteGather()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFPlainStreamData2 | WriteGather |
+  // Sequential access, multiple buffers.
+  /// Copies the data in the given buffers into the stream at the
+  /// current position of the stream.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pStreamPropertyValue pointer is valid.
+  /// - the pBufs pointer is valid.
+  /// - the pBytesWritten pointer is valid.
+  /// - the indicated bytes could be written to the stream.
+  ///
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize() called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - Either pStreamPropertyValue or pBufs or pBytesWritten arg is NULL.
+  // @end
+  // 
+  STDMETHOD (WriteGather)
+   (
+    // @parm [in] AAFPropertyValue | pStreamPropertyValue | stream property value to modify
+    IAAFPropertyValue * pStreamPropertyValue,
+
+    // @parm [in] aafUInt32 | bufCount | number of buffers
+    aafUInt32  bufCount,
+
+    // @parm [in, ref, size_is(bufCount)] aafIOBufferDesc_constptr | pBufs | buffers containing data to be written to the stream
+    aafIOBufferDesc_constptr  pBufs,
+
+    // @parm [out,ref] aafUInt32 * | pBytesWritten | number of bytes actually written
+    aafUInt32 *  pBytesWritten
+  );
+
+  //***********************************************************
+  // METHOD NAME: ReadAsyncAt()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFPlainStreamData2 | ReadAsyncAt |
+  // Sequential asynchronous access, single buffer.
+  /// Copies the data at the specified position of the stream to the given
+  /// buffer.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pStreamPropertyValue pointer is valid.
+  /// - position is valid.
+  /// - the pData pointer is valid.
+  /// - the indicated bytes exist in the stream.
+  ///
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize() called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - either pStreamPropertyValue or pData arg is NULL.
+  // @end
+  // 
+  STDMETHOD (ReadAsyncAt)
+   (
+    // @parm [in] AAFPropertyValue | pStreamPropertyValue | stream property value to read
+    IAAFPropertyValue * pStreamPropertyValue,
+
+    // @parm [in] aafUInt64 | position | stream position at which to start the read
+    aafUInt64  position,
+
+    // @parm [in] aafUInt32 | dataSize | number of bytes to read
+    aafUInt32  dataSize,
+
+    // @parm [out, size_is(dataSize)] aafMemPtr_t | pData | buffer into which bytes from the stream are read
+    aafMemPtr_t  pData,
+
+    // @parm [in] IAAFIOCompletion * | pCompletion | object implementing the IAAFIOCompletion interface to be called when the read is completed
+    IAAFIOCompletion *  pCompletion,
+
+    // @parm [in] aafMemConstPtr_t | pClientArg | client-specific data to be returned to the as a part of the I/O completion routine
+    aafMemConstPtr_t  pClientArg
+  );
+
+  //***********************************************************
+  // METHOD NAME: WriteAsyncAt()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFPlainStreamData2 | WriteAsyncAt |
+  // Sequential asynchronous access, single buffer.
+  /// Copies the data in the given buffer into the stream at the
+  /// specified position of the stream..
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pStreamPropertyValue pointer is valid.
+  /// - position is valid.
+  /// - the pData pointer is valid.
+  /// - the indicated bytes could be written to the stream.
+  ///
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize() called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - Either pStreamPropertyValue or pData arg is NULL.
+  // @end
+  // 
+  STDMETHOD (WriteAsyncAt)
+   (
+    // @parm [in] AAFPropertyValue | pStreamPropertyValue | stream property value to modify
+    IAAFPropertyValue * pStreamPropertyValue,
+
+    // @parm [in] aafUInt64 | position | stream position at which to start the write
+    aafUInt64  position,
+
+    // @parm [in] aafUInt32 | dataSize | number of bytes to write
+    aafUInt32  dataSize,
+
+    // @parm [in, ref, size_is(dataSize)] aafMemConstPtr_t | pData | buffer containing data to be written to the stream
+    aafMemConstPtr_t  pData,
+
+    // @parm [in] IAAFIOCompletion * | pCompletion | object implementing the IAAFIOCompletion interface to be called when the write is completed
+    IAAFIOCompletion *  pCompletion,
+
+    // @parm [in] aafMemConstPtr_t | pClientArg | client-specific data to be returned to the as a part of the I/O completion routine
+    aafMemConstPtr_t  pClientArg
+  );
+
+  //***********************************************************
+  // METHOD NAME: ReadScatterAsyncAt()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFPlainStreamData2 | ReadScatterAsyncAt |
+  // Sequential asynchronous access, multiple buffers.
+  /// Copies the data at the position of the stream to the given
+  /// buffers.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pStreamPropertyValue pointer is valid.
+  /// - position is valid.
+  /// - the pBufs pointer is valid.
+  /// - the indicated bytes exist in the stream.
+  ///
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize() called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - Either pStreamPropertyValue or pBufs arg is NULL.
+  // @end
+  // 
+  STDMETHOD (ReadScatterAsyncAt)
+   (
+    // @parm [in] AAFPropertyValue | pStreamPropertyValue | stream property value to read
+    IAAFPropertyValue * pStreamPropertyValue,
+
+    // @parm [in] aafUInt64 | position | stream position at which to start the read
+    aafUInt64  position,
+
+    // @parm [in] aafUInt32 | bufCount | number of buffers
+    aafUInt32  bufCount,
+
+    // @parm [out, size_is(bufCount)] aafIOBufferDesc_t * | pBufs | buffers into which bytes from the stream are read
+    aafIOBufferDesc_t *  pBufs,
+
+    // @parm [in] IAAFIOCompletion * | pCompletion | object implementing the IAAFIOCompletion interface to be called when the read is completed
+    IAAFIOCompletion *  pCompletion,
+
+    // @parm [in] aafMemConstPtr_t | pClientArg | client-specific data to be returned to the as a part of the I/O completion routine
+    aafMemConstPtr_t  pClientArg
+  );
+
+  //***********************************************************
+  // METHOD NAME: WriteGatherAsyncAt()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFPlainStreamData2 | WriteGatherAsyncAt |
+  // Sequential asynchronous access, multiple buffers.
+  /// Copies the data in the given buffers into the stream at the
+  /// current position of the stream.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pStreamPropertyValue pointer is valid.
+  /// - position is valid.
+  /// - the pBufs pointer is valid.
+  /// - the indicated bytes could be written to the stream.
+  ///
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NOT_INITIALIZED
+  //   - This object has not yet had Initialize() called on it.
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - Either pStreamPropertyValue or pBufs arg is NULL.
+  // @end
+  // 
+  STDMETHOD (WriteGatherAsyncAt)
+   (
+    // @parm [in] AAFPropertyValue | pStreamPropertyValue | stream property value to modify
+    IAAFPropertyValue * pStreamPropertyValue,
+
+    // @parm [in] aafUInt64 | position | stream position at which to start the write
+    aafUInt64  position,
+
+    // @parm [in] aafUInt32 | bufCount | number of buffers
+    aafUInt32  bufCount,
+
+    // @parm [in, ref, size_is(bufCount)] aafIOBufferDesc_constptr | pBufs | buffers containing data to be written to the stream
+    aafIOBufferDesc_constptr  pBufs,
+
+    // @parm [in] IAAFIOCompletion * | pCompletion | object implementing the IAAFIOCompletion interface to be called when the write is completed
+    IAAFIOCompletion *  pCompletion,
+
+    // @parm [in] aafMemConstPtr_t | pClientArg | client-specific data to be returned to the as a part of the I/O completion routine
+    aafMemConstPtr_t  pClientArg
   );
 
 

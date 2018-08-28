@@ -73,6 +73,7 @@ public:
     //          <c OMFile> is named <p fileName>, use the <c OMClassFactory>
     //          <p factory> to create the objects. The file must already
     //          exist.
+    //   @precondition <f readable()>
   static OMFile* openExistingRead(const wchar_t* fileName,
                                   const OMClassFactory* factory,
                                   void* clientOnRestoreContext,
@@ -83,23 +84,22 @@ public:
     //          <c OMFile> is named <p fileName>, use the <c OMClassFactory>
     //          <p factory> to create the objects. The file must already
     //          exist.
+    //   @precondition <f modifiable()>
   static OMFile* openExistingModify(const wchar_t* fileName,
                                     const OMClassFactory* factory,
                                     void* clientOnRestoreContext,
                                     const OMLoadMode loadMode,
                                     OMDictionary* dictionary = 0);
 
-    // @cmember Open a new <c OMFile> for modify access, the <c
-    //          OMFile> is named <p fileName>, use the <c
-    //          OMClassFactory> <p factory> to create the objects. The
-    //          file // must not already exist. The byte ordering on
-    //          the newly created // file is given by <p
-    //          byteOrder>. The client root <c OMStorable> // in the
-    //          newly created file is given by <p clientRoot>. If a //
-    //          default (actual) encoding implentation is registered
-    //          for the // requested encoding then use the registered
-    //          default.
-
+    // @cmember Open a new <c OMFile> for modify access, the
+    //          <c OMFile> is named <p fileName>, use the <c OMClassFactory>
+    //          <p factory> to create the objects. The file must not already
+    //          exist. The byte ordering on the newly created file is given
+    //          by <p byteOrder>. The client root <c OMStorable> in the newly
+    //          created file is given by <p clientRoot>. If a default (actual)
+    //          encoding implentation is registered for the requested encoding
+    //          then use the registered default.
+    //   @precondition <f creatable()>
   static OMFile* openNewModify(const wchar_t* fileName,
                                const OMClassFactory* factory,
                                void* clientOnRestoreContext,
@@ -107,6 +107,19 @@ public:
                                OMStorable* clientRoot,
                                const OMStoredObjectEncoding& encoding,
                                OMDictionary* dictionary = 0);
+
+    // @cmember Can an existing file named <p fileName> be opened
+    //          for read access ? The file must already exist and be readable.
+  static bool readable(const wchar_t* fileName);
+
+    // @cmember Can an existing file named <p fileName> be opened
+    //          for read/write access ? The file must already exist and be
+    //          both readable and writable.
+  static bool modifiable(const wchar_t* fileName);
+
+    // @cmember Can a new file named <p fileName> be created for read access ?
+    //          The file must not already exist.
+  static bool creatable(const wchar_t* fileName);
 
   // @cmember Is the given <c OMRawStorage> compatible with the given file
   //          access mode and encoding ? Can a file of the specified encoding
@@ -125,6 +138,24 @@ public:
     // @cmember Is <p rawStorage> compatible with <p accesMode> ?
   static bool compatible(const OMRawStorage* rawStorage,
                          const OMAccessMode accessMode);
+
+    // @cmember Can the contents of an existing file named <p fileName>
+    //          and of the encoding specified by <p encoding> be accessed
+    //          successfully in the mode specified by <p accessMode> ?
+    //          This method attempts to identify issues with the file
+    //          contents before opening the file and restoring its metadata.
+  static bool compatibleStoredFormat(const wchar_t* fileName,
+                                     const OMAccessMode accessMode,
+                                     const OMStoredObjectEncoding& encoding);
+
+    // @cmember Can the contents of a file of the encoding specified
+    //          by <p encoding> on the given <c OMRawStorage> be accessed
+    //          successfully in the mode specified by <p accessMode> ?
+    //          This method attempts to identify issues with the file
+    //          contents before opening the file and restoring its metadata.
+  static bool compatibleStoredFormat(const OMRawStorage* rawStorage,
+                                     const OMAccessMode accessMode,
+                                     const OMStoredObjectEncoding& encoding);
 
     // @cmember Open an existing <c OMFile> for read-only access.
     // @devnote Will superceed openExistingRead() above.
@@ -174,6 +205,12 @@ public:
      //          in <p encoding>.
   static bool isRecognized(OMRawStorage* rawStorage,
                            OMStoredObjectEncoding& encoding);
+
+     // @cmember Is the file named <p fileName> being modified/in-progress ?
+  static bool isBeingModified(const wchar_t* fileName, const OMStoredObjectEncoding &encoding);
+
+     // @cmember Does <p rawStorage> contain a file being modified/in-progress ?
+  static bool isBeingModified(OMRawStorage* rawStorage, const OMStoredObjectEncoding &encoding);
 
   static void initialize(void);
 
@@ -228,6 +265,8 @@ public:
     //          read-only or transient files.
     //   @precondition <f isOpen()>
   void saveFile(void* clientOnSaveContext = 0);
+
+  void saveFile(bool finalize, void* clientOnSaveContext = 0);
 
     // @cmember Save the entire contents of this <c OMFile> as well as
     //          any unsaved changes in the new file <p destFile>. <p destFile>
@@ -308,7 +347,6 @@ public:
   bool isWritable(void) const;
 
     // @cmember The name of this <c OMFile>.
-    //   @devnote Soon to be obsolete.
   const wchar_t* fileName(void) const;
 
     // @cmember The encoding of this <c OMFile>.

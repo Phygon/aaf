@@ -1165,7 +1165,7 @@ OMWeakReferenceVectorProperty<Key, ReferencedObject>::identification(
 }
 
   // @mfunc The size of the identification of <c OMObject> in this
-  //        <c OMWeakReferenceSetProperty>. The size is given
+  //        <c OMWeakReferenceVectorProperty>. The size is given
   //        in bytes.
   //   @tcarg class | ReferencedObject | The type of the referenced
   //          (contained) object. This type must be a descendant of
@@ -1333,7 +1333,8 @@ void OMWeakReferenceVectorProperty<Key, ReferencedObject>::shallowCopyTo(
 template <typename Key, typename ReferencedObject>
 void OMWeakReferenceVectorProperty<Key, ReferencedObject>::deepCopyTo(
                                                      OMProperty* destination,
-                                                     void* clientContext) const
+                                                     void* clientContext,
+                                                     bool deferStreamData) const
 {
   TRACE("OMWeakReferenceVectorProperty<Key, ReferencedObject>::deepCopyTo");
   PRECONDITION( "Valid destination", destination != 0 );
@@ -1368,7 +1369,7 @@ void OMWeakReferenceVectorProperty<Key, ReferencedObject>::deepCopyTo(
         OMStorable* d = source->shallowCopy(factory);
         dest->insertObject(d);
         d->onCopy(clientContext);
-        source->deepCopyTo(d, clientContext);
+        source->deepCopyTo(d, clientContext, deferStreamData);
       }
     }
   }

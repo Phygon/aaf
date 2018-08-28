@@ -173,8 +173,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppIndirectPropertyValue->ReleaseReference(); // We are through with this pointer.
+          internalppIndirectPropertyValue = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppIndirectPropertyValue should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppIndirectPropertyValue == 0);
+
   return hr;
 }
 
@@ -277,8 +288,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppIndirectPropertyValue->ReleaseReference(); // We are through with this pointer.
+          internalppIndirectPropertyValue = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppIndirectPropertyValue should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppIndirectPropertyValue == 0);
+
   return hr;
 }
 
@@ -378,8 +400,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppActualPropertyValue->ReleaseReference(); // We are through with this pointer.
+          internalppActualPropertyValue = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppActualPropertyValue should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppActualPropertyValue == 0);
+
   return hr;
 }
 
@@ -552,8 +585,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalpActualType->ReleaseReference(); // We are through with this pointer.
+          internalpActualType = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalpActualType should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalpActualType == 0);
+
   return hr;
 }
 

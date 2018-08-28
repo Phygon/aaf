@@ -1,0 +1,1078 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFJPEG2000SubDescriptor\
+#endm
+#c
+#startm .parent-module 0
+AAFSubDescriptor\
+#endm
+#c
+#c #import ./AAFSubDescriptor.exp
+#import ./AAFJPEG2000SubDescriptor2.exp
+AD_HEAD
+AD_IDL(///
+/// IAAFJPEG2000SubDescriptor is DEPRECATED.
+/// Please use IAAFJPEG2000SubDescriptor2.
+///
+/// The IAAFJPEG2000SubDescriptor interface is implemented by objects which
+/// describe JPEG 2000 \(ISO/IEC 15444-1\) video essence.
+///
+/// In addition to the specific error results listed for each method\,
+/// all methods in this interface may also return one of the following
+/// values:
+/// 
+/// AAFRESULT_NOMEMORY
+///   - insufficient system memory is available to perform the
+///     operation.
+///)
+AD_CLASS_UUID(9AFD3B8D, 4A20, 4a4f, 9D, 52, BC, C1, 4D, 1B, 7A, 7B)
+
+AD_DEFAULT_UUID(A225AE02, 9A1F, 4f59, 92, 12, 80, B2, 58, A2, BF, EC)
+AD_COM_EXT_CLASS_BEGIN(public IAAFJPEG2000SubDescriptor2)
+AD_METHOD0(Initialize,
+		   Initializes a newly allocated\, IAAFJPEG2000SubDescriptor2-supporting
+  /// object. This method must be called after allocation\, and before
+  /// any other method can be called.
+  ///
+  /// Succeeds if:
+  /// - Initialize\(\) has not yet been called on this object.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect\, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_ALREADY_INITIALIZED
+  ///   - Initialize\(\) has already been called on this object.)
+
+
+AD_XMETHOD1(SetRsiz,
+			[in],
+				objPass,
+				aafUInt16,
+				rsiz,
+			An enumerated value that defines the JPEG 2000 decoder capabilities.
+  /// Values are defined in ISO\/IEC 15444-1 Annex A.5 Table A-10.
+  /// Other values may be defined in amendments to ISO\/IEC 15444-1
+  /// or in related international standards documents.,
+
+     Sets the enumerated value that defines the JPEG 2000 decoder capabilities.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the Rsiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetRsiz,
+			[out],
+				objPass,
+				aafUInt16 *,
+				pRsiz,
+			An enumerated value that defines the JPEG 2000 decoder capabilities.
+  /// Values are defined in ISO\/IEC 15444-1 Annex A.5 Table A-10.
+  /// Other values may be defined in amendments to ISO\/IEC 15444-1
+  /// or in related international standards documents.,
+
+     Gets the enumerated value that defines the JPEG 2000 decoder capabilities.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pRsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pRsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pRsiz arg is NULL.)
+
+
+AD_XMETHOD1(SetXsiz,
+			[in],
+				objPass,
+				aafUInt32,
+				xsiz,
+			Width of the reference grid\, as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Sets the width of the reference grid.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the Xsiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetXsiz,
+			[out],
+				objPass,
+				aafUInt32 *,
+				pXsiz,
+			Width of the reference grid\, as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Gets the width of the reference grid.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pXsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pXsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pXsiz arg is NULL.)
+
+
+AD_XMETHOD1(SetYsiz,
+			[in],
+				objPass,
+				aafUInt32,
+				ysiz,
+			Height of the reference grid\, as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Sets the height of the reference grid.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the Ysiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetYsiz,
+			[out],
+				objPass,
+				aafUInt32 *,
+				pYsiz,
+			Height of the reference grid\, as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Gets the height of the reference grid.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pYsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pYsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pYsiz arg is NULL.)
+
+
+AD_XMETHOD1(SetXOsiz,
+			[in],
+				objPass,
+				aafUInt32,
+				xosiz,
+			Horizontal offset from the origin of the reference grid to the left
+  /// side of the image area\, as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Sets the horizontal offset from the origin of the reference grid
+  /// to the left side of the image area.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the XOsiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetXOsiz,
+			[out],
+				objPass,
+				aafUInt32 *,
+				pXOsiz,
+			Horizontal offset from the origin of the reference grid to the left
+  /// side of the image area\, as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Gets the horizontal offset from the origin of the reference grid
+  /// to the left side of the image area.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pXOsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pXOsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pXOsiz arg is NULL.)
+
+
+AD_XMETHOD1(SetYOsiz,
+			[in],
+				objPass,
+				aafUInt32,
+				yosiz,
+			Vertical offset from the origin of the reference grid to the top
+  /// side of the image area\, as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Gets the vertical offset from the origin of the reference grid
+  /// to the top side of the image area.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the YOsiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetYOsiz,
+			[out],
+				objPass,
+				aafUInt32 *,
+				pYOsiz,
+			Vertical offset from the origin of the reference grid to the top
+  /// side of the image area\, as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Gets the vertical offset from the origin of the reference grid
+  /// to the top side of the image area.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pYOsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pYOsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pYOsiz arg is NULL.)
+
+
+AD_XMETHOD1(SetXTsiz,
+			[in],
+				objPass,
+				aafUInt32,
+				xtsiz,
+			Width of one reference tile with respect to the reference grid\,
+  /// as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Gets the width of one reference tile with respect to the reference grid.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the XTsiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetXTsiz,
+			[out],
+				objPass,
+				aafUInt32 *,
+				pXTsiz,
+			Width of one reference tile with respect to the reference grid\,
+  /// as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Sets the width of one reference tile with respect to the reference grid.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pXTsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pXTsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pXTsiz arg is NULL.)
+
+
+AD_XMETHOD1(SetYTsiz,
+			[in],
+				objPass,
+				aafUInt32,
+				ytsiz,
+			Height of one reference tile with respect to the reference grid\,
+  /// as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Gets the height of one reference tile with respect to the reference grid.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the YTsiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetYTsiz,
+			[out],
+				objPass,
+				aafUInt32 *,
+				pYTsiz,
+			Height of one reference tile with respect to the reference grid\,
+  /// as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Sets the height of one reference tile with respect to the reference grid.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pYTsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pYTsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pYTsiz arg is NULL.)
+
+
+AD_XMETHOD1(SetXTOsiz,
+			[in],
+				objPass,
+				aafUInt32,
+				xtosiz,
+			Horizontal offset from the origin of the reference grid to the left
+  /// side of the first tile\, as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Gets the horizontal offset from the origin of the reference grid
+  /// to the left side of the first tile.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the XTOsiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetXTOsiz,
+			[out],
+				objPass,
+				aafUInt32 *,
+				pXTOsiz,
+			Horizontal offset from the origin of the reference grid to the left
+  /// side of the first tile\, as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Sets the horizontal offset from the origin of the reference grid
+  /// to the left side of the first tile.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pXTOsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pXTOsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pXTOsiz arg is NULL.)
+
+
+AD_XMETHOD1(SetYTOsiz,
+			[in],
+				objPass,
+				aafUInt32,
+				ytosiz,
+				Vertical offset from the origin of the reference grid to
+  /// the top side of the first tile\, as defined in ISO\/IEC 15444-1
+  /// Annex A.5.1.,
+
+     Gets the vertical offset from the origin of the reference grid to
+  /// the top side of the first tile.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the YTOsiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetYTOsiz,
+			[out],
+				objPass,
+				aafUInt32 *,
+				pYTOsiz,
+				Vertical offset from the origin of the reference grid to
+  /// the top side of the first tile\, as defined in ISO\/IEC 15444-1
+  /// Annex A.5.1.,
+
+     Gets the vertical offset from the origin of the reference grid to
+  /// the top side of the first tile.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pYTOsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pYTOsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pYTOsiz arg is NULL.)
+
+
+AD_XMETHOD1(SetCsiz,
+			[in],
+				objPass,
+				aafUInt16,
+				csiz,
+			The number of components in the picture\,
+  /// as defined in ISO\/IEC 15444-1 Annex A.5 Table A-10.,
+
+     Sets the number of components in the picture.
+  /// If this Sub Descriptor is referenced by the CDCI Descriptor\, the order
+  /// and kind of components shall be as defined by the Container Format in
+  /// the File Descriptor.
+  /// If this Sub Descriptor is referenced by the RGBA Descriptor\, the order
+  /// and kind of components shall be as defined by the Pixel Layout property
+  /// of the RGBA Descriptor.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the Csiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetCsiz,
+			[out],
+				objPass,
+				aafUInt16 *,
+				pCsiz,
+			The number of components in the picture\,
+  /// as defined in ISO\/IEC 15444-1 Annex A.5 Table A-10.,
+
+     Gets the number of components in the picture.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pCsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pCsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pCsiz arg is NULL.)
+
+
+AD_XMETHOD2(SetComponentSsizAt,
+			[in],
+				objPass,
+				aafUInt16,
+				index,
+			The index of the component,
+			[in],
+				objPass,
+				aafUInt8,
+				ssiz,
+			The Ssiz parameter of the index-th component\,
+  /// as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Sets the Ssiz parameter of the index-th component.
+  /// If this Sub Descriptor is referenced by the CDCI Descriptor\, the order
+  /// and kind of components shall be as defined by the Container Format in
+  /// the File Descriptor.
+  /// If this Sub Descriptor is referenced by the RGBA Descriptor\, the order
+  /// and kind of components shall be as defined by the Pixel Layout property
+  /// of the RGBA Descriptor.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the Ssiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD2(GetComponentSsizAt,
+			[in],
+				objPass,
+				aafUInt16,
+				index,
+			The index of the component,
+			[out],
+				objPass,
+				aafUInt8 *,
+				pSsiz,
+			The Ssiz parameter of the index-th component\,
+  /// as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Gets the Ssiz parameter of the index-th component.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pSsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pSsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pSsiz arg is NULL.)
+
+
+AD_XMETHOD2(SetComponentXRsizAt,
+			[in],
+				objPass,
+				aafUInt16,
+				index,
+			The index of the component,
+			[in],
+				objPass,
+				aafUInt8,
+				ssiz,
+			The XRsiz parameter of the index-th component\,
+  /// as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Sets the XRsiz parameter of the index-th component.
+  /// If this Sub Descriptor is referenced by the CDCI Descriptor\, the order
+  /// and kind of components shall be as defined by the Container Format in
+  /// the File Descriptor.
+  /// If this Sub Descriptor is referenced by the RGBA Descriptor\, the order
+  /// and kind of components shall be as defined by the Pixel Layout property
+  /// of the RGBA Descriptor.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the XRsiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD2(GetComponentXRsizAt,
+			[in],
+				objPass,
+				aafUInt16,
+				index,
+			The index of the component,
+			[out],
+				objPass,
+				aafUInt8 *,
+				pXRsiz,
+			The XRsiz parameter of the index-th component\,
+  /// as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Gets the XRsiz parameter of the index-th component.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pXRsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pXRsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pXRsiz arg is NULL.)
+
+
+AD_XMETHOD2(SetComponentYRsizAt,
+			[in],
+				objPass,
+				aafUInt16,
+				index,
+			The index of the component,
+			[in],
+				objPass,
+				aafUInt8,
+				ssiz,
+			The YRsiz parameter of the index-th component\,
+  /// as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Sets the YRsiz parameter of the index-th component.
+  /// If this Sub Descriptor is referenced by the CDCI Descriptor\, the order
+  /// and kind of components shall be as defined by the Container Format in
+  /// the File Descriptor.
+  /// If this Sub Descriptor is referenced by the RGBA Descriptor\, the order
+  /// and kind of components shall be as defined by the Pixel Layout property
+  /// of the RGBA Descriptor.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the YRsiz property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD2(GetComponentYRsizAt,
+			[in],
+				objPass,
+				aafUInt16,
+				index,
+			The index of the component,
+			[out],
+				objPass,
+				aafUInt8 *,
+				pYRsiz,
+			The YRsiz parameter of the index-th component\,
+  /// as defined in ISO\/IEC 15444-1 Annex A.5.1.,
+
+     Gets the YRsiz parameter of the index-th component.
+  /// This property is required.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pYRsiz pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pYRsiz.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pYRsiz arg is NULL.)
+
+
+AD_XMETHOD2(SetCodingStyleDefault,
+			[in],
+				objPass,
+				aafUInt32,
+				valueSize,
+			The number of default coding style bytes,
+			[in\, size_is\(valueSize\)],
+				objPass,
+				aafDataBuffer_t,
+				pValue,
+			The default coding style bytes.
+  /// The data format is as defined in ISO\/IEC 15444-1\, Annex A.6.1.,
+
+     Sets the default coding style for all components.
+  /// This property is optional.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pValue pointer is valid.
+  /// 
+  /// If this method fails the CodingStyleDefault property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pValue arg is NULL.
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetCodingStyleDefaultBufLen,
+			[out],
+				objPass,
+				aafUInt32 *,
+				pSizeOfBuffer,
+			The number of bytes in the default coding style sequence,
+
+     Gets the number of bytes in the default coding style sequence.
+  /// This property is optional.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pSizeOfBuffer pointer is valid.
+  /// - the property is present.
+  /// 
+  /// If this method fails nothing will be written to *pSizeOfBuffer.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pSizeOfBuffer arg is NULL.
+  ///
+  /// AAFRESULT_PROP_NOT_PRESENT
+  ///   - the property is not present.)
+
+
+AD_XMETHOD2(GetCodingStyleDefault,
+			[in],
+				objPass,
+				aafUInt32,
+				valueSize,
+			The size of the pValue buffer,
+			[in\, size_is\(valueSize\)],
+				objPass,
+				aafDataBuffer_t,
+				pValue,
+			The buffer to hold returned default coding style bytes.
+  /// The data format is as defined in ISO\/IEC 15444-1\, Annex A.6.1.,
+
+     Gets the default coding style bytes.
+  /// This property is optional.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pValue pointer is valid.
+  /// - the property is present.
+  /// 
+  /// If this method fails nothing will be written to *pValue.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pValue arg is NULL.
+  ///
+  /// AAFRESULT_PROP_NOT_PRESENT
+  ///   - the property is not present.)
+
+
+AD_XMETHOD2(SetQuantizationDefault,
+			[in],
+				objPass,
+				aafUInt32,
+				valueSize,
+			The number of default quantization style bytes,
+			[in\, size_is\(valueSize\)],
+				objPass,
+				aafDataBuffer_t,
+				pValue,
+			The default quantization style bytes.
+  /// The data format is as defined in ISO\/IEC 15444-1\, Annex A.6.4.,
+
+     Sets the default quantization style for all components.
+  /// This property is optional.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pValue pointer is valid.
+  /// 
+  /// If this method fails the QuantizationDefault property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pValue arg is NULL.
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetQuantizationDefaultBufLen,
+			[out],
+				objPass,
+				aafUInt32 *,
+				pSizeOfBuffer,
+			The number of bytes in the default quantization style sequence,
+
+     Gets the number of bytes in the default quantization style sequence.
+  /// This property is optional.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pSizeOfBuffer pointer is valid.
+  /// - the property is present.
+  /// 
+  /// If this method fails nothing will be written to *pSizeOfBuffer.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pSizeOfBuffer arg is NULL.
+  ///
+  /// AAFRESULT_PROP_NOT_PRESENT
+  ///   - the property is not present.)
+
+
+AD_XMETHOD2(GetQuantizationDefault,
+			[in],
+				objPass,
+				aafUInt32,
+				valueSize,
+			The size of the pValue buffer,
+			[in\, size_is\(valueSize\)],
+				objPass,
+				aafDataBuffer_t,
+				pValue,
+			The buffer to hold returned default quantization style bytes.
+  /// The data format is as defined in ISO\/IEC 15444-1\, Annex A.6.4.,
+
+     Gets the default quantization style bytes.
+  /// This property is optional.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pValue pointer is valid.
+  /// - the property is present.
+  /// 
+  /// If this method fails nothing will be written to *pValue.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pValue arg is NULL.
+  ///
+  /// AAFRESULT_PROP_NOT_PRESENT
+  ///   - the property is not present.)
+
+
+#c
+#c AAFJPEG2000SubDescriptor2 methods
+#c
+AD_COM_METH(.method-SetJ2CLayout)
+AD_COM_METH(.method-CountJ2CLayoutElements)
+AD_COM_METH(.method-GetJ2CLayout)
+
+AD_COM_EXT_CLASS_END(AAFJPEG2000SubDescriptor2)

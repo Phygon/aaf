@@ -119,12 +119,18 @@ public:
   OMStrongObjectReference(void);
 
     // @cmember Constructor.
-  OMStrongObjectReference(OMProperty* property, const wchar_t* name);
+  OMStrongObjectReference(OMProperty* property,
+                          const OMUniqueObjectIdentification& id);
 
     // @cmember Constructor.
   OMStrongObjectReference(OMProperty* property,
-                          const wchar_t* name,
+                          const OMUniqueObjectIdentification& id,
                           bool isLoaded);
+
+    // @cmember Constructor.
+  OMStrongObjectReference(OMProperty* property,
+                          const OMUniqueObjectIdentification& id,
+                          OMUInt32 localKey);
 
     // @cmember Copy constructor.
   OMStrongObjectReference(const OMStrongObjectReference&);
@@ -165,7 +171,20 @@ public:
     //          The value is a pointer to the referenced <c OMStorable>.
   virtual OMStorable* setValue(const OMStorable* value);
 
-  virtual const wchar_t* name(void) const;
+    // @cmember Get the ID of the referenced object.
+  virtual OMUniqueObjectIdentification identification(void) const;
+
+    // @cmember Does this <c OMStrongObjectReference> have local key ?
+    //          <c OMStrongObjectReference> has local key if it is
+    //          a part of a container such as vector or set.
+  bool hasLocalKey(void) const;
+
+    // @cmember The local key of this <c OMStrongObjectReference>.
+    //          The key is unique only within a given container instance
+    //          and is assigned to each element of the container in such
+    //          way as to be independent of the element's position within
+    //          the container.
+  OMUInt32 localKey(void) const;
 
 protected:
   // @access Protected members.
@@ -190,8 +209,18 @@ protected:
     //          has not yet been loaded, true otherwise.
   bool _isLoaded;
 
-    // @cmember The name of this <c OMStrongObjectReference>.
-  wchar_t* _name;
+    // @cmember ID of the referenced object.
+  OMUniqueObjectIdentification _identification;
+
+    // @cmember The local key of this <c OMStrongObjectReference>.
+    //          <c OMStrongObjectReference> has local key if it is
+    //          a part of a container such as vector or set.
+    //          The key is unique only within a given container instance
+    //          and is assigned to each element of the container in such
+    //          way as to be independent of the element's position within
+    //          the container.
+  bool _hasLocalKey;
+  OMUInt32 _localKey;
 
 };
 
@@ -265,6 +294,8 @@ public:
                                          OMPropertyTag targetTag);
 
   const void* identification(void) const;
+
+  size_t identificationSize(void) const;
 
   void setIdentification(const void* id);
 

@@ -35,6 +35,7 @@
 
 #ifndef OM_NO_STRUCTURED_STORAGE
 
+#include "OMSSStructuredStorage.h"
 #include "OMSSStoredObjectFactory.h"
 
 #include "OMSSStoredObject.h"
@@ -111,8 +112,16 @@ OMSSStoredObjectFactory::createWrite(OMRawStorage* rawStorage,
                                       const OMByteOrder byteOrder)
 {
   TRACE("OMSSStoredObjectFactory::createWrite");
-  ASSERT("Unimplemented code not reached", false);
-  return 0;
+
+  PRECONDITION("Valid raw storage", rawStorage != 0);
+  PRECONDITION("Valid byte order",
+                      (byteOrder == littleEndian) || (byteOrder == bigEndian));
+  PRECONDITION("Compatible raw storage access mode",
+                         rawStorage->isReadable() && rawStorage->isWritable());
+  PRECONDITION("Compatible raw storage", rawStorage->isPositionable() &&
+                                         rawStorage->isExtendible());
+
+  return createFile(rawStorage, byteOrder, signature());
 }
 
   // @mfunc Create a new root <c OMSSStoredObject> in the raw storage
@@ -283,6 +292,22 @@ OMSSStoredObjectFactory::isRecognized(OMRawStorage* rawStorage)
   return result;
 }
 
+  // @mfunc Is the file named <p fileName> an incomplete (in-progress) file ?
+  //          If so, the result is true.
+bool OMSSStoredObjectFactory::isBeingModified(const wchar_t* fileName)
+{
+  TRACE("OMSSStoredObjectFactory::isBeingModified");
+  return false;
+}
+
+  // @mfunc Does <p rawStorage> contain an incomplete (in-progress) file ?
+  //          If so, the result is true.
+bool OMSSStoredObjectFactory::isBeingModified(OMRawStorage* rawStorage)
+{
+  TRACE("OMSSStoredObjectFactory::isBeingModified");
+  return false;
+}
+
   // @mfunc Can a file be created successfully on the given
   //        <c OMRawStorage> and accessed successfully in the mode
   //        specified by <p accessMode> ?
@@ -326,8 +351,27 @@ bool OMSSStoredObjectFactory::compatibleNamedFile(
   return result;
 }
 
-  // @mfunc Perform any necessary actions when <p file> is closed.
-  //   @parm The <c OMFile>
+  // @mfunc Can the contents of a file on the given <c OMRawStorage>
+  //        be accessed successfully in the mode specified by
+  //        <p accessMode> ?
+  //        This method attempts to identify issues with the file
+  //        contents before opening the file and restoring its metadata.
+  //   @parm The <c OMRawStorage>.
+  //   @parm The <t OMAccessMode>.
+  //   @rdesc True if the file contents can be accessed, false otherwise.
+bool OMSSStoredObjectFactory::compatibleStoredFormat(
+                                  const OMRawStorage* NNAME(rawStorage),
+                                  const OMFile::OMAccessMode NNAME(accessMode))
+{
+  TRACE("OMSSStoredObjectFactory::compatibleStoredFormat");
+  // Missing checks ?
+  bool result = true;
+  return result;
+}
+
+  // @mfunc Perform any necessary actions when the file
+  //        contained in <p fileName> is closed.
+  //   @parm The file name.
 void OMSSStoredObjectFactory::close(OMFile* file)
 {
   TRACE("OMSSStoredObjectFactory::close");

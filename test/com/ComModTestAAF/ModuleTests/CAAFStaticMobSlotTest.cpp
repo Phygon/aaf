@@ -38,7 +38,8 @@
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
+
+#include "AAFWideString.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -118,9 +119,6 @@ static HRESULT CreateAAFFile(
 				(IUnknown **)&sclp));
 			checkResult(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
 			checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
-			pComponent->Release();
-			pComponent = NULL;
-			
 			checkResult(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
 			
 			checkResult(defs.cdStaticMobSlot()->
@@ -130,6 +128,9 @@ static HRESULT CreateAAFFile(
 			checkResult(newSlot->SetSlotID(test+1));
 			checkResult(newSlot->SetName(slotNames[test]));
 			checkResult(pMob->AppendSlot(newSlot));
+
+			pComponent->Release();
+			pComponent = NULL;
 			
 			newSlot->Release();
 			newSlot = NULL;
@@ -139,6 +140,39 @@ static HRESULT CreateAAFFile(
 			
 			sclp->Release();
 			sclp = NULL;
+		}
+
+		// Test unknown Length
+		{
+			checkResult(defs.cdSourceClip()->
+				CreateInstance(IID_IAAFSourceClip,
+				(IUnknown **)&sclp));
+			checkResult(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+			checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
+			checkResult(sclp->QueryInterface(IID_IAAFSegment, (void **)&seg));
+
+			checkResult(defs.cdStaticMobSlot()->CreateInstance(IID_IAAFMobSlot,	(IUnknown **)&newSlot));
+
+			// Unknown Length is allowed when Component is unattached
+			checkResult(pComponent->SetLength(AAF_UNKNOWN_LENGTH));
+			// Component with Unknown Length can't be attached to StaticMobSlot
+			checkExpression((newSlot->SetSegment(seg) == AAFRESULT_INVALID_PARAM), AAFRESULT_TEST_FAILED);
+
+			// OK
+			checkResult(pComponent->SetLength(0));
+			checkResult(newSlot->SetSegment(seg));
+
+			// Unknown Length is not allowed when Component is attached to StaticMobSlot
+			checkExpression((pComponent->SetLength(AAF_UNKNOWN_LENGTH) == AAFRESULT_BAD_LENGTH), AAFRESULT_TEST_FAILED);
+
+			pComponent->Release();
+			pComponent = NULL;
+
+			newSlot->Release();
+			newSlot = NULL;
+
+			seg->Release();
+			seg = NULL;
 		}
 		
 		// Add the mob to the file.
@@ -153,6 +187,9 @@ static HRESULT CreateAAFFile(
 	// Cleanup and return
 	if (newSlot)
 		newSlot->Release();
+
+	if (pComponent)
+		pComponent->Release();
 	
 	if (seg)
 		seg->Release();
@@ -313,15 +350,15 @@ extern "C" HRESULT CAAFStaticMobSlot_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following AAFStaticMobSlot tests have not been implemented:" << endl; 
-//		cout << "     GetSegment" << endl; 
-//		cout << "     GetNameBufLen" << endl; 
-//		cout << "     GetPhysicalNum" << endl; 
-//		cout << "     GetDataDef" << endl; 
-//		cout << "     SetSegment" << endl; 
-//		cout << "     SetName" << endl; 
-//		cout << "     SetPhysicalNum" << endl; 
-//		cout << "     SetSlotID" << endl; 
+//		cout << "The following AAFStaticMobSlot tests have not been implemented:" << endl;
+//		cout << "     GetSegment" << endl;
+//		cout << "     GetNameBufLen" << endl;
+//		cout << "     GetPhysicalNum" << endl;
+//		cout << "     GetDataDef" << endl;
+//		cout << "     SetSegment" << endl;
+//		cout << "     SetName" << endl;
+//		cout << "     SetPhysicalNum" << endl;
+//		cout << "     SetSlotID" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 	

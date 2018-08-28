@@ -46,7 +46,7 @@ grep -v "Nothing to be done" | \
 grep -v Skipping | \
 grep -v "updating timestamp" | \
 grep -v "did not change" | \
-grep -v update.ksh | \
+grep -v update.sh | \
 grep -v "make -f unixaafsdk.mak CFG=Debug" |
 grep -v ^real | \
 grep -v ^user | \

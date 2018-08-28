@@ -170,6 +170,9 @@ AAFRESULT STDMETHODCALLTYPE
   if(pMobID == NULL)
     return AAFRESULT_NULL_PARAM;
 
+  if (!_rendering.isPresent())
+    return AAFRESULT_PROP_NOT_PRESENT;
+
   *pMobID = _rendering;
 
   return(AAFRESULT_SUCCESS); 

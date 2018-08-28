@@ -44,10 +44,16 @@
 class ImplAAFFile;
 class ImplAAFObject;
 
+#include "OMExceptions.h"
+#include "OMUtilities.h"
+
+
+
+
 
 typedef enum
 {
-	kRoundCeiling, kRoundFloor
+	kRoundCeiling, kRoundFloor, kRoundAuto
 } aafRounding_t;
 
 
@@ -97,6 +103,13 @@ inline bool operator > (const aafUID_t& lhs,
   return memcmp(&lhs, &rhs, sizeof(aafUID_t)) > 0;
 }
 
+const aafUID_t kNullUID = {0,0,0,{0,0,0,0,0,0,0,0}};
+
+inline bool isNull(const aafUID_t& id)
+{
+  return id == kNullUID;
+}
+
 // aafMobID_t comparison operators.
 
 inline bool operator == (const aafMobID_t& lhs,
@@ -122,6 +135,29 @@ inline bool operator > (const aafMobID_t& lhs,
 {
   return memcmp(&lhs, &rhs, sizeof(aafMobID_t)) > 0;
 }
+
+const aafMobID_t kNullMobID = {{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,
+                               {0,0,0,{0,0,0,0,0,0,0,0}}};
+
+inline bool isNull(const aafMobID_t& id)
+{
+  return id == kNullMobID;
+}
+
+
+
+
+
+inline bool operator==(const OMClassId &a, const aafUID_t &b)
+{
+	return memcmp(&a, &b, sizeof(OMClassId))==0;
+}
+
+inline bool operator==(const aafUID_t &a, const OMClassId &b)
+{
+	return b == a;
+}
+
 
 /************************************************************************
  *
@@ -246,6 +282,34 @@ void wcsconvertFilepathtoURL(wchar_t *filepath, wchar_t *url);
 #else
 #define CHECK_CLIENT_IMPLEMENTED_QI(pUnknown, IID)
 #endif
+
+
+/************************************************************************
+ *
+ * Handling unexpected internal errors
+ *
+ ************************************************************************/
+
+// Throw OMException if AAFRESULT indicates an error.
+inline void check(AAFRESULT hr)
+{
+	if (AAFRESULT_FAILED(hr))
+		throw OMException(hr);
+}
+
+// Throw OMException if specified pointer is not NULL.
+inline void check(const void* pointer, AAFRESULT hr=AAFRESULT_INTERNAL_ERROR)
+{
+	if (!pointer)
+		throw OMException(hr);
+}
+
+// Throw OMException if specified expression is not true.
+inline void check(bool expression, AAFRESULT hr=AAFRESULT_INTERNAL_ERROR)
+{
+	if (!expression)
+		throw OMException(hr);
+}
 
 
 #endif				/* _AAF_UTIL_API_ */

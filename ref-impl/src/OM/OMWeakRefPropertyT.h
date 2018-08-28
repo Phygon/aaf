@@ -647,10 +647,11 @@ void OMWeakReferenceProperty<Key, ReferencedObject>::shallowCopyTo(
   ASSERT("Valid destination", dest != this);
   ASSERT("Valid source", (_targetName != 0) || (_targetPropertyPath != 0));
 
-  Key id = identification();
+  dest->_reference = OMWeakObjectReference(dest,
+                                           _reference.identification(),
+                                           _reference.identificationSize(),
+                                           nullOMPropertyTag);
 
-  dest->_reference = _reference;
-  dest->_reference.setValue(&id, 0); // set reference unresolved
   dest->_targetTag = nullOMPropertyTag;
   dest->_targetName = _targetName;
   delete [] dest->_targetPropertyPath;
@@ -671,7 +672,8 @@ void OMWeakReferenceProperty<Key, ReferencedObject>::shallowCopyTo(
 template <typename Key, typename ReferencedObject>
 void OMWeakReferenceProperty<Key, ReferencedObject>::deepCopyTo(
                                                      OMProperty* destination,
-                                                     void* clientContext) const
+                                                     void* clientContext,
+                                                     bool deferStreamData) const
 {
   TRACE("OMWeakReferenceProperty<Key, ReferencedObject>::deepCopyTo");
   PRECONDITION( "Valid destination", destination != 0 );
@@ -687,6 +689,13 @@ void OMWeakReferenceProperty<Key, ReferencedObject>::deepCopyTo(
 
     // Update the target tag on object reference
     wp->setTargetTag(wp->targetTag());
+    // Maintain consistent target tag in _reference.
+    // This line has been removed in the open source version because,
+    // I assume, _reference is declared deprecated elsewhere in the code
+    // (althouth I am not sure about the reasons and how the deprecation
+    // should be achieved). I am leaving this here until _reference is
+    // actually removed from the class declaration.
+    wp->_reference.setTargetTag(wp->targetTag());
 
     OMStrongReferenceSet* dest = wp->targetSet();
     ASSERT("Destination is correct type", dest != 0);
@@ -701,7 +710,7 @@ void OMWeakReferenceProperty<Key, ReferencedObject>::deepCopyTo(
       OMStorable* d = source->shallowCopy(factory);
       dest->insertObject(d);
       d->onCopy(clientContext);
-      source->deepCopyTo(d, clientContext);
+      source->deepCopyTo(d, clientContext, deferStreamData);
     }
   }
 }
@@ -735,7 +744,7 @@ OMStorable* OMWeakReferenceProperty<Key, ReferencedObject>::getReferencedValue(v
 	const Key& key = identification();
 	memcpy( reinterpret_cast<void*>(&bid), reinterpret_cast<const void*>(&key), sizeof(bid) );
     if (hostByteOrder() != bigEndian) {
-	  OMUniqueObjectIdentificationType::instance()->reorder(
+      OMUniqueObjectIdentificationType::instance()->reorder(
                                                reinterpret_cast<OMByte*>(&bid),
                                                sizeof(bid));
     }

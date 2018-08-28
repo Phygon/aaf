@@ -50,17 +50,18 @@
 
 #include "ImplAAFPlainEssenceData.h"
 
-#include "OMUtilities.h"
+#include "OMAssertions.h"
+// HACK: Should not know about OMKLVStoredStream here.
+//       Need to introduce an encoding-independent stored index stream class.
+#include "OMKLVStoredStream.h"
 
 #include <string.h>
 #include "AAFResult.h"
+#include "AAFUtils.h"
 
 
 extern "C" const aafClassID_t CLSID_AAFPlainEssenceData;
 
-
-const aafMobID_t kNullMobID = {{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,
-	{0,0,0,{0,0,0,0,0,0,0,0}}};
 
 ImplAAFEssenceData::ImplAAFEssenceData () :
   _fileMobID(PID_EssenceData_MobID,	L"MobID"),
@@ -488,8 +489,8 @@ const OMMaterialIdentification&
 
 
 
-OMDataStreamPropertyFilter* ImplAAFEssenceData::createMediaDataFilter()
+OMDataStreamPropertyFilter* ImplAAFEssenceData::mediaDataFilter()
 {
-  return _mediaData.createFilter();
+  return _mediaData.filter();
 }
 

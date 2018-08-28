@@ -59,11 +59,14 @@
 #include "ImplAAFDataDef.h"
 #include "ImplAAFEssenceAccess.h"
 #include "ImplAAFSourceMob.h"
+#include "ImplAAFSequence.h"
 
 #include "ImplAAFSmartPointer.h"
 typedef ImplAAFSmartPointer<ImplAAFDataDef> ImplAAFDataDefSP;
 
 extern "C" const aafClassID_t CLSID_AAFEssenceAccess;
+
+static AAFRESULT GetSegmentSelectInfo(ImplAAFSegment* segment, aafSelectInfo_t* selectInfo);
 
 ImplAAFEssenceGroup::ImplAAFEssenceGroup ()
 :   _choices(	PID_EssenceGroup_Choices,		L"Choices"),
@@ -362,10 +365,27 @@ AAFRESULT ImplAAFEssenceGroup::GetMinimumBounds(aafPosition_t rootPos, aafLength
 			  if (tmpFound)
 				{
 				  *foundObj = tmpFound;
-				  if (tmpMinLen < rootLen)
-					*minLength = tmpMinLen;
+				  if (rootLen != AAF_UNKNOWN_LENGTH && tmpMinLen != AAF_UNKNOWN_LENGTH)
+				  {
+					  if (tmpMinLen < rootLen)
+						*minLength = tmpMinLen;
+					  else
+						*minLength = rootLen;
+				  }
 				  else
-					*minLength = rootLen;
+				  {
+					  // One if the legths is unknown (-1)
+					  if (tmpMinLen != AAF_UNKNOWN_LENGTH)
+					  {
+						XASSERT(rootLen == AAF_UNKNOWN_LENGTH, AAFRESULT_INTERNAL_ERROR);
+						*minLength = tmpMinLen;
+					  }
+					  else
+					  {
+						XASSERT(tmpMinLen == AAF_UNKNOWN_LENGTH, AAFRESULT_INTERNAL_ERROR);
+						*minLength = rootLen;
+					  }
+				  }
 				}
 			  else
 				{
@@ -385,18 +405,49 @@ AAFRESULT ImplAAFEssenceGroup::GetMinimumBounds(aafPosition_t rootPos, aafLength
 	return(AAFRESULT_SUCCESS);
 }
 
+AAFRESULT ImplAAFEssenceGroup::FindSubSegment(
+			aafPosition_t offset,
+			aafMediaCriteria_t *mediaCrit,
+			aafPosition_t *sequPosPtr,
+			ImplAAFSegment **subseg,
+			aafBool *found)
+{
+	ImplAAFSegment			*criteriaSegment = NULL;
+
+	XPROTECT()
+	  {
+		aafMediaCriteria_t defaultCriteria = {kAAFAnyRepresentation};
+		aafMediaCriteria_t *criteria = mediaCrit ? mediaCrit : &defaultCriteria;
+		CHECK(GetCriteriaSegment(criteria, &criteriaSegment));
+		CHECK(criteriaSegment->FindSubSegment(offset, criteria, sequPosPtr, subseg, found));
+	  }
+	XEXCEPT
+	  {
+		if(criteriaSegment)
+		  {
+		    criteriaSegment->ReleaseReference();
+		    criteriaSegment = NULL;
+		  }
+	  }
+	XEND
+
+	if(criteriaSegment)
+	  {
+		criteriaSegment->ReleaseReference();
+		criteriaSegment = NULL;
+	  }
+
+	return(AAFRESULT_SUCCESS);
+}
+
 AAFRESULT ImplAAFEssenceGroup::GetCriteriaSegment(
 			aafMediaCriteria_t *criteria,
 			ImplAAFSegment		**retSrcClip)
 {
 	aafInt32				score, highestScore;
 	aafUInt32				n, numReps;
-	ImplAAFMob				*mob = NULL;
-	ImplAAFSourceMob		*fileMob = NULL;
 	ImplAAFSegment			*highestScoreSourceClip = NULL, *sourceClip = NULL;
-	ImplAAFSourceClip		*sclp;
 	aafSelectInfo_t			selectInfo;
-	ImplAAFEssenceAccess	*access;
 
 	aafAssert(criteria != NULL, file, AAFRESULT_NULL_PARAM);
 	aafAssert(retSrcClip != NULL, file, AAFRESULT_NULL_PARAM);
@@ -415,36 +466,8 @@ AAFRESULT ImplAAFEssenceGroup::GetCriteriaSegment(
 				highestScoreSourceClip = sourceClip;
 				break;
 			}
-			sclp = dynamic_cast<ImplAAFSourceClip*>(sourceClip);
-			if(sclp == 0)
-				RAISE(AAFRESULT_INVALID_LINKAGE);
 
-			CHECK(sclp->ResolveRef(&mob));
-			fileMob = dynamic_cast<ImplAAFSourceMob*>(mob);
-			if(fileMob == NULL)
-				RAISE(AAFRESULT_INCONSISTANCY);
-
-			access = (ImplAAFEssenceAccess *)CreateImpl (CLSID_AAFEssenceAccess);
-			CHECK(access->GetSelectInfo (fileMob, &selectInfo))
-				
-			//sdaigle: Don't forget to release objects not used anymore.
-			if( access )
-				access->ReleaseReference();
-
-			/* Check for locator file existance & continue if not present
-			 * A file which is supposed to be an OMFI file must be opened
-			 * to check for the existance of the data object, so we must
-			 * open the file here.
-			 */
-//!!!			CHECK(LocateMediaFile(file, fileMob, &dataFile, &isOMFI));
-//			if(dataFile == NULL)
-//				continue;
-//			if(dataFile != file)
-//				omfsCloseFile(dataFile);
-
-			//sdaigle: Don't forget to release objects not used anymore.
-			if( fileMob )
-				fileMob->ReleaseReference();
+			CHECK(GetSegmentSelectInfo(sourceClip, &selectInfo));
 
 			score = 0;
 			switch(criteria->type)
@@ -580,12 +603,116 @@ void ImplAAFEssenceGroup::Accept(AAFComponentVisitor& visitor)
 		ImplAAFSegment* pChoice = 0;
 		GetChoiceAt(i, &pChoice);
 
-       	        pChoice->Accept(visitor);
+		pChoice->Accept(visitor);
 
 		pChoice->ReleaseReference();
 		pChoice = NULL;
 	}
 
+	ImplAAFSourceClip* pStillFrame = NULL;
+	GetStillFrame(&pStillFrame);
+	if (pStillFrame)
+	{
+		pStillFrame->Accept(visitor);
+		pStillFrame->ReleaseReference();
+		pStillFrame = NULL;
+	}
+
 	// TODO
 	// visitor.VisitEssenceGroup(this);
 }
+
+/*static*/
+AAFRESULT GetSegmentSelectInfo(ImplAAFSegment* segment, aafSelectInfo_t* selectInfo)
+{
+	ImplAAFSourceClip		*sclp = NULL;
+	ImplAAFComponent		*sequenceComponent = NULL;
+	ImplAAFMob				*mob = NULL;
+	ImplAAFEssenceAccess	*access = NULL;
+
+	XPROTECT()
+	{
+		sclp = dynamic_cast<ImplAAFSourceClip*>(segment);
+		if(sclp != NULL)
+		{
+			sclp->AcquireReference();
+		}
+
+		if(!sclp)
+		{
+			ImplAAFSequence* sequence = dynamic_cast<ImplAAFSequence*>(segment);
+
+			// Attempt to find first source clip
+			aafUInt32 count = 0;
+			CHECK(sequence->CountComponents(&count));
+			for(aafUInt32 i = 0; i < count; i++)
+			{
+				CHECK(sequence->GetComponentAt(i, &sequenceComponent));
+				sclp = dynamic_cast<ImplAAFSourceClip*>(sequenceComponent);
+				if(sclp != NULL)
+					break;
+				sequenceComponent->ReleaseReference();
+				sequenceComponent = NULL;
+			}
+		}
+
+		if(sclp != NULL)
+		{
+			CHECK(sclp->ResolveRef(&mob));
+			ImplAAFSourceMob *fileMob = dynamic_cast<ImplAAFSourceMob*>(mob);
+			if(fileMob == NULL)
+				RAISE(AAFRESULT_INCONSISTANCY);
+
+			access = (ImplAAFEssenceAccess *)CreateImpl (CLSID_AAFEssenceAccess);
+			CHECK(access->GetSelectInfo (fileMob, selectInfo))
+
+			//sdaigle: Don't forget to release objects not used anymore.
+			if( access )
+			{
+				access->ReleaseReference();
+				access = NULL;
+			}
+
+			//sdaigle: Don't forget to release objects not used anymore.
+			if( mob )
+			{
+				mob->ReleaseReference();
+				mob = NULL;
+			}
+			if( sclp )
+			{
+				sclp->ReleaseReference();
+				sclp = NULL;
+			}
+		}
+		else
+				RAISE(AAFRESULT_INVALID_LINKAGE);
+	}
+	XEXCEPT
+	{
+		if( sclp )
+		{
+			sclp->ReleaseReference();
+			sclp = NULL;
+		}
+		if( sequenceComponent )
+		{
+			sequenceComponent->ReleaseReference();
+			sequenceComponent = NULL;
+		}
+		if( access )
+		{
+			access->ReleaseReference();
+			access = NULL;
+		}
+		if( mob )
+		{
+			mob->ReleaseReference();
+			mob = NULL;
+		}
+	}
+	XEND
+
+	return(AAFRESULT_SUCCESS);
+}
+

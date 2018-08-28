@@ -35,7 +35,6 @@
 #include "aaflib.h"
 
 #include "AAFResult.h"
-#include "AAFSDKBuild.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -45,14 +44,16 @@
 //
 // Define the platform specific default dll name.
 //
-#if defined( OS_WINDOWS )
-#define DEFAULT_AAFDLL_NAME "AAFCOAPI.dll"
-#elif defined( OS_DARWIN )
-#define DEFAULT_AAFDLL_NAME "libcom-api.dylib"
-#elif defined( OS_UNIX )
-#define DEFAULT_AAFDLL_NAME "libcom-api.so"
-#else
-#error Unknown operating system
+#ifndef DEFAULT_AAFDLL_NAME
+  #if defined( OS_WINDOWS )
+    #define DEFAULT_AAFDLL_NAME "AAFCOAPI.dll"
+  #elif defined( OS_DARWIN )
+    #define DEFAULT_AAFDLL_NAME "libcom-api.dylib"
+  #elif defined( OS_UNIX )
+    #define DEFAULT_AAFDLL_NAME "libcom-api.so"
+  #else
+    #error Unknown operating system
+  #endif
 #endif
 
 
@@ -177,11 +178,11 @@ static HRESULT LoadIfNecessary(AAFDLL **ppAAFDLL)
 // Provides the version of this static library.
 //
 static const aafProductVersion_t impl_version = {
-  AAF_MAJOR_VERSION,
-  AAF_MINOR_VERSION,
-  AAF_MAINT_RELEASE,
-  AAF_PATCH_LEVEL,
-  AAF_RELEASE_STAGE
+  AAFSDK_VERSION_MAJOR,
+  AAFSDK_VERSION_MINOR,
+  AAFSDK_VERSION_PATCH,
+  AAFSDK_VERSION_BUILD,
+  AAFSDK_VERSION_RELEASE
 };
 STDAPI AAFGetStaticLibraryVersion
   (aafProductVersion_t *  pVersion)

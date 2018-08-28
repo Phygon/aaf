@@ -58,8 +58,6 @@ typedef ImplAAFEnumerator<ImplAAFIdentification> ImplEnumAAFIdentifications;
 #include "OMStrongRefProperty.h"
 #include "OMStrongRefVectorProperty.h"
 
-#include "aafTable.h"
-
 #include "aafErr.h"
 #include "AAFUtils.h"
 #include "ImplAAFObject.h"
@@ -407,6 +405,70 @@ public:
     RemoveDescriptiveScheme
         (const aafUID_t& descriptiveSchemeID);
 
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CreateEmptyDescriptiveSchemes();
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+    RemoveDescriptiveSchemes();
+
+
+  //--------------------------------------------------------------------------
+  //
+  // Avid private methods start
+  //
+  // The following methods are to support AAFMXFPreface interface
+  //
+  //--------------------------------------------------------------------------
+
+  //****************
+  // AddEssenceContainer()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AddEssenceContainer
+        (const aafUID_t& essenceContainer);
+
+
+  //****************
+  // CountDMSchemes()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CountDMSchemes
+        (aafUInt32 * pCount);
+
+
+  //****************
+  // GetDMSchemes()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    GetDMSchemes
+        (aafUInt32 maxDMSchemesCount,
+         aafUID_t* pDMSchemes);
+
+
+  //****************
+  // IsDMSchemePresent()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsDMSchemePresent
+        (const aafUID_t& dmScheme,
+         aafBoolean_t* pIsPresent);
+
+
+  //****************
+  // AddDMScheme()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    AddDMScheme
+        (const aafUID_t& dmSchemeID);
+
+  //--------------------------------------------------------------------------
+  //
+  // Avid private methods end
+  //
+  // The following methods are to support AAFMXFPreface interface
+  //
+  //--------------------------------------------------------------------------
+
 
 public:
   // Interfaces visible inside the toolkit, but not exposed through the API
@@ -466,9 +528,7 @@ private:
   OMFixedSizeProperty<aafUID_t>                    _operationalPattern;
   OMSetProperty<aafUID_t>                          _essenceContainers;
   OMSetProperty<aafUID_t>                          _descriptiveSchemes;
-#if 0 // tjb - not yet
   OMWeakReferenceProperty<OMUniqueMaterialIdentification, ImplAAFMob> _primaryMob;
-#endif
 };
 
 //

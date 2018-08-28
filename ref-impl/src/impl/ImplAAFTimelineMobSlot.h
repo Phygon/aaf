@@ -154,15 +154,27 @@ public:
 public:
 // Internal to the SDK, but available to other SDK internal code.
 virtual AAFRESULT FindSegment(aafPosition_t offset,
+										  aafMediaCriteria_t *mediaCrit,
 										  ImplAAFSegment **segment,
 										  aafRational_t *srcRate,
 										  aafPosition_t *diffPos);
   virtual AAFRESULT ConvertToEditRate(aafPosition_t tmpPos,
 										aafRational_t destRate,
 										aafPosition_t *convertPos);
+  virtual AAFRESULT ConvertToEditRate(aafPosition_t tmpPos,
+										aafRational_t destRate,
+										aafRounding_t editRateConversion,
+										aafPosition_t *convertPos);
   virtual AAFRESULT ConvertToMyRate(aafPosition_t tmpPos,
 										  ImplAAFMobSlot *srcSlot,
 										aafPosition_t *convertPos);
+  virtual AAFRESULT ConvertToMyRate(aafPosition_t tmpPos,
+									ImplAAFMobSlot *srcSlot,
+									aafRounding_t editRateConversion,
+									aafPosition_t *convertPos);
+
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetSegment(ImplAAFSegment* pSegment);
 
 protected:
 	OMFixedSizeProperty<aafRational_t>	_editRate;

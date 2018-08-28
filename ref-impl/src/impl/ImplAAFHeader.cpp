@@ -35,7 +35,6 @@
 
 #include "AAFTypes.h"
 #include "AAFResult.h"
-#include "aafTable.h"
 #include "aafErr.h"
 #include "AAFUtils.h"
 #include "ImplAAFModule.h"
@@ -95,8 +94,6 @@ typedef ImplAAFSmartPointer<ImplEnumAAFIdentifications>
 
 extern "C" const aafClassID_t CLSID_EnumAAFIdentifications;
 
-const aafUID_t NIL_UID = { 0,0,0,{0,0,0,0,0,0,0,0} };
-
 
 ImplAAFHeader::ImplAAFHeader ()
 : _byteOrder(         PID_Header_ByteOrder,          L"ByteOrder"),
@@ -108,10 +105,8 @@ ImplAAFHeader::ImplAAFHeader ()
   _objectModelVersion(PID_Header_ObjectModelVersion, L"ObjectModelVersion"),
   _operationalPattern(PID_Header_OperationalPattern, L"OperationalPattern"),
   _essenceContainers(PID_Header_EssenceContainers, L"EssenceContainers"),
-  _descriptiveSchemes(PID_Header_DescriptiveSchemes, L"DescriptiveSchemes")
-#if 0 // tjb - not yet
-, _primaryMob(PID_Header_PrimaryMob, L"PrimaryMob", L"/Header/Content/Mobs", PID_Mob_MobID)
-#endif
+  _descriptiveSchemes(PID_Header_DescriptiveSchemes, L"DescriptiveSchemes"),
+  _primaryMob(PID_Header_PrimaryMob, L"PrimaryMob", L"/Header/Content/Mobs", PID_Mob_MobID)
 {
   _persistentProperties.put(_byteOrder.address());
   _persistentProperties.put(_lastModified.address());
@@ -123,9 +118,7 @@ ImplAAFHeader::ImplAAFHeader ()
   _persistentProperties.put(_operationalPattern.address());
   _persistentProperties.put(_essenceContainers.address());
   _persistentProperties.put(_descriptiveSchemes.address());
-#if 0 // tjb - not yet
   _persistentProperties.put(_primaryMob.address());
-#endif
 
 	_toolkitRev = AAFReferenceImplementationVersion;
 	_file = NULL;
@@ -592,7 +585,7 @@ AAFRESULT
 			ident.companyName = const_cast<aafCharacter *>(L"Unknown");
 			ident.productName = const_cast<aafCharacter *>(L"Unknown");
 			ident.productVersionString = (aafWChar*)NULL;
-			ident.productID = NIL_UID;
+			ident.productID = kNullUID;
 			ident.platform = (aafWChar*)NULL;
 			ident.productVersion = 0;
 		}
@@ -606,7 +599,10 @@ AAFRESULT
     if (ident.productVersionString == 0) {
       ident.productVersionString = const_cast<aafCharacter *>(L"Unknown version");
     }
-
+    if (ident.platform == 0) {
+      ident.platform = const_cast<aafCharacter *>(L"Unknown");
+    }
+    
     // Get the dictionary so that we can use the factory
     // method to create the identification.
     ImplAAFDictionary *pDictionary = GetDictionary();
@@ -771,12 +767,12 @@ ImplAAFDictionary *ImplAAFHeader::GetDictionary() const
   // old-fashioned way (through AAFObject).
   if (! result)
 	{
-	  AAFRESULT hr = ImplAAFObject::GetDictionary(&result);
+	  ARESULT (AAFRESULT hr) ImplAAFObject::GetDictionary(&result);
 	  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 	  ASSERTU (result);
 	  // clients of GetDictionary(void) expect the dictionary to *not*
 	  // be reference-counted.
-	  aafUInt32 refcnt = result->ReleaseReference ();
+	  ARESULT (aafUInt32 refcnt) result->ReleaseReference ();
 	  // make sure at least one reference remains.
 	  ASSERTU (refcnt > 0);
 #if 1 // HACK4MEIP2
@@ -850,17 +846,35 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::GetPrimaryMob (ImplAAFMob** /*pPrimaryMob*/)
+    ImplAAFHeader::GetPrimaryMob (ImplAAFMob** pPrimaryMob)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  if (!pPrimaryMob)
+    return AAFRESULT_NULL_PARAM;
+
+  if (!_primaryMob.isPresent())
+    return AAFRESULT_PROP_NOT_PRESENT;
+
+  if(_primaryMob.isVoid())
+    return AAFRESULT_OBJECT_NOT_FOUND;
+
+  *pPrimaryMob = _primaryMob;
+  ASSERTU (*pPrimaryMob);
+  (*pPrimaryMob)->AcquireReference ();
+
+  return AAFRESULT_SUCCESS;
 }
 
 
 
 AAFRESULT STDMETHODCALLTYPE
-    ImplAAFHeader::SetPrimaryMob (ImplAAFMob* /*pPrimaryMob*/)
+    ImplAAFHeader::SetPrimaryMob (ImplAAFMob* pPrimaryMob)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  if (!pPrimaryMob)
+    return AAFRESULT_NULL_PARAM;
+
+  _primaryMob = pPrimaryMob;
+
+  return AAFRESULT_SUCCESS;
 }
 
   
@@ -1154,6 +1168,93 @@ ImplAAFHeader::RemoveDescriptiveScheme
   return AAFRESULT_SUCCESS;
 }
 
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFHeader::CreateEmptyDescriptiveSchemes()
+{
+	if(_descriptiveSchemes.isPresent() && _descriptiveSchemes.count() > 0)
+	{
+		return AAFRESULT_PROP_ALREADY_PRESENT;
+	}
+	_descriptiveSchemes.setPresent();
+	return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFHeader::RemoveDescriptiveSchemes()
+{
+	if (_descriptiveSchemes.isPresent())
+	{
+		_descriptiveSchemes.clear();
+		_descriptiveSchemes.removeProperty();
+	}
+	
+	return AAFRESULT_SUCCESS;
+}
+
+
+
+//----------------------------------------------------------------------------
+//
+// Avid private methods start
+//
+// The following methods are to support AAFMXFPreface interface
+//
+//----------------------------------------------------------------------------
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::AddEssenceContainer (const aafUID_t& essenceContainerID)
+{
+  if (_essenceContainers.contains(essenceContainerID))
+    return AAFRESULT_INVALID_PARAM;
+
+
+  _essenceContainers.insert(essenceContainerID);
+
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::CountDMSchemes (aafUInt32 * pCount)
+{
+  return CountDescriptiveSchemes(pCount);
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::GetDMSchemes (aafUInt32 maxDMSchemesCount,
+                                 aafUID_t* pDMSchemes)
+{
+  return GetDescriptiveSchemes(maxDMSchemesCount, pDMSchemes);
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFHeader::IsDMSchemePresent (const aafUID_t& dmSchemeID,
+                                      aafBoolean_t* pIsPresent)
+{
+  return IsDescriptiveSchemePresent(dmSchemeID, pIsPresent);
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFHeader::AddDMScheme (const aafUID_t& dmSchemeID)
+{
+  return AddDescriptiveScheme(dmSchemeID);
+}
+
+//----------------------------------------------------------------------------
+//
+// Avid private methods end
+//
+// The following methods are to support AAFMXFPreface interface
+//
+//----------------------------------------------------------------------------
 
 
 void ImplAAFHeader::SetContentStorage( ImplAAFContentStorage* pNewStorage )

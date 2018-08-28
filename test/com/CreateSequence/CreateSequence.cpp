@@ -103,7 +103,10 @@ static HRESULT moduleErrorTmp = S_OK; /* note usage in macro */
 #define checkFatal(a)  \
 { moduleErrorTmp = a; \
   if (FAILED(moduleErrorTmp)) \
-     exit(1);\
+  { \
+     LogError(moduleErrorTmp, __LINE__, __FILE__);\
+     exit(moduleErrorTmp);\
+  } \
 }
 
 
@@ -524,7 +527,7 @@ cleanup:
     clock_t finish;
     double duration;
 
-    pFile->Save();
+    checkFatal(pFile->Save());
     pFile->Close();
 
 #if defined(USE_MEMORY_FILE)
@@ -700,7 +703,7 @@ int main(int argumentCount, char *argumentVector[])
   //  printf("%ld\n",argumentCount);
   if ((argumentCount < 2) || (argumentCount > 3)) {
     usage();
-    return 0;
+    return EXIT_SUCCESS;
   }
   //  Processing the second argument to be stored as global variable N
   char* Ns = argumentVector[1];
@@ -713,7 +716,7 @@ int main(int argumentCount, char *argumentVector[])
     printf("The first argument was of the incorrect form. [%s]\n",
            argumentVector[1]);
     usage();
-    return 0;
+    return EXIT_SUCCESS;
   }
 
   //  With no second argument, set output filename to CreateSequence<N>.aaf
@@ -740,7 +743,8 @@ int main(int argumentCount, char *argumentVector[])
     fprintf(stderr, "check environment variables -\n");
     fprintf(stderr, "  Windows    - $PATH\n");
     fprintf(stderr, "  Unix/Linux - $LD_LIBRARY_PATH\n");
-    exit(hr);
+    fprintf(stderr, "  MacOS X/Darwin - $DYLD_LIBRARY_PATH\n");
+    exit(EXIT_FAILURE);
   }
 
   aafWChar FileNameBuffer[MAX];
@@ -755,5 +759,5 @@ int main(int argumentCount, char *argumentVector[])
   // Open the file and gather statistics
   ReadAAFFile(pwFileName);
 
-  return(0);
+  return EXIT_SUCCESS;
 }

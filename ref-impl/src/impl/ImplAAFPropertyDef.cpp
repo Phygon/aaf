@@ -55,6 +55,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "AAFTypeDefUIDs.h"
+#include "AAFUtils.h"
 
 
 #include "OMAssertions.h"
@@ -356,7 +357,7 @@ OMProperty * ImplAAFPropertyDef::CreateOMProperty () const
 	  // Either there was no create func, or an existing one deferred
 	  // to the type def.
 	  ImplAAFTypeDefSP ptd;
-	  AAFRESULT hr = GetTypeDef (&ptd);
+	  ARESULT (AAFRESULT hr) GetTypeDef (&ptd);
 	  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 	  ASSERTU (ptd);
 	  result = ptd->pvtCreateOMProperty (_pid, name());
@@ -404,7 +405,7 @@ void ImplAAFPropertyDef::onSave(void* clientContext) const
     {\
       nonConstThis = const_cast<ImplAAFPropertyDef *>(this);\
       typeId = _Type;\
-      if (0 != memcmp(&typeId, &tid, sizeof(aafUID_t)))\
+      if (typeId != tid)\
       {\
         nonConstThis->_Type = tid;\
       }\
@@ -520,81 +521,84 @@ AAFRESULT ImplAAFPropertyDef::MergeTo( ImplAAFClassDef* pDestClassDef )
         GetTypeDef( &pTypeDef );
         aafUID_t  typeID;
         pTypeDef->GetAUID( &typeID );
-        pTypeDef->MergeTo( pDestDictionary );
+        hr = pTypeDef->MergeTo( pDestDictionary );
         pTypeDef->ReleaseReference();
         pTypeDef = NULL;
 
-        ImplAAFTypeDef* pDestTypeDef = NULL;
-        pDestDictionary->LookupTypeDef( typeID, &pDestTypeDef );
-        ASSERTU( pDestTypeDef != NULL );
-
-        // Register the property definition.
-        // The property registering method to use depends on whether
-        // this class definition is attached to or detached from
-        // the dictionary.
-        ImplAAFPropertyDef* pDestPropertyDef = NULL;
-        aafUID_t  classID;
-        pDestClassDef->GetAUID( &classID );
-        if( pDestDictionary->PvtIsClassPresent( classID ) )
-        {
-            // This class definition is in the dictionary - only
-            // optional properties can be registered.
-            ASSERTU( _IsOptional == kAAFTrue );
-
-            hr = pDestClassDef->RegisterOptionalPropertyDef( propertyID,
-                                                             (aafCharacter*)pName,
-                                                             pDestTypeDef,
-                                                             &pDestPropertyDef );
-        }
-        else
-        {
-            // This class definition is not in the dictionary -
-            // any properties can be registered.
-            aafBoolean_t isUniqueIdentifier = kAAFFalse;
-            if( _IsUniqueIdentifier.isPresent() )
-            {
-                isUniqueIdentifier = _IsUniqueIdentifier;
-            }
-
-            hr = pDestClassDef->RegisterNewPropertyDef( propertyID,
-                                                        (aafCharacter*)pName,
-                                                        pDestTypeDef,
-                                                        _IsOptional,
-                                                        isUniqueIdentifier,
-                                                        &pDestPropertyDef );
-        }
-
-
-        // If present, copy the property definition description.
         if( AAFRESULT_SUCCEEDED( hr ) )
         {
-            aafUInt32  descriptionBufLen = 0;
-            GetDescriptionBufLen( &descriptionBufLen );
-            if( descriptionBufLen > 0 )
+            ImplAAFTypeDef* pDestTypeDef = NULL;
+            pDestDictionary->LookupTypeDef( typeID, &pDestTypeDef );
+            ASSERTU( pDestTypeDef != NULL );
+
+            // Register the property definition.
+            // The property registering method to use depends on whether
+            // this class definition is attached to or detached from
+            // the dictionary.
+            ImplAAFPropertyDef* pDestPropertyDef = NULL;
+            aafUID_t  classID;
+            pDestClassDef->GetAUID( &classID );
+            if( pDestDictionary->PvtIsClassPresent( classID ) )
             {
-                aafUInt8* pDescription = new aafUInt8[ descriptionBufLen ];
-                GetDescription( (aafCharacter*)pDescription,
-                                descriptionBufLen );
+                // This class definition is in the dictionary - only
+                // optional properties can be registered.
+                ASSERTU( _IsOptional == kAAFTrue );
 
-                hr = pDestPropertyDef->SetDescription(
-                        (aafCharacter*)pDescription );
-
-                delete[] pDescription;
-                pDescription = NULL;
+                hr = pDestClassDef->RegisterOptionalPropertyDef( propertyID,
+                                                                 (aafCharacter*)pName,
+                                                                 pDestTypeDef,
+                                                                 &pDestPropertyDef );
             }
-        }
+            else
+            {
+                // This class definition is not in the dictionary -
+                // any properties can be registered.
+                aafBoolean_t isUniqueIdentifier = kAAFFalse;
+                if( _IsUniqueIdentifier.isPresent() )
+                {
+                    isUniqueIdentifier = _IsUniqueIdentifier;
+                }
 
-        // Because RegisterOptionalPropertyDef/RegisterNewPropertyDef can
-        // fail (for example, if the property's already registered with a
-        // different class), pDestPropertyDef may not be a valid pointer.
-        if( pDestPropertyDef )
-        {
-            pDestPropertyDef->ReleaseReference();
-            pDestPropertyDef = NULL;
-        }
+                hr = pDestClassDef->RegisterNewPropertyDef( propertyID,
+                                                            (aafCharacter*)pName,
+                                                            pDestTypeDef,
+                                                            _IsOptional,
+                                                            isUniqueIdentifier,
+                                                            &pDestPropertyDef );
+            }
 
-        pDestTypeDef->ReleaseReference();
-        pDestTypeDef = NULL;
+
+            // If present, copy the property definition description.
+            if( AAFRESULT_SUCCEEDED( hr ) )
+            {
+                aafUInt32  descriptionBufLen = 0;
+                GetDescriptionBufLen( &descriptionBufLen );
+                if( descriptionBufLen > 0 )
+                {
+                    aafUInt8* pDescription = new aafUInt8[ descriptionBufLen ];
+                    GetDescription( (aafCharacter*)pDescription,
+                                    descriptionBufLen );
+
+                    hr = pDestPropertyDef->SetDescription(
+                            (aafCharacter*)pDescription );
+
+                    delete[] pDescription;
+                    pDescription = NULL;
+                }
+            }
+
+            // Because RegisterOptionalPropertyDef/RegisterNewPropertyDef can
+            // fail (for example, if the property's already registered with a
+            // different class), pDestPropertyDef may not be a valid pointer.
+            if( pDestPropertyDef )
+            {
+                pDestPropertyDef->ReleaseReference();
+                pDestPropertyDef = NULL;
+            }
+
+            pDestTypeDef->ReleaseReference();
+            pDestTypeDef = NULL;
+        }
 
         delete[] pName;
         pName = NULL;

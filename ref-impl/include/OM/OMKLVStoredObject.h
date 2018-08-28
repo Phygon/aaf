@@ -43,7 +43,7 @@ class OMSimpleProperty;
 class OMDataVector;
 class OMDataSet;
 class OMDataStream;
-class OMMXFStorage;
+class OMMXFStorageBase;
 class OMStrongReference;
 class OMStrongReferenceSet;
 class OMStrongReferenceVector;
@@ -70,32 +70,36 @@ public:
 
     // @cmember Open the root <c OMKLVStoredObject> in the raw storage
     //          <p rawStorage> for reading only.
-  static OMKLVStoredObject* openRead(OMMXFStorage* rawStorage);
+  static OMKLVStoredObject* openRead(OMMXFStorageBase* rawStorage);
 
     // @cmember Open the root <c OMKLVStoredObject> in the raw storage
     //          <p rawStorage> for modification.
-  static OMKLVStoredObject* openModify(OMMXFStorage* rawStorage);
+  static OMKLVStoredObject* openModify(OMMXFStorageBase* rawStorage);
 
     // @cmember Create a new root <c OMKLVStoredObject> in the raw storage
     //          <p rawStorage>. The byte order of the newly created root
     //          is given by <p byteOrder>.
-  static OMKLVStoredObject* createWrite(OMMXFStorage* rawStorage,
+  static OMKLVStoredObject* createWrite(OMMXFStorageBase* rawStorage,
                                         const OMByteOrder byteOrder);
 
     // @cmember Create a new root <c OMKLVStoredObject> in the raw storage
     //          <p rawStorage>. The byte order of the newly created root
     //          is given by <p byteOrder>.
-  static OMKLVStoredObject* createModify(OMMXFStorage* rawStorage,
+  static OMKLVStoredObject* createModify(OMMXFStorageBase* rawStorage,
                                          const OMByteOrder byteOrder);
 
     // @cmember Does <p rawStorage> contain a recognized file ?
   static bool isRecognized(OMRawStorage* rawStorage);
 
-    // @cmember Does <p file> have an <c OMMXFStorage>.
+    // @cmember Can the contents of a file on the given <c OMRawStorage>
+    //          be successfully modified ?
+  static bool modifiableStoredFormat(const OMRawStorage* rawStorage);
+
+    // @cmember Does <p file> have an <c OMMXFStorageBase>.
   static bool hasMxfStorage(const OMFile* file);
 
-    // @cmember The <c OMMXFStorage> associated with <p file>.
-  static OMMXFStorage* mxfStorage(const OMFile* file);
+    // @cmember The <c OMMXFStorageBase> associated with <p file>.
+  static OMMXFStorageBase* mxfStorage(const OMFile* file);
 
     // @cmember Does <p stream> represent MXF essence ?
   static bool isMxfEssence(const OMDataStreamProperty* stream);
@@ -114,11 +118,37 @@ public:
     //            make sense for all derived instances of <c OMStoredObject>.
   virtual OMStoredObject* create(const wchar_t* name);
 
-    // @cmember Open an exsiting <c OMKLVStoredObject>, named <p name>,
+    // @cmember Create a new <c OMKLVStoredObject>, contained by this
+    //          <c OMKLVStoredObject>. New <c OMKLVStoredObject> is a stored
+    //          representatin of an <c OMStorable> referenced by
+    //          <p containingProperty>.
+  virtual OMStoredObject* create(const OMProperty* containingProperty);
+
+    // @cmember Create a new <c OMKLVStoredObject>, contained by this
+    //          <c OMKLVStoredObject>. New <c OMKLVStoredObject> is a stored
+    //          representatin of an <c OMStorable> referenced by
+    //          an element <p localKey> of <p containingProperty>.
+  virtual OMStoredObject* create(const OMProperty* containingProperty,
+                                 OMUInt32 localKey);
+
+    // @cmember Open an existing <c OMKLVStoredObject>, named <p name>,
     //          contained by this <c OMKLVStoredObject>.
     //   @devnote The name argument to this member function doesn't
     //            make sense for all derived instances of <c OMStoredObject>.
   virtual OMStoredObject* open(const wchar_t* name);
+
+    // @cmember Open an existing <c OMKLVStoredObject>, contained by this
+    //          <c OMKLVStoredObject>. <c OMKLVStoredObject> is a stored
+    //          representatin of an <c OMStorable> referenced by
+    //          <p containingProperty>.
+  virtual OMStoredObject* open(const OMProperty* containingProperty);
+
+    // @cmember Open an existing <c OMKLVStoredObject>, contained by this
+    //          <c OMKLVStoredObject>. <c OMKLVStoredObject> is a stored
+    //          representatin of an <c OMStorable> referenced by
+    //          an element <p localKey> of <p containingProperty>.
+  virtual OMStoredObject* open(const OMProperty* containingProperty,
+                               OMUInt32 localKey);
 
     // @cmember Close this <c OMKLVStoredObject>.
   virtual void close(void);
@@ -129,6 +159,8 @@ public:
   virtual OMByteOrder byteOrder(void) const;
 
   virtual void save(OMFile& file);
+
+  virtual void save(OMFile& file, bool finalize);
 
   virtual void save(OMStorable& object);
 
@@ -311,6 +343,37 @@ public:
 
   OMUInt64 restoreObjectDirectoryReference(OMUniqueObjectIdentification& id);
 
+  void writeMetaDictionary(const OMDictionary* dictionary);
+
+  void writeDefinition(const OMDefinition* d);
+
+  void writeClassDefinition(const OMClassDefinition* cd);
+
+  void writePropertyDefinition(const OMPropertyDefinition* pd);
+
+  void writeTypeDefinition(const OMType* td);
+
+  void readMetaDictionary(OMDictionary* dictionary);
+
+  void readDefinition(OMUniqueObjectIdentification& id,
+                      const wchar_t** name,
+                      const wchar_t** description);
+
+  void readClassDefinition(OMUniqueObjectIdentification& id,
+                           const wchar_t** name,
+                           const wchar_t** description,
+                           OMUniqueObjectIdentification& parent,
+                           bool& isConcrete);
+
+  void readPropertyDefinition(OMUniqueObjectIdentification& id,
+                              const wchar_t** name,
+                              const wchar_t** description,
+                              OMUniqueObjectIdentification& type,
+                              bool& isRequired,
+                              OMUniqueObjectIdentification& memberOf);
+
+  void readTypeDefinition(OMDictionary* dictionary);
+
 private:
   // @access Private members.
 
@@ -320,10 +383,18 @@ private:
     // @cmember The <c OMKLVStoredStream> associated with <p stream>
   static OMKLVStoredStream* mxfStream(const OMDataStreamProperty* stream);
 
-    // @cmember Constructor.
-  OMKLVStoredObject(OMMXFStorage* s, OMByteOrder byteOrder);
+  static bool isEnforcingST377(const OMFile* file);
 
-  OMMXFStorage* _storage;
+    // @cmember Are bits in <p externalValue> a SMPTE UL representation of
+    //          an extendible enumumeration value of type <p type>?
+  static bool isExtendibleEnumStoredAsSMPTEUL(const OMByte* externalValue,
+                                              const OMUInt32 externalSize,
+                                              const OMType* type);
+
+    // @cmember Constructor.
+  OMKLVStoredObject(OMMXFStorageBase* s, OMByteOrder byteOrder);
+
+  OMMXFStorageBase* _storage;
   OMByteOrder _byteOrder;
   bool _reorderBytes;
 };

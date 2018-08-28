@@ -3,18 +3,18 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
-/* File created by MIDL compiler version 6.00.0361 */
+/* File created by MIDL compiler version 8.00.0603 */
 /* at TIMESTAMP REMOVED
  */
 /* Compiler settings for ../ref-impl/include/com-api/AAFPrivate.idl:
-    Oicf, W1, Zp8, env=Win32 (32b run)
+    Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 8.00.0603 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
          __declspec(uuid()), __declspec(selectany), __declspec(novtable)
          DECLSPEC_UUID(), MIDL_INTERFACE()
 */
-//@@MIDL_FILE_HEADING(  )
+/* @@MIDL_FILE_HEADING(  ) */
 
 #pragma warning( disable: 4049 )  /* more than 64k source lines */
 
@@ -48,84 +48,98 @@
 #ifndef __IAAFRoot_FWD_DEFINED__
 #define __IAAFRoot_FWD_DEFINED__
 typedef interface IAAFRoot IAAFRoot;
+
 #endif 	/* __IAAFRoot_FWD_DEFINED__ */
 
 
 #ifndef __IAAFHTMLClip_FWD_DEFINED__
 #define __IAAFHTMLClip_FWD_DEFINED__
 typedef interface IAAFHTMLClip IAAFHTMLClip;
+
 #endif 	/* __IAAFHTMLClip_FWD_DEFINED__ */
 
 
 #ifndef __IAAFHTMLDescriptor_FWD_DEFINED__
 #define __IAAFHTMLDescriptor_FWD_DEFINED__
 typedef interface IAAFHTMLDescriptor IAAFHTMLDescriptor;
+
 #endif 	/* __IAAFHTMLDescriptor_FWD_DEFINED__ */
 
 
 #ifndef __IAAFMetaDictionary_FWD_DEFINED__
 #define __IAAFMetaDictionary_FWD_DEFINED__
 typedef interface IAAFMetaDictionary IAAFMetaDictionary;
+
 #endif 	/* __IAAFMetaDictionary_FWD_DEFINED__ */
 
 
 #ifndef __IAAFPropValData_FWD_DEFINED__
 #define __IAAFPropValData_FWD_DEFINED__
 typedef interface IAAFPropValData IAAFPropValData;
+
 #endif 	/* __IAAFPropValData_FWD_DEFINED__ */
 
 
 #ifndef __IAAFStreamPropertyValue_FWD_DEFINED__
 #define __IAAFStreamPropertyValue_FWD_DEFINED__
 typedef interface IAAFStreamPropertyValue IAAFStreamPropertyValue;
+
 #endif 	/* __IAAFStreamPropertyValue_FWD_DEFINED__ */
 
 
 #ifndef __IAAFStrongRefArrayValue_FWD_DEFINED__
 #define __IAAFStrongRefArrayValue_FWD_DEFINED__
 typedef interface IAAFStrongRefArrayValue IAAFStrongRefArrayValue;
+
 #endif 	/* __IAAFStrongRefArrayValue_FWD_DEFINED__ */
 
 
 #ifndef __IAAFStrongRefSetValue_FWD_DEFINED__
 #define __IAAFStrongRefSetValue_FWD_DEFINED__
 typedef interface IAAFStrongRefSetValue IAAFStrongRefSetValue;
+
 #endif 	/* __IAAFStrongRefSetValue_FWD_DEFINED__ */
 
 
 #ifndef __IAAFStrongRefValue_FWD_DEFINED__
 #define __IAAFStrongRefValue_FWD_DEFINED__
 typedef interface IAAFStrongRefValue IAAFStrongRefValue;
+
 #endif 	/* __IAAFStrongRefValue_FWD_DEFINED__ */
 
 
 #ifndef __IAAFTextClip_FWD_DEFINED__
 #define __IAAFTextClip_FWD_DEFINED__
 typedef interface IAAFTextClip IAAFTextClip;
+
 #endif 	/* __IAAFTextClip_FWD_DEFINED__ */
 
 
 #ifndef __IAAFWeakRefArrayValue_FWD_DEFINED__
 #define __IAAFWeakRefArrayValue_FWD_DEFINED__
 typedef interface IAAFWeakRefArrayValue IAAFWeakRefArrayValue;
+
 #endif 	/* __IAAFWeakRefArrayValue_FWD_DEFINED__ */
 
 
 #ifndef __IAAFWeakRefSetValue_FWD_DEFINED__
 #define __IAAFWeakRefSetValue_FWD_DEFINED__
 typedef interface IAAFWeakRefSetValue IAAFWeakRefSetValue;
+
 #endif 	/* __IAAFWeakRefSetValue_FWD_DEFINED__ */
 
 
 #ifndef __IAAFWeakRefValue_FWD_DEFINED__
 #define __IAAFWeakRefValue_FWD_DEFINED__
 typedef interface IAAFWeakRefValue IAAFWeakRefValue;
+
 #endif 	/* __IAAFWeakRefValue_FWD_DEFINED__ */
 
 
 #ifndef __IEnumAAFStorablePropVals_FWD_DEFINED__
 #define __IEnumAAFStorablePropVals_FWD_DEFINED__
 typedef interface IEnumAAFStorablePropVals IEnumAAFStorablePropVals;
+
 #endif 	/* __IEnumAAFStorablePropVals_FWD_DEFINED__ */
 
 
@@ -136,10 +150,8 @@ typedef interface IEnumAAFStorablePropVals IEnumAAFStorablePropVals;
 extern "C"{
 #endif 
 
-void * __RPC_USER MIDL_user_allocate(size_t);
-void __RPC_USER MIDL_user_free( void * ); 
 
-/* interface __MIDL_itf_AAFPrivate_0000 */
+/* interface __MIDL_itf_AAFPrivate_0000_0000 */
 /* [local] */ 
 
 //=---------------------------------------------------------------------=
@@ -167,7 +179,7 @@ void __RPC_USER MIDL_user_free( void * );
 // (http://www.amwa.tv/policies).
 //
 // Copyright Notices:
-// The Original Code of this file is Copyright 1998-2009, licensor of the
+// The Original Code of this file is Copyright 1998-2012, licensor of the
 // Advanced Media Workflow Association.  All rights reserved.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -196,8 +208,8 @@ void __RPC_USER MIDL_user_free( void * );
 
 
 
-extern RPC_IF_HANDLE __MIDL_itf_AAFPrivate_0000_v0_0_c_ifspec;
-extern RPC_IF_HANDLE __MIDL_itf_AAFPrivate_0000_v0_0_s_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_AAFPrivate_0000_0000_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_AAFPrivate_0000_0000_v0_0_s_ifspec;
 
 #ifndef __IAAFRoot_INTERFACE_DEFINED__
 #define __IAAFRoot_INTERFACE_DEFINED__
@@ -215,12 +227,13 @@ EXTERN_C const IID IID_IAAFRoot;
     {
     public:
         virtual /* [local] */ HRESULT STDMETHODCALLTYPE GetImplRep( 
-            /* [retval][out] */ void **__MIDL_0008) = 0;
+            /* [retval][out] */ void **__MIDL__IAAFRoot0000) = 0;
         
         virtual /* [local] */ HRESULT STDMETHODCALLTYPE InitializeExtension( 
             REFCLSID clsid) = 0;
         
     };
+    
     
 #else 	/* C style interface */
 
@@ -231,7 +244,8 @@ EXTERN_C const IID IID_IAAFRoot;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFRoot * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFRoot * This);
@@ -241,7 +255,7 @@ EXTERN_C const IID IID_IAAFRoot;
         
         /* [local] */ HRESULT ( STDMETHODCALLTYPE *GetImplRep )( 
             IAAFRoot * This,
-            /* [retval][out] */ void **__MIDL_0008);
+            /* [retval][out] */ void **__MIDL__IAAFRoot0000);
         
         /* [local] */ HRESULT ( STDMETHODCALLTYPE *InitializeExtension )( 
             IAAFRoot * This,
@@ -261,50 +275,26 @@ EXTERN_C const IID IID_IAAFRoot;
 
 
 #define IAAFRoot_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFRoot_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFRoot_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
-#define IAAFRoot_GetImplRep(This,__MIDL_0008)	\
-    (This)->lpVtbl -> GetImplRep(This,__MIDL_0008)
+#define IAAFRoot_GetImplRep(This,__MIDL__IAAFRoot0000)	\
+    ( (This)->lpVtbl -> GetImplRep(This,__MIDL__IAAFRoot0000) ) 
 
 #define IAAFRoot_InitializeExtension(This,clsid)	\
-    (This)->lpVtbl -> InitializeExtension(This,clsid)
+    ( (This)->lpVtbl -> InitializeExtension(This,clsid) ) 
 
 #endif /* COBJMACROS */
 
 
 #endif 	/* C style interface */
 
-
-
-/* [local] */ HRESULT STDMETHODCALLTYPE IAAFRoot_GetImplRep_Proxy( 
-    IAAFRoot * This,
-    /* [retval][out] */ void **__MIDL_0008);
-
-
-void __RPC_STUB IAAFRoot_GetImplRep_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
-
-
-/* [local] */ HRESULT STDMETHODCALLTYPE IAAFRoot_InitializeExtension_Proxy( 
-    IAAFRoot * This,
-    REFCLSID clsid);
-
-
-void __RPC_STUB IAAFRoot_InitializeExtension_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
 
 
 
@@ -348,6 +338,7 @@ EXTERN_C const IID IID_IAAFHTMLClip;
         
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IAAFHTMLClipVtbl
@@ -357,7 +348,8 @@ EXTERN_C const IID IID_IAAFHTMLClip;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFHTMLClip * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFHTMLClip * This);
@@ -405,112 +397,38 @@ EXTERN_C const IID IID_IAAFHTMLClip;
 
 
 #define IAAFHTMLClip_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFHTMLClip_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFHTMLClip_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #define IAAFHTMLClip_SetBeginAnchor(This,pBeginAnchor)	\
-    (This)->lpVtbl -> SetBeginAnchor(This,pBeginAnchor)
+    ( (This)->lpVtbl -> SetBeginAnchor(This,pBeginAnchor) ) 
 
 #define IAAFHTMLClip_GetBeginAnchor(This,pBeginAnchor,bufSize)	\
-    (This)->lpVtbl -> GetBeginAnchor(This,pBeginAnchor,bufSize)
+    ( (This)->lpVtbl -> GetBeginAnchor(This,pBeginAnchor,bufSize) ) 
 
 #define IAAFHTMLClip_GetBeginAnchorBufLen(This,pBufSize)	\
-    (This)->lpVtbl -> GetBeginAnchorBufLen(This,pBufSize)
+    ( (This)->lpVtbl -> GetBeginAnchorBufLen(This,pBufSize) ) 
 
 #define IAAFHTMLClip_SetEndAnchor(This,pEndAnchor)	\
-    (This)->lpVtbl -> SetEndAnchor(This,pEndAnchor)
+    ( (This)->lpVtbl -> SetEndAnchor(This,pEndAnchor) ) 
 
 #define IAAFHTMLClip_GetEndAnchor(This,pEndAnchor,bufSize)	\
-    (This)->lpVtbl -> GetEndAnchor(This,pEndAnchor,bufSize)
+    ( (This)->lpVtbl -> GetEndAnchor(This,pEndAnchor,bufSize) ) 
 
 #define IAAFHTMLClip_GetEndAnchorBufLen(This,pBufSize)	\
-    (This)->lpVtbl -> GetEndAnchorBufLen(This,pBufSize)
+    ( (This)->lpVtbl -> GetEndAnchorBufLen(This,pBufSize) ) 
 
 #endif /* COBJMACROS */
 
 
 #endif 	/* C style interface */
 
-
-
-HRESULT STDMETHODCALLTYPE IAAFHTMLClip_SetBeginAnchor_Proxy( 
-    IAAFHTMLClip * This,
-    /* [string][in] */ aafCharacter_constptr pBeginAnchor);
-
-
-void __RPC_STUB IAAFHTMLClip_SetBeginAnchor_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
-
-
-HRESULT STDMETHODCALLTYPE IAAFHTMLClip_GetBeginAnchor_Proxy( 
-    IAAFHTMLClip * This,
-    /* [size_is][string][out] */ aafCharacter *pBeginAnchor,
-    /* [in] */ aafUInt32 bufSize);
-
-
-void __RPC_STUB IAAFHTMLClip_GetBeginAnchor_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
-
-
-HRESULT STDMETHODCALLTYPE IAAFHTMLClip_GetBeginAnchorBufLen_Proxy( 
-    IAAFHTMLClip * This,
-    /* [out] */ aafUInt32 *pBufSize);
-
-
-void __RPC_STUB IAAFHTMLClip_GetBeginAnchorBufLen_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
-
-
-HRESULT STDMETHODCALLTYPE IAAFHTMLClip_SetEndAnchor_Proxy( 
-    IAAFHTMLClip * This,
-    /* [string][in] */ aafCharacter_constptr pEndAnchor);
-
-
-void __RPC_STUB IAAFHTMLClip_SetEndAnchor_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
-
-
-HRESULT STDMETHODCALLTYPE IAAFHTMLClip_GetEndAnchor_Proxy( 
-    IAAFHTMLClip * This,
-    /* [size_is][string][out] */ aafCharacter *pEndAnchor,
-    /* [in] */ aafUInt32 bufSize);
-
-
-void __RPC_STUB IAAFHTMLClip_GetEndAnchor_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
-
-
-HRESULT STDMETHODCALLTYPE IAAFHTMLClip_GetEndAnchorBufLen_Proxy( 
-    IAAFHTMLClip * This,
-    /* [out] */ aafUInt32 *pBufSize);
-
-
-void __RPC_STUB IAAFHTMLClip_GetEndAnchorBufLen_Stub(
-    IRpcStubBuffer *This,
-    IRpcChannelBuffer *_pRpcChannelBuffer,
-    PRPC_MESSAGE _pRpcMessage,
-    DWORD *_pdwStubPhase);
 
 
 
@@ -534,6 +452,7 @@ EXTERN_C const IID IID_IAAFHTMLDescriptor;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IAAFHTMLDescriptorVtbl
@@ -543,7 +462,8 @@ EXTERN_C const IID IID_IAAFHTMLDescriptor;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFHTMLDescriptor * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFHTMLDescriptor * This);
@@ -565,13 +485,13 @@ EXTERN_C const IID IID_IAAFHTMLDescriptor;
 
 
 #define IAAFHTMLDescriptor_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFHTMLDescriptor_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFHTMLDescriptor_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -602,6 +522,7 @@ EXTERN_C const IID IID_IAAFMetaDictionary;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IAAFMetaDictionaryVtbl
@@ -611,7 +532,8 @@ EXTERN_C const IID IID_IAAFMetaDictionary;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFMetaDictionary * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFMetaDictionary * This);
@@ -633,13 +555,13 @@ EXTERN_C const IID IID_IAAFMetaDictionary;
 
 
 #define IAAFMetaDictionary_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFMetaDictionary_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFMetaDictionary_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -670,6 +592,7 @@ EXTERN_C const IID IID_IAAFPropValData;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IAAFPropValDataVtbl
@@ -679,7 +602,8 @@ EXTERN_C const IID IID_IAAFPropValData;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFPropValData * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFPropValData * This);
@@ -701,13 +625,13 @@ EXTERN_C const IID IID_IAAFPropValData;
 
 
 #define IAAFPropValData_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFPropValData_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFPropValData_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -738,6 +662,7 @@ EXTERN_C const IID IID_IAAFStreamPropertyValue;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IAAFStreamPropertyValueVtbl
@@ -747,7 +672,8 @@ EXTERN_C const IID IID_IAAFStreamPropertyValue;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFStreamPropertyValue * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFStreamPropertyValue * This);
@@ -769,13 +695,13 @@ EXTERN_C const IID IID_IAAFStreamPropertyValue;
 
 
 #define IAAFStreamPropertyValue_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFStreamPropertyValue_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFStreamPropertyValue_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -806,6 +732,7 @@ EXTERN_C const IID IID_IAAFStrongRefArrayValue;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IAAFStrongRefArrayValueVtbl
@@ -815,7 +742,8 @@ EXTERN_C const IID IID_IAAFStrongRefArrayValue;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFStrongRefArrayValue * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFStrongRefArrayValue * This);
@@ -837,13 +765,13 @@ EXTERN_C const IID IID_IAAFStrongRefArrayValue;
 
 
 #define IAAFStrongRefArrayValue_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFStrongRefArrayValue_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFStrongRefArrayValue_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -874,6 +802,7 @@ EXTERN_C const IID IID_IAAFStrongRefSetValue;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IAAFStrongRefSetValueVtbl
@@ -883,7 +812,8 @@ EXTERN_C const IID IID_IAAFStrongRefSetValue;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFStrongRefSetValue * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFStrongRefSetValue * This);
@@ -905,13 +835,13 @@ EXTERN_C const IID IID_IAAFStrongRefSetValue;
 
 
 #define IAAFStrongRefSetValue_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFStrongRefSetValue_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFStrongRefSetValue_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -942,6 +872,7 @@ EXTERN_C const IID IID_IAAFStrongRefValue;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IAAFStrongRefValueVtbl
@@ -951,7 +882,8 @@ EXTERN_C const IID IID_IAAFStrongRefValue;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFStrongRefValue * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFStrongRefValue * This);
@@ -973,13 +905,13 @@ EXTERN_C const IID IID_IAAFStrongRefValue;
 
 
 #define IAAFStrongRefValue_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFStrongRefValue_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFStrongRefValue_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -1010,6 +942,7 @@ EXTERN_C const IID IID_IAAFTextClip;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IAAFTextClipVtbl
@@ -1019,7 +952,8 @@ EXTERN_C const IID IID_IAAFTextClip;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFTextClip * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFTextClip * This);
@@ -1041,13 +975,13 @@ EXTERN_C const IID IID_IAAFTextClip;
 
 
 #define IAAFTextClip_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFTextClip_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFTextClip_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -1078,6 +1012,7 @@ EXTERN_C const IID IID_IAAFWeakRefArrayValue;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IAAFWeakRefArrayValueVtbl
@@ -1087,7 +1022,8 @@ EXTERN_C const IID IID_IAAFWeakRefArrayValue;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFWeakRefArrayValue * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFWeakRefArrayValue * This);
@@ -1109,13 +1045,13 @@ EXTERN_C const IID IID_IAAFWeakRefArrayValue;
 
 
 #define IAAFWeakRefArrayValue_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFWeakRefArrayValue_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFWeakRefArrayValue_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -1146,6 +1082,7 @@ EXTERN_C const IID IID_IAAFWeakRefSetValue;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IAAFWeakRefSetValueVtbl
@@ -1155,7 +1092,8 @@ EXTERN_C const IID IID_IAAFWeakRefSetValue;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFWeakRefSetValue * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFWeakRefSetValue * This);
@@ -1177,13 +1115,13 @@ EXTERN_C const IID IID_IAAFWeakRefSetValue;
 
 
 #define IAAFWeakRefSetValue_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFWeakRefSetValue_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFWeakRefSetValue_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -1214,6 +1152,7 @@ EXTERN_C const IID IID_IAAFWeakRefValue;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IAAFWeakRefValueVtbl
@@ -1223,7 +1162,8 @@ EXTERN_C const IID IID_IAAFWeakRefValue;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IAAFWeakRefValue * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IAAFWeakRefValue * This);
@@ -1245,13 +1185,13 @@ EXTERN_C const IID IID_IAAFWeakRefValue;
 
 
 #define IAAFWeakRefValue_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IAAFWeakRefValue_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IAAFWeakRefValue_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */
@@ -1282,6 +1222,7 @@ EXTERN_C const IID IID_IEnumAAFStorablePropVals;
     public:
     };
     
+    
 #else 	/* C style interface */
 
     typedef struct IEnumAAFStorablePropValsVtbl
@@ -1291,7 +1232,8 @@ EXTERN_C const IID IID_IEnumAAFStorablePropVals;
         HRESULT ( STDMETHODCALLTYPE *QueryInterface )( 
             IEnumAAFStorablePropVals * This,
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void **ppvObject);
+            /* [annotation][iid_is][out] */ 
+            _COM_Outptr_  void **ppvObject);
         
         ULONG ( STDMETHODCALLTYPE *AddRef )( 
             IEnumAAFStorablePropVals * This);
@@ -1313,13 +1255,13 @@ EXTERN_C const IID IID_IEnumAAFStorablePropVals;
 
 
 #define IEnumAAFStorablePropVals_QueryInterface(This,riid,ppvObject)	\
-    (This)->lpVtbl -> QueryInterface(This,riid,ppvObject)
+    ( (This)->lpVtbl -> QueryInterface(This,riid,ppvObject) ) 
 
 #define IEnumAAFStorablePropVals_AddRef(This)	\
-    (This)->lpVtbl -> AddRef(This)
+    ( (This)->lpVtbl -> AddRef(This) ) 
 
 #define IEnumAAFStorablePropVals_Release(This)	\
-    (This)->lpVtbl -> Release(This)
+    ( (This)->lpVtbl -> Release(This) ) 
 
 
 #endif /* COBJMACROS */

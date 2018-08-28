@@ -396,6 +396,80 @@ HRESULT STDMETHODCALLTYPE
 	return status;
 }
 
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceDataStream::WriteSampleIndex (
+    aafUInt32 bytes,
+    aafDataBuffer_t  buffer,
+    aafUInt32  *pBytesWritten)
+{
+  if (NULL == _data)
+    return AAFRESULT_NOT_INITIALIZED;
+  else if (NULL == buffer || NULL == pBytesWritten)
+    return AAFRESULT_NULL_PARAM;
+
+  return(_data->WriteSampleIndex (bytes, buffer, pBytesWritten));
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceDataStream::ReadSampleIndex (aafUInt32  buflen,
+        aafDataBuffer_t  buffer,
+        aafUInt32 *  bytesRead)
+{
+  if (NULL == _data)
+    return AAFRESULT_NOT_INITIALIZED;
+  else if (NULL == buffer || NULL == bytesRead)
+    return AAFRESULT_NULL_PARAM;
+
+
+	return(_data->ReadSampleIndex (buflen, buffer, bytesRead));
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceDataStream::SeekSampleIndex(aafPosition_t  byteOffset)
+{
+	HRESULT		hr = S_OK;
+	aafBool		valid;
+
+	if (NULL == _data)
+		return AAFRESULT_NOT_INITIALIZED;
+
+  	hr = IsPosValid (byteOffset, &valid);
+	if(hr != S_OK)
+		return(hr);
+
+	if(!valid)
+		return(AAFRESULT_BADSAMPLEOFFSET);
+
+	return(_data->SetSampleIndexPosition(byteOffset));
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceDataStream::GetSampleIndexPosition (aafPosition_t *  position)
+{
+  if (NULL == _data)
+    return AAFRESULT_NOT_INITIALIZED;
+
+	return(_data->GetSampleIndexPosition (position));
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceDataStream::GetSampleIndexLength (aafLength_t *  position)
+{
+  if (NULL == _data)
+    return AAFRESULT_NOT_INITIALIZED;
+
+	aafLength_t	result;
+	HRESULT		status;
+
+	status = _data->GetSampleIndexSize (&result);
+	*position = result;
+	return status;
+}
+
 
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceDataStream::FlushCache ()
@@ -427,6 +501,12 @@ HRESULT CAAFEssenceDataStream::InternalQueryInterface
         return E_INVALIDARG;
 
     // We support the IID_IAAFEssenceDataStream and the IID_IAAFEssenceDataStream2 interfaces 
+    if (EQUAL_UID(riid,IID_IAAFEssenceDataStreamEx)) 
+    { 
+        *ppvObj = (IAAFEssenceDataStreamEx *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
     if (EQUAL_UID(riid,IID_IAAFEssenceDataStream)) 
     { 
         *ppvObj = (IAAFEssenceDataStream *)this; 

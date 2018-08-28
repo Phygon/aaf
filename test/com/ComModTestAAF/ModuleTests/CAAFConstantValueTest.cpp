@@ -41,8 +41,8 @@ using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <wchar.h>
 
+#include "AAFWideString.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
@@ -530,10 +530,10 @@ extern "C" HRESULT CAAFConstantValue_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IAAFConstantValue methods have not been implemented:" << endl; 
-//		cout << "     GetValue" << endl; 
-//		cout << "     GetValueBufLen" << endl; 
-//		cout << "     SetValue" << endl; 
+//		cout << "The following IAAFConstantValue methods have not been implemented:" << endl;
+//		cout << "     GetValue" << endl;
+//		cout << "     GetValueBufLen" << endl;
+//		cout << "     SetValue" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

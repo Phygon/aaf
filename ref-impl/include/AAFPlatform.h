@@ -210,7 +210,7 @@
 /*
  *  Compiler:   GNU C++
  *  Processor:  x86-64 (both AMD and Intel x86-64)
- *  OS:         MaxOS 10 (Darwin)
+ *  OS:         MacOS 10 (Darwin)
  */
 #elif defined(__GNUC__) && defined(__x86_64__) && defined(__APPLE__) && defined(__APPLE_CC__)
 #define CPU_INTEL
@@ -277,8 +277,11 @@
  *
  ***************************************************************/
 
-#if defined( OS_WINDOWS )
+#if defined( OS_WINDOWS ) && defined( CPU_INTEL )
 # define PLATFORM_NAME L"Win32"
+
+#elif defined( OS_WINDOWS ) && defined( CPU_X64 )
+# define PLATFORM_NAME L"Win64"
 
 #elif defined( OS_IRIX )
 # define PLATFORM_NAME L"IRIX"

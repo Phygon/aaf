@@ -1,4 +1,3 @@
-
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -39,12 +38,12 @@
 #include "AAFDefUIDs.h"
 #include "AAFTypeDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
+#include "AAFWideString.h"
 
 #include <iostream>
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
 
 typedef IAAFSmartPointer<IAAFClassDef>             IAAFClassDefSP;
 typedef IAAFSmartPointer<IAAFDictionary>           IAAFDictionarySP;
@@ -64,8 +63,8 @@ public:
 };
 
 // The template class CAAFModTestLog provides a way to keep track of which methods in a class have been
-// tested, and whether the tests have passed or failed.  The parameter class T should be set to an 
-// enumeration type giving a named index for each method to be tested (see usage in CAAFClassDef_test(testMode_t mode) 
+// tested, and whether the tests have passed or failed.  The parameter class T should be set to an
+// enumeration type giving a named index for each method to be tested (see usage in CAAFClassDef_test(testMode_t mode)
 // below).
 template<class T>
 class CAAFModTestLog
@@ -229,7 +228,7 @@ static const aafUID_t ourPid2 =
 static aafCharacter_constptr kOptionalObjectPropertyName = L"Optional Object Property";
 
 
-// Use existing class AAFFiller as parent for the new class definition we will 
+// Use existing class AAFFiller as parent for the new class definition we will
 // create
 static aafUID_t AUID_ParentClass=AUID_AAFFiller;
 
@@ -242,13 +241,14 @@ inline void checkResult(HRESULT r)
   if (FAILED(r))
     throw r;
 }
+
 inline void checkExpression(bool expression, HRESULT r=AAFRESULT_TEST_FAILED)
 {
   if (!expression)
     throw r;
 }
 
-// Function to compare COM interface pointers, taken from 
+// Function to compare COM interface pointers, taken from
 // CAAFTypeDefFixedArrayTest.cpp.
 template <class T1, class T2>
 aafBoolean_t  AreUnksSame(T1& cls1, T2& cls2)

@@ -102,7 +102,7 @@ public:
 
     // @cmember The number of <p ReferencedObject>s in the associated
     //          <c OMStrongReferenceVectorProperty>.
-  virtual size_t count(void) const;
+  virtual OMUInt32 count(void) const;
 
     // @cmember Advance this <c OMStrongReferenceVectorIterator> to the
     //          next <p ReferencedObject>, if any.
@@ -158,7 +158,7 @@ public:
     //          associated <c OMStrongReferenceVectorProperty> at the position
     //          currently designated by this
     //          <c OMStrongReferenceVectorIterator>.
-  virtual size_t index(void) const;
+  virtual OMUInt32 index(void) const;
 
     // @cmember Return the <p OMObject> in the associated
     //          reference container property at the position currently

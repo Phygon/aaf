@@ -146,8 +146,8 @@ static HRESULT CreateAAFFile(
 	// We can't really do anthing in AAF without the header.
 	checkResult(pFile->GetHeader(&pHeader));
 
-    // Get the AAF Dictionary so that we can create valid AAF objects.
-    checkResult(pHeader->GetDictionary(&pDictionary));
+	// Get the AAF Dictionary so that we can create valid AAF objects.
+	checkResult(pHeader->GetDictionary(&pDictionary));
 	CAAFBuiltinDefs defs (pDictionary);
     
 	for(n = 0; n < 2; n++)

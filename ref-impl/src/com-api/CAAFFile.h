@@ -56,6 +56,7 @@
 
 class CAAFFile
   : public IAAFFile,
+    public IAAFSaveIntermediate,
     public CAAFRoot
 {
 protected:
@@ -68,7 +69,6 @@ protected:
   virtual ~CAAFFile ();
 
 public:
-
 
   //***********************************************************
   //
@@ -295,6 +295,42 @@ public:
     // The AAF Dictionary 
     /*[out, retval]*/ IAAFDictionary ** ppDictionary);
 
+  //***********************************************************
+  // METHOD NAME: SaveIntermediate()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFSaveIntermediate | SaveIntermediate |
+  // If this IAAFFile-supporting object is open, all unsaved changes
+  /// made to the contents of this object are saved. The resulting file
+  /// is not guaranteed to be complete. To finalize the file use the
+  /// Save method of the IAAFFile interface.
+  ///
+  /// This method will succeed only if all of the following are true:
+  /// - This object is currently open.
+  /// - Sufficient space remains in the storage for the data to be
+  ///   written.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NOT_OPEN
+  ///   - This object is not open.
+  ///
+  /// AAFRESULT_WRONG_OPENMODE
+  ///   - This object is not open for writing or modification.
+  ///
+  /// AAFRESULT_INSUFFICIENT_SPACE
+  ///   - There is insufficient space in the storage to save the
+  ///     contents of this object.
+  // @end
+  STDMETHOD (SaveIntermediate)
+    ();
+
+
 
 protected:
   // 
@@ -316,5 +352,4 @@ public:
 };
 
 #endif // ! __CAAFFile_h__
-
 

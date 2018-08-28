@@ -38,7 +38,7 @@
 #include "OMStoredStream.h"
 #include "OMVector.h"
 
-class OMMXFStorage;
+class OMMXFStorageBase;
 
   // @class Implementation of <c OMStoredStream> for
   //        SMPTE (Society of Motion Picture and Television Engineers)
@@ -50,7 +50,7 @@ public:
   // @access Public members.
 
     // @cmember Constructor.
-  OMKLVStoredStream(OMMXFStorage* store, OMUInt32 sid);
+  OMKLVStoredStream(OMMXFStorageBase* store, OMUInt32 sid);
 
     // @cmember Destructor.
   ~OMKLVStoredStream(void);
@@ -66,6 +66,39 @@ public:
                     const OMUInt32 bytes,
                     OMUInt32& bytesRead) const;
 
+    // @cmember Attempt to read the vector of buffers given by <p buffers>
+    //          from this <c OMKLVStoredStream>. This is "read scatter". The
+    //          <p bufferCount> buffers are read in order until all have
+    //          been successfully read or an error is encountered. Once
+    //          an error has been encountered on one buffer no additional
+    //          buffers are read.
+    //          The number of bytes read is returned in <p bytesRead>.
+  virtual void read(OMIOBufferDescriptor* buffers,
+                    OMUInt32 bufferCount,
+                    OMUInt32& bytesRead) const;
+
+    // Asynchronous read - single buffer
+  virtual void read(OMUInt64 position,
+                    OMByte* buffer,
+                    const OMUInt32 bytes,
+                    void* /* */ completion,
+                    const void* clientArgument);
+
+    // Asynchronous read - multiple buffers
+  virtual void read(OMUInt64 position,
+                    OMIOBufferDescriptor* buffers,
+                    OMUInt32 bufferCount,
+                    void* /* */ completion,
+                    const void* clientArgument) const;
+
+    // @cmember Find out if <p bytesRequired> contiguous bytes, starting at
+    //          <p position>, in this <c OMKLVStoredStream> are available for
+    //          writing. The actual number of bytes available is returned
+    //          in <p bytesAvailable>.
+  virtual void probe(OMUInt64 position,
+                     OMUInt32 bytesRequired,
+                     OMUInt32& bytesAvailable) const;
+
     // @cmember Write <p size> bytes from the buffer at address
     //          <p data> to this <c OMKLVStoredStream>.
   virtual void write(void* data, OMUInt32 size);
@@ -76,6 +109,31 @@ public:
   virtual void write(const OMByte* data,
                      const OMUInt32 bytes,
                      OMUInt32& bytesWritten);
+
+    // @cmember Attempt to write the vector of buffers given by <p buffers>
+    //          to this <c OMKLVStoredStream>. This is "write gather". The
+    //          <p bufferCount> buffers are written in order until all have
+    //          been successfully written or an error is encountered. Once
+    //          an error has been encountered on one buffer no additional
+    //          buffers are written.
+    //          The number of bytes written is returned in <p bytesWritten>.
+  virtual void write(OMIOBufferDescriptor* buffers,
+                     OMUInt32 bufferCount,
+                     OMUInt32& bytesWritten);
+
+    // Asynchronous write - single buffer
+  virtual void write(OMUInt64 position,
+                     const OMByte* buffer,
+                     const OMUInt32 bytes,
+                     void* /* */ completion,
+                     const void* clientArgument);
+
+    // Asynchronous write - multiple buffers
+  virtual void write(OMUInt64 position,
+                     const OMIOBufferDescriptor* buffers,
+                     OMUInt32 bufferCount,
+                     void* /* */ completion,
+                     const void* clientArgument);
 
     // @cmember The size of this <c OMKLVStoredStream> in bytes.
   virtual OMUInt64 size(void) const;
@@ -95,6 +153,15 @@ public:
 
     // @cmember Close this <c OMKLVStoredStream>.
   virtual void close(void);
+
+    // @cmember Create this <c OMKLVStoredStream> in the file.
+  virtual void create(const OMKLVKey& label,
+                      OMUInt32 blockSize,
+                      OMUInt32 allocationSize,
+                      bool alignV);
+
+    // @cmember Does this <c OMKLVStoredStream> exist in the file ? 
+  virtual bool exists(void) const;
 
 
   // Stream essence element key
@@ -152,7 +219,7 @@ private:
   OMKLVKey _label;
   OMUInt32 _blockSize;
   OMUInt64 _fileOffset;
-  OMMXFStorage* _store;
+  OMMXFStorageBase* _store;
   OMUInt32 _sid;
   OMUInt64 _position;
 

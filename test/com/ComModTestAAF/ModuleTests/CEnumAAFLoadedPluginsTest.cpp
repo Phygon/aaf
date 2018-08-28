@@ -190,11 +190,11 @@ extern "C" HRESULT CEnumAAFLoadedPlugins_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IEnumAAFLoadedPlugins tests have not been implemented:" << endl; 
-//		cout << "     Next" << endl; 
-//		cout << "     Skip" << endl; 
-//		cout << "     Reset" << endl; 
-///		cout << "     Clone" << endl; 
+//		cout << "The following IEnumAAFLoadedPlugins tests have not been implemented:" << endl;
+//		cout << "     Next" << endl;
+//		cout << "     Skip" << endl;
+//		cout << "     Reset" << endl;
+///		cout << "     Clone" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

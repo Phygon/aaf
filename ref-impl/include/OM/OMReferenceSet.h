@@ -32,7 +32,7 @@
 //=---------------------------------------------------------------------=
 
 // @doc OMEXTERNAL
-#ifndef OREFERENCESET_H
+#ifndef OMREFERENCESET_H
 #define OMREFERENCESET_H
 
 #include "OMSet.h"

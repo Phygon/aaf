@@ -37,6 +37,7 @@
 #include "OMFile.h"
 
 #include "OMAssertions.h"
+#include "OMExceptions.h"
 #include "OMStoredObject.h"
 #include "OMStoredObjectFactory.h"
 #include "OMClassFactory.h"
@@ -45,6 +46,7 @@
 #include "OMDictionary.h"
 #include "OMRootStorable.h"
 #include "OMRawStorage.h"
+#include "OMStream.h"
 #include "OMUniqueObjectIdentType.h"
 #include "OMSetIterator.h"
 
@@ -89,6 +91,7 @@ OMFile* OMFile::openExistingRead(const wchar_t* fileName,
   TRACE("OMFile::openExistingRead");
 
   PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be read", readable(fileName));
   PRECONDITION("Valid class factory", factory != 0);
   PRECONDITION("Valid dictionary", dictionary != 0);
 
@@ -118,13 +121,20 @@ OMFile* OMFile::openExistingRead(const wchar_t* fileName,
     ASSERT("Valid raw storage", store != 0);
     newFile = new OMFile(store,
                          clientOnRestoreContext,
-			 nullOMStoredObjectEncoding, // don't care 
+                         nullOMStoredObjectEncoding, // don't care 
                          readOnlyMode,
                          factory,
                          dictionary,
                          loadMode);
     ASSERT("Valid heap pointer", newFile != 0);
-    newFile->open();
+    try {
+      newFile->open();
+    } catch (OMException& /* e */) {
+      f->close(newFile);
+      delete newFile;
+      newFile = 0;
+      throw; // propagate
+    }
   }
   POSTCONDITION("File is open", newFile->isOpen());
   return newFile;
@@ -147,6 +157,7 @@ OMFile* OMFile::openExistingModify(const wchar_t* fileName,
   TRACE("OMFile::openExistingModify");
 
   PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be modified", modifiable(fileName));
   PRECONDITION("Valid class factory", factory != 0);
   PRECONDITION("Valid dictionary", dictionary != 0);
 
@@ -182,7 +193,14 @@ OMFile* OMFile::openExistingModify(const wchar_t* fileName,
                          dictionary,
                          loadMode);
     ASSERT("Valid heap pointer", newFile != 0);
-    newFile->open();
+    try {
+      newFile->open();
+    } catch (OMException& /* e */) {
+      f->close(newFile);
+      delete newFile;
+      newFile = 0;
+      throw; // propagate
+    }
   }
   POSTCONDITION("File is open", newFile->isOpen());
   return newFile;
@@ -213,6 +231,7 @@ OMFile* OMFile::openNewModify(const wchar_t* fileName,
   TRACE("OMFile::openNewModify");
 
   PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be created", creatable(fileName));
   PRECONDITION("Valid class factory", factory != 0);
   PRECONDITION("Valid byte order",
                     ((byteOrder == littleEndian) || (byteOrder == bigEndian)));
@@ -255,6 +274,41 @@ OMFile* OMFile::openNewModify(const wchar_t* fileName,
   }
   POSTCONDITION("File is open", newFile->isOpen());
   return newFile;
+}
+
+  // @mfunc Can an existing file named <p fileName> be opened
+  //        for read access ? The file must already exist and be readable.
+  //   @parm The name of the file.
+  //   @rdesc <e bool.true> if <p fileName> is readable,
+  //          <e bool.false> otherwise.
+bool OMFile::readable(const wchar_t* fileName)
+{
+  TRACE("OMFile::readable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+  return OMStream::readable(fileName);
+}
+
+  // @mfunc Can an existing file named <p fileName> be opened
+  //        for read/write access ? The file must already exist and be
+  //        both readable and writable.
+  //   @rdesc <e bool.true> if <p fileName> is modifiable,
+  //          <e bool.false> otherwise.
+bool OMFile::modifiable(const wchar_t* fileName)
+{
+  TRACE("OMFile::modifiable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+  return OMStream::modifiable(fileName);
+}
+
+  // @mfunc Can a new file named <p fileName> be created for read access ?
+  //        The file must not already exist.
+  //   @rdesc <e bool.true> if <p fileName> is creatable,
+  //          <e bool.false> otherwise.
+bool OMFile::creatable(const wchar_t* fileName)
+{
+  TRACE("OMFile::creatable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+  return OMStream::creatable(fileName);
 }
 
   // @mfunc Is the given <c OMRawStorage> compatible with the given file
@@ -326,6 +380,58 @@ bool OMFile::compatible(const OMRawStorage* rawStorage,
       }
       break;
   }
+  return result;
+}
+
+  // @mfunc Can the contents of an existing file named <p fileName>
+  //        and of the encoding specified by <p encoding> be accessed
+  //        successfully in the mode specified by <p accessMode> ?
+  //        This method attempts to identify issues with the file
+  //        contents before opening the file and restoring its metadata.
+  //   @parm The name of the file.
+  //   @parm The <t OMAccessMode>
+  //   @parm The <t OMStoredObjectEncoding>
+  //   @rdesc True if the file contents can be accessed, false otherwise.
+bool OMFile::compatibleStoredFormat(const wchar_t* fileName,
+                                    const OMAccessMode accessMode,
+                                    const OMStoredObjectEncoding& encoding)
+{
+  TRACE("OMFile::compatibleStoredFormat");
+  PRECONDITION("Valid file name", fileName != 0);
+
+  bool result = false;
+  const OMRawStorage* store =
+                            OMCachedDiskRawStorage::openExistingRead(fileName);
+  if (store != 0) {
+    result = compatibleStoredFormat(store, accessMode, encoding);
+    delete store;
+    store = 0;
+  } else {
+    result = false;
+  }
+  return result;
+}
+
+  // @mfunc Can the contents of a file of the encoding specified
+  //        by <p encoding> on the given <c OMRawStorage> be accessed
+  //        successfully in the mode specified by <p accessMode> ?
+  //        This method attempts to identify issues with the file
+  //        contents before opening the file and restoring its metadata.
+  //   @parm The <c OMRawStorage>
+  //   @parm The <t OMAccessMode>
+  //   @parm The <t OMStoredObjectEncoding>
+  //   @rdesc True if the file contents can be accessed, false otherwise.
+bool OMFile::compatibleStoredFormat(const OMRawStorage* rawStorage,
+                                    const OMAccessMode accessMode,
+                                    const OMStoredObjectEncoding& encoding)
+{
+  TRACE("OMFile::compatibleStoredFormat");
+  PRECONDITION("Valid raw storage", rawStorage != 0);
+
+  bool result = false;
+  OMStoredObjectFactory* factory = findFactory(encoding);
+  ASSERT("Recognized file encoding", factory != 0);
+  result = factory->compatibleStoredFormat(rawStorage, accessMode);
   return result;
 }
 
@@ -566,6 +672,26 @@ bool OMFile::isRecognized(OMRawStorage* rawStorage,
   return result;
 }
 
+bool OMFile::isBeingModified(const wchar_t* fileName,
+                             const OMStoredObjectEncoding &encoding)
+{
+  TRACE("OMFile::isBeingModified");
+  OMStoredObjectFactory* f = findFactory(encoding);
+  ASSERT("Recognized file encoding", f != 0);
+
+  return f->isBeingModified(fileName);
+}
+
+bool OMFile::isBeingModified(OMRawStorage* rawStorage,
+                             const OMStoredObjectEncoding &encoding)
+{
+  TRACE("OMFile::isBeingModified");
+  OMStoredObjectFactory* f = findFactory(encoding);
+  ASSERT("Recognized file encoding", f != 0);
+
+  return f->isBeingModified(rawStorage);
+}
+
 void OMFile::initialize(void)
 {
   TRACE("OMFile::initialize");
@@ -744,11 +870,19 @@ void OMFile::saveFile(void* clientOnSaveContext)
   TRACE("OMFile::saveFile");
   PRECONDITION("File is open", isOpen());
 
+  saveFile(true, clientOnSaveContext);
+}
+
+void OMFile::saveFile(bool finalize, void* clientOnSaveContext)
+{
+  TRACE("OMFile::saveFile");
+  PRECONDITION("File is open", isOpen());
+
   _clientOnSaveContext = clientOnSaveContext;
 
   _isValid = false; // failing save() leaves the file invalid
   if (isWritable()) {
-    _rootStore->save(*this);
+    _rootStore->save(*this, finalize);
   }
   _isValid = true; // successful save() leaves the file valid
 }
@@ -852,6 +986,7 @@ void OMFile::close(void)
   if (isValid()) {
     OMStoredObjectFactory* factory = findFactory(_encoding);
     ASSERT("Recognized file encoding", factory != 0);
+    /* OMRawStorage* store = */ rawStorage();
     factory->close(this);
   }
 

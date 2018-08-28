@@ -35,7 +35,8 @@
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
+
+#include "AAFWideString.h"
 #include <string.h>
 #include "AAF.h"
 #include "AAFResult.h"
@@ -77,7 +78,7 @@ inline void checkExpression(bool expression, HRESULT r=AAFRESULT_TEST_FAILED)
     throw r;
 }
 
-// Function to compare COM interface pointers, taken from 
+// Function to compare COM interface pointers, taken from
 // CAAFTypeDefFixedArrayTest.cpp.
 template <class T1, class T2>
 aafBoolean_t  AreUnksSame(T1& cls1, T2& cls2)

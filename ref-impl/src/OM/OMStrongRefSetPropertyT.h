@@ -208,19 +208,17 @@ OMStrongReferenceSetProperty<UniqueIdentification,
   // Set the set to contain the new object
   //
   const OMUInt32 localKey = nextLocalKey();
-  wchar_t* name = elementName(localKey);
   UniqueIdentification key = object->identification();
   ASSERT("Valid identification", isValidIdentification(key));
 
   SetElement newElement(this,
-                        name,
+                        nullOMUniqueObjectIdentification,
                         localKey,
                         &key,
                         sizeof(key));
   newElement.setValue(&key, object);
   _set.insert(key, newElement);
   setPresent();
-  delete [] name;
 
   POSTCONDITION("Object is present", containsValue(object));
   //POSTCONDITION("Optional property is present", isPresent());
@@ -979,7 +977,8 @@ template <typename UniqueIdentification, typename ReferencedObject>
 void OMStrongReferenceSetProperty<UniqueIdentification,
                                   ReferencedObject>::deepCopyTo(
                                                      OMProperty* destination,
-                                                     void* clientContext) const
+                                                     void* clientContext,
+                                                     bool deferStreamData) const
 {
   TRACE("OMStrongReferenceSetProperty<UniqueIdentification, "
                                      "ReferencedObject>::deepCopyTo");
@@ -1001,10 +1000,11 @@ void OMStrongReferenceSetProperty<UniqueIdentification,
     void* id = element.identification();
     if (!dest->contains(id)) {
       OMStorable* source = element.getValue();
+      ASSERT("Valid source", source != 0);
       OMStorable* d = source->shallowCopy(factory);
       dest->insertObject(d);
       d->onCopy(clientContext);
-      source->deepCopyTo(d, clientContext);
+      source->deepCopyTo(d, clientContext, deferStreamData);
     }
   }
 }

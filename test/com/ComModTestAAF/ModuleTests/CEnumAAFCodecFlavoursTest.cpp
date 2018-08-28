@@ -166,7 +166,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 	try
 	{
-	  // Open the AAF file
+		// Open the AAF file
 		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = true;
 
@@ -275,9 +275,9 @@ extern "C" HRESULT CEnumAAFCodecFlavours_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IEnumAAFCodecFlavours tests have not been implemented:" << endl; 
-//		cout << "     Next" << endl; 
-//		cout << "     Clone" << endl; 
+//		cout << "The following IEnumAAFCodecFlavours tests have not been implemented:" << endl;
+//		cout << "     Next" << endl;
+//		cout << "     Clone" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

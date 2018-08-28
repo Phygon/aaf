@@ -66,7 +66,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT ImplAAFFiller::TraverseToClip(aafLength_t /*length*/,
-										 ImplAAFSegment ** /*sclp*/,
+										 ImplAAFSourceClip ** /*sclp*/,
 										 ImplAAFPulldown ** /*pulldownObj*/,
 										 aafInt32 * /*pulldownPhase*/,
 										 aafLength_t * /*sclpLen*/,

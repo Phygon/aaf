@@ -43,7 +43,8 @@ using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
-#include <wchar.h>
+
+#include "AAFWideString.h"
 #include <string.h>
 
 #include "CAAFBuiltinDefs.h"
@@ -175,12 +176,33 @@ static HRESULT  createEXTENUMType (IAAFDictionary * const pDict)
 		TEST_EXTENUM_TYPE_NAME)   );  //The Enum TypeName
 
 	//IAAFTypeDefExtEnum::AppendElement
-	aafUInt32 i =0;
+	aafUInt32 i = 0;
 	while (i < TEST_EXTENUM_COUNT)
 	{
 		checkResult(spEXTENUM->AppendElement(TEST_EXTENUM_VALUES[i], //values of elems
 						TEST_EXTENUM_NAMES[i] ));  //names of elems
 		i++;
+	}
+
+	//IAAFTypeDefExtEnum::AppendElement for duplicate cases
+	// Return success if trying to add same pair
+	i = 0;
+	while (i < TEST_EXTENUM_COUNT) 
+	{
+		checkResult(spEXTENUM->AppendElement(TEST_EXTENUM_VALUES[i], TEST_EXTENUM_NAMES[i]));
+		++i;
+	}
+
+	// Return AAFRESULT_INVALID_PARAM if trying to add pair whre only one of two units is duplicate 
+	i = 1;
+	while (i < TEST_EXTENUM_COUNT) 
+	{
+		HRESULT hr = spEXTENUM->AppendElement(TEST_EXTENUM_VALUES[0], TEST_EXTENUM_NAMES[i]);
+		if (hr != AAFRESULT_INVALID_PARAM) throw hr;
+		checkExpression(AAFRESULT_INVALID_PARAM==hr, AAFRESULT_TEST_FAILED);
+		hr = spEXTENUM->AppendElement(TEST_EXTENUM_VALUES[i], TEST_EXTENUM_NAMES[0]);
+		checkExpression(AAFRESULT_INVALID_PARAM==hr, AAFRESULT_TEST_FAILED);
+		++i;
 	}
 
 	//  Register our new EXTENUM type def :
@@ -388,7 +410,6 @@ static HRESULT verifyContents (IAAFHeader* const pHeader, IAAFDictionary* const 
 	checkExpression( memcmp (&someval, &TEST_EXTENUM_SOME_VALUE, sizeof(aafUID_t)) == 0, 
 								AAFRESULT_TEST_FAILED );
 	
-
 	
 	aafUInt32 index = 0;
 	while (index < TEST_EXTENUM_COUNT )
@@ -514,7 +535,7 @@ static HRESULT CreateAAFFile(
 		//////////////////// done /!!!!!!!!!!!!!!!!!!!!!!
 		
 		//Verify results right away (during this creation process) ....
-		checkResult(verifyContents (pHeader, pDict, kAAFTrue));  //True => minimal testing 
+		checkResult(verifyContents (pHeader, pDict, kAAFFalse));  //True => minimal testing, False => full testing 
 		
 	}
 	catch (HRESULT & rResult)

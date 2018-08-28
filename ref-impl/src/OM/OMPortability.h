@@ -45,32 +45,47 @@
 //
 #if defined (_MSC_VER) && defined(_M_IX86) && defined(_WIN32)
 #define OM_COMPILER_MSC_INTEL_WINDOWS
+#define OM_COMPILER_MSC
 #define OM_OS_WINDOWS
 #elif defined (_MSC_VER) && defined(_M_X64) && defined(_WIN32)
-# define OM_COMPILER_MSC_X64_WINDOWS
-# define OM_COMPILER_MSC
-# define OM_OS_WINDOWS
+#define OM_COMPILER_MSC_X64_WINDOWS
+#define OM_COMPILER_MSC
+#define OM_OS_WINDOWS
 #elif defined(__MWERKS__) && defined(__MACH__)
 #define OM_COMPILER_MWERKS_PPC_MACOSX
+#define OM_COMPILER_MWERKS
 #define OM_OS_MACOSX
 #elif defined(__GNUC__) && defined(__ppc__) && defined(__APPLE__)
 #define OM_COMPILER_GCC_PPC_MACOSX
+#define OM_COMPILER_GCC
 #define OM_OS_UNIX
+#define OM_OS_MACOSX
 #elif defined(__GNUC__) && defined(__i386__) && defined(__APPLE__)
 #define OM_COMPILER_GCC_INTEL_MACOSX
+#define OM_COMPILER_GCC
 #define OM_OS_UNIX
+#define OM_OS_MACOSX
 #elif defined(__GNUC__) && defined(__x86_64__) && defined(__APPLE__)
 #define OM_COMPILER_GCC_X86_64_MACOSX
+#define OM_COMPILER_GCC_INTEL_X86_64_MACOSX
+#define OM_COMPILER_GCC
 #define OM_OS_UNIX
+#define OM_OS_MACOSX
 #elif defined(__GNUC__) && defined(__mips__) && defined(__sgi__)
 #define OM_COMPILER_GCC_MIPS_SGI
+#define OM_COMPILER_GCC
 #define OM_OS_UNIX
+#define OM_OS_IRIX
 #elif defined(__GNUC__) && defined(__i386__) && defined(__linux__)
 #define OM_COMPILER_GCC_INTEL_LINUX
+#define OM_COMPILER_GCC
 #define OM_OS_UNIX
+#define OM_OS_LINUX
 #elif defined(__GNUC__) && defined(__x86_64__) && defined(__linux__)
 #define OM_COMPILER_GCC_X86_64_LINUX
+#define OM_COMPILER_GCC
 #define OM_OS_UNIX
+#define OM_OS_LINUX
 #elif defined(__GNUC__) && defined(__powerpc__) && defined(__linux__)
 #define OM_COMPILER_GCC_PPC_LINUX
 #define OM_OS_UNIX
@@ -79,7 +94,9 @@
 #define OM_OS_UNIX
 #elif defined(__GNUC__) && defined(__i386__) && defined(__FreeBSD__)
 #define OM_COMPILER_GCC_INTEL_FREEBSD
+#define OM_COMPILER_GCC
 #define OM_OS_UNIX
+#define OM_OS_FREEBSD
 #elif defined(__GNUC__) && defined(__i386__) && defined(__OpenBSD__)
 #define OM_COMPILER_GCC_INTEL_OPENBSD
 #define OM_OS_UNIX
@@ -89,14 +106,19 @@
 #elif defined(__GNUC__) && defined(__i386__) && defined(__CYGWIN__)
 #define OM_COMPILER_GCC_INTEL_CYGWIN
 #define OM_OS_UNIX
+#define OM_COMPILER_GCC
+#define OM_OS_WINDOWS
 #elif defined(mips) && defined(sgi)
 #define OM_COMPILER_SGICC_MIPS_SGI
+#define OM_COMPILER_SGICC
 #define OM_OS_UNIX
+#define OM_OS_IRIX
 #elif defined(__GNUC__) && defined(__sparc__) && defined(__sun__)
 #define OM_COMPILER_GCC_SPARC_SUNOS
+#define OM_COMPILER_GCC
 #define OM_OS_UNIX
 #else
 #error "Unknown compiler"
 #endif
 
-#endif
+#endif // !OMPORTABILITY_H

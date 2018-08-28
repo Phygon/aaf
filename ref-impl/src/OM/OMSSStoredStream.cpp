@@ -36,9 +36,9 @@
 
 #ifndef OM_NO_STRUCTURED_STORAGE
 
-#include "OMSSStoredStream.h"
+#include "OMStructuredStorage.h"
 
-#include "OMMSStructuredStorage.h"
+#include "OMSSStoredStream.h"
 #include "OMAssertions.h"
 #include "OMExceptions.h"
 #include "OMTransparentStoredStreamFilter.h"
@@ -65,7 +65,7 @@ void OMSSStoredStream::read(void* data, OMUInt32 size) const
   PRECONDITION("Valid data buffer", data != 0);
   PRECONDITION("Valid size", size > 0);
 
-  OMUInt32 bytesRead;
+  ULONG bytesRead;
   HRESULT result = _stream->Read(data, size, &bytesRead);
   checkStatus(result);
   ASSERT("Succeeded", SUCCEEDED(result));
@@ -82,9 +82,70 @@ void OMSSStoredStream::read(OMByte* data,
   PRECONDITION("Valid data buffer", data != 0);
   PRECONDITION("Valid size", bytes > 0);
 
-  HRESULT result = _stream->Read(data, bytes, &bytesRead);
+  // HACK ALERT for GCC/Linux - Accomodate any variety of int and long incompatibility
+  ULONG tempLong=static_cast<ULONG>(bytesRead);
+  HRESULT result = _stream->Read(data, bytes, &tempLong);
+  bytesRead=static_cast<OMUInt32>(tempLong);
   checkStatus(result);
   ASSERT("Succeeded", SUCCEEDED(result));
+}
+
+  // @mfunc Attempt to read the vector of buffers given by <p buffers>
+  //        from this <c OMSSStoredStream>. This is "read scatter". The
+  //        <p bufferCount> buffers are read in order until all have
+  //        been successfully read or an error is encountered. Once
+  //        an error has been encountered on one buffer no additional
+  //        buffers are read.
+  //        The number of bytes read is returned in <p bytesRead>.
+  //   @parm The vector of buffers into which the bytes are to be read.
+  //   @parm The count of buffers.
+  //   @parm The actual number of bytes that were read.
+void OMSSStoredStream::read(OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             OMUInt32& bytesRead) const
+{
+  TRACE("OMSSStoredStream::read");
+
+  OMUInt32 totalBytesRead = 0;
+  for (OMUInt32 i = 0; i < bufferCount; i++) {
+    OMUInt32 readCount;
+    read(buffers[i]._buffer, buffers[i]._bufferSize, readCount);
+    totalBytesRead = totalBytesRead + readCount;
+    if (readCount != buffers[i]._bufferSize) {
+      break;
+    }
+  }
+  bytesRead = totalBytesRead;
+}
+
+  // Asynchronous read - single buffer
+void OMSSStoredStream::read(OMUInt64 /* position */,
+                             OMByte* /* buffer */,
+                             const OMUInt32 /* bytes */,
+                             void* /* */ /* completion */,
+                             const void* /* clientArgument */)
+{
+  TRACE("OMSSStoredStream::read");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // Asynchronous read - multiple buffers
+void OMSSStoredStream::read(OMUInt64 /* position */,
+                             OMIOBufferDescriptor* /* buffers */,
+                             OMUInt32 /* bufferCount */,
+                             void* /* */ /* completion */,
+                             const void* /* clientArgument */) const
+{
+  TRACE("OMSSStoredStream::read");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMSSStoredStream::probe(OMUInt64 /* position */,
+                              OMUInt32 /* bytesRequired */,
+                              OMUInt32& /* bytesAvailable */) const
+{
+  TRACE("OMSSStoredStream::probe");
+  ASSERT("Unimplemented code not reached", false);
 }
 
 void OMSSStoredStream::write(void* data, OMUInt32 size)
@@ -94,7 +155,7 @@ void OMSSStoredStream::write(void* data, OMUInt32 size)
   PRECONDITION("Valid data", data != 0);
   PRECONDITION("Valid size", size > 0);
 
-  OMUInt32 bytesWritten;
+  ULONG bytesWritten;
   HRESULT resultCode = _stream->Write(data, size, &bytesWritten);
   checkStatus(resultCode);
   ASSERT("Succeeded", SUCCEEDED(resultCode));
@@ -111,9 +172,62 @@ void OMSSStoredStream::write(const OMByte* data,
   PRECONDITION("Valid data", data != 0);
   PRECONDITION("Valid size", bytes > 0);
 
-  HRESULT resultCode = _stream->Write(data, bytes, &bytesWritten);
+  // HACK ALERT for GCC/Linux - Accomodate any variety of int and long incompatibility
+  ULONG tempLong=static_cast<ULONG>(bytesWritten);
+  HRESULT resultCode = _stream->Write(data, bytes, &tempLong);
+  bytesWritten=static_cast<OMUInt32>(tempLong);
   checkStatus(resultCode);
   ASSERT("Succeeded", SUCCEEDED(resultCode));
+}
+
+  // @cmember Attempt to write the vector of buffers given by <p buffers>
+  //          to this <c OMSSStoredStream>. This is "write gather". The
+  //          <p bufferCount> buffers are written in order until all have
+  //          been successfully written or an error is encountered. Once
+  //          an error has been encountered on one buffer no additional
+  //          buffers are written.
+  //          The number of bytes written is returned in <p bytesWritten>.
+  //   @parm The vector of buffers from which the bytes are to be written.
+  //   @parm The count of buffers.
+  //   @parm The actual number of bytes that were written.
+void OMSSStoredStream::write(OMIOBufferDescriptor* buffers,
+                              OMUInt32 bufferCount,
+                              OMUInt32& bytesWritten)
+{
+  TRACE("OMSSStoredStream::write");
+
+  OMUInt32 totalBytesWritten = 0;
+  for (OMUInt32 i = 0; i < bufferCount; i++) {
+    OMUInt32 writeCount;
+    write(buffers[i]._buffer, buffers[i]._bufferSize, writeCount);
+    totalBytesWritten = totalBytesWritten + writeCount;
+    if (writeCount != buffers[i]._bufferSize) {
+      break;
+    }
+  }
+  bytesWritten = totalBytesWritten;
+}
+
+  // Asynchronous write - single buffer
+void OMSSStoredStream::write(OMUInt64 /* position */,
+                              const OMByte* /* buffer */,
+                              const OMUInt32 /* bytes */,
+                              void* /* */ /* completion */,
+                              const void* /* clientArgument */)
+{
+  TRACE("OMSSStoredStream::write");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // Asynchronous write - multiple buffers
+void OMSSStoredStream::write(OMUInt64 /* position */,
+                              const OMIOBufferDescriptor* /* buffers */,
+                              OMUInt32 /* bufferCount */,
+                              void* /* */ /* completion */,
+                              const void* /* clientArgument */)
+{
+  TRACE("OMSSStoredStream::write");
+  ASSERT("Unimplemented code not reached", false);
 }
 
 OMUInt64 OMSSStoredStream::size(void) const

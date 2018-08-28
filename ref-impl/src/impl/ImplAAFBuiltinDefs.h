@@ -65,7 +65,7 @@
 //   defs.cdFiller()->CreateInstance(IID_IAAFFiller, (IAAFObject**) &pFiller);
 //   // Note that ImplAAFClassDef returned by cdFiller() is only used
 //   // for the duration of the CreateInstance() function call.
-// 
+//
 //   // Use of CAAFBuiltinDefs to obtain a data definition
 //   pFiller->Initialize(defs.ddkAAFPicture(), 10);
 //   // Note that ImplAAFDataDef returned by ddkAAFPicture() is only used
@@ -180,8 +180,12 @@ public:
   //
   // Class Def 'get' methods
   //
+  CLASS_DEF_METHOD(AES3PCMDescriptor);
   CLASS_DEF_METHOD(AIFCDescriptor);
+  CLASS_DEF_METHOD(ANCDataDescriptor);
+  CLASS_DEF_METHOD(AudioChannelLabelSubDescriptor);
   CLASS_DEF_METHOD(AuxiliaryDescriptor);
+  CLASS_DEF_METHOD(AVCSubDescriptor);
   CLASS_DEF_METHOD(BWFImportDescriptor);
   CLASS_DEF_METHOD(CDCIDescriptor);
   CLASS_DEF_METHOD(ClassDef);
@@ -190,10 +194,14 @@ public:
   CLASS_DEF_METHOD(Component);
   CLASS_DEF_METHOD(CompositionMob);
   CLASS_DEF_METHOD(ConstantValue);
+  CLASS_DEF_METHOD(ContainerConstraintsSubDescriptor);
   CLASS_DEF_METHOD(ContainerDef);
   CLASS_DEF_METHOD(ContentStorage);
   CLASS_DEF_METHOD(ControlPoint);
   CLASS_DEF_METHOD(DataDef);
+  CLASS_DEF_METHOD(DataEssenceDescriptor);
+  CLASS_DEF_METHOD(DefObject);
+  CLASS_DEF_METHOD(DescriptiveClip);
   CLASS_DEF_METHOD(DescriptiveFramework);
   CLASS_DEF_METHOD(DescriptiveMarker);
   CLASS_DEF_METHOD(DescriptiveObject);
@@ -209,20 +217,29 @@ public:
   CLASS_DEF_METHOD(Filler);
   CLASS_DEF_METHOD(FilmDescriptor);
   CLASS_DEF_METHOD(GPITrigger);
+  CLASS_DEF_METHOD(GroupOfSoundfieldGroupsLabelSubDescriptor);
+  CLASS_DEF_METHOD(Header);
   CLASS_DEF_METHOD(HTMLClip);
   CLASS_DEF_METHOD(HTMLDescriptor);
   CLASS_DEF_METHOD(Identification);
   CLASS_DEF_METHOD(ImportDescriptor);
   CLASS_DEF_METHOD(InterpolationDefinition);
+  CLASS_DEF_METHOD(JPEG2000SubDescriptor);
   CLASS_DEF_METHOD(KLVData);
   CLASS_DEF_METHOD(KLVDataDefinition);
   CLASS_DEF_METHOD(Locator);
   CLASS_DEF_METHOD(MasterMob);
+  CLASS_DEF_METHOD(MetaDefinition);
+  CLASS_DEF_METHOD(MCALabelSubDescriptor);
   CLASS_DEF_METHOD(Mob);
   CLASS_DEF_METHOD(MobSlot);
+  CLASS_DEF_METHOD(MPEGAudioDescriptor);
   CLASS_DEF_METHOD(MPEGVideoDescriptor);
+  CLASS_DEF_METHOD(MPEG4VisualSubDescriptor);
+  CLASS_DEF_METHOD(MultipleDescriptor);
   CLASS_DEF_METHOD(NestedScope);
   CLASS_DEF_METHOD(NetworkLocator);
+  CLASS_DEF_METHOD(Object);
   CLASS_DEF_METHOD(OperationDef);
   CLASS_DEF_METHOD(OperationGroup);
   CLASS_DEF_METHOD(Parameter);
@@ -236,13 +253,16 @@ public:
   CLASS_DEF_METHOD(RGBADescriptor);
   CLASS_DEF_METHOD(RIFFChunk);
   CLASS_DEF_METHOD(ScopeReference);
+  CLASS_DEF_METHOD(Segment);
   CLASS_DEF_METHOD(Selector);
   CLASS_DEF_METHOD(Sequence);
   CLASS_DEF_METHOD(SoundDescriptor);
+  CLASS_DEF_METHOD(SoundfieldGroupLabelSubDescriptor);
   CLASS_DEF_METHOD(SourceClip);
   CLASS_DEF_METHOD(SourceMob);
   CLASS_DEF_METHOD(SourceReference);
   CLASS_DEF_METHOD(StaticMobSlot);
+  CLASS_DEF_METHOD(SubDescriptor);
   CLASS_DEF_METHOD(TIFFDescriptor);
   CLASS_DEF_METHOD(TaggedValue);
   CLASS_DEF_METHOD(TaggedValueDefinition);
@@ -264,11 +284,13 @@ public:
   CLASS_DEF_METHOD(TypeDefInt);
   CLASS_DEF_METHOD(TypeDefRecord);
   CLASS_DEF_METHOD(TypeDefRename);
+  CLASS_DEF_METHOD(TypeDefSet);
   CLASS_DEF_METHOD(TypeDefStream);
   CLASS_DEF_METHOD(TypeDefString);
   CLASS_DEF_METHOD(TypeDefStrongObjRef);
   CLASS_DEF_METHOD(TypeDefVariableArray);
   CLASS_DEF_METHOD(TypeDefWeakObjRef);
+  CLASS_DEF_METHOD(VBIDataDescriptor);
   CLASS_DEF_METHOD(VaryingValue);
   CLASS_DEF_METHOD(WAVEDescriptor);
 
@@ -286,6 +308,7 @@ public:
 
   // defines ddkAAFXXX() which use AAF v1.1 values
   DATA_DEF_METHOD(Auxiliary);
+  DATA_DEF_METHOD(Data);
   DATA_DEF_METHOD(DescriptiveMetadata);
   DATA_DEF_METHOD(Edgecode);
   DATA_DEF_METHOD(Matte);

@@ -54,6 +54,7 @@ using namespace std;
 
 const CLSID CLSID_AAFBasicInterp = { 0x5B6C85A1, 0x0EDE, 0x11d3, { 0x80, 0xA9, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
 
+// convenient error handlers.
 inline void checkResult(HRESULT r)
 {
   if (FAILED(r))
@@ -163,11 +164,11 @@ extern "C" HRESULT CAAFPluginManager_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IAAFPluginManager tests have not been implemented:" << endl; 
-////!!!		cout << "     RegisterPluginDirectory" << endl; 
-////!!!		cout << "     RegisterPluginFile" << endl; 
-////		cout << "     EnumLoadedPlugins" << endl; 
-//		cout << "     CreateInstance" << endl; 
+//		cout << "The following IAAFPluginManager tests have not been implemented:" << endl;
+////!!!		cout << "     RegisterPluginDirectory" << endl;
+////!!!		cout << "     RegisterPluginFile" << endl;
+////		cout << "     EnumLoadedPlugins" << endl;
+//		cout << "     CreateInstance" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

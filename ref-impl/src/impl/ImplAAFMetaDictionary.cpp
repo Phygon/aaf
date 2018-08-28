@@ -54,6 +54,9 @@
 #include "ImplAAFBaseClassFactory.h"
 #endif
 
+#include "AAF.h"
+#include "ImplAAFDMS1Builtins.h"
+#include "AAFFileKinds.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -62,7 +65,6 @@
 #include "OMPropertySetIterator.h"
 
 #include "ImplAAFObjectCreation.h"
-#include "ImplAAFCloneResolver.h"
 #include "aafErr.h"
 
 
@@ -71,6 +73,8 @@
 
 #include "AAFObjectModel.h"
 #include "AAFObjectModelProcs.h"
+#include "AAFClassDefUIDs.h"
+#include "AAFUtils.h"
 
 #include "ImplAAFTypeDefCharacter.h"
 #include "ImplAAFTypeDefEnum.h"
@@ -88,9 +92,7 @@
 #include "ImplAAFTypeDefVariableArray.h"
 #include "ImplAAFTypeDefWeakObjRef.h"
 
-
 extern "C" const aafClassID_t CLSID_AAFMetaDictionary;
-extern "C" const aafClassID_t CLSID_AAFPropertyDef;
 extern "C" const aafClassID_t CLSID_EnumAAFClassDefs;
 extern "C" const aafClassID_t CLSID_EnumAAFTypeDefs;
 
@@ -102,7 +104,8 @@ ImplAAFMetaDictionary::ImplAAFMetaDictionary () :
   _classDefinitions (PID_MetaDictionary_ClassDefinitions,
                      L"ClassDefinitions", 
                      PID_MetaDefinition_Identification),
-  _dataDictionary(NULL)
+  _dataDictionary(NULL),
+  _builtinClassesLoaded(false)
 {
   _persistentProperties.put (_typeDefinitions.address());
   _persistentProperties.put (_classDefinitions.address());
@@ -156,6 +159,18 @@ ImplAAFMetaDictionary::~ImplAAFMetaDictionary ()
     {
       pAxiomaticClassDef->ReleaseReference();
       pAxiomaticClassDef = 0;
+    }
+  }
+
+  // Release the _properties
+  OMReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPropertyDef> properties(_properties);
+  while(++properties)
+  {
+    ImplAAFPropertyDef *pProperty = properties.value();
+    if (pProperty)
+    {
+      pProperty->ReleaseReference();
+      pProperty = 0;
     }
   }
 
@@ -238,9 +253,9 @@ OMStorable* ImplAAFMetaDictionary::create(const OMClassId& classId) const
   OMStorable* storable = NULL;
 
   // If we are creating the meta dictionary then just return this.
-  if (0 == memcmp(&AUID_AAFMetaDictionary, &classId, sizeof(classId)))
+  if (AUID_AAFMetaDictionary == classId)
   {
-	ImplAAFClassDef* pClassDef = findAxiomaticClassDefinition(AUID_AAFMetaDictionary);
+    ARESULT(ImplAAFClassDef* pClassDef) findAxiomaticClassDefinition(AUID_AAFMetaDictionary);
     ASSERTU(NULL != pClassDef);
     storable = const_cast<ImplAAFMetaDictionary *>(this);
   }
@@ -254,9 +269,11 @@ OMStorable* ImplAAFMetaDictionary::create(const OMClassId& classId) const
     ImplAAFMetaDefinition *pMetaObject = NULL;
     ImplAAFMetaDictionary *pNonConstThis = const_cast<ImplAAFMetaDictionary *>(this);
     AAFRESULT result = pNonConstThis->CreateMetaInstance((*reinterpret_cast<const aafUID_t *>(&classId)), &pMetaObject);
-    ASSERTU(AAFRESULT_SUCCEEDED(result));
+    check(result);
     storable = pMetaObject;
   }
+
+  check(storable != 0, AAFRESULT_CLASS_NOT_FOUND);
 
   // Set the class factory for the meta-data objects to this meta dictionary.
   storable->setClassFactory(this);
@@ -267,7 +284,7 @@ OMStorable* ImplAAFMetaDictionary::create(const OMClassId& classId) const
 void ImplAAFMetaDictionary::destroy(OMStorable* victim) const
 {
   ImplAAFMetaDefinition* v = dynamic_cast<ImplAAFMetaDefinition*>(victim);
-  ASSERTU(v != 0);
+  check(v != 0);
   v->ReleaseReference();
 }
 
@@ -342,8 +359,56 @@ void
 ImplAAFMetaDictionary::associate(const OMObjectIdentification& id,
                                  const OMPropertyId propertyId)
 {
-  ASSERTU(_dataDictionary);
-  _dataDictionary->associate(*reinterpret_cast<const aafUID_t *>(&id), propertyId);
+  dataDictionary()->associate(*reinterpret_cast<const aafUID_t *>(&id), propertyId);
+#if 1 //  DMS1SUPPORT || DICTIONARYLESSFILES
+  if (_properties.count() == 0) {
+#if 0 // DICTIONARYLESSFILES
+    PreloadBuiltinClassDefs();
+#endif
+    initializePropertyMap();
+  }
+  ImplAAFPropertyDef* p = 0;
+  bool found = _properties.find(id, p);
+  if (found) {
+    OMPropertyId pid = p->localIdentification();
+    if (pid != propertyId) {
+      p->setLocalIdentification(propertyId);
+    }
+  } // else dark
+#endif
+}
+
+void ImplAAFMetaDictionary::initializePropertyMap(void)
+{
+  ImplEnumAAFClassDefs* enumClassDefs = 0;
+  ImplAAFClassDef* pClassDef = 0;
+
+  AAFRESULT ar = GetClassDefs(&enumClassDefs);
+  check(ar);
+
+  while (AAFRESULT_SUCCEEDED(enumClassDefs->NextOne (&pClassDef))) {
+    ImplEnumAAFPropertyDefs* pPropEnum = 0;
+    ImplAAFPropertyDef* pPropDef = 0;
+
+    ar = pClassDef->GetPropertyDefs(&pPropEnum);
+    check(ar);
+
+    while (AAFRESULT_SUCCEEDED(pPropEnum->NextOne(&pPropDef))) {
+      _properties.insert(pPropDef);
+
+      // Do not release pPropDef, it's now owned by _properties
+      // and will be released in the destructor.
+    }
+
+    pPropEnum->ReleaseReference();
+    pPropEnum = 0;
+
+    pClassDef->ReleaseReference();
+    pClassDef = 0;
+  }
+
+  enumClassDefs->ReleaseReference();
+  enumClassDefs = 0;
 }
 
 void ImplAAFMetaDictionary::newClass(const OMUniqueObjectIdentification& id,
@@ -890,7 +955,7 @@ void ImplAAFMetaDictionary::newEnumeratedType(const OMObjectIdentification& id,
     ImplAAFTypeDefEnum* pTypeDef = dynamic_cast<ImplAAFTypeDefEnum*>(pMetaDef);
     ASSERT("Meta def is a enum type def", pTypeDef != 0);
     hr = pTypeDef->Initialize(*typeDefAUID, spElementTypeDef, elementValues, 
-        elementNames, elementCount, name);
+        const_cast<wchar_t**>(elementNames), elementCount, name);
     if (!AAFRESULT_SUCCEEDED(hr))
     {
         // TODO: should throw an exception here
@@ -1198,7 +1263,7 @@ void ImplAAFMetaDictionary::newRecordType(const OMObjectIdentification& id,
     ImplAAFTypeDefRecord* pTypeDef = dynamic_cast<ImplAAFTypeDefRecord*>(pMetaDef);
     ASSERT("Meta def is a record type def", pTypeDef != 0);
     hr = pTypeDef->Initialize(*typeDefAUID, &memberTypeDefs.getAt(0), 
-        memberNames, memberCount, name);
+        const_cast<wchar_t**>(memberNames), memberCount, name);
     if (!AAFRESULT_SUCCEEDED(hr))
     {
         // TODO: should throw an exception here
@@ -1636,6 +1701,28 @@ void ImplAAFMetaDictionary::typeDefinitions(OMVector<OMType*>& typeDefs) const
 //}
 
 
+bool
+ImplAAFMetaDictionary::isRequired(const OMStoredObjectEncoding& encoding) const
+{
+  bool result = true;
+#if 0 // DICTIONARYLESSFILES
+  if (memcmp(&encoding, &kAAFFileKind_AafKlvBinary, sizeof(encoding)) == 0) {
+    result = false;
+  }
+#endif
+  return result;
+}
+
+void ImplAAFMetaDictionary::extend(void)
+{
+  IUnknown* u = static_cast<IUnknown*>(dataDictionary()->GetContainer());
+  IAAFDictionary* pDictionary = 0;
+  HRESULT hr = u->QueryInterface(IID_IAAFDictionary, (void**)&pDictionary);
+  if (!SUCCEEDED(hr)) return;
+  DMS1RegisterDefinitions(pDictionary);
+  pDictionary->Release();
+}
+
 // Temporary method to set the 
 void ImplAAFMetaDictionary::setDataDictionary(ImplAAFDictionary *dataDictionary)
 {
@@ -1645,7 +1732,7 @@ void ImplAAFMetaDictionary::setDataDictionary(ImplAAFDictionary *dataDictionary)
 
 ImplAAFDictionary * ImplAAFMetaDictionary::dataDictionary(void) const
 {
-  ASSERTU (NULL != _dataDictionary);
+  check(_dataDictionary);
   return (_dataDictionary);
 }
 
@@ -1873,6 +1960,14 @@ AAFRESULT STDMETHODCALLTYPE
   if (!ppMetaObject) 
     return AAFRESULT_NULL_PARAM;
 
+  // Only a MetaDefinition should be created with CreateMetaInstance().
+  // Regular objects should be created with ImplAAFDictionary::CreateInstance() 
+  if (!isMeta(*reinterpret_cast<const OMObjectIdentification *>(&classId)))
+	return AAFRESULT_INVALID_CLASS_ID;
+
+  // We do not want to create instances of MetaDefinitions which are abstract 
+  if (isAbstractMeta(*reinterpret_cast<const OMObjectIdentification *>(&classId)))
+	return AAFRESULT_ABSTRACT_CLASS;
 
   // Lookup the class definition for the given classId. If the class
   // definition is one of the "built-in" class definitions then the
@@ -2477,14 +2572,19 @@ void ImplAAFMetaDictionary::RegisterAxiomaticProperties(void)
     if (classDefinition->axiomatic())
     {
       pClass = findAxiomaticClassDefinition(*classDefinition->id());
-      ASSERTU(pClass);
-
-      for (propertyIndex = 0; propertyIndex < classDefinition->propertyCount(); ++propertyIndex)
+      check(pClass, AAFRESULT_CLASS_NOT_FOUND);
+      if (pClass)
       {
-        propertyDefinition = classDefinition->propertyDefinitionAt(propertyIndex);
-        pProperty = findAxiomaticPropertyDefinition(*propertyDefinition->id());
-        ASSERTU(pProperty);
-        pClass->pvtRegisterExistingPropertyDef(pProperty);
+        for (propertyIndex = 0; propertyIndex < classDefinition->propertyCount(); ++propertyIndex)
+        {
+          propertyDefinition = classDefinition->propertyDefinitionAt(propertyIndex);
+          pProperty = findAxiomaticPropertyDefinition(*propertyDefinition->id());
+          check(pProperty, AAFRESULT_PROPERTY_NOT_FOUND);
+          if (pProperty)
+          {
+            pClass->pvtRegisterExistingPropertyDef(pProperty);
+          }
+        }
       }
     }
   }
@@ -2498,7 +2598,7 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMDefinitions(void)
  
   // Get the class definition for all classes.
   pClassDef = findAxiomaticClassDefinition(AUID_AAFClassDef);
-  ASSERTU (pClassDef);
+  check (pClassDef, AAFRESULT_CLASS_NOT_FOUND);
 
   //
   // Initialize the OM Properties for all of the axiomatic class definitions.
@@ -2507,9 +2607,7 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMDefinitions(void)
   while(++axiomaticClassDefinitions)
   {
     ImplAAFClassDef *pClass = axiomaticClassDefinitions.value();
-    ASSERTU (pClass);
-    if (!pClass)
-      throw AAFRESULT_INVALID_OBJ;
+    check (pClass, AAFRESULT_INVALID_OBJ);
 
     pClass->InitializeOMStorable(pClassDef);
   }
@@ -2517,7 +2615,7 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMDefinitions(void)
  
   // Get the class definition for all classes.
   pClassDef = findAxiomaticClassDefinition(AUID_AAFPropertyDef);
-  ASSERTU (pClassDef);
+  check (pClassDef, AAFRESULT_CLASS_NOT_FOUND);
 
   //
   // Initialize the OM Properties for all of the axiomatic property definitions.
@@ -2526,9 +2624,7 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMDefinitions(void)
   while(++axiomaticPropertyDefinitions)
   {
     ImplAAFPropertyDef *pProperty = axiomaticPropertyDefinitions.value();
-    ASSERTU (pProperty);
-    if (!pProperty)
-      throw AAFRESULT_INVALID_OBJ;
+    check (pProperty, AAFRESULT_PROPERTY_NOT_FOUND);
 
     pProperty->InitializeOMStorable(pClassDef);
   }
@@ -2548,21 +2644,15 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMDefinitions(void)
   while(++axiomaticTypeDefinitions)
   {
     ImplAAFTypeDef *pType = axiomaticTypeDefinitions.value();
-    ASSERTU (pType);
-    if (!pType)
-      throw AAFRESULT_INVALID_OBJ;
+    check (pType, AAFRESULT_INVALID_OBJ);
 
     result = pType->GetAUID(&id);
-    ASSERTU (AAFRESULT_SUCCEEDED(result));
-    if (AAFRESULT_FAILED(result))
-      throw result;
+    check(result);
     typeDefinition = objectModel->findTypeDefinition(&id);
-    ASSERTU (typeDefinition);
+    check(typeDefinition, AAFRESULT_TYPE_NOT_FOUND);
     classDefinition = typeDefinition->classDefinition();
     pClassDef = findAxiomaticClassDefinition(*classDefinition->id());
-    ASSERTU (pType);
-    if (!pType)
-      throw AAFRESULT_CLASS_NOT_FOUND;
+    check(pClassDef, AAFRESULT_CLASS_NOT_FOUND);
 
     pType->InitializeOMStorable(pClassDef);
   }
@@ -2571,7 +2661,7 @@ void ImplAAFMetaDictionary::InitializeAxiomaticOMDefinitions(void)
   // Handle special case of initializition the meta dictionary's 
   // OM propreties. TODO: Add InitializeOMStorable method to ImplAAFMetaDictionary.
   pClassDef = findAxiomaticClassDefinition(AUID_AAFMetaDictionary);
-  ASSERTU (pClassDef);
+  check(pClassDef, AAFRESULT_CLASS_NOT_FOUND);
   InitializeOMStorable(pClassDef);
 }
 
@@ -2787,5 +2877,51 @@ void ImplAAFMetaDictionary::InitOMProperties (ImplAAFClassDef * pClassDef)
     property->initialize(propertyDefinition);
   }
 }
+
+void ImplAAFMetaDictionary::PreloadBuiltinClassDefs()
+{
+	const AAFObjectModel	*model = AAFObjectModel::singleton();
+	const ClassDefinition	*mcd;
+	ImplAAFClassDef			*pClassDef;
+	aafUInt32				i, count;
+    AAFRESULT				status;
+	aafUID_constptr			pUid;
+	bool					somethingInModelNotInDictionary = false;
+
+	if(!_builtinClassesLoaded)
+	{
+		aafUInt32	beforeCount, afterCount;
+		
+		/// We're relying on a side effect of LookupCLassDef(creating axiomatic or builtin class)
+		// Assert that this code adds at least one classdef.  That way, if LookupCLassDef is changed
+		// to have no side effects, we'll know.
+		CountClassDefs(&beforeCount);
+		count = model->countClassDefinitions();
+		for(i=0; i < count; i++)
+		{
+			mcd = model->classDefinitionAt (i);
+			if(mcd)
+			{
+				pUid = mcd->id();
+				if(pUid)
+				{
+					if(!containsClass(*pUid))
+					{
+						somethingInModelNotInDictionary = true;
+						status = dataDictionary()->LookupClassDef (*pUid, &pClassDef);
+						if(SUCCEEDED(status))
+						{
+							pClassDef->ReleaseReference();
+						}
+					}
+				}
+			}
+		}
+		CountClassDefs(&afterCount);
+		ASSERTU(IMPLIES(somethingInModelNotInDictionary, beforeCount != afterCount));
+		_builtinClassesLoaded = true;
+	}
+}
+
 
 

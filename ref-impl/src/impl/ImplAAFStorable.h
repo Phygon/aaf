@@ -1,3 +1,5 @@
+//@doc
+//@class    MetaDefinition | Implementation class for MetaDefinition
 #ifndef __ImplAAFStorable_h__
 #define __ImplAAFStorable_h__
 
@@ -61,6 +63,9 @@ public:
   
   // Associate OMClassDefinition and OMPropertyDefinitions with this object.
   virtual void InitializeOMStorable(ImplAAFClassDef * pClassDef);
+
+  // Return 'true' if this object has been initialized via InitializeOMStorable().
+  virtual bool IsOMStorableInitialized() const;
   
   virtual AAFRESULT GetDefinition(ImplAAFClassDef ** ppClassDef);
 
@@ -80,6 +85,8 @@ protected:
   // Call during long operations in order to give time to the calling application
   void Progress(void) const;
 
+private:
+  bool _initializedOMStorable;
 };
 
 //

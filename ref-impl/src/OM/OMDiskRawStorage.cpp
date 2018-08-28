@@ -264,6 +264,28 @@ void OMDiskRawStorage::writeAt(OMUInt64 position,
   write(bytes, byteCount, bytesWritten);
 }
 
+void OMDiskRawStorage::writeCopyByteAt(OMUInt64 position,
+                                         OMByte theByte,
+                                         OMUInt32 byteCount,
+                                         OMUInt32& bytesWritten)
+{
+  TRACE("OMDiskRawStorage::writeCopyByteAt");
+
+  PRECONDITION("Writable", isWritable());
+  PRECONDITION("Positionable", isPositionable());
+  PRECONDITION("Valid byte count", byteCount > 0);
+
+  setPosition(position);
+  for (OMUInt32 i=0; i<byteCount; i++) {
+    OMUInt32 localBytesWritten = 0;
+    write(&theByte, 1, localBytesWritten);
+    bytesWritten += localBytesWritten;
+    if (localBytesWritten != 1) {
+      break;
+    }
+  }
+}
+
   // @mfunc May this <c OMDiskRawStorage> be changed in size ?
   //   @rdesc Always <e bool.true>.
   //   @this const
@@ -297,7 +319,7 @@ OMUInt64 OMDiskRawStorage::extent(void) const
   //        being set to <mf OMDiskRawStorage::size>.
   //        precondition - isExtendible()
   //   @parm The new size of this <c OMDiskRawStorage> in bytes.
-  //   @devnote There is no ISO/ANSI way of truncating a file in place.
+  //   @devnote There is no ISO way of truncating a file in place.
 void OMDiskRawStorage::extend(OMUInt64 newSize)
 {
   TRACE("OMDiskRawStorage::extend");
@@ -396,6 +418,82 @@ void OMDiskRawStorage::setPosition(OMUInt64 newPosition) const
   PRECONDITION("Positionable", isPositionable());
 
   _file->setPosition(newPosition);
+}
+
+void OMDiskRawStorage::streamReadAt(OMUInt64 /* position */,
+                                    OMByte* /* bytes */,
+                                    OMUInt32 /* byteCount */,
+                                    OMUInt32& /* bytesRead */) const
+{
+  TRACE("OMDiskRawStorage::");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMDiskRawStorage::streamReadAt(OMUInt64 /* position */,
+                                    OMIOBufferDescriptor* /* buffers */,
+                                    OMUInt32 /* bufferCount */,
+                                    OMUInt32& /* bytesRead */) const
+{
+  TRACE("OMDiskRawStorage::streamReadAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMDiskRawStorage::streamReadAt(OMUInt64 /* position */,
+                                    OMByte* /* buffer */,
+                                    const OMUInt32 /* bytes */,
+                                    void* /* */ /* completion */,
+                                    const void* /* clientArgument */) const
+{
+  TRACE("OMDiskRawStorage::streamReadAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMDiskRawStorage::streamReadAt(OMUInt64 /* position */,
+                                    OMIOBufferDescriptor* /* buffers */,
+                                    OMUInt32 /* bufferCount */,
+                                    void* /* */ /* completion */,
+                                    const void* /* clientArgument */) const
+{
+  TRACE("OMDiskRawStorage::streamReadAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMDiskRawStorage::streamWriteAt(OMUInt64 /* position */,
+                                     const OMByte* /* bytes */,
+                                     OMUInt32 /* byteCount */,
+                                     OMUInt32& /* bytesWritten */)
+{
+  TRACE("OMDiskRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMDiskRawStorage::streamWriteAt(OMUInt64 /* position */,
+                                     OMIOBufferDescriptor* /* buffers */,
+                                     OMUInt32 /* bufferCount */,
+                                     OMUInt32& /* bytesWritten */)
+{
+  TRACE("OMDiskRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMDiskRawStorage::streamWriteAt(OMUInt64 /* position */,
+                                     const OMByte* /* buffer */,
+                                     const OMUInt32 /* bytes */,
+                                     void* /* */ /* completion */,
+                                     const void* /* clientArgument */)
+{
+  TRACE("OMDiskRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMDiskRawStorage::streamWriteAt(OMUInt64 /* position */,
+                                     const OMIOBufferDescriptor* /* buffers */,
+                                     OMUInt32 /* bufferCount */,
+                                     void* /* */ /* completion */,
+                                     const void* /* clientArgument */)
+{
+  TRACE("OMDiskRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
 }
 
   // @mfunc Return the file name for this <c OMDiskRawStorage>.

@@ -1,0 +1,25 @@
+Building AAF-SDK using CMake
+
+Navigate to the AAF SDK root directory and run:
+
+Linux:
+
+$ mkdir -R out/build
+$ cd out/build
+$ cmake -G "Unix Makefiles" -DPLATFORM=vc11 -DARCH=x64 ../..
+$ cmake --build . --config Debug
+$ cmake --build . --config Release
+
+MacOS:
+
+$ mkdir -R out/build
+$ cd out/build
+$ cmake -G "Xcode" -DPLATFORM=clang7 -DARCH=x86_64 ../..
+$ cmake --build .
+
+Windows:
+
+> mkdir out\build
+> cd out\build
+> cmake -G "Visual Studio 12 2013 Win64" -DPLATFORM=vc11 -DARCH=x64 ..\..
+> cmake --build .

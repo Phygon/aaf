@@ -306,7 +306,6 @@ public:
   virtual void makeAxiomatic (void) const; // override
 
   aafUInt16 pid(void) const { return _pid; }
-  void setPid(aafUInt16 pid) { _pid = pid; }
   aafUID_constptr typeId(void) const { return _typeId; }
   bool required(void) const { return _required; }
   bool uid(void) const { return _uid; }

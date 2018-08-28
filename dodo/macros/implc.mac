@@ -266,6 +266,27 @@ AD_CLASS_BEGIN\
 AD_CLASS_BEGIN\
 #endm
 
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT5_CLASS_BEGIN 05
+AD_CLASS_BEGIN\
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT6_CLASS_BEGIN 06
+AD_CLASS_BEGIN\
+#endm
 
 #ccccccccccccccccccccccccccc
 #c
@@ -884,7 +905,6 @@ AD_CLASS_END\
 AD_CLASS_END\
 #endm
 
-
 #ccccccccccccccccccccccccccc
 #c
 #c Ends a class definition for classes which support more than the
@@ -896,6 +916,27 @@ AD_CLASS_END\
 AD_CLASS_END\
 #endm
 
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT5_CLASS_END 05
+AD_CLASS_END\
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT6_CLASS_END 06
+AD_CLASS_END\
+#endm
 
 #ccccccccccccccccccccccccccc
 #c

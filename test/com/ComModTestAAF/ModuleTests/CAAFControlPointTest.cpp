@@ -156,7 +156,7 @@ static HRESULT CreateAAFFile(
 								   (IUnknown **)&pParamDef));
 
  		checkResult(pDictionary->LookupTypeDef (kAAFTypeID_Rational, &pTypeDef));
-    checkResult(pParamDef->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC, pTypeDef));
+		checkResult(pParamDef->Initialize (parmID, TEST_PARAM_NAME, TEST_PARAM_DESC, pTypeDef));
 
 		checkResult(AAFGetPluginManager(&pMgr));
 		checkResult(pMgr->CreatePluginDefinition(LinearInterpolator, pDictionary, &pDefObject));
@@ -382,7 +382,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		// Open the AAF file
 		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = true;
-		
+
 		// Get the AAF file header.
 		checkResult(pFile->GetHeader(&pHeader));
 

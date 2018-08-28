@@ -52,7 +52,7 @@ using namespace std;
 #include "CAAFBuiltinDefs.h"
 
 #define kNumComponents	5
-#define kNumSlots	11 // adjust slot-specific behaviour in test if you change this
+#define kNumSlots	12 // adjust slot-specific behaviour in test if you change this
 
 static const	aafMobID_t	TEST_MobID = 
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
@@ -153,6 +153,13 @@ static HRESULT CreateAAFFile(
 				checkResult(pDictionary2->LookupPictureWithMatteDataDef(&pSeqDataDef));
 			else if (slot==10)
 				checkResult(pDictionary2->LookupMatteDataDef(&pSeqDataDef));
+			else if (slot==11)
+			{
+				// TODO: IAAFDictionary interface needs to be extended to
+				// add a look-up method for Data Essence data definition.
+				pSeqDataDef = defs.ddkAAFData();
+				pSeqDataDef->AddRef();
+			}
 
 			checkResult(pSequence->Initialize( pSeqDataDef ));
 			checkResult(pSequence->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
@@ -279,6 +286,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFDataDef*		pDataDef = NULL;
 	IAAFDataDef2*		pDataDef2 = NULL;
 	IAAFDataDef3*		pDataDef3 = NULL;
+	IAAFDataDef4*		pDataDef4 = NULL;
 	IAAFSequence*		pSequence = NULL;
 	IAAFDictionary*		pDictionary = NULL;
 	IEnumAAFComponents*	pCompIter = NULL;
@@ -294,7 +302,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		// Get the AAF file header.
 		checkResult(pFile->GetHeader(&pHeader));
-		
+
 		// Validate that there is only one composition mob.
 		checkResult(pHeader->CountMobs(kAAFCompMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
@@ -340,6 +348,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 					checkResult(pComp->GetDataDef(&pDataDef));
 					checkResult(pDataDef->QueryInterface(IID_IAAFDataDef2, (void **) &pDataDef2));
 					checkResult(pDataDef->QueryInterface(IID_IAAFDataDef3, (void **) &pDataDef3));
+					checkResult(pDataDef->QueryInterface(IID_IAAFDataDef4, (void **) &pDataDef4));
 
 					// This is the structure on the first and sixth slot:
 					// 0 Picture        | PWM | LegPic | Pic | Pic | Pic |
@@ -393,6 +402,12 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 					else
 						checkExpression(testBool == kAAFFalse, AAFRESULT_TEST_FAILED);
 
+					checkResult(pDataDef4->IsDataKind(&testBool));
+					if (slot==11) // data essence
+						checkExpression(testBool == kAAFTrue, AAFRESULT_TEST_FAILED);
+					else
+						checkExpression(testBool == kAAFFalse, AAFRESULT_TEST_FAILED);
+
 					if (slot==0 || slot==6)
 					{
 						// First component of picture slot has a picture with matte component
@@ -428,6 +443,8 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 					pComp->Release();
 					pComp = NULL;
+					pDataDef4->Release();
+					pDataDef4 = NULL;
 					pDataDef3->Release();
 					pDataDef3 = NULL;
 					pDataDef2->Release();
@@ -539,38 +556,10 @@ extern "C" HRESULT CAAFDataDef_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following AAFDataDef methods have not been implemented:" << endl; 
-//		cout << "     IsDataDefOf - needs unit test" << endl; 
+//		cout << "The following AAFDataDef methods have not been implemented:" << endl;
+//		cout << "     IsDataDefOf - needs unit test" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 
 	return hr;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		   
-
-
-
-
-
-

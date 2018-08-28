@@ -33,8 +33,6 @@
 #include <AAFDefUIDs.h>
 #include <AAFFileKinds.h>
 
-#include "../../../../ref-impl/include/AAFSDKBuild.h"
-
 #include <map>
 #include <string>
 #include <memory>
@@ -50,7 +48,7 @@ class KindMap {
 public:
   KindMap()
   {
-#if AAF_MAJOR_VERSION == 1 && AAF_MINOR_VERSION == 0 && AAF_MAINT_RELEASE == 2
+#if AAFSDK_VERSION_MAJOR == 1 && AAFSDK_VERSION_MINOR == 0 && AAFSDK_VERSION_PATCH == 2
 
     #define ADD_KIND( X ) \
     _kindMap[ string( #X ) ] = aafFileKindAaf##X;
@@ -60,7 +58,7 @@ public:
     ADD_KIND( M4KBinary );
     ADD_KIND( S4KBinary );
     
-#elif AAF_MAJOR_VERSION >= 1 && AAF_MINOR_VERSION >= 0
+#elif AAFSDK_VERSION_MAJOR >= 1 && AAFSDK_VERSION_MINOR >= 0
 
     #define ADD_KIND( X ) \
     _kindMap[ string( #X ) ] = kAAFFileKind_Aaf##X;

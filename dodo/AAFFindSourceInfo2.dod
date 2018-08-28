@@ -1,0 +1,210 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFFindSourceInfo2\
+#endm
+#startm .parent-module 0
+AAFRoot\
+#endm
+#c
+AD_HEAD
+
+AD_INCLUDE(AAFTypes)
+AD_FORWARD_DECLARATION(AAFMob)
+
+AD_CLASS_UUID(FB0762F9, C944, 46FE, B8, A3, 97, E4, 6F, A5, 6B, AC)
+AD_DEFAULT_UUID(FB0762FA, C944, 46FE, B8, A3, 97, E4, 6F, A5, 6B, AC)
+AD_XCLASS_BEGIN(Concrete, Transient)
+#c
+#c Original FindSourceInfo methods
+#c
+AD_XMETHOD1(GetMob,
+			[out],
+			  objOut,
+			  AAFMob,
+			  ppMob,
+			  The final media object referenced,
+			This function returns the mob found by the function
+  /// which generated this IAAFFindSourceInfo2 as a result.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the ppMob pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *ppMob.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect\, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NULLOBJECT
+  ///   - There is no valid mob referenced
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - ppMob arg is NULL.)
+
+AD_XMETHOD1(GetSourceReference,
+			[out],
+			  objPass,
+			  aafSourceRef_t *,
+			  pSourceRef,
+			  Source Reference,
+			This function returns the source reference found by the function
+  /// which generated this IAAFFindSourceInfo2 as a result.
+  ///
+  /// Note: the 3 properties that make up the "source
+  /// reference" are sourceID\, sourceTrackID\, and startTime.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - This object has already been Initialize\(\)d.
+  /// - the pSourceRef pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pSourceRef.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect\, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize\(\) called on it.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pSourceRef arg is NULL.)
+
+AD_METHOD1(GetLength,
+		   [retval][out],
+		     aafLength_t *,
+		     pLength,
+		     Length of this component,
+		   Gets the length of this component.
+  /// This function returns the duration in edit units of the result.
+  ///	
+  /// Succeeds if all of the following are true:
+  /// - the pLength pointer is valid.
+  /// - the optional length property is present for this object.
+  ///
+  /// This method deals with an optional property\\\, which will only be
+  /// present for time-varying media.
+  /// 
+  /// If this method fails nothing will be written to *pLength.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect\\\, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \\\(This is the only code indicating success.\\\)
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pLength arg is NULL.
+  ///
+  /// AAFRESULT_BAD_PROP
+  ///   - the optional length property is not present for this object.)
+
+AD_METHOD1(GetEditRate,
+		   [out\\\,retval], 
+		     aafRational_t *, 
+		     pEditRate, 
+		     Edit rate property value,
+		   This method will get the edit rate for this result.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the pEditRate pointer is valid.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect\\\, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \\\(This is the only code indicating success.\\\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize\\\(\\\) called on it.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pEditRate arg is NULL.)
+#c
+#c New FindSourceInfo methods
+#c
+AD_XMETHOD3(GetMultichannelSourceReference,
+			[out],
+			  objPass,
+			  aafSourceRef_t *,
+			  pSourceRef,
+			  Source Reference,
+			[out],
+			  objPass,
+			  aafBoolean_t *,
+			  pHasChannelIDs,
+			  Has Channel IDs,
+			[out],
+			  objPass,
+			  aafUInt32 *,
+			  pChannelID,
+			  Channel ID,
+			This function returns the source reference and channel ID found by the function
+  /// which generated this IAAFFindSourceInfo2 as a result.
+  ///
+  /// Note: the 3 properties that make up the "source
+  /// reference" are sourceID\, sourceTrackID\, and startTime.
+  ///
+  /// pHasChannelIDs is a flag indicating whether the returned 
+  /// channel ID value is valid.
+  ///
+  /// If the source is a mono channel Mob Slot without an assigned channel 
+  /// the channel ID value returned by the function shall be zero.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - This object has already been Initialize\(\)d.
+  /// - the pSourceRef pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pSourceRef.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect\, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize\(\) called on it.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pSourceRef arg is NULL.)
+AD_XCLASS_END(Concrete, Transient)

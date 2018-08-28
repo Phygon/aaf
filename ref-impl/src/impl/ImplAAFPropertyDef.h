@@ -158,12 +158,14 @@ public:
   // Overrides from OMPropertyDefinition
   //
   virtual OMClassDefinition* containingClass(void) const;
+
+  virtual const OMType* type(void) const;
+  
   virtual const OMUniqueObjectIdentification& identification(void) const;
   virtual const wchar_t* name(void) const;
   virtual bool hasDescription(void) const;
   virtual const wchar_t* description(void) const;
   virtual bool isPredefined(void) const;
-  virtual const OMType* type(void) const;
   virtual OMPropertyId localIdentification(void) const;
   // PdN: TODO: this is not used by the OM layer but by newProperty
   void setLocalIdentification(OMPropertyId propertyId);

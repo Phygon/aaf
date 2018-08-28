@@ -60,14 +60,6 @@ AAFCodecDefs.h \
 AAFCompressionDefs.h \
 "
 
-# Oliver - 050319 - anticipate:
-
-# AAFPluginExtEnum.h
-# AAFCodecFlavours.h
-# AAFEssenceFormats.h
-# AAFEnumerations.h
-
-
 SOURCE=./include
 DEST=../../ref-impl/include
 
@@ -117,7 +109,8 @@ do
     if [[ $mode == "update" ]]
     then
       echo "Creating \"${DEST}/$h\"."
-      cp ${SOURCE}/$h ${DEST}/$h
+      rm -f ${DEST}/$h
+      cp -p ${SOURCE}/$h ${DEST}/$h
     else
       echo "Can't find \"${DEST}/$h\"."
     fi
@@ -132,7 +125,8 @@ do
     if [[ $mode == "update" ]]
     then
       echo "Updating \"${DEST}/$h\"."
-      cp ${SOURCE}/$h ${DEST}/$h
+      rm -f ${DEST}/$h
+      cp -p ${SOURCE}/$h ${DEST}/$h
     else
       echo "File needs updating \"${DEST}/$h\"."
     fi

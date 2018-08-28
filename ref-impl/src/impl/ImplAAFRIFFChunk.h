@@ -55,9 +55,6 @@
 #endif
 
 
-class OMDataStreamPropertyFilter;
-
-
 class ImplAAFRIFFChunk : public ImplAAFObject
 {
 public:
@@ -72,7 +69,6 @@ protected:
   
   	OMFixedSizeProperty<aafUInt32>          _chunkID;
     OMDataStreamProperty                    _chunkData;
-    OMDataStreamPropertyFilter*             _chunkDataFilter;
 
 public:
 

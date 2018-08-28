@@ -59,6 +59,10 @@
 #include <ctype.h>
 #include <wchar.h>
 
+#include <iostream>
+
+using namespace std;
+
 #include "AAFUtils.h"
 #include "AAFDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
@@ -362,6 +366,9 @@ AAFRESULT ImplAAFPluginManager::Init(void)
 		// the reference implementation.
 		//		
 		//CHECK(RegisterSharedPlugins());
+#if 0 // DICTIONARYLESSFILES
+		CHECK(RegisterMetaDictionaryPlugins());
+#endif
 	}
 	XEXCEPT
 	{
@@ -588,6 +595,34 @@ AAFRESULT ImplAAFPluginManager::RegisterSharedPlugins(void)
   return AAFFindLibrary(libraryDirectory, registerSharedPluginsProc, &testLibraryData);
 }
 
+static AAFRDLIRESULT metaDictionaryTestPluginProc(const char * path, const char* /* name */, char isDirectory, void * userData)
+{
+  AAFTestLibraryProcData *pData = (AAFTestLibraryProcData *)userData;
+  if (!isDirectory) 
+  {
+      if ( 0 != strcmp(path, pData->currentLibraryPath) )
+        (pData->plugins)->RegisterPluginFile(path);
+  }
+  return 0;
+}
+
+// Attempt to register all of the meta-dictionary plugin files.
+AAFRESULT ImplAAFPluginManager::RegisterMetaDictionaryPlugins(void)
+{
+  const char* libraryDirectory = AAFGetLibraryDirectory();
+  ASSERTU(NULL != libraryDirectory);
+
+  AAFTestLibraryProcData testLibraryData(this, _pluginFiles);
+
+  const char* suffix = "/AAFMetaDictionaries";
+  char* metaDictionaryPluginDirectory = new char[strlen(libraryDirectory) + strlen(suffix) + 1];
+  ASSERTU(NULL != metaDictionaryPluginDirectory);
+  strcpy(metaDictionaryPluginDirectory, libraryDirectory);
+  strcat(metaDictionaryPluginDirectory, suffix);
+  AAFRESULT ar = AAFFindLibrary(metaDictionaryPluginDirectory, metaDictionaryTestPluginProc, &testLibraryData);
+  delete [] metaDictionaryPluginDirectory;
+  return ar;
+}
 
 // Attempt to register all of the plugin files in the given directory.
 AAFRESULT ImplAAFPluginManager::RegisterPluginDirectory(const char *directoryName)
@@ -902,6 +937,15 @@ AAFRESULT ImplAAFPluginManager::RegisterPlugin(CLSID pluginClass)
 			interpolator = NULL;
 		}
 
+		IAAFDictionaryExtension* pDictionaryExtension = 0;
+		if(plugin->QueryInterface(IID_IAAFDictionaryExtension, (void **)&pDictionaryExtension) == AAFRESULT_SUCCESS)
+		  {
+		    category = AUID_AAFDictionary;
+
+		    pDictionaryExtension->Release();
+		    pDictionaryExtension = 0;
+		  }
+
 		//
 		// NOTE: This version supports a multiple plugins per definition (id).
 		//
@@ -1114,17 +1158,15 @@ AAFPluginFileEntry::~AAFPluginFileEntry()
 {
   if (_pPluginFile)
   {
-    // If we are about to release the last reference to the plugin file
-    // and the plugin file claims that it it not ready to be unloaded then ...
+#ifndef NDEBUG // symbol for ansi assert
+    // If we are about to 
     if (1 == _pPluginFile->ReferenceCount() && S_OK != _pPluginFile->CanUnloadNow())
     {
-      // *** Need to output some sort of warning! ***
-      //
-      // "WARNING: Unloading a plugin dll when the CanUnloadNow()\n"
-      // "callback has failed. This may not be an error if the dll\n"
-      // "was loaded outside of the AAF Plugin Manager.\n"
+      cerr << "WARNING: Unloading a plugin dll when the CanUnloadNow()\n"
+              "callback has failed. This may not be an error if the dll\n"
+              "was loaded outside of the AAF Plugin Manager.\n";
     }
-
+#endif
     _pPluginFile->ReleaseReference();
     _pPluginFile = NULL;
   }

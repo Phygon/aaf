@@ -37,6 +37,7 @@
 #include "OMDataStreamProperty.h"
 
 #include "OMAssertions.h"
+#include "OMExceptions.h"
 
 #include "OMStoredStream.h"
 #include "OMPropertySet.h"
@@ -47,19 +48,132 @@
 #include "OMDataStreamAccess.h"
 #include "OMDataStreamPropertyFilter.h"
 
+  // Copying.
+
+  // @class Provide deferred copying of <c OMDataStream> properties.
+  //        This permits OMStorable::deepCopyTo() to construct objects
+  //        "bottom up", and to supply the data for <c OMDataStream>
+  //        properties only after copying of the objects is complete.
+class OMDeferredStream : public OMDataStreamAccess {
+public:
+  // @access Public members.
+
+  // @cmember Does <c OMDeferredStream> support deferred copying of
+  //          this <c OMDataStream>?
+  static bool canCopy(const OMDataStream& stream);
+
+    // @cmember Constructor.
+    //          Copy the contents of the <p source> stream property into
+    //          memory to be written out later in OMDeferredStream::save().
+  OMDeferredStream(const OMDataStream& source, void* context);
+  virtual ~OMDeferredStream();
+
+    // @cmember Save data to the given <c OMDataStream> object.
+    //          This is a call back function supplied by the client.
+    //          The client is passed the opaque context
+    //          used to construct this <c OMDataStreamAccess> object.
+  virtual void save(OMDataStream& destination, void* context);
+
+private:
+  OMUInt32 _size;
+  OMUInt8* _bytes;
+
+};
+
+  // @mfunc Does <c OMDeferredStream> support deferred copying of
+  //        this <c OMDataStream>?
+  //   @parm The <c OMDataStream> to validate.
+/*static*/ bool OMDeferredStream::canCopy(const OMDataStream& stream)
+{
+    const OMUInt32 maxSupportedStreamSize = 1024 * 1024 * 16;
+    const bool result = (stream.size() <= maxSupportedStreamSize);
+    return result;
+}
+
+  // @mfunc Constructor.
+  //        Copy the contents of the <p source> stream property into
+  //        memory to be written out later in OMDeferredStream::save().
+OMDeferredStream::OMDeferredStream(const OMDataStream& source, void* context)
+: OMDataStreamAccess(context),
+  _size(0),
+  _bytes(0)
+{
+  TRACE("OMDeferredStream::OMDeferredStream");
+
+  // Allocate the buffer to hold stream data
+  if (!OMDeferredStream::canCopy(source)) {
+    throw OMException("Cannot copy stream property");
+  }
+  const OMUInt64 source_size = source.size();
+  ASSERT("Stream size", source.size() < OMUINT32_MAX);
+  _size = static_cast<OMUInt32>(source_size);
+  _bytes = new OMUInt8[_size];
+
+  // Save current position of source
+  const OMUInt64 savedPosition = source.position();
+
+  // Copy the stream contents into memory
+  source.setPosition(0);
+  OMUInt32 bytesRead = 0;
+  source.read(_bytes, _size, bytesRead);
+  ASSERT("Read stream bytes", bytesRead == _size);
+
+  // Restore current position of source
+  source.setPosition(savedPosition);
+}
+
+OMDeferredStream::~OMDeferredStream()
+{
+  delete [] _bytes;
+  _bytes = 0;
+}
+
+  // @mfunc Save data to the given <c OMDataStream> object.
+  //        This is a call back function supplied by the client.
+  //        The client is passed the opaque context
+  //        used to construct this <c OMDataStreamAccess> object.
+  //   @parm A pointer to the new <p ReferencedObject>.
+void OMDeferredStream::save(OMDataStream& destination, void* /*context*/)
+{
+  TRACE("OMDeferredStream::save");
+  PRECONDITION("Valid source bytes", _bytes);
+
+  OMDataStreamProperty& dest =
+    dynamic_cast<OMDataStreamProperty&>(destination);
+  ASSERT("Valid destination", dest.hasStreamAccess());
+
+  destination.setPosition(0);
+
+  OMUInt32 bytesWritten = 0;
+  destination.write(_bytes, _size, bytesWritten);
+  ASSERTU(_size == bytesWritten);
+
+  // Source stream data is copied once.
+  delete [] _bytes;
+  _bytes = 0;
+
+  dest.clearStreamAccess();
+  destination.setPosition(0);
+}
+
+
 OMDataStreamProperty::OMDataStreamProperty(const OMPropertyId propertyId,
                                            const wchar_t* name)
 : OMDataStream(propertyId, name),
   _stream(0),
   _exists(false),
   _byteOrder(unspecified),
-  _streamAccess(0)
+  _streamAccess(0),
+  _filter(0)
 {
 }
 
 OMDataStreamProperty::~OMDataStreamProperty(void)
 {
   TRACE("OMDataStreamProperty::~OMDataStreamProperty");
+
+  delete _filter;
+  _filter = 0;
 
   if (_stream != 0) {
     try {
@@ -74,7 +188,7 @@ OMDataStreamProperty::~OMDataStreamProperty(void)
 
 void OMDataStreamProperty::detach(void)
 {
-	  if (_stream != 0) {
+  if (_stream != 0) {
     try {
       close();
     } catch (...) {
@@ -95,12 +209,11 @@ void OMDataStreamProperty::save(void) const
   // The stream has never been written to but we want the stream to
   // exist in the file, create it.
   //
+  bool created_here = false;
   OMDataStreamProperty* p = const_cast<OMDataStreamProperty*>(this);
   if (!_exists) {
     p->create();
-	// Overcomes Schemasoft library SEGV when writing zero-length DataStream
-	// property
-    p->close();
+    created_here = true;
   }
   if (hasStreamAccess()) {
     // Set the current position to the end of the stream
@@ -113,6 +226,34 @@ void OMDataStreamProperty::save(void) const
     // Allow clients to write to the stream
     //
     streamAccess()->save(const_cast<OMDataStreamProperty&>(*this));
+  }
+  // The following supplements the hack in OMStorable::save(), where
+  // an OMStoredObject is closed right after an OMStorable is saved.
+  // This causes an OMStoredStream associated with a deferred
+  // OMDataStreamProperty (hasStreamAccess() is true) to remain open,
+  // after the OMStoredObject associated with the OMStorable containing
+  // the stream property is closed. The open OMStoredStream then gets
+  // closed when the corresponding OMDataStreamProperty is destroyed.
+  // Schemasoft-based implementation of IStorage and IStream interfaces
+  // does not support operations on an IStream after its parent IStorage
+  // has been closed. Attempting to close an "orphaned" OMStoredStream
+  // causes segmentation fault in the Schemasoft Structured Storage library.
+  //
+  // This hack closes any stream that didn't exist prior to saving the file
+  // and that was created during save, after the deferred stream data has
+  // been written to the stream. This helps to avoid any issues with trying
+  // to access streams whose parent object has already been closed. The hack
+  // would potentially affect applications that want to write to stream
+  // properties after performing metadata save.
+  //
+  // The real issue is the Schemasoft-based IStorage and IStream
+  // implementation (OMSSIStorage and OMSSIStream), which behaves
+  // differently from the Microsoft native implementation. Removing
+  // this hack would require an update of OMSSIStorage and OMSSIStream.
+  //
+  if (created_here)
+  {
+    p->close();
   }
 }
 
@@ -232,13 +373,20 @@ void OMDataStreamProperty::close(void)
 {
   TRACE("OMDataStreamProperty::close");
 
+  if (_filter != 0) {
+    _filter->synchronize();
+    delete _filter;
+    _filter = 0;
+  }
+  // Clear stream access callback before deleting the stream in case
+  // the callback's destructor wants to fiddle with the stream
+  if (hasStreamAccess()) {
+    clearStreamAccess();
+  }
   if (_stream != 0) {
     _stream->close();
     delete _stream;
     _stream = 0;
-  }
-  if (hasStreamAccess()) {
-    clearStreamAccess();
   }
   _exists = false;
 
@@ -279,6 +427,94 @@ void OMDataStreamProperty::write(const OMByte* buffer,
   TRACE("OMDataStreamProperty::write");
 
   stream()->write(buffer, bytes, bytesWritten);
+  setPresent();
+}
+
+  // @mfunc Attempt to read the vector of buffers given by <p buffers>
+  //        from this <c OMDataStreamProperty>. This is "read scatter". The
+  //        <p bufferCount> buffers are read in order until all have
+  //        been successfully read or an error is encountered. Once
+  //        an error has been encountered on one buffer no additional
+  //        buffers are read.
+  //        The number of bytes read is returned in <p bytesRead>.
+  //   @parm The vector of buffers into which the bytes are to be read.
+  //   @parm The count of buffers.
+  //   @parm The actual number of bytes that were read.
+void OMDataStreamProperty::read(OMIOBufferDescriptor* buffers,
+                                OMUInt32 bufferCount,
+                                OMUInt32& bytesRead) const
+{
+  TRACE("OMDataStreamProperty::read");
+  stream()->read(buffers, bufferCount, bytesRead);
+}
+
+  // @mfunc Attempt to write the vector of buffers given by <p buffers>
+  //        to this <c OMDataStreamProperty>. This is "write gather". The
+  //        <p bufferCount> buffers are written in order until all have
+  //        been successfully written or an error is encountered. Once
+  //        an error has been encountered on one buffer no additional
+  //        buffers are written.
+  //        The number of bytes written is returned in <p bytesWritten>.
+  //   @parm The vector of buffers from which the bytes are to be written.
+  //   @parm The count of buffers.
+  //   @parm The actual number of bytes that were written.
+void OMDataStreamProperty::write(const OMIOBufferDescriptor* buffers,
+                                 OMUInt32 bufferCount,
+                                 OMUInt32& bytesWritten)
+{
+  TRACE("OMDataStreamProperty::write");
+  OMIOBufferDescriptor* b = const_cast<OMIOBufferDescriptor*>(buffers);
+  stream()->write(b, bufferCount, bytesWritten);
+  setPresent();
+}
+
+    // Asynchronous read - single buffer
+void OMDataStreamProperty::read(OMUInt64 position,
+                                OMByte* buffer,
+                                const OMUInt32 bytes,
+                                void* /* */ completion,
+                                const void* clientArgument)
+{
+  TRACE("OMDataStreamProperty::read");
+
+  stream()->read(position, buffer, bytes, completion, clientArgument);
+}
+
+    // Asynchronous write - single buffer
+void OMDataStreamProperty::write(OMUInt64 position,
+                                 const OMByte* buffer,
+                                 const OMUInt32 bytes,
+                                 void* /* */ completion,
+                                 const void* clientArgument)
+{
+  TRACE("OMDataStreamProperty::write");
+
+  stream()->write(position, buffer, bytes, completion, clientArgument);
+  setPresent();
+}
+
+    // Asynchronous read - multiple buffers
+void OMDataStreamProperty::read(OMUInt64 position,
+                                OMIOBufferDescriptor* buffers,
+                                OMUInt32 bufferCount,
+                                void* /* */ completion,
+                                const void* clientArgument) const
+{
+  TRACE("OMDataStreamProperty::read");
+
+  stream()->read(position, buffers, bufferCount, completion, clientArgument);
+}
+
+    // Asynchronous write - multiple buffers
+void OMDataStreamProperty::write(OMUInt64 position,
+                                 const OMIOBufferDescriptor* buffers,
+                                 OMUInt32 bufferCount,
+                                 void* /* */ completion,
+                                 const void* clientArgument)
+{
+  TRACE("OMDataStreamProperty::write");
+
+  stream()->write(position, buffers, bufferCount, completion, clientArgument);
   setPresent();
 }
 
@@ -537,7 +773,8 @@ void OMDataStreamProperty::shallowCopyTo(OMProperty* /* destination */) const
 }
 
 void OMDataStreamProperty::deepCopyTo(OMProperty* destination,
-                                      void* /* clientContext */) const
+                                      void* /* clientContext */,
+                                      bool deferStreamData) const
 {
   TRACE("OMDataStreamProperty::deepCopyTo");
   PRECONDITION("Valid destination", destination != 0);
@@ -552,36 +789,41 @@ void OMDataStreamProperty::deepCopyTo(OMProperty* destination,
     dest->setByteOrder(byteOrder());
   }
 
-  // Save current position of source
-  OMUInt64 savedPosition = position();
+  if (deferStreamData) {
+    OMDeferredStream* deferredCopy = new OMDeferredStream(*this, 0);
+    dest->setStreamAccess(deferredCopy);
+  } else {
+    // Save current position of source
+    OMUInt64 savedPosition = position();
+  
+    // Copy the stream contents
+    setPosition(0);
+    dest->setPosition(0);
+    OMUInt32 bytesRead;
+    OMUInt32 bytesWritten;
+    OMUInt64 bytesToCopy = size();
+    OMByte buffer[1024];
+    while (bytesToCopy != 0) {
+      read(buffer, sizeof(buffer), bytesRead);
+      dest->write(buffer, bytesRead, bytesWritten);
+      bytesToCopy = bytesToCopy - bytesWritten;
+    }
+  
+    // Restore current position of source
+    setPosition(savedPosition);
+    dest->setPosition(0);
 
-  // Copy the stream contents
-  setPosition(0);
-  dest->setPosition(0);
-  OMUInt32 bytesRead;
-  OMUInt32 bytesWritten;
-  OMUInt64 bytesToCopy = size();
-  OMByte buffer[1024];
-  while (bytesToCopy != 0) {
-    read(buffer, sizeof(buffer), bytesRead);
-    dest->write(buffer, bytesRead, bytesWritten);
-    bytesToCopy = bytesToCopy - bytesWritten;
-  }
-
-  // Restore current position of source
-  setPosition(savedPosition);
-  dest->setPosition(0);
-
-  // Close the destination stream if the source was empty  
-  // Most data stream functions, used directly or in ASSERTs, have the side-effect of 
-  // creating the data stream. This was an issue for the XML stored format because an empty
-  // source data stream resulted in an destination data stream file which was not closed 
-  // when the AAF file is closed because dest->isPresent() is false - an optional and empty 
-  // source data stream results in a "not present" destination data stream. Subsequent attempts 
-  // to open the same data stream file resulted in an exception.
-  if (dest->isOptional() && !dest->isPresent())
-  {
-      dest->close();
+    // Close the destination stream if the source was empty  
+    // Most data stream functions, used directly or in ASSERTs, have the side-effect of 
+    // creating the data stream. This was an issue for the XML stored format because an empty
+    // source data stream resulted in an destination data stream file which was not closed 
+    // when the AAF file is closed because dest->isPresent() is false - an optional and empty 
+    // source data stream results in a "not present" destination data stream. Subsequent attempts 
+    // to open the same data stream file resulted in an exception.
+    if (dest->isOptional() && !dest->isPresent())
+    {
+        dest->close();
+    }
   }
 }
 
@@ -661,22 +903,16 @@ void OMDataStreamProperty::setEssenceElementKey(const OMKLVKey& key)
   POSTCONDITION("Essence element key set", essenceElementKey() == key);
 }
 
-OMDataStreamPropertyFilter* OMDataStreamProperty::createFilter(void)
+  // @mfunc The encoding-specific stream filter.
+  //   @rdesc The stram filter.
+OMDataStreamPropertyFilter* OMDataStreamProperty::filter(void)
 {
-  TRACE("OMDataStreamProperty::createFilter");
+  TRACE("OMDataStreamProperty::filter");
 
-  OMDataStreamPropertyFilter* result = new OMDataStreamPropertyFilter(this);
-  ASSERT("Valid heap pointer", result != 0);
-  return result;
-}
-
-const wchar_t* OMDataStreamProperty::storedName(void) const
-{
-  TRACE("OMDataStreamProperty::storedName");
-
-  if (_storedName == 0) {
-    OMDataStreamProperty* p = const_cast<OMDataStreamProperty*>(this);
-    p->_storedName = OMStoredObject::streamName(_name, propertyId());
+  if (_filter == 0) {
+    _filter = new OMDataStreamPropertyFilter(this);
   }
-  return _storedName;
+
+  POSTCONDITION("Valid filter", _filter != 0);
+  return _filter;
 }

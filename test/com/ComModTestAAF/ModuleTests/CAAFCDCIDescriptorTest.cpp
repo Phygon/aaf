@@ -83,7 +83,7 @@ using namespace std;
 #define kAlphaTransparencyTestVal		kAAFMaxValueTransparent
 #define kImageAlignmentFactorTestVal	0
 
-// our test Mob id 
+// our test Mob id
 static const aafMobID_t	TEST_MobID = 
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
@@ -179,21 +179,34 @@ static HRESULT CreateAAFFile(
 			  {
 				  // Add all CDCI properties
 				  hr = pCDCIDesc->SetComponentWidth(kCWTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetHorizontalSubsampling(kHSTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetVerticalSubsampling(kVSTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetColorSiting(kCSTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetBlackReferenceLevel(kBRLTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetWhiteReferenceLevel(kWRLTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetColorRange(kCRTest);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc->SetPaddingBits(kPBTest);
-				  if (SUCCEEDED(hr)) hr = SetDigitalImageDescProps(pCDCIDesc);
+				  if (SUCCEEDED(hr))
+					  hr = pCDCIDesc->SetHorizontalSubsampling(kHSTest);
+				  if (SUCCEEDED(hr))
+					  hr = pCDCIDesc->SetVerticalSubsampling(kVSTest);
+				  if (SUCCEEDED(hr))
+					  hr = pCDCIDesc->SetColorSiting(kCSTest);
+				  if (SUCCEEDED(hr))
+					  hr = pCDCIDesc->SetBlackReferenceLevel(kBRLTest);
+				  if (SUCCEEDED(hr))
+					  hr = pCDCIDesc->SetWhiteReferenceLevel(kWRLTest);
+				  if (SUCCEEDED(hr))
+					  hr = pCDCIDesc->SetColorRange(kCRTest);
+				  if (SUCCEEDED(hr))
+					  hr = pCDCIDesc->SetPaddingBits(kPBTest);
+				  if (SUCCEEDED(hr))
+					  hr = SetDigitalImageDescProps(pCDCIDesc);
 
 			    // Optional Properties accessed using IAAFCDCIDescriptor2
-					if (SUCCEEDED(hr)) hr = pCDCIDesc->QueryInterface (IID_IAAFCDCIDescriptor2, (void **)&pCDCIDesc2);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc2->SetAlphaSamplingWidth(kAlphaSamplingWidthTestVal);
-				  if (SUCCEEDED(hr)) hr = pCDCIDesc2->SetReversedByteOrder(kReversedByteOrderTestVal);
-				  pCDCIDesc2->Release();
-				  pCDCIDesc2 = NULL;
+				  if (SUCCEEDED(hr))
+					  hr = pCDCIDesc->QueryInterface (IID_IAAFCDCIDescriptor2, (void **)&pCDCIDesc2);
+				  if (SUCCEEDED(hr))
+				  {
+					  hr = pCDCIDesc2->SetAlphaSamplingWidth(kAlphaSamplingWidthTestVal);
+					  if (SUCCEEDED(hr))
+						  hr = pCDCIDesc2->SetReversedByteOrder(kReversedByteOrderTestVal);
+					  pCDCIDesc2->Release();
+					  pCDCIDesc2 = NULL;
+				  }
 
 				  if (SUCCEEDED(hr))
 				  {
@@ -303,40 +316,61 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
 						// test for expected CDCI properties
 						hr = pCDCIDesc->GetComponentWidth(&val32);
-						if (SUCCEEDED(hr) && val32 != kCWTest) hr = AAFRESULT_TEST_FAILED;
+						if (SUCCEEDED(hr) && val32 != kCWTest)
+							hr = AAFRESULT_TEST_FAILED;
 
-						if (SUCCEEDED(hr)) hr = pCDCIDesc->GetHorizontalSubsampling(&uval32);
-						if (SUCCEEDED(hr) && uval32 != kHSTest) hr = AAFRESULT_TEST_FAILED;
+						if (SUCCEEDED(hr))
+							hr = pCDCIDesc->GetHorizontalSubsampling(&uval32);
+						if (SUCCEEDED(hr) && uval32 != kHSTest)
+							hr = AAFRESULT_TEST_FAILED;
 
-						if (SUCCEEDED(hr)) hr = pCDCIDesc->GetVerticalSubsampling(&uval32);
-						if (SUCCEEDED(hr) && uval32 != kVSTest) hr = AAFRESULT_TEST_FAILED;
+						if (SUCCEEDED(hr))
+							hr = pCDCIDesc->GetVerticalSubsampling(&uval32);
+						if (SUCCEEDED(hr) && uval32 != kVSTest)
+							hr = AAFRESULT_TEST_FAILED;
 
-						if (SUCCEEDED(hr)) hr = pCDCIDesc->GetColorSiting(&csval);
-						if (SUCCEEDED(hr) && csval != kCSTest) hr = AAFRESULT_TEST_FAILED;
+						if (SUCCEEDED(hr))
+							hr = pCDCIDesc->GetColorSiting(&csval);
+						if (SUCCEEDED(hr) && csval != kCSTest)
+							hr = AAFRESULT_TEST_FAILED;
 
-						if (SUCCEEDED(hr)) hr = pCDCIDesc->GetBlackReferenceLevel(&uval32);
-						if (SUCCEEDED(hr) && uval32 != kBRLTest) hr = AAFRESULT_TEST_FAILED;
+						if (SUCCEEDED(hr))
+							hr = pCDCIDesc->GetBlackReferenceLevel(&uval32);
+						if (SUCCEEDED(hr) && uval32 != kBRLTest)
+							hr = AAFRESULT_TEST_FAILED;
 
-						if (SUCCEEDED(hr)) hr = pCDCIDesc->GetWhiteReferenceLevel(&uval32);
-						if (SUCCEEDED(hr) && uval32 != kWRLTest) hr = AAFRESULT_TEST_FAILED;
+						if (SUCCEEDED(hr))
+							hr = pCDCIDesc->GetWhiteReferenceLevel(&uval32);
+						if (SUCCEEDED(hr) && uval32 != kWRLTest)
+							hr = AAFRESULT_TEST_FAILED;
 
-						if (SUCCEEDED(hr)) hr = pCDCIDesc->GetColorRange(&uval32);
-						if (SUCCEEDED(hr) && uval32 != kCRTest) hr = AAFRESULT_TEST_FAILED;
+						if (SUCCEEDED(hr))
+							hr = pCDCIDesc->GetColorRange(&uval32);
+						if (SUCCEEDED(hr) && uval32 != kCRTest)
+							hr = AAFRESULT_TEST_FAILED;
 
-						if (SUCCEEDED(hr)) hr = pCDCIDesc->GetPaddingBits(&val16);
-						if (SUCCEEDED(hr) && val16 != kPBTest) hr = AAFRESULT_TEST_FAILED;
+						if (SUCCEEDED(hr))
+							hr = pCDCIDesc->GetPaddingBits(&val16);
+						if (SUCCEEDED(hr) && val16 != kPBTest)
+							hr = AAFRESULT_TEST_FAILED;
 
-				    // Optional Properties accessed using IAAFCDCIDescriptor2
-						if (SUCCEEDED(hr)) hr = pCDCIDesc->QueryInterface (IID_IAAFCDCIDescriptor2, (void **)&pCDCIDesc2);
+						// Optional Properties accessed using IAAFCDCIDescriptor2
+						if (SUCCEEDED(hr))
+							hr = pCDCIDesc->QueryInterface (IID_IAAFCDCIDescriptor2, (void **)&pCDCIDesc2);
+						if (SUCCEEDED(hr))
+						{
+							hr = pCDCIDesc2->GetAlphaSamplingWidth(&uval32);
+							if (SUCCEEDED(hr) && uval32 != kAlphaSamplingWidthTestVal)
+								hr = AAFRESULT_TEST_FAILED;
 
-					  if (SUCCEEDED(hr)) hr = pCDCIDesc2->GetAlphaSamplingWidth(&uval32);
-						if (SUCCEEDED(hr) && uval32 != kAlphaSamplingWidthTestVal) hr = AAFRESULT_TEST_FAILED;
+							if (SUCCEEDED(hr))
+								hr = pCDCIDesc2->GetReversedByteOrder(&boolval);
+							if (SUCCEEDED(hr) && boolval != kReversedByteOrderTestVal)
+								hr = AAFRESULT_TEST_FAILED;
 
-					  if (SUCCEEDED(hr)) hr = pCDCIDesc2->GetReversedByteOrder(&boolval);
-						if (SUCCEEDED(hr) && boolval != kReversedByteOrderTestVal) hr = AAFRESULT_TEST_FAILED;
-
-					  pCDCIDesc2->Release();
-					  pCDCIDesc2 = NULL;
+							pCDCIDesc2->Release();
+							pCDCIDesc2 = NULL;
+						}
 
 						pCDCIDesc->Release();
 						pCDCIDesc = NULL;

@@ -48,7 +48,6 @@
 #include "OMAssertions.h"
 #include <string.h>
 
-
 ImplAAFPropertyValue::ImplAAFPropertyValue ()
   : _pType (NULL),
   _property(NULL),
@@ -111,7 +110,7 @@ AAFRESULT ImplAAFPropertyValue::Initialize (
   ASSERTU (property->definition());
   if (NULL == property->definition())
     return AAFRESULT_INVALID_PARAM;
-  const OMType *type = property->definition()->type();
+  ARESULT (const OMType *type) property->definition()->type();
   ASSERTU (type);
 
   // Get the storable container for this property. Since this is a "direct 

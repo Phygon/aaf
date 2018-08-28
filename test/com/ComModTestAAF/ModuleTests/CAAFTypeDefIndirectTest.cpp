@@ -61,6 +61,8 @@ typedef IAAFSmartPointer<IAAFMobSlot>               IAAFMobSlotSP;
 typedef IAAFSmartPointer<IAAFSequence>              IAAFSequenceSP;
 typedef IAAFSmartPointer<IAAFSegment>               IAAFSegmentSP;
 typedef IAAFSmartPointer<IAAFComponent>             IAAFComponentSP;
+typedef IAAFSmartPointer<IAAFTypeDefEnum>           IAAFTypeDefEnumSP;
+typedef IAAFSmartPointer<IAAFTypeDefRecord>         IAAFTypeDefRecordSP;
 
 
 #include <iostream>
@@ -70,7 +72,8 @@ using namespace std;
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
-#include <wchar.h>
+
+#include "AAFWideString.h"
 
 // Required function prototypes
 extern "C"
@@ -124,7 +127,7 @@ extern "C" HRESULT CAAFTypeDefIndirect_test(
 //
 // Constants for new property definitions
 //
-#define NUM_COMPONENT_ANNOTATION_PROPERTIES 6
+#define NUM_COMPONENT_ANNOTATION_PROPERTIES 10
 static const aafUID_t kComponentAnnotationPIDs[
 	NUM_COMPONENT_ANNOTATION_PROPERTIES]=
 {
@@ -139,7 +142,15 @@ static const aafUID_t kComponentAnnotationPIDs[
 	{0x1f23b4a0, 0x5675, 0x11d4, 
 		{ 0x92, 0x29, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d }},
 	{0x3ee82080, 0x5675, 0x11d4, 
-		{ 0x92, 0x29, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d }}
+		{ 0x92, 0x29, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d }},
+	{0x2185fa3e, 0xdb1d, 0x45d4,
+		{ 0xaa, 0x77, 0x2f, 0x80, 0x80, 0x68, 0xc6, 0x07 }},
+	{0x2a021ead, 0x65ed, 0x43e2,
+		{ 0xa1, 0xc2, 0xe7, 0x52, 0x6a, 0x16, 0x1c, 0xc9 }},
+	{0x0f3d758b, 0x2e8c, 0x45ea,
+		{ 0x9d, 0xe8, 0x38, 0x9b, 0x67, 0x14, 0xed, 0xf7 }},
+	{0x218583ac, 0xfd29, 0x45c4,
+		{ 0x94, 0xa3, 0x06, 0xcb, 0x28, 0xf5, 0x15, 0x22 }}
 };
 
 // AUID of renamed type we will create
@@ -151,6 +162,21 @@ static aafCharacter_constptr kSequenceAnnotation1 =
 static const char kSequenceAnnotation2[] = 
    "Sequence - Component Annotation 2 - as array of UInt8";
 static aafUInt16 kSequenceAnnotation3=5;
+static const enum CustomEnum {Hot=66, Cold=77} kSequenceAnnotation6=Hot;
+static const struct CustomRecord
+{
+	signed char a;
+	unsigned char b;
+	bool operator ==(const CustomRecord& x) const {return (a==x.a && b==x.b);}
+} kSequenceAnnotation8={-22,33};
+
+// AUID of enum type we will create
+static const aafUID_t kAUID_CustomEnum = 
+{ 0xbbe9bacd, 0xcdec, 0x47f0, { 0x8a, 0xc6, 0xbe, 0x25, 0x73, 0xc5, 0xe8, 0x5d } };
+
+// AUID of record type we will create
+static const aafUID_t kAUID_CustomRecord = 
+{ 0x7a375fe9, 0x2667, 0x4b6d, { 0x89, 0x25, 0xe8, 0xdf, 0x4f, 0xab, 0x5b, 0x0d } };
 
 // The test mob id that we added...
 static const 	aafMobID_t	sTestMob =
@@ -430,6 +456,24 @@ static void Test_GetActualValue(IUnknown *pUnknown,IAAFPropertyDef *pPropertyDef
   checkExpression(*ppActualValue!=0,AAFRESULT_TEST_FAILED);
 }
 
+static void Test_CreateUInt8ArrayValue (
+  IAAFDictionary *pDictionary,
+  const aafUInt8* pData,
+  const aafUInt32 dataSize,
+  IAAFPropertyValue** pValue)
+{
+  // Create actual property value of UInt8 array type
+  IAAFTypeDefSP pTypeDef;
+  checkResult(pDictionary->LookupTypeDef(kAAFTypeID_UInt8Array, &pTypeDef));
+  IAAFTypeDefVariableArraySP pTypeDefVariableArray;
+  checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefVariableArray,
+	  (void**)&pTypeDefVariableArray));
+  checkResult(pTypeDefVariableArray->CreateValueFromCArray(
+	  (aafMemPtr_t)pData,
+          dataSize,
+	  pValue));
+}
+
 static void ValidatePropertyValue(IAAFDictionary *pDictionary,
 	IUnknown *pUnknown,
 	IAAFPropertyDef *pIndirectPropertyDef,
@@ -516,6 +560,30 @@ static void ValidateTestPropertyValues(IAAFDictionary *pDictionary,
 	  ppComponentAnnotationPropertyDefs[5],kAUID_Word,
 	  (aafDataBuffer_t)&kSequenceAnnotation3,sizeof(aafUInt16));
 
+  // Validate property value of enum type created via 
+  // CreateValueFromActualData()
+  ValidatePropertyValue(pDictionary,pSequence,
+	  ppComponentAnnotationPropertyDefs[6],kAUID_CustomEnum,
+	  (aafDataBuffer_t)&kSequenceAnnotation6,sizeof(CustomEnum));
+
+  // Validate property value of enum type created via 
+  // CreateValueFromActualValue()
+  ValidatePropertyValue(pDictionary,pSequence,
+	  ppComponentAnnotationPropertyDefs[7],kAUID_CustomEnum,
+	  (aafDataBuffer_t)&kSequenceAnnotation6,sizeof(CustomEnum));
+
+  // Validate property value of record type created via 
+  // CreateValueFromActualData()
+  ValidatePropertyValue(pDictionary,pSequence,
+	  ppComponentAnnotationPropertyDefs[8],kAUID_CustomRecord,
+	  (aafDataBuffer_t)&kSequenceAnnotation8,sizeof(CustomRecord));
+
+  // Validate property value of record type created via 
+  // CreateValueFromActualValue()
+  ValidatePropertyValue(pDictionary,pSequence,
+	  ppComponentAnnotationPropertyDefs[9],kAUID_CustomRecord,
+	  (aafDataBuffer_t)&kSequenceAnnotation8,sizeof(CustomRecord));
+
   // Validate string property values via GetActualValue()
   int n;
   IAAFPropertyValueSP pActualValue;
@@ -584,7 +652,126 @@ static void ValidateTestPropertyValues(IAAFDictionary *pDictionary,
 	  sizeof(aafUInt16)));
 	checkExpression(value==kSequenceAnnotation3,AAFRESULT_TEST_FAILED);
   }
+
+  // Validate property value of enum type via GetActualValue()
+  for(n=0;n<2;n++)
+  {
+	// Property defs 6 and 7 correspond to enum properties
+	Test_GetActualValue(pSequence,ppComponentAnnotationPropertyDefs[n==0?6:7],
+	  &pActualValue);
+	checkResult(pActualValue->GetType(&pTypeDef));
+	IAAFTypeDefEnumSP pTypeDefEnum;
+	checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefEnum,
+	  (void**)&pTypeDefEnum));
+	aafInt64 value;
+	checkResult(pTypeDefEnum->GetIntegerValue(pActualValue, &value));
+	checkExpression(static_cast<CustomEnum>(value)==kSequenceAnnotation6,AAFRESULT_TEST_FAILED);
+  }
+
+  // Validate property value of record type via GetActualValue()
+  for(n=0;n<2;n++)
+  {
+	// Property defs 8 and 9 correspond to record properties
+    Test_GetActualValue(pSequence,ppComponentAnnotationPropertyDefs[n==0?8:9],
+	  &pActualValue);
+	checkResult(pActualValue->GetType(&pTypeDef));
+	IAAFTypeDefRecordSP pTypeDefRecord;
+	checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefRecord,
+	  (void**)&pTypeDefRecord));
+	CustomRecord value = {0, 0};
+	checkResult(pTypeDefRecord->GetStruct(pActualValue, (aafMemPtr_t)&value, sizeof(CustomRecord)));
+	checkExpression(value==kSequenceAnnotation8,AAFRESULT_TEST_FAILED);
+  }
 }
+
+static void TestInvalidInputs (
+	IAAFDictionary *pDictionary,
+	IAAFSequence *pSequence)
+{
+  AAFRESULT hr = AAFRESULT_SUCCESS;
+  IAAFTypeDefSP pTmpTypeDef;
+  IAAFTypeDefIndirectSP pIndirectType;
+  IAAFTypeDefSP pOversizeActualType;
+  IAAFPropertyValueSP pIndirectValue;
+  IAAFPropertyValueSP pActualValue;
+
+
+  // Get indirect type definition
+  checkResult (pDictionary->LookupTypeDef (kAAFTypeID_Indirect, &pTmpTypeDef));  
+  checkResult (pTmpTypeDef->QueryInterface (IID_IAAFTypeDefIndirect, (void**)&pIndirectType));
+
+  // Get the type definition of actual data
+  checkResult (pDictionary->LookupTypeDef (kAAFTypeID_UInt8Array, &pOversizeActualType));
+
+  // The maximum allowed property size is 64K
+  const aafUInt32 maxSimplePropertySize = 64 * 1024;
+
+  // Generate dummy annotation
+  aafUInt32 oversizeActualDataSize = maxSimplePropertySize + 1024;
+  aafUInt8* pOversizeActualData = new aafUInt8[ oversizeActualDataSize ];
+  memset(pOversizeActualData, 'A', oversizeActualDataSize);
+
+  // Try setting value whose size is larger than the supported
+  // maximum simple property size.
+  hr = pIndirectType->CreateValueFromActualData (
+                                    pOversizeActualType,
+                                    pOversizeActualData,
+                                    oversizeActualDataSize,
+                                    &pIndirectValue);
+  checkExpression(hr == AAFRESULT_BAD_SIZE, AAFRESULT_TEST_FAILED);
+
+  // Try setting value whose size is equal to the supported
+  // maximum simple property size. Normally such size would
+  // be valid but for indirect properties it is not because
+  // a few bytes of an indirect property value are used to
+  // maintain type-specific data slightly reducing the space
+  // available for actual value data.
+  hr = pIndirectType->CreateValueFromActualData (
+                                    pOversizeActualType,
+                                    pOversizeActualData,
+                                    maxSimplePropertySize,
+                                    &pIndirectValue);
+  checkExpression(hr == AAFRESULT_BAD_SIZE, AAFRESULT_TEST_FAILED);
+
+  // Try setting value whose size is equal to the supported
+  // maximum simple property size. Normally such size would
+  // be valid but for indirect properties it is not because
+  // a few bytes of an indirect property value are used to
+  // maintain type-specific data slightly reducing the space
+  // available for actual value data.
+  Test_CreateUInt8ArrayValue (pDictionary,
+                              pOversizeActualData,
+                              maxSimplePropertySize,
+                              &pActualValue);
+  hr = pIndirectType->CreateValueFromActualValue(
+                                    pActualValue,
+                                    &pIndirectValue);
+  checkExpression(hr == AAFRESULT_BAD_SIZE, AAFRESULT_TEST_FAILED);
+
+  delete [] pOversizeActualData;
+  pOversizeActualData = NULL;
+
+}
+
+// This routine passes platform-specific type information
+// to AAF enum and record type definitions. It should be
+// called after the type definitions are created or restored and
+// before thay are used to access proprty values.
+static void DescribeInternalTypeLayout(IAAFDictionary* pDictionary)
+{
+  IAAFTypeDefSP pTypeDef;
+  checkResult(pDictionary->LookupTypeDef(kAUID_CustomEnum, &pTypeDef));
+  IAAFTypeDefEnumSP pTypeDefEnum;
+  checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefEnum, (void**)&pTypeDefEnum));
+  pTypeDefEnum->RegisterSize(sizeof(CustomEnum));
+
+  checkResult(pDictionary->LookupTypeDef(kAUID_CustomRecord, &pTypeDef));
+  IAAFTypeDefRecordSP pTypeDefRecord;
+  checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefRecord, (void**)&pTypeDefRecord));
+  aafUInt32 offsets[] = {offsetof(CustomRecord, a), offsetof(CustomRecord, b)};
+  checkResult (pTypeDefRecord->RegisterMembers (offsets, 2, sizeof (CustomRecord)));
+}
+
 
 // Create the test file.
 void CAAFTypeDefIndirect_create (
@@ -706,15 +893,12 @@ void CAAFTypeDefIndirect_create (
 	  ppComponentAnnotationPropertyDefs[3],pActualStringValue);
 
   // Create actual property value of UInt8 array type
-  checkResult(pDictionary->LookupTypeDef(kAAFTypeID_UInt8Array,&pTypeDef));
-  IAAFTypeDefVariableArraySP pTypeDefVariableArray;
-  checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefVariableArray,
-	  (void**)&pTypeDefVariableArray));
   IAAFPropertyValueSP pActualUInt8ArrayValue;
   aafUInt32 dataSize=(strlen(kSequenceAnnotation2)+1)*sizeof(char);
-  checkResult(pTypeDefVariableArray->CreateValueFromCArray(
+  Test_CreateUInt8ArrayValue (
+	  pDictionary,
 	  (aafMemPtr_t)kSequenceAnnotation2,dataSize,
-	  &pActualUInt8ArrayValue));
+	  &pActualUInt8ArrayValue);
 
   Test_CreateValueFromActualValue(pDictionary,pSequence,
 	  ppComponentAnnotationPropertyDefs[4],pActualUInt8ArrayValue);
@@ -734,6 +918,81 @@ void CAAFTypeDefIndirect_create (
 
   Test_CreateValueFromActualValue(pDictionary,pSequence,
 	  ppComponentAnnotationPropertyDefs[5],pActualRenameValue);
+
+
+  // Test additional types
+
+  // Register a enum type
+  IAAFTypeDefEnumSP pTypeDefEnum;
+  checkResult(pDictionary->CreateMetaInstance(AUID_AAFTypeDefEnum,
+    IID_IAAFTypeDefEnum,(IUnknown **)&pTypeDefEnum));
+  aafInt64 enumValues[] = {Hot, Cold};
+  aafString_t enumNames[] = {L"Hot", L"Cold"};
+  checkResult(pTypeDefEnum->Initialize(kAUID_CustomEnum,
+										defs.tdUInt8(),
+										enumValues,
+										enumNames,
+										2,
+										L"CustomEnum"));
+  checkResult(pTypeDefEnum->RegisterSize(sizeof(CustomEnum)));
+  IAAFTypeDefSP pTypeDefEnum_TypeDef;
+  checkResult(pTypeDefEnum->QueryInterface(IID_IAAFTypeDef,
+    (void**)&pTypeDefEnum_TypeDef));
+  checkResult(pDictionary->RegisterTypeDef(pTypeDefEnum_TypeDef));
+
+  // Test creating a enum using CreateValueFromActualData()
+  Test_CreateValueFromActualData(
+	  pSequence,
+	  ppComponentAnnotationPropertyDefs[6],
+	  pTypeDefEnum_TypeDef,
+	  sizeof(CustomEnum),
+	  (aafDataBuffer_t)&kSequenceAnnotation6);
+
+  // Test creating a enum using CreateValueFromActualValue()
+  IAAFPropertyValueSP pCustomEnumValue;
+  checkResult(pTypeDefEnum->CreateValueFromName(L"Hot", &pCustomEnumValue));
+  Test_CreateValueFromActualValue(pDictionary,pSequence,
+	  ppComponentAnnotationPropertyDefs[7],pCustomEnumValue);
+
+
+
+  // Register a record type
+  IAAFTypeDefRecordSP pTypeDefRecord;
+  checkResult(pDictionary->CreateMetaInstance(AUID_AAFTypeDefRecord,
+  IID_IAAFTypeDefRecord,(IUnknown **)&pTypeDefRecord));
+  IAAFTypeDef* memberTypes[] = {defs.tdInt8(), defs.tdUInt8()};
+  aafString_t memberNames[] = {L"Numerator", L"Denominator"};
+  checkResult (pTypeDefRecord->Initialize (kAUID_CustomRecord,
+											memberTypes,
+											memberNames,
+											2,
+											L"CustomRecord"));
+  aafUInt32 offsets[] = {offsetof(CustomRecord, a), offsetof(CustomRecord, b)};
+  checkResult (pTypeDefRecord->RegisterMembers (offsets,
+												2,
+												sizeof (CustomRecord)));
+  IAAFTypeDefSP pTypeDefRecord_TypeDef;
+  checkResult(pTypeDefRecord->QueryInterface(IID_IAAFTypeDef,
+    (void**)&pTypeDefRecord_TypeDef));
+  checkResult(pDictionary->RegisterTypeDef(pTypeDefRecord_TypeDef));
+
+  // Test creating a record using CreateValueFromActualData()
+  Test_CreateValueFromActualData(
+	  pSequence,
+	  ppComponentAnnotationPropertyDefs[8],
+	  pTypeDefRecord_TypeDef,
+	  sizeof(kSequenceAnnotation8),
+	  (aafDataBuffer_t)&kSequenceAnnotation8);
+
+  // Test creating a record using CreateValueFromActualValue()
+  IAAFPropertyValueSP pCustomRecordValue;
+  checkResult(pTypeDefRecord->CreateValueFromStruct((aafMemPtr_t)&kSequenceAnnotation8,
+	  sizeof(CustomRecord), &pCustomRecordValue));
+  Test_CreateValueFromActualValue(pDictionary,pSequence,
+	  ppComponentAnnotationPropertyDefs[9],pCustomRecordValue);
+
+
+  TestInvalidInputs (pDictionary, pSequence);
 
   ValidateTestPropertyValues(pDictionary,pSequence);
 
@@ -769,6 +1028,8 @@ void CAAFTypeDefIndirect_read (aafCharacter_constptr pFileName)
   checkResult (pMob->GetSlotAt (0, &pMobSlot));
   checkResult (pMobSlot->GetSegment (&pSequenceSegment));
   checkResult (pSequenceSegment->QueryInterface (IID_IAAFSegment, (void**)&pSequence));
+
+  DescribeInternalTypeLayout(pDictionary);
 
   ValidateTestPropertyValues(pDictionary,pSequence);
 

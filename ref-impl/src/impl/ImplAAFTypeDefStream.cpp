@@ -277,6 +277,108 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+AAFRESULT STDMETHODCALLTYPE
+   ImplAAFTypeDefStream::ReadScatter (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUInt32  bufCount,
+      aafIOBufferDesc_t *  pBufs,
+      aafUInt32 *  pBytesRead)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  return pStreamPropertyValue->ReadScatter(bufCount, pBufs, pBytesRead);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefStream::WriteGather (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUInt32  bufCount,
+      aafIOBufferDesc_constptr  pBufs,
+      aafUInt32 *  pBytesWritten)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  return pStreamPropertyValue->WriteGather(bufCount, pBufs, pBytesWritten);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefStream::ReadAsyncAt (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUInt64  position,
+      aafUInt32  dataSize,
+      aafMemPtr_t  pData,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  return pStreamPropertyValue->ReadAsyncAt(position,
+                                           dataSize,
+                                           pData,
+                                           pCompletion,
+                                           pClientArg);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefStream::WriteAsyncAt (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUInt64  position,
+      aafUInt32  dataSize,
+      aafMemConstPtr_t  pData,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  return pStreamPropertyValue->WriteAsyncAt(position,
+                                            dataSize,
+                                            pData,
+                                            pCompletion,
+                                            pClientArg);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefStream::ReadScatterAsyncAt (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUInt64  position,
+      aafUInt32  bufCount,
+      aafIOBufferDesc_t *  pBufs,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  return pStreamPropertyValue->ReadScatterAsyncAt(position,
+                                                  bufCount,
+                                                  pBufs,
+                                                  pCompletion,
+                                                  pClientArg);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTypeDefStream::WriteGatherAsyncAt (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUInt64  position,
+      aafUInt32  bufCount,
+      aafIOBufferDesc_constptr  pBufs,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  return pStreamPropertyValue->WriteGatherAsyncAt(position,
+                                                  bufCount,
+                                                  pBufs,
+                                                  pCompletion,
+                                                  pClientArg);
+}
+
+
 
 
 
@@ -527,14 +629,14 @@ void ImplAAFTypeDefStream::reorder(OMByte* /* bytes */,
                                    OMUInt32 /* bytesSize */) const
 {
   // Should be properly implemented
-  ASSERTU (0);
+  check (AAFRESULT_NOT_IMPLEMENTED);
 }
 
 OMUInt32 ImplAAFTypeDefStream::externalSize(const OMByte* /* internalBytes */,
                                             OMUInt32 /* internalBytesSize */) const
 {
   // Should be properly implemented
-  ASSERTU (0);
+  check (AAFRESULT_NOT_IMPLEMENTED);
   return 0; // Not reached!
 }
 
@@ -550,14 +652,14 @@ void ImplAAFTypeDefStream::externalize(const OMByte* /* internalBytes */,
                                        OMByteOrder /* byteOrder */) const
 {
   // Should be properly implemented
-  ASSERTU (0);
+  check (AAFRESULT_NOT_IMPLEMENTED);
 }
 
 OMUInt32 ImplAAFTypeDefStream::internalSize(const OMByte* /* externalBytes */,
                                             OMUInt32 /* externalBytesSize */) const
 {
   // Should be properly implemented
-  ASSERTU (0);
+  check (AAFRESULT_NOT_IMPLEMENTED);
   return 0; // Not reached!
 }
 
@@ -573,7 +675,7 @@ void ImplAAFTypeDefStream::internalize(const OMByte* /* externalBytes */,
                                        OMByteOrder /* byteOrder */) const
 {
   // Should be properly implemented
-  ASSERTU (0);
+  check (AAFRESULT_NOT_IMPLEMENTED);
 }
 
 void ImplAAFTypeDefStream::accept(OMTypeVisitor& visitor) const
@@ -593,8 +695,10 @@ aafBool ImplAAFTypeDefStream::IsFixedSize (void) const
 
 OMUInt32 ImplAAFTypeDefStream::PropValSize (void) const
 {
-  ASSERTU (0);
-  return 0; // not reached!
+  // This method should not be called for ImplAAFTypeDefStream because
+  // ImplAAFTypeDefStream does not define fixed size types.
+  check(AAFRESULT_INTERNAL_ERROR);
+  return 0;
 }
 
 
@@ -607,8 +711,10 @@ aafBool ImplAAFTypeDefStream::IsRegistered (void) const
 
 OMUInt32 ImplAAFTypeDefStream::NativeSize (void) const
 {
-  ASSERTU (0);
-  return 0; // not reached!
+  // This method should not be called for ImplAAFTypeDefStream because
+  // ImplAAFTypeDefStream does not define fixed size types.
+  check(AAFRESULT_INTERNAL_ERROR);
+  return 0;
 }
 
 

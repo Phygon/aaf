@@ -48,6 +48,20 @@ bool Is_AAFDataDefinitionMatch_t_Valid(AAFDataDefinitionMatch_t param)
   }
 }
 
+bool Is_aafAVCContentScanningType_t_Valid(aafAVCContentScanningType_t param)
+{
+  switch (param) {
+    case kAAFAVCContentScanning_NotKnown:
+    case kAAFAVCContentScanning_ProgressiveFramePicture:
+    case kAAFAVCContentScanning_InterlaceFieldPicture:
+    case kAAFAVCContentScanning_InterlaceFramePicture:
+    case kAAFAVCContentScanning_Interlace_FrameFieldPicture:
+      return true;
+    default:
+      return false;
+  }
+}
+
 bool Is_aafAlphaTransparency_t_Valid(aafAlphaTransparency_t param)
 {
   switch (param) {
@@ -167,6 +181,8 @@ bool Is_aafColorSiting_t_Valid(aafColorSiting_t param)
     case kAAFThreeTap:
     case kAAFQuincunx:
     case kAAFRec601:
+    case kAAFLineAlternating:
+    case kAAFVerticalMidpoint:
     case kAAFUnknownSiting:
       return true;
     default:
@@ -552,6 +568,19 @@ bool Is_aafJPEGcomponent_t_Valid(aafJPEGcomponent_t param)
   }
 }
 
+bool Is_aafMPEG4VisualCodedContentType_t_Valid(aafMPEG4VisualCodedContentType_t param)
+{
+  switch (param) {
+    case kAAFMPEG4VisualCodedContent_Unknown:
+    case kAAFMPEG4VisualCodedContent_Progressive:
+    case kAAFMPEG4VisualCodedContent_Interlaced:
+    case kAAFMPEG4VisualCodedContent_Mixed:
+      return true;
+    default:
+      return false;
+  }
+}
+
 bool Is_aafMediaOpenMode_t_Valid(aafMediaOpenMode_t param)
 {
   switch (param) {
@@ -678,6 +707,25 @@ bool Is_aafRGBAComponentKind_t_Valid(aafRGBAComponentKind_t param)
     case kAAFCompPalette:
     case kAAFCompRed:
     case kAAFCompNull:
+    case kAAFCompRedLSBs:
+    case kAAFCompGreenLSBs:
+    case kAAFCompBlueLSBs:
+    case kAAFCompAlphaLSBs:
+    case kAAFCompColorDifferenceU:
+    case kAAFCompColorDifferenceV:
+    case kAAFCompComposite:
+    case kAAFCompNonCoSitedLuma:
+    case kAAFCompLuma:
+    case kAAFCompDepth:
+    case kAAFCompColorDifferenceULSBs:
+    case kAAFCompColorDifferenceVLSBs:
+    case kAAFCompCompositeLSBs:
+    case kAAFCompNonCoSitedLumaLSBs:
+    case kAAFCompLumaLSBs:
+    case kAAFCompDepthLSBs:
+    case kAAFCompColorX:
+    case kAAFCompColorY:
+    case kAAFCompColorZ:
       return true;
     default:
       return false;
@@ -760,6 +808,7 @@ bool Is_aafSignalStandard_t_Valid(aafSignalStandard_t param)
     case kAAFSignalStandard_SMPTE274M:
     case kAAFSignalStandard_SMPTE296M:
     case kAAFSignalStandard_SMPTE349M:
+    case kAAFSignalStandard_SMPTE428_1:
       return true;
     default:
       return false;

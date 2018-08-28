@@ -44,6 +44,7 @@ class OMStoredObject;
 class OMFile;
 class OMClassFactory;
 class OMClassDefinition;
+class OMStrongObjectReference;
 
   // @class Abstract base class for all objects that may be stored by
   //        the Object Manager.
@@ -71,13 +72,11 @@ public:
 // private:
 
     // @cmember Attach this <c OMStorable>.
-  void attach(const OMStorable* container, const wchar_t* name);
+  void attach(const OMProperty* containingProperty,
+              const OMStrongObjectReference& containingReference);
 
     // @cmember Detach this <c OMStorable>.
   void detach(void);
-
-    // @cmember Give this <c OMStorable> a name.
-  void setName(const wchar_t* name);
 
     // @cmember Save this <c OMStorable>.
   virtual void save(void) const;
@@ -176,6 +175,33 @@ public:
     //          <c OMStorable> are left unchanged.
   void deepCopyTo(OMStorable* destination, void* clientContext) const;
 
+    // @cmember Create a deep copy of this <c OMStorable>, attach the
+    //          copy to <p destination>.
+    //          In a deep copy, contained objects (strong object
+    //          references) and streams are copied.
+    //          This function copies the entire object tree rooted at this
+    //          <c OMStorable>. The root object is treated differently than
+    //          the contained objects in that only the strong references
+    //          and streams are copied. Clients may choose to create
+    //          <p destination> using <mf OMStorable::shallowCopy>.
+    //          All strong reference properties of this <c OMStorable> must
+    //          be present in the property set of <p destination>. The values
+    //          of the strong reference properties of <p destination> must
+    //          be void and are replaced by those of this <c OMStorable>.
+    //          Any properties of <p destination> not also in this
+    //          <c OMStorable> are left unchanged.
+    //          Setting <p deferStreamData> to 'true' delays copying of
+    //          streams contents until the next file save. A callback is
+    //          set up for each copied <c OMDataStream> property in the
+    //          <p destination> and is invoked during save after copying
+    //          of the objects is complete. Requesting defered copying of
+    //          stream contents requires the source <c OMFile> containing
+    //          this <c OMStorable> to remain open until after the saving
+    //          of the destination file.
+  void deepCopyTo(OMStorable* destination,
+                  void* clientContext,
+                  bool deferStreamData) const;
+
     // @cmember The number of objects contained within this <c OStorable>.
   virtual OMUInt64 objectCount(void) const;
 
@@ -206,20 +232,27 @@ public:
 protected:
   // @access Protected members.
 
-    // @cmember The name of this <c OMStorable>.
-  const wchar_t* name(void) const;
-
   OMPropertySet _persistentProperties;
 
 private:
 
   const OMStorable* container(void) const;
+  const OMProperty* containingProperty(void) const;
+
+    // @cmember Does the reference to this <c OMStorable> has local key ?
+    //          A reference has local key if it is a part of a container
+    //          such as vector or set.
+  bool referenceHasLocalKey(void) const;
+  OMUInt32 referenceLocalKey(void) const;
+  void setReferenceLocalKey(OMUInt32 localKey);
+  void clearReferenceLocalKey(void);
 
   static OMPropertyId destinationId(const OMStorable* destination,
                                     const OMProperty* property);
 
-  const OMStorable* _container;
-  wchar_t* _name;
+  const OMProperty* _containingProperty;
+  bool _referenceHasLocalKey;
+  OMUInt32 _referenceLocalKey;
 
   OMStoredObject* _store;
   bool _exists; // true means an accessible persisted representation exists

@@ -125,6 +125,23 @@ public:
                        OMUInt32 byteCount,
                        OMUInt32& bytesWritten);
 
+    // @cmember Attempt to write the byte specified by <p theByte>
+    //          <p byteCount> times starting at offset <p position> in this
+    //          <c OMCachedRawStorage>.
+    //          The actual number of bytes written is returned in
+    //          <p bytesWritten>.
+    //          Writing to positions greater than
+    //          <mf OMCachedRawStorage::size> causes this
+    //          <c OMCachedRawStorage>
+    //          to be extended, however such extension can fail, causing
+    //          <p bytesWritten> to be less than <p byteCount>.
+    //          @precondition <f isWritable()> && <f isPositionable()>
+    //   @devnote How is failure to extend indicated ?
+  virtual void writeCopyByteAt(OMUInt64 position,
+                               OMByte theByte,
+                               OMUInt32 byteCount,
+                               OMUInt32& bytesWritten);
+
     // @cmember The current extent of this <c OMCachedRawStorage> in bytes.
     //          The <f extent()> is the allocated size, while the <f size()>
     //          is the valid size.

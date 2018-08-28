@@ -3,18 +3,18 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
-/* File created by MIDL compiler version 6.00.0361 */
+/* File created by MIDL compiler version 8.00.0603 */
 /* at TIMESTAMP REMOVED
  */
 /* Compiler settings for ../ref-impl/include/com-api/AAFPluginTypes.idl:
-    Oicf, W1, Zp8, env=Win32 (32b run)
+    Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 8.00.0603 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
          __declspec(uuid()), __declspec(selectany), __declspec(novtable)
          DECLSPEC_UUID(), MIDL_INTERFACE()
 */
-//@@MIDL_FILE_HEADING(  )
+/* @@MIDL_FILE_HEADING(  ) */
 
 #pragma warning( disable: 4049 )  /* more than 64k source lines */
 
@@ -49,10 +49,8 @@
 extern "C"{
 #endif 
 
-void * __RPC_USER MIDL_user_allocate(size_t);
-void __RPC_USER MIDL_user_free( void * ); 
 
-/* interface __MIDL_itf_AAFPluginTypes_0000 */
+/* interface __MIDL_itf_AAFPluginTypes_0000_0000 */
 /* [local] */ 
 
 //=---------------------------------------------------------------------=
@@ -80,7 +78,7 @@ void __RPC_USER MIDL_user_free( void * );
 // (http://www.amwa.tv/policies).
 //
 // Copyright Notices:
-// The Original Code of this file is Copyright 1998-2009, licensor of the
+// The Original Code of this file is Copyright 1998-2012, licensor of the
 // Advanced Media Workflow Association.  All rights reserved.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -91,37 +89,40 @@ void __RPC_USER MIDL_user_free( void * );
 //=---------------------------------------------------------------------=
 
 
-extern RPC_IF_HANDLE __MIDL_itf_AAFPluginTypes_0000_v0_0_c_ifspec;
-extern RPC_IF_HANDLE __MIDL_itf_AAFPluginTypes_0000_v0_0_s_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_AAFPluginTypes_0000_0000_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_AAFPluginTypes_0000_0000_v0_0_s_ifspec;
 
 #ifndef __IAAFPluginTypes_INTERFACE_DEFINED__
 #define __IAAFPluginTypes_INTERFACE_DEFINED__
 
 /* interface IAAFPluginTypes */
-/* [auto_handle][unique][uuid] */ 
+/* [unique][uuid] */ 
 
 typedef aafInt32 aafDeinterleave_t;
 
 typedef 
 enum _aafDeinterleave_e
-    {	kAAFdeinterleave	= 0,
-	kAAFleaveInterleaved	= kAAFdeinterleave + 1
+    {
+        kAAFdeinterleave	= 0,
+        kAAFleaveInterleaved	= ( kAAFdeinterleave + 1 ) 
     } 	aafDeinterleave_e;
 
 typedef aafInt32 aafCheckVerbose_t;
 
 typedef 
 enum _aafCheckVerbose_e
-    {	kAAFCheckVerbose	= 0,
-	kAAFCheckQuiet	= kAAFCheckVerbose + 1
+    {
+        kAAFCheckVerbose	= 0,
+        kAAFCheckQuiet	= ( kAAFCheckVerbose + 1 ) 
     } 	aafCheckVerbose_e;
 
 typedef aafInt32 aafCheckWarnings_t;
 
 typedef 
 enum _aafCheckWarnings_e
-    {	kAAFCheckPrintWarnings	= 0,
-	kAAFCheckNoWarnings	= kAAFCheckPrintWarnings + 1
+    {
+        kAAFCheckPrintWarnings	= 0,
+        kAAFCheckNoWarnings	= ( kAAFCheckPrintWarnings + 1 ) 
     } 	aafCheckWarnings_e;
 
 typedef struct _aafSelectInfo_t

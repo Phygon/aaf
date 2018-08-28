@@ -514,9 +514,9 @@ extern "C" HRESULT CAAFTimecodeStream12M_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IAAFDefObject methods have not been tested:" << endl; 
-//		cout << "     SegmentOffsetToTC" << endl; 
-//		cout << "     SegmentTCToOffset" << endl; 
+//		cout << "The following IAAFDefObject methods have not been tested:" << endl;
+//		cout << "     SegmentOffsetToTC" << endl;
+//		cout << "     SegmentTCToOffset" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

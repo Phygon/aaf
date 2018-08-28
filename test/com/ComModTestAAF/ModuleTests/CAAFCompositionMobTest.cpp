@@ -95,6 +95,7 @@ static HRESULT CreateAAFFile(
 	IAAFCompositionMob*			pCompMob = NULL;
 	IAAFCompositionMob2*			pCompMob2 = NULL;
 	IAAFMob*					pMob = NULL;
+	aafMobID_t					renderinMobID;
 
 	HRESULT						hr = S_OK;
 
@@ -131,6 +132,7 @@ static HRESULT CreateAAFFile(
 
 		// Check the CompositionMob2 Rendering implementation
 		checkResult( pCompMob->QueryInterface( IID_IAAFCompositionMob2, reinterpret_cast<void**>(&pCompMob2) ) );
+		checkExpression( pCompMob2->GetRendering(&renderinMobID) == AAFRESULT_PROP_NOT_PRESENT, AAFRESULT_TEST_FAILED );
 		checkResult( pCompMob2->SetRendering( TEST_rendering_mobID ) );
 
 	  // Add the mob to the file.

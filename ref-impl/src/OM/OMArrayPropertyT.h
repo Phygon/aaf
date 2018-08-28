@@ -125,7 +125,7 @@ void OMArrayProperty<Element>::getValueAt(Element* value,
   TRACE("OMArrayProperty<Element>::getValueAt");
   PRECONDITION("Valid value", value != 0);
 
-  *value = _vector.getAt(index);;
+  *value = _vector.getAt(index);
 }
 
 template <typename Element>
@@ -208,6 +208,19 @@ void OMArrayProperty<Element>::prependValue(const Element* value)
 
   _vector.prepend(*value);
   setPresent();
+}
+
+  // @mfunc Remove the last (index == count() - 1) element
+  //         from this <c OMArrayProperty>.
+  //   @tcarg class | Element | The array element type.
+  //          This type must support operator = and operator ==.
+template <typename Element>
+void OMArrayProperty<Element>::removeLast(void)
+{
+  TRACE("OMVector<Element>::removeLast");
+  PRECONDITION("Not empty", count() != 0);
+
+  _vector.removeLast();
 }
 
   // @mfunc Get the value of this <c OMArrayProperty>.  The
@@ -335,6 +348,7 @@ template <typename Element>
 OMUInt32 OMArrayProperty<Element>::bitsSize(void) const
 {
   TRACE("OMArrayProperty<Element>::bitsSize");
+  OBSOLETE("methods on class OMDataVector");
 
   ASSERT("Array not too big", (count() * elementSize()) <= OMUINT32_MAX);
   OMUInt32 result = static_cast<OMUInt32>(count() * elementSize());
@@ -392,7 +406,8 @@ OMArrayProperty<Element>::shallowCopyTo(OMProperty* destination) const
 
 template <typename Element>
 void OMArrayProperty<Element>::deepCopyTo(OMProperty* /* destination */,
-                                          void* /* clientContext */) const
+                                          void* /* clientContext */,
+                                          bool /* deferStreamData */) const
 {
   TRACE("OMArrayProperty<Element>::deepCopyTo");
   // Nothing to do - this is a deep copy

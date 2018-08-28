@@ -143,7 +143,7 @@ public:
 public:
 
 	virtual AAFRESULT TraverseToClip(aafLength_t length,
-					ImplAAFSegment **sclp,
+					ImplAAFSourceClip **sclp,
 					 ImplAAFPulldown **pulldownObj,
 					 aafInt32 *pulldownPhase,
 					 aafLength_t *sclpLen,

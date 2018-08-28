@@ -227,7 +227,7 @@ ImplAAFTypeDef* ImplAAFTypeDefFixedArray::NonRefCountedBaseType (void) const
 	else
 	{	
 		ImplAAFTypeDef* result;
- 		AAFRESULT hr = GetType (&result);
+ 		ARESULT (AAFRESULT hr) GetType (&result);
  		ASSERTU (AAFRESULT_SUCCEEDED (hr));
  		ASSERTU (result);
  		((ImplAAFTypeDefFixedArray*)this)->_cachedBaseType = result;
@@ -280,9 +280,10 @@ OMUInt32 ImplAAFTypeDefFixedArray::externalSize(const OMByte* /*internalBytes*/,
 
 OMUInt32 ImplAAFTypeDefFixedArray::externalSize(void) const
 {
-  // Should be properly implemented
-  ASSERTU (0);
-  return 0; // Not reached!
+  ImplAAFTypeDef* ptd = NonRefCountedBaseType ();
+  ASSERTU (ptd->IsFixedSize ());
+  OMUInt32 result = _ElementCount * ptd->PropValSize ();
+  return result;
 }
 
 

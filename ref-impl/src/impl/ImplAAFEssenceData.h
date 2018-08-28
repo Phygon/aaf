@@ -250,7 +250,7 @@ public:
 
   virtual const OMMaterialIdentification& identification(void) const;
 
-  OMDataStreamPropertyFilter* createMediaDataFilter();
+  OMDataStreamPropertyFilter* mediaDataFilter();
 
 private:
   OMFixedSizeProperty<aafMobID_t> _fileMobID;

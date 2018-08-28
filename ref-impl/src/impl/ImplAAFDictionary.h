@@ -121,9 +121,9 @@ public:
   // 
   // This method implements the OMClassFactory interface.
   //
-  OMStorable* create(const OMClassId& classId) const;
+  virtual OMStorable* create(const OMClassId& classId) const;
 
-  void destroy(OMStorable* victim) const;
+  virtual void destroy(OMStorable* victim) const;
 
   void associate(const aafUID_t& id,
                  const OMPropertyId propertyId);
@@ -912,9 +912,14 @@ bool PvtIsTypePresent (
   // have been initialized. This should be called after the file has been opened.
   void InitializeMetaDefinitions(void);
 
+  AAFRESULT RegisterMetaDictionaries();
+
   // Merge class definitions, their property definitions and their
   // dependencies to the destination dictionary.
   virtual AAFRESULT MergeTo( ImplAAFDictionary* pDestDictionary );
+
+  static bool IsAAFContainerDefinitionID (const aafUID_t& containerDefID);
+
 
 private:
   void InitDataDefinition(const aafUID_t & dataDefinitionID,

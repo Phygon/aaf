@@ -101,7 +101,7 @@ public:
 
     // @cmember The number of <p ReferencedObject>s in the associated
     //          <c OMReferenceSet>.
-  virtual size_t count(void) const;
+  virtual OMUInt32 count(void) const;
 
     // @cmember Advance this <c OMReferenceSetIterator> to the next
     //          <p ReferencedObject>, if any.

@@ -55,6 +55,7 @@
 #include "ImplAAFBaseClassFactory.h"
 #include "ImplAAFBuiltinClasses.h"
 #include "ImplAAFBuiltinTypes.h"
+#include "ImplAAFDMS1Builtins.h"
 
 #include "ImplAAFMob.h"
 #include "AAFStoredObjectIDs.h"
@@ -67,10 +68,15 @@
 #include "OMVectorIterator.h"
 
 #include "OMAssertions.h"
+#include "OMExceptions.h"
 #include <string.h>
 #include "aafErr.h"
 #include "AAFUtils.h"
 #include "AAFDataDefs.h"
+#include "AAF.h"
+#include "AAFPrivate.h"
+#include "ImplAAFPluginManager.h"
+EXTERN_C const IID IID_IAAFRoot;
 
 #include "ImplAAFSmartPointer.h"
 
@@ -358,7 +364,7 @@ OMStorable* ImplAAFDictionary::create(const OMClassId& classId) const
   const aafUID_t * auid  = reinterpret_cast<const aafUID_t*>(&classId);
   ImplAAFDictionary * pNonConstThis = (ImplAAFDictionary*) this;
 
-  if (memcmp(auid, &AUID_AAFMetaDictionary, sizeof(aafUID_t)) == 0)
+  if (classId == AUID_AAFMetaDictionary)
   { // TEMPORARY: Set the factory of the meta dictionary to this dictionary.
     metaDictionary()->setClassFactory(this);
     // Do not bump the reference count. The meta dictionary is currently
@@ -372,7 +378,11 @@ OMStorable* ImplAAFDictionary::create(const OMClassId& classId) const
     // by the API client to create objects.
     ImplAAFObject *pObject = NULL;
     hr = pNonConstThis->CreateInstance(*auid, &pObject);
-    ASSERTU (AAFRESULT_SUCCEEDED (hr));
+    if (AAFRESULT_FAILED (hr))
+	{
+		// This method is expected to always return a valid object.
+		throw OMException(hr);
+	}
     return pObject;
   }
   // ImplAAFClassDefSP pcd;
@@ -384,7 +394,7 @@ OMStorable* ImplAAFDictionary::create(const OMClassId& classId) const
 
 void ImplAAFDictionary::destroy(OMStorable* victim) const
 {
-  ImplAAFObject* v = dynamic_cast<ImplAAFObject*>(victim);
+  ImplAAFObject* v = fast_dynamic_cast<ImplAAFObject*>(victim);
   ASSERTU(v != 0);
   v->ReleaseReference();
 }
@@ -435,7 +445,7 @@ ImplAAFObject* ImplAAFDictionary::pvtInstantiate(const aafUID_t & auid) const
   ImplAAFClassDef	*parent;
 
   // Is this a request to create the dictionary?
-  if (memcmp(&auid, &AUID_AAFDictionary, sizeof(aafUID_t)) == 0)
+  if (auid == AUID_AAFDictionary)
 	{ // The result is just this instance.
 	  result = const_cast<ImplAAFDictionary*>(this);
 	  // Bump the reference count.
@@ -543,6 +553,11 @@ AAFRESULT STDMETHODCALLTYPE
   hr = LookupClassDef (classId, &pClassDef);
   if (AAFRESULT_FAILED (hr))
 	return hr;
+
+  // We should not create an instance of a MetaDefinition with CreateInstance().
+  // CreateMetaInstance() should be used for that instead.
+  if ( metaDictionary()->isMeta(*reinterpret_cast<const OMObjectIdentification *>(&classId) ))
+	return AAFRESULT_INVALID_CLASS_ID;
 
   if (! pClassDef->pvtIsConcrete ())
 	return AAFRESULT_ABSTRACT_CLASS;
@@ -772,6 +787,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFDictionary::GetClassDefs (
       ImplEnumAAFClassDefs ** ppEnum)
@@ -893,6 +909,14 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 	  // no recognized type guid
 	  return AAFRESULT_NO_MORE_OBJECTS;
+	}
+  // Check again to see if it's in the dict.
+  // The type we're looking for may have been recursively added
+  // by NewBuiltinTypeDef() above.
+  status = dictLookupTypeDef (typeID, ppTypeDef);
+  if (AAFRESULT_SUCCEEDED (status))
+	{
+	  return status;
 	}
   // Yup, found it in builtins.  Register it.
   if(_defRegistrationAllowed)
@@ -2121,7 +2145,7 @@ AAFRESULT ImplAAFDictionary::PvtIsPropertyDefDuplicate(
 		while((foundDup == false) && classEnum->NextOne(&pClassDef) == AAFRESULT_SUCCESS)
 		{
 			CHECK(pClassDef->GetAUID(&testClassID));
-			if(memcmp(&testClassID, &correctClassID, sizeof(aafUID_t)) != 0)
+			if(testClassID == correctClassID)
 			{
 				foundDup = pClassDef->PvtIsPropertyDefRegistered(propertyDefID);
 			}
@@ -2437,31 +2461,265 @@ void ImplAAFDictionary::InitializeMetaDefinitions(void)
   }
 }
 
+HRESULT ImplAAFDictionary::RegisterMetaDictionaries()
+{
+	// Get an IAAFDictionary from this to pass to the plug-ins
+	HRESULT hr;
+	IUnknown* u = static_cast<IUnknown*>(GetContainer());
+	IAAFDictionary* pDictionary = 0;
+	hr = u->QueryInterface(IID_IAAFDictionary, (void**)&pDictionary);
+	if (!SUCCEEDED(hr)) return hr;
+
+	// Get the plug-in manager
+	IAAFPluginManager *pPluginManager = 0;
+	hr = AAFGetPluginManager(&pPluginManager);
+	if (!SUCCEEDED(hr))
+	  {
+	    pDictionary->Release();
+	    return hr;
+	  }
+
+	// Get an enumerator over the dictionary extension plug-ins
+	IEnumAAFLoadedPlugins* pEnumPlugins = 0;
+	hr =  pPluginManager->EnumLoadedPlugins(AUID_AAFDictionary, &pEnumPlugins);
+	if (!SUCCEEDED(hr))
+	  {
+	    pPluginManager->Release();
+	    pDictionary->Release();
+	    return hr;
+	  }
+
+	// Get an ImplAAFPluginManager from the IAAFPluginManager because
+	// CreateInstanceFromDefinition() is not public.
+	IAAFRoot* pRoot = 0;
+	hr = pPluginManager->QueryInterface(IID_IAAFRoot, (void**)&pRoot);
+	if (!SUCCEEDED(hr))
+	  {
+	    pEnumPlugins->Release();
+	    pPluginManager->Release();
+	    pDictionary->Release();
+	    return hr;
+	  }
+	ImplAAFPluginManager* pImplPluginManager = 0;
+	hr = pRoot->GetImplRep((void**)&pImplPluginManager);
+	if (!SUCCEEDED(hr))
+	  {
+	    pRoot->Release();
+	    pEnumPlugins->Release();
+	    pPluginManager->Release();
+	    pDictionary->Release();
+	    return hr;
+	  }
+
+	// Make sure that the built-ins are initialized before we
+	// pass this to the plug-ins.
+	InitBuiltins();
+
+	// Loop over the plug-ins akeing them to register their
+	// extension definitions.
+	aafUID_t pluginID;
+	while(pEnumPlugins->NextOne (&pluginID) == AAFRESULT_SUCCESS)
+	  {
+	    IAAFDictionaryExtension *pDictionaryExtension = 0;
+	    hr = pImplPluginManager->CreateInstanceFromDefinition(pluginID, NULL, IID_IAAFDictionaryExtension, (void **)&pDictionaryExtension);
+	    if (!SUCCEEDED(hr)) continue; // Try next plugin (log this ?)
+
+	    hr = pDictionaryExtension->RegisterExtensionDefinitions(pDictionary);
+	    if (!SUCCEEDED(hr)) {
+	      pDictionaryExtension->Release();
+	      continue; // Try next plugin (log this ?)
+	    }
+	    pDictionaryExtension->Release();
+	    pDictionaryExtension = 0;
+	  }
+
+	pRoot->Release();
+	pEnumPlugins->Release();
+	pPluginManager->Release();
+	pDictionary->Release();
+	return AAFRESULT_SUCCESS;
+}
 
 AAFRESULT ImplAAFDictionary::MergeTo( ImplAAFDictionary* pDestDictionary )
 {
     ASSERTU( pDestDictionary );
-
-
-    ImplEnumAAFClassDefs* pEnumSrcClassDefs = NULL;
-    AAFRESULT hr = GetClassDefs( &pEnumSrcClassDefs );
+	AAFRESULT hr;
+    ImplEnumAAFClassDefs* pEnumSrcClassDefs = NULL;    
+	hr = GetClassDefs( &pEnumSrcClassDefs );
     if( AAFRESULT_SUCCEEDED(hr) )
     {
         ImplAAFClassDef* pSrcClassDef = NULL;
         while( AAFRESULT_SUCCEEDED(pEnumSrcClassDefs->NextOne(&pSrcClassDef)) )
         {
-            pSrcClassDef->MergeTo( pDestDictionary );
+#if 1 // DMS1SUPPORT
+            aafUID_t classID;
+            pSrcClassDef->GetAUID( &classID );
+            if( ! IsDMS1ClassDefinition( classID ) )
+            {
+                hr = pSrcClassDef->MergeTo( pDestDictionary );
+            }
+#else
+            hr = pSrcClassDef->MergeTo( pDestDictionary );
+#endif
+
             pSrcClassDef->ReleaseReference();
             pSrcClassDef = NULL;
+
+            if( AAFRESULT_FAILED(hr) )
+                break;
         }
 
         pEnumSrcClassDefs->ReleaseReference();
         pEnumSrcClassDefs = NULL;
     }
 
+	// Copy all Type Definitions to the destination Dictionary.
+	//
+	// A Type Definition that is not explicitly referenced by
+	// Property Definitions will not get copied with Class Definitions.
+	// A Type Definition, however, may be referenced by other objects,
+	// such as an indirect property value, and needs to be present in
+	// the destination Dictionary.
+	ImplEnumAAFTypeDefs* pEnumSrcTypeDefs = NULL;
+	hr = GetTypeDefs( &pEnumSrcTypeDefs );
+	if( AAFRESULT_SUCCEEDED(hr) )
+	{
+		ImplAAFTypeDef* pSrcTypeDef = NULL;
+		while( AAFRESULT_SUCCEEDED(pEnumSrcTypeDefs->NextOne(&pSrcTypeDef)) )
+		{
+#if 1 // DMS1SUPPORT
+			aafUID_t typeID;
+			pSrcTypeDef->GetAUID( &typeID );
+			if( ! IsDMS1TypeDefinition( typeID ) )
+			{
+				hr = pSrcTypeDef->MergeTo( pDestDictionary );
+			}
+#else
+			hr = pSrcTypeDef->MergeTo( pDestDictionary );
+#endif
+
+			pSrcTypeDef->ReleaseReference();
+			pSrcTypeDef = NULL;
+
+			if( AAFRESULT_FAILED(hr) )
+				break;
+		}
+
+		pEnumSrcTypeDefs->ReleaseReference();
+		pEnumSrcTypeDefs = NULL;
+	}
+
+
+    //
+    // Copy Parameter Definitions to the destination Dictionary
+    //
+    // Issue #1:
+    //
+    // It is possible for a Parameter object to not be contained within
+    // an Operation Group but to belong to another kind of object.
+    // An Operation Group has a weak reference to its Operation Definition,
+    // which, in turn, has weak references to Parameter Definitions for
+    // Parameter objects that may be present in the Operation Group.
+    // By design or by mistake a Parameter object doesn't have a weak
+    // reference to its Parameter Definition, but only specifies its UID.
+    //
+    // The above matters when copying objects from one file to another.
+    // The copy process walks the object tree following strong and weak
+    // references. Copying a Parameter will not copy its Definition because
+    // there no explicit reference from one to the other. But if the Parameter
+    // belongs to an Operation Group it's definition will be copied as part
+    // of copying the Operation Group, by following references from
+    // the Group to its Operation Definition and then to its Parameter
+    // Definitions.
+    //
+    // If a Parameter belongs to an object other than Operation Group,
+    // its Parameter Definition although present in the Dictionary is not
+    // referenced by anybody. When such Parameters are copied into an external
+    // file their Definitions are not followed by the copy process and end up
+    // missing from the destination file. When reading such a file Parameters
+    // without Definitions will not be restored.
+    //
+    // There are AAF files where Parameters are not contained within
+    // Operation Groups but belong to other Parameters. In those cases
+    // the corresponding Parameter Definitions although present in
+    // the Dictionary are not weakly referenced by anybody. Parameter
+    // itself only has an ID of it Definition. When such Parameters are
+    // copied into an external file their Definitions are not followed by
+    // the copy process and end up missing from the destination file.
+    //
+    // Issue #2:
+    //
+    // It is possible to create an Operation Definiton that does not specify,
+    // i.e. has weak references to its Parameter Definitions. For the reason
+    // described above these Parameter Definitions will not be copied to
+    // an external file.
+    //
+    // The fix:
+    //
+    // Here we copy all the parameter definitions to as part of dictionary
+    // merge. This approach has a downside of copying Parameter Definitions
+    // that are not used in the destination file.
+    //
+    // An alternative approach is to use the OMStorable::onCopy() call back
+    // in ImplAAFMob::CloneExternal() to find and copy Definitions for
+    // Parameters that get copied to the destination file.
+    //
+    OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFParameterDef> iterator(_parameterDefinitions);
+    while( ++iterator )
+    {
+        const ImplAAFParameterDef* pSrcParamDef = iterator.value();
+        const OMUniqueObjectIdentification id = pSrcParamDef->identification();
+        if( !pDestDictionary->_parameterDefinitions.contains(id) )
+        {
+            OMStorable* pNewStorable = pSrcParamDef->shallowCopy(pDestDictionary);
+            ImplAAFParameterDef* pDestParamDef = dynamic_cast<ImplAAFParameterDef*>(pNewStorable);
+            ASSERTU(pDestParamDef);
+            // Instance created by shallowCopy() is already reference counted.
+            pDestDictionary->_parameterDefinitions.appendValue(pDestParamDef);
+            pDestParamDef->onCopy(0);
+            pSrcParamDef->deepCopyTo(pDestParamDef, 0);
+        }
+    }
+
 
     return hr;
 }
+
+
+// Returns true if the passed in container definition ID is an ID of AAF
+// container definition.
+//
+// Container definition IDs are currently compiled in.
+/*static*/ bool ImplAAFDictionary::IsAAFContainerDefinitionID (const aafUID_t& containerDefID)
+{
+  bool isAAFContainer = false;
+
+
+  if (EqualAUID(&containerDefID, &ContainerAAF))
+  {
+    isAAFContainer = true;
+  }
+  else if (EqualAUID(&containerDefID, &ContainerAAFMSS) )
+  {
+    isAAFContainer = true;
+  }
+  else if (EqualAUID(&containerDefID, &ContainerAAFKLV) )
+  {
+    isAAFContainer = true;
+  }
+  else if (EqualAUID(&containerDefID, &ContainerAAFXML) )
+  {
+    isAAFContainer = true;
+  }
+  else
+  {
+    isAAFContainer = false;
+  }
+
+
+  return isAAFContainer;
+}
+
 
 
 /*************************************************************************

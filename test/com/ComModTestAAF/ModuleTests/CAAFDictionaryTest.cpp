@@ -1,4 +1,3 @@
-
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -39,7 +38,8 @@ using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
-#include <wchar.h>
+
+#include "AAFWideString.h"
 #include <string.h>
 
 #include "AAFStoredObjectIDs.h"
@@ -731,9 +731,10 @@ static HRESULT CreateAAFFile(
   IAAFSequenceSP   pSequence;
   IAAFSegmentSP    pSegment;
   IAAFComponentSP  pComponent;
+  IAAFClassDefSP   pClassDef;
   int              i;
   HRESULT          hr = S_OK;
-	
+  aafUInt32		   beforeClasses, afterClasses;
 	
   try
 	{  
@@ -749,6 +750,12 @@ static HRESULT CreateAAFFile(
 	  // Get the AAF Dictionary so that we can create valid AAF objects.
 	  checkResult(pHeader->GetDictionary(&pDictionary));
 		
+	  pDictionary->CountClassDefs(&beforeClasses);
+	  // CommentMarker is far down the tree (loads 3 other classes) and unlikely to be auto-loaded by something else
+	  pDictionary->LookupClassDef(kAAFClassID_CommentMarker, &pClassDef);
+	  pDictionary->CountClassDefs(&afterClasses);
+	  //checkExpression (beforeClasses == afterClasses, AAFRESULT_TEST_FAILED);
+
 	  // Create a new class, and register it in the dictionary.
 	  RegisterNewClass (pDictionary);
 	  CAAFBuiltinDefs defs (pDictionary);
@@ -773,6 +780,7 @@ static HRESULT CreateAAFFile(
 	  //	(i.e. starting/ending w/ transition, two trans back
 	  //	to back).
 	  //
+
 	  for(i = 0; i < kNumComponents; i++)
 		{
 		  aafLength_t		len = 10;
@@ -900,7 +908,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 	  // Get the AAF file header.
 	  checkResult(pFile->GetHeader(&pHeader));
-		
+
 	  // Validate that there is only one composition mob.
 	  checkResult(pHeader->CountMobs(kAAFCompMob, &numMobs));
 	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);

@@ -66,6 +66,9 @@ typedef ImplAAFSmartPointer<ImplEnumAAFPropertyDefs> ImplEnumAAFPropertyDefsSP;
 #include "ImplAAFDictionary.h"
 #endif
 
+#ifndef __ImplAAFMetaDictionary_h__
+#include "ImplAAFMetaDictionary.h"
+#endif
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -99,7 +102,7 @@ extern "C" const aafClassID_t CLSID_AAFObject;
 /* Note!  Will modify argument... */
 #define release_and_zero(pIfc)   \
 {                                \
-  ASSERTU (pIfc);                 \
+  ASSERTU (pIfc);                \
   pIfc->ReleaseReference ();     \
   pIfc = 0;                      \
 }
@@ -219,6 +222,28 @@ AAFRESULT STDMETHODCALLTYPE
   return AAFRESULT_SUCCESS;
 }
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFClassDef::InitOMPropertiesForObject (
+      ImplAAFObject *obj)
+{
+  OMObject		*omObj;
+  ImplAAFPropertyDef	*propDef;
+  OMPropertySet *ps;
+
+ // if (!_Properties.isPresent())
+  {
+	OMStrongReferenceSetIterator<OMUniqueObjectIdentification, ImplAAFPropertyDef>iter(_Properties);
+	ps = obj->propertySet();
+	while(++iter)
+	{
+	  omObj = iter.currentObject();
+	  propDef = static_cast<ImplAAFPropertyDef*>(omObj);
+	  obj->InitOMProperty(propDef, ps);
+	}
+  }
+
+  return AAFRESULT_SUCCESS;
+}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::CountPropertyDefs (
@@ -539,18 +564,14 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFClassDef::IsRoot (
-      aafBool * isRoot)
+      aafBool * pIsRoot)
 {
-	aafUID_t	uid;
-	
-	if (! isRoot) return AAFRESULT_NULL_PARAM;
-	
-	GetAUID (&uid);
-	*isRoot = memcmp(&uid, &AUID_AAFObject, sizeof(aafUID_t)) == 0;
-  	if (!(*isRoot))
-	  *isRoot = memcmp(&uid, &AUID_AAFMetaDefinition, sizeof(aafUID_t)) == 0;
-  	if (!(*isRoot))
-	  *isRoot = memcmp(&uid, &AUID_AAFMetaDictionary, sizeof(aafUID_t)) == 0;
+	if (! pIsRoot) return AAFRESULT_NULL_PARAM;
+
+	if (hasParent())
+	  *pIsRoot = kAAFFalse;
+	else
+	  *pIsRoot = kAAFTrue;
 
 	return AAFRESULT_SUCCESS;
 }
@@ -625,140 +646,55 @@ const OMPropertyDefinition* ImplAAFClassDef::propertyDefinition(
   return pDef;
 }
 
-const OMPropertyDefinition* ImplAAFClassDef::propertyDefinition(
- 		            const OMStorable* pDstStorable,
-			    const OMPropertyDefinition *pSrcOMPropertyDef )
-{
-  ImplAAFPropertyDef *pSrcAAFPropertyDef =
-	  dynamic_cast<ImplAAFPropertyDef*>( const_cast<OMPropertyDefinition*>(pSrcOMPropertyDef) );
-
-  if ( !pSrcAAFPropertyDef ) {
-    return 0;
-  }
-
-  HRESULT hr;
-
-  // Get the source AUID.  The destintion auid must be identical.
-  aafUID_t auid;
-  hr = pSrcAAFPropertyDef->GetAUID(&auid);
-  if ( AAFRESULT_SUCCESS != hr ) {
-    return 0;
-  }
-
-    // Now lookup the type id using the dst storable's dictionary.
-  ImplAAFObject* pDstObj = dynamic_cast<ImplAAFObject*>( const_cast<OMStorable*>(pDstStorable) );
-  if ( !pDstObj ) {
-    return 0;
-  }
-
-  ImplAAFPropertyDef* pDstPropertyDef;
-  hr = LookupPropertyDef( auid, &pDstPropertyDef ); 
-  if ( hr == AAFRESULT_NO_MORE_OBJECTS ) {
-
-    // Get the source name, the desitnation name must be identical.
-    aafUInt32 srcNameBufLen;
-    hr = pSrcAAFPropertyDef->GetNameBufLen(&srcNameBufLen);
-    if ( AAFRESULT_SUCCESS != hr ) {
-      return 0;
-    }
-    
-    // Allocate space for src name, round srcNameBufLen up to the nearest wchar_t size.
-    int srcNameLen = (srcNameBufLen+1)/2;
-    wchar_t *srcName = new wchar_t [srcNameLen];
-    if ( !srcName ) {
-      return 0;
-    }
-    hr = pSrcAAFPropertyDef->GetName( srcName, srcNameLen*sizeof(wchar_t) );
-    if ( AAFRESULT_SUCCESS != hr ) {
-      return 0;
-    }
-    
-    // Get the source type def, and lookup the destination type def.
-    ImplAAFSmartPointer<ImplAAFTypeDef> spTypeDef;
-    hr = pSrcAAFPropertyDef->GetTypeDef( &spTypeDef );
-    if ( AAFRESULT_SUCCESS != hr ) {
-      return 0;
-    }
-    
-    // Sanity check.  There is not reason for this to be called
-    // for other than optional properties.
-    aafBool isOptional;
-    hr = pSrcAAFPropertyDef->GetIsOptional(&isOptional);
-    if ( AAFRESULT_SUCCESS != hr ) {
-      return 0;
-    }
-    if ( !isOptional ) {
-      return 0;
-    }
-    
-    aafUID_t srcTypeId;
-    hr = spTypeDef->GetAUID( &srcTypeId );
-    if ( AAFRESULT_SUCCESS != hr ) {
-      return 0;
-    }
-    
-    ImplAAFSmartPointer<ImplAAFDictionary> spDstDict;
-    hr = pDstObj->GetDictionary(&spDstDict);
-    if ( AAFRESULT_SUCCESS != hr ) {
-      return 0;
-    }
-    
-    // Get the destination type def.
-    ImplAAFSmartPointer<ImplAAFTypeDef> spDstTypeDef;
-    hr = spDstDict->LookupTypeDef(srcTypeId, &spDstTypeDef);
-    ASSERTU( AAFRESULT_SUCCESS == hr );
-    
-    hr = RegisterOptionalPropertyDef( auid, srcName, spDstTypeDef, &pDstPropertyDef );
-    if ( AAFRESULT_SUCCESS != hr ) {
-      return 0;
-    }
-  }
-  else if ( AAFRESULT_SUCCESS != hr ) {
-    return 0;
-  }
-  
-  hr = pDstObj->CreatePropertyInstanceAndAdd( pDstPropertyDef );
-  if ( AAFRESULT_SUCCESS != hr ) {
-    return 0;
-  }
-  
-  return pDstPropertyDef;
-}
-
 PropertyDefinitionsIterator* ImplAAFClassDef::propertyDefinitions(void) const
 {
   return _Properties.createIterator();
 }
 
-const OMUniqueObjectIdentification&
-ImplAAFClassDef::identification(void) const
+bool ImplAAFClassDef::hasParent(void) const
 {
-  // to prevent ambiguity
-  return ImplAAFMetaDefinition::identification();
+  aafUID_t uid;
+  GetAUID (&uid);
+
+  bool result = true;
+  if( uid == AUID_AAFObject ||
+      uid == AUID_AAFMetaDefinition ||
+      uid == AUID_AAFMetaDictionary )
+  {
+      result = false;
+  }
+
+
+  return result;
 }
 
-const wchar_t* ImplAAFClassDef::name(void) const
+const OMClassDefinition* ImplAAFClassDef::parent(void) const
 {
-  // to prevent ambiguity
-  return ImplAAFMetaDefinition::name();
+  ASSERTU( !isRoot() );
+
+
+  ImplAAFClassDef* pNonConstThis = const_cast<ImplAAFClassDef*>(this);
+  ImplAAFClassDef* pParent = 0;
+  pNonConstThis->GetParent( &pParent );
+  ASSERTU( pParent );
+
+
+  // This method does not increment the reference count
+  // of the returned class definition.
+  pParent->ReleaseReference();
+
+
+  return pParent;
 }
 
-bool ImplAAFClassDef::hasDescription(void) const
+bool ImplAAFClassDef::isConcrete(void) const
 {
-  // to prevent ambiguity
-  return ImplAAFMetaDefinition::hasDescription();
-}
-
-const wchar_t* ImplAAFClassDef::description(void) const
-{
-  // to prevent ambiguity
-  return ImplAAFMetaDefinition::description();
-}
-
-bool ImplAAFClassDef::isPredefined(void) const
-{
-  // to prevent ambiguity
-  return ImplAAFMetaDefinition::isPredefined();
+  bool result = false;
+  aafBool b = pvtIsConcrete();
+  if (b == kAAFTrue) {
+    result = true;
+  }
+  return result;
 }
 
 bool ImplAAFClassDef::omIsConcrete(void) const
@@ -892,10 +828,22 @@ AAFRESULT STDMETHODCALLTYPE
 
   AAFRESULT hr;
   ImplAAFDictionarySP pDict;
+  aafUID_t thisClassID;
+  // get our class ID
+  hr = GetAUID (&thisClassID);
+  if (AAFRESULT_FAILED (hr))
+	return hr;
+
   hr = GetDictionary (&pDict);
   if (AAFRESULT_FAILED (hr))
 	return hr;
   ASSERTU (pDict);
+
+  // We should not create an instance of a MetaDefinition with CreateInstance().
+  // CreateMetaInstance() should be used for that instead.
+  if (pDict->metaDictionary()->isMeta(*reinterpret_cast<const OMObjectIdentification *>(&thisClassID)))
+	return AAFRESULT_INVALID_CLASS_ID;
+
   ImplAAFObject * pObj =
 	pDict->CreateAndInit (this);
   ASSERTU (pObj);
@@ -987,7 +935,7 @@ aafBool ImplAAFClassDef::pvtPropertyIdentifierAUID::DoesMatch
 {
   aafUID_t testUID;
   ASSERTU (pTestPropDef);
-  AAFRESULT hr = pTestPropDef->GetAUID (&testUID);
+  ARESULT (AAFRESULT hr) pTestPropDef->GetAUID (&testUID);
   ASSERTU (AAFRESULT_SUCCEEDED (hr));
   return (EqualAUID (&_id, &testUID) ? kAAFTrue : kAAFFalse);
 }
@@ -1071,6 +1019,119 @@ void ImplAAFClassDef::onSave(void* clientContext) const
 void ImplAAFClassDef::onRestore(void* clientContext) const
 {
   ImplAAFMetaDefinition::onRestore(clientContext);
+
+  // Register PrimaryMob property definition on a restored instance
+  // of Header class.
+  //
+  //
+  // When opening a KLV-encoded file that doesn't have Header::PrimaryMob
+  // defined a Header instance is created using the file's Header class
+  // definition which is updated afterwards (see calls to
+  // MergeBuiltinClassDefs() in ImplAAFFile::Open() and other file open
+  // methods) to add missing properties present in the built-in Header
+  // definition but missing from the file's Header definition. As a result
+  // it ends up with a Header class instance that doesn't match its
+  // definition, i.e. the instance doesn't have PrimaryMob property but
+  // the class definition does.
+  //
+  // This breaks the mechanism that follows weak references to objects
+  // contained in the Header, such as Data Definitions. See, for example,
+  // ImplAAFComponent::GetDataDef().
+  // 
+  // This hack takes care of registering PrimaryMob property after the
+  // Header class definition has been read from the file but before the
+  // Header is instantiated.
+  //
+  // This hack relies on ImplAAFClassDef::onRestore() being called after
+  // the metadata dictionary has been restored from the file and before
+  // metadata instances are created. A corresponding change has been made
+  // in OMKLVStoredObject::restore(OMFile&) to ensure this happens.
+  //
+  // TODO: This issue is likely to be not specific to PrimaryMob definition
+  // but to affect any built-in optional property definition added to the
+  // Header class. Furhtermore, it may not be specific to the Header class
+  // but affect any class containing strong reference sets that can be
+  // referenced by weak reference properties.
+  //
+  // The core issue is likely to be the KLV file restore mechanism that
+  // creates class instances using definitions from the file before they
+  // are updated with information from the built-in dictionary (see
+  // OMKLVStoredObject::restore(OMFile&)).
+  // 
+  static const aafUID_t Class_Header =
+  {0x0d010101, 0x0101, 0x2f00, {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06, 0x01, 0x01}};
+  static const aafUID_t Property_Header_PrimaryMob =
+  {0x06010104, 0x0108, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x04}};
+
+  ImplAAFClassDef* This = const_cast<ImplAAFClassDef*>(this);
+
+  aafUID_t classID = {0};
+  GetAUID(&classID);
+  if (classID == Class_Header &&
+      !This->PvtIsPropertyDefRegistered(Property_Header_PrimaryMob))
+  {
+#if 1
+	ImplAAFPropertyDefSP pPropDef;
+	AAFRESULT hr = This->pvtRegisterPropertyDef(Property_Header_PrimaryMob,
+												L"PrimaryMob",
+												kAAFTypeID_MobWeakReference,
+												kAAFTrue,
+												kAAFFalse,
+												&pPropDef);
+	if (AAFRESULT_FAILED(hr))
+		throw hr;
+#else
+	// Copy PrimaryMob property definition from the built-in dictionary into
+    // Header class definition restored from file.
+	ImplAAFDictionarySP pDict;
+	AAFRESULT hr = GetDictionary (&pDict);
+	if (AAFRESULT_SUCCEEDED(hr))
+	{
+	  ImplAAFClassDefSP pBuiltinClassDef;
+	  hr = pDict->LookupClassDef(classID, &pBuiltinClassDef);
+	  if (AAFRESULT_SUCCEEDED(hr))
+	  {
+		ImplAAFPropertyDefSP pBuiltinPropDef;
+		hr = pBuiltinClassDef->LookupPropertyDef(Property_Header_PrimaryMob, &pBuiltinPropDef);
+		if (AAFRESULT_SUCCEEDED(hr))
+		{
+		  ImplAAFPropertyDefSP pPropDef;
+		  hr = This->pvtRegisterPropertyDef(Property_Header_PrimaryMob, pBuiltinPropDef->name(), kAAFTypeID_MobWeakReference, kAAFTrue, kAAFFalse, &pPropDef);
+		}
+	  }
+	}
+#endif
+  }
+}
+
+const OMUniqueObjectIdentification& ImplAAFClassDef::identification(void) const
+{
+  // to prevent ambiguity
+  return ImplAAFMetaDefinition::identification();
+}
+
+const wchar_t* ImplAAFClassDef::name(void) const
+{
+  // to prevent ambiguity
+  return ImplAAFMetaDefinition::name();
+}
+
+bool ImplAAFClassDef::hasDescription(void) const
+{
+  // to prevent ambiguity
+  return ImplAAFMetaDefinition::hasDescription();
+}
+
+const wchar_t* ImplAAFClassDef::description(void) const
+{
+  // to prevent ambiguity
+  return ImplAAFMetaDefinition::description();
+}
+
+bool ImplAAFClassDef::isPredefined(void) const
+{
+  // to prevent ambiguity
+  return ImplAAFMetaDefinition::isPredefined();
 }
 
 // Method is called after associated class has been added to MetaDictionary.
@@ -1203,6 +1264,7 @@ AAFRESULT ImplAAFClassDef::MergePropertyDefsTo(
 {
     ASSERTU( pDestClassDef );
 
+    AAFRESULT hr = AAFRESULT_SUCCESS;
     ImplEnumAAFPropertyDefs* pEnumSourcePropertyDefs = NULL;
     GetPropertyDefs( &pEnumSourcePropertyDefs );
     ASSERTU( pEnumSourcePropertyDefs );
@@ -1219,7 +1281,7 @@ AAFRESULT ImplAAFClassDef::MergePropertyDefsTo(
                 pDestClassDef->LookupPropertyDef( propertyID,
                                                   &pDestPropertyDef ) ) )
         {
-            pSourcePropertyDef->MergeTo( pDestClassDef );
+            hr = pSourcePropertyDef->MergeTo( pDestClassDef );
         }
         else
         {
@@ -1229,12 +1291,15 @@ AAFRESULT ImplAAFClassDef::MergePropertyDefsTo(
 
         pSourcePropertyDef->ReleaseReference();
         pSourcePropertyDef = NULL;
+
+        if( AAFRESULT_FAILED(hr) )
+            break;
     }
 
     pEnumSourcePropertyDefs->ReleaseReference();
     pEnumSourcePropertyDefs = NULL;
 
 
-    return AAFRESULT_SUCCESS;
+    return hr;
 }
 

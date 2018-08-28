@@ -105,6 +105,7 @@
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
+#include "AAFUtils.h"
 #include "ImplAAFTypeDefObjectRef.h"
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFPropValData.h"
@@ -226,7 +227,7 @@ AAFRESULT STDMETHODCALLTYPE
 OMType* ImplAAFTypeDefSet::elementType(void) const
 {
   ImplAAFTypeDef* result = 0;
-  AAFRESULT hr = GetElementType(&result);
+  ARESULT (AAFRESULT hr) GetElementType(&result);
   ASSERTU(hr == 0);
   result->ReleaseReference();
   return result->type();
@@ -650,6 +651,40 @@ ImplAAFTypeDefSet::GetElements (
 }
 
 
+aafBool ImplAAFTypeDefSet::IsFixedSize () const
+{
+  return kAAFFalse;
+}
+
+
+OMUInt32 ImplAAFTypeDefSet::PropValSize () const
+{
+  // This method should not be called for TypeDefSet because
+  // TypeDefSet does not define fixed size types.
+  ASSERTU(IsFixedSize() == kAAFFalse);
+  check(AAFRESULT_INTERNAL_ERROR);
+  return 0;
+}
+
+
+aafBool ImplAAFTypeDefSet::IsRegistered () const
+{
+  ImplAAFTypeDefSP pElementType;
+  check(GetElementType(&pElementType));
+  return pElementType->IsRegistered();
+}
+
+
+OMUInt32 ImplAAFTypeDefSet::NativeSize () const
+{
+  // This method should not be called for TypeDefSet because
+  // TypeDefSet does not define fixed size types.
+  ASSERTU(IsFixedSize() == kAAFFalse);
+  check(AAFRESULT_INTERNAL_ERROR);
+  return 0;
+}
+
+
 bool ImplAAFTypeDefSet::IsAggregatable () const
 { return false; }
 
@@ -943,22 +978,20 @@ void ImplAAFTypeDefSet::reorder(OMByte* /*bytes*/,
 							 OMUInt32 /*bytesSize*/) const
 {
   // Should be properly implemented
-  ASSERTU (0);
+  check (AAFRESULT_NOT_IMPLEMENTED);
 }
 
 OMUInt32 ImplAAFTypeDefSet::externalSize(const OMByte* /*internalBytes*/,
 									OMUInt32 /*internalBytesSize*/) const
 {
   // Should be properly implemented
-  ASSERTU (0);
+  check (AAFRESULT_NOT_IMPLEMENTED);
   return 0; // Not reached!
 }
 
 OMUInt32 ImplAAFTypeDefSet::externalSize(void) const
 {
-  // Should be properly implemented
-  ASSERTU (0);
-  return 0; // Not reached!
+  return PropValSize();
 }
 
 void ImplAAFTypeDefSet::externalize(const OMByte* /*internalBytes*/,
@@ -968,22 +1001,20 @@ void ImplAAFTypeDefSet::externalize(const OMByte* /*internalBytes*/,
 								 OMByteOrder /*byteOrder*/) const
 {
   // Should be properly implemented
-  ASSERTU (0);
+  check (AAFRESULT_NOT_IMPLEMENTED);
 }
 
 OMUInt32 ImplAAFTypeDefSet::internalSize(const OMByte* /*externalBytes*/,
 									OMUInt32 /*externalSize*/) const
 {
   // Should be properly implemented
-  ASSERTU (0);
+  check (AAFRESULT_NOT_IMPLEMENTED);
   return 0; // Not reached!
 }
 
 OMUInt32 ImplAAFTypeDefSet::internalSize(void) const
 {
-  // Should be properly implemented
-  ASSERTU (0);
-  return 0; // Not reached!
+  return NativeSize();
 }
 
 void ImplAAFTypeDefSet::internalize(const OMByte* /*externalBytes*/,
@@ -993,7 +1024,7 @@ void ImplAAFTypeDefSet::internalize(const OMByte* /*externalBytes*/,
 								 OMByteOrder /*byteOrder*/) const
 {
   // Should be properly implemented
-  ASSERTU (0);
+  check (AAFRESULT_NOT_IMPLEMENTED);
 }
 
 void ImplAAFTypeDefSet::accept(OMTypeVisitor& visitor) const

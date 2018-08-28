@@ -39,12 +39,12 @@
 
 #include "OMSS_SSStoredObjectFactory.h"
 
+#include "OMSSStructuredStorage.h"
 #include "OMSSStoredObject.h"
 #include "OMAssertions.h"
 #include "OMUtilities.h"
 #include "OMRawStorage.h"
 #include "OMUniqueObjectIdentType.h"
-#include "OMSSStructuredStorage.h"
 
 #include "OMExceptions.h"
 

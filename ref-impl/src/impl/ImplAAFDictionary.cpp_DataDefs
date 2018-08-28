@@ -80,6 +80,16 @@ InitDataDefinition (
   L"Timecode data (legacy)");
 
 InitDataDefinition (
+  kAAFDataDef_SMPTE12MTimecodeTrackActiveUserBits, 
+  L"DataDef_SMPTE12MTimecodeTrackActiveUserBits", 
+  L"SMPTE 12M Timecode track with active user bits");
+
+InitDataDefinition (
+  kAAFDataDef_SMPTE309MTimecodeTrackDatecodeUserBits, 
+  L"DataDef_SMPTE309MTimecodeTrackDatecodeUserBits", 
+  L"SMPTE 12M Timecode track with active user bits");
+
+InitDataDefinition (
   kAAFDataDef_Edgecode, 
   L"DataDef_Edgecode", 
   L"Edgecode data");
@@ -88,6 +98,11 @@ InitDataDefinition (
   kAAFDataDef_DescriptiveMetadata, 
   L"DataDef_DescriptiveMetadata", 
   L"Descriptive metadata");
+
+InitDataDefinition (
+  kAAFDataDef_Data, 
+  L"DataDef_Data", 
+  L"Data Essence data");
 
 InitDataDefinition (
   kAAFDataDef_Auxiliary, 

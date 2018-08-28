@@ -80,7 +80,6 @@ struct ContentStorageTest
 	void readEssenceData(IAAFPlainEssenceData *pEssenceData,
 		const aafDataBuffer_t data,
 		aafUInt32 dataSize);
-	
 
 	void cleanupReferences();
 	void setBufferSize(aafUInt32 bufferSize);
@@ -151,8 +150,8 @@ extern "C" HRESULT CAAFContentStorage_test(
 	// Cleanup our object if it exists.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IAAFContentStorage methods have not been tested:" << endl;       
-//		cout << "     GetMobs" << endl; 
+//		cout << "The following IAAFContentStorage methods have not been tested:" << endl;
+//		cout << "     GetMobs" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 	
@@ -414,7 +413,7 @@ void ContentStorageTest::openFile(wchar_t *pFileName)
 	testMob = NULL;
 	/***/
 	uid = kTestMobID2;
-    check(_pStorage->IsEssenceDataPresent (uid, kAAFEssence, &testBool));
+	check(_pStorage->IsEssenceDataPresent (uid, kAAFEssence, &testBool));
 	checkExpression(kAAFTrue == testBool, AAFRESULT_TEST_FAILED);
 	/***/
 	uid = kTestMobID2;
@@ -501,20 +500,20 @@ void ContentStorageTest::createEssenceData(IAAFSourceMob *pSourceMob)
 	
 	check(pRawEssenceData->SetFileMob(pSourceMob));
 	check(_pStorage->AddEssenceData(pRawEssenceData));
-	
+
 	IAAFEssenceData2* pEssenceData2 = NULL;
 	check(pRawEssenceData->QueryInterface(IID_IAAFEssenceData2, (void**)&pEssenceData2));
 	check(pEssenceData2->GetPlainEssenceData(0, &_pEssenceData));
 
 	writeEssenceData(_pEssenceData, (aafDataBuffer_t)_smiley, sizeof(_smiley));
 	writeEssenceData(_pEssenceData, (aafDataBuffer_t)_frowney, sizeof(_frowney));
-	
+
 	// Read back the data before saving and/or closing the file
 	check(_pEssenceData->SetPosition(0));
 	aafPosition_t dataPosition = 0;
 	check(_pEssenceData->GetPosition(&dataPosition));
 	checkExpression(dataPosition == 0, AAFRESULT_TEST_FAILED);
-	
+
 	// Validate the current essence size.
 	aafLength_t essenceSize = 0;
 	aafLength_t expectedEssenceSize = sizeof(_smiley) + sizeof(_frowney);
@@ -557,7 +556,7 @@ void ContentStorageTest::openEssenceData()
 		aafLength_t expectedEssenceSize = sizeof(_smiley) + sizeof(_frowney);
 		check(_pEssenceData->GetSize(&essenceSize));
 		checkExpression(essenceSize == expectedEssenceSize, AAFRESULT_TEST_FAILED);
-		
+
 		// Validate that the correct data can be read back.
 		readEssenceData(_pEssenceData, (aafDataBuffer_t)_smiley, sizeof(_smiley));
 		readEssenceData(_pEssenceData, (aafDataBuffer_t)_frowney, sizeof(_frowney));
@@ -674,5 +673,3 @@ void ContentStorageTest::readEssenceData(IAAFPlainEssenceData *pEssenceData,
 		checkExpression (0 == memcmp(data + offset, (char *)_buffer, dataSize - offset), AAFRESULT_TEST_FAILED);
 	}
 }
-
-

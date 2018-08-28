@@ -56,6 +56,8 @@ public:
 
     // @cmember Destructor.
   virtual ~OMDataStreamProperty(void);
+
+   // @cmember closes the stream.
   virtual void detach(void);
 
     // @cmember Save this <c OMDataStreamProperty>.
@@ -105,6 +107,56 @@ public:
   virtual void write(const OMByte* buffer,
                      const OMUInt32 bytes,
                      OMUInt32& bytesWritten);
+
+    // @cmember Attempt to read the vector of buffers given by <p buffers>
+    //          from this <c OMDataStreamProperty>. This is "read scatter". The
+    //          <p bufferCount> buffers are read in order until all have
+    //          been successfully read or an error is encountered. Once
+    //          an error has been encountered on one buffer no additional
+    //          buffers are read.
+    //          The number of bytes read is returned in <p bytesRead>.
+  virtual void read(OMIOBufferDescriptor* buffers,
+                    OMUInt32 bufferCount,
+                    OMUInt32& bytesRead) const;
+
+    // @cmember Attempt to write the vector of buffers given by <p buffers>
+    //          to this <c OMDataStreamProperty>. This is "write gather". The
+    //          <p bufferCount> buffers are written in order until all have
+    //          been successfully written or an error is encountered. Once
+    //          an error has been encountered on one buffer no additional
+    //          buffers are written.
+    //          The number of bytes written is returned in <p bytesWritten>.
+  virtual void write(const OMIOBufferDescriptor* buffers,
+                     OMUInt32 bufferCount,
+                     OMUInt32& bytesWritten);
+
+    // Asynchronous read - single buffer
+  virtual void read(OMUInt64 position,
+                    OMByte* buffer,
+                    const OMUInt32 bytes,
+                    void* /* */ completion,
+                    const void* clientArgument);
+
+    // Asynchronous write - single buffer
+  virtual void write(OMUInt64 position,
+                     const OMByte* buffer,
+                     const OMUInt32 bytes,
+                     void* /* */ completion,
+                     const void* clientArgument);
+
+    // Asynchronous read - multiple buffers
+  virtual void read(OMUInt64 position,
+                    OMIOBufferDescriptor* buffers,
+                    OMUInt32 bufferCount,
+                    void* /* */ completion,
+                    const void* clientArgument) const;
+
+    // Asynchronous write - multiple buffers
+  virtual void write(OMUInt64 position,
+                     const OMIOBufferDescriptor* buffers,
+                     OMUInt32 bufferCount,
+                     void* /* */ completion,
+                     const void* clientArgument);
 
   // Typed access interface - these functions use the OMType interface
 
@@ -168,7 +220,8 @@ public:
   virtual void shallowCopyTo(OMProperty* destination) const;
 
   virtual void deepCopyTo(OMProperty* destination,
-                          void* clientContext) const;
+                          void* clientContext,
+                          bool deferStreamData) const;
 
   // Deferred access.
 
@@ -199,12 +252,8 @@ public:
 
   // Stream filtering
 
-  virtual OMDataStreamPropertyFilter* createFilter();
-
-
-protected:
-
-  virtual const wchar_t* storedName(void) const;
+    // @cmember The encoding-specific stream filter.
+  virtual OMDataStreamPropertyFilter* filter(void);
 
 private:
 
@@ -223,6 +272,8 @@ private:
 
   OMDataStreamAccess* _streamAccess;
 
+    // @cmember Encoding-specific stream filter.
+  OMDataStreamPropertyFilter* _filter;
 };
 
 #endif

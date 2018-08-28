@@ -1,0 +1,93 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFGroupOfSoundfieldGroupsLabelSubDescriptor\
+#endm
+#c
+#startm .parent-module 0
+AAFMCALabelSubDescriptor\
+#endm
+#c
+#c #import ./AAFMCALabelSubDescriptor.exp
+AD_HEAD
+AD_IDL(///
+/// The IAAFGroupOfSoundfieldGroupsLabelSubDescriptor interface.
+///
+/// In addition to the specific error results listed for each method\,
+/// all methods in this interface may also return one of the following
+/// values:
+/// 
+/// AAFRESULT_NOMEMORY
+///   - insufficient system memory is available to perform the
+///     operation.
+///)
+AD_CLASS_UUID(CAF03CDA, E069, 47BF, B2, 42, 45, 88, F0, 4D, 77, DC)
+
+AD_DEFAULT_UUID(75B80862, 8728, 47BF, 80, 30, 37, 34, 75, 1B, F6, 3C)
+AD_XCLASS_BEGIN(Concrete, StoredObject)
+AD_XMETHOD3(Initialize,
+			[in],
+				objPass,
+				aafUID_constref,
+				dictionaryID,
+				Label dictionary ID.,
+			[in],
+				objPass,
+				aafUID_constref,
+				linkID,
+				Link ID.,
+			[in],
+				objPass,
+				aafCharacter_constptr,
+				pTagSymbol,
+				Tag symbol.,
+		   Initializes a newly allocated\,
+  /// IAAFGroupOfSoundfieldGroupsLabelSubDescriptor-supporting object.
+  /// This method must be called after allocation\, and before
+  /// any other method can be called.
+  ///
+  /// Succeeds if:
+  /// - Initialize\(\) has not yet been called on this object.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect\, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_ALREADY_INITIALIZED
+  ///   - Initialize\(\) has already been called on this object.)
+
+
+AD_XCLASS_END(Concrete, StoredObject)

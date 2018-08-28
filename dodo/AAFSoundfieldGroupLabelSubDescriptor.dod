@@ -1,0 +1,158 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFSoundfieldGroupLabelSubDescriptor\
+#endm
+#c
+#startm .parent-module 0
+AAFMCALabelSubDescriptor\
+#endm
+#c
+#c #import ./AAFMCALabelSubDescriptor.exp
+AD_HEAD
+AD_IDL(///
+/// The IAAFSoundfieldGroupLabelSubDescriptor interface.
+///
+/// In addition to the specific error results listed for each method\,
+/// all methods in this interface may also return one of the following
+/// values:
+/// 
+/// AAFRESULT_NOMEMORY
+///   - insufficient system memory is available to perform the
+///     operation.
+///)
+AD_CLASS_UUID(F07A7F20, 6462, 4DAB, B4, BE, 84, CC, CF, DC, FB, 48)
+
+AD_DEFAULT_UUID(3A7101D2, DC11, 48D8, A2, 58, 30, A1, C8, 81, 72, 67)
+AD_XCLASS_BEGIN(Concrete, StoredObject)
+AD_XMETHOD3(Initialize,
+			[in],
+				objPass,
+				aafUID_constref,
+				dictionaryID,
+				Label dictionary ID.,
+			[in],
+				objPass,
+				aafUID_constref,
+				linkID,
+				Link ID.,
+			[in],
+				objPass,
+				aafCharacter_constptr,
+				pTagSymbol,
+				Tag symbol.,
+		   Initializes a newly allocated\,
+  /// IAAFSoundfieldGroupLabelSubDescriptor-supporting object.
+  /// This method must be called after allocation\, and before
+  /// any other method can be called.
+  ///
+  /// Succeeds if:
+  /// - Initialize\(\) has not yet been called on this object.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect\, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_ALREADY_INITIALIZED
+  ///   - Initialize\(\) has already been called on this object.)
+
+
+AD_XMETHOD1(CountGroupOfSoundfieldGroupsLinkIDs,
+			[out],
+			objPass,
+			aafUInt32 *,
+			pCount,
+			Count of Link IDs of the Groups of Soundfield Groups,
+
+			Returns number of Link IDs of Groups of Soundfield Groups to which
+  /// this Soundfield Group belongs.
+  ///
+  /// Succeeds if:
+  /// - the object is initialized.
+  /// - pCount is a valid pointer.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pCount\))
+
+
+AD_XMETHOD2(GetGroupOfSoundfieldGroupsLinkIDAt,
+			[in],
+			objPass,
+			aafUInt32,
+			index,
+			Index of Link ID of the Groups of Soundfield Groups to retrieve,
+
+			[out],
+			objPass,
+			aafUID_t *,
+			pGroupOfGroupsLinkID,
+			Requested Link ID of the Groups of Soundfield Groups,
+
+     Gets the indexed Link ID of Groups of Soundfield Groups to which
+  /// this Soundfield Group belongs.
+  ///
+  /// Succeeds if:
+  /// - pGroupOfGroupsLinkID is a valid pointer.
+  /// - index is less than CountGroupOfSoundfieldGroupsLinkIDs\(\).
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pGroupOfGroupsLinkID\)
+  ///
+  /// AAFRESULT_BADINDEX
+  ///   - Index is not less than CountGroupOfSoundfieldGroupsLinkIDs\(\).)
+
+
+AD_XMETHOD1(AppendGroupOfSoundfieldGroupsLinkID,
+			[in\, ref],
+			objPass,
+			aafUID_constref,
+			groupOfGroupsLinkID,
+			Appended Link ID of Group of Soundfield Groups,
+
+     Append a new Link ID of Group of Soundfield Groups to which
+  /// this Soundfield Group belongs.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the new Groups Link ID is not already part of this Soundfield Group Label.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  ///
+  /// AAFRESULT_INVALID_PARAM
+  ///   - the specified Link ID is already referenced by this Soundfield Group Label.)
+
+
+AD_XCLASS_END(Concrete, StoredObject)

@@ -134,7 +134,7 @@ bool OMArrayPropertyIterator<Element>::after(void) const
   //   @rdesc The number of <p Elements>s
   //   @this const
 template <typename Element>
-size_t OMArrayPropertyIterator<Element>::count(void) const
+OMUInt32 OMArrayPropertyIterator<Element>::count(void) const
 {
   TRACE("OMArrayPropertyIterator<Element>::count");
   return _iterator.count();
@@ -232,7 +232,7 @@ Element OMArrayPropertyIterator<Element>::setValue(Element newElement)
   //   @rdesc The index of the current position.
   //   @this const
 template <typename Element>
-size_t OMArrayPropertyIterator<Element>::index(void) const
+OMUInt32 OMArrayPropertyIterator<Element>::index(void) const
 {
   TRACE("OMArrayPropertyIterator<Element>::index");
   return _iterator.index();

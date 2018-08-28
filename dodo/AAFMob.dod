@@ -40,6 +40,7 @@ AAFObject\
 #c
 #c #import ./AAFObject.exp
 #import ./AAFMob2.exp
+#import ./AAFMob3.exp
 AD_HEAD
 AD_IDL(///
 /// IAAFMob is DEPRECATED\,  Please use IAAFMob2.
@@ -79,7 +80,7 @@ AD_CLASS_UUID(B1A21375, 1A7D, 11d2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A21374, 1A7D, 11d2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
-AD_COM_EXT_CLASS_BEGIN(public IAAFMob2)
+AD_COM_EXT2_CLASS_BEGIN(public IAAFMob2, public IAAFMob3)
 
 AD_XMETHOD1(GetMobID,
 			[out],
@@ -947,4 +948,9 @@ AD_COM_METH(.method-GetUsageCode)
 AD_COM_METH(.method-AppendNewStaticSlot)
 AD_COM_METH(.method-AppendNewEventSlot)
 
-AD_COM_EXT_CLASS_END(AAFMob2)
+#c
+#c AAFMob3 methods
+#c
+AD_COM_METH(.method-CloneExternalAdvanced)
+
+AD_COM_EXT2_CLASS_END(AAFMob2, AAFMob3)

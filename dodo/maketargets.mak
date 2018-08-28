@@ -39,7 +39,7 @@ BLD_CFG_DIR = ../ref-impl/bld_cfg
 include $(BLD_CFG_DIR)/common.mk
 
 DODO = ./tool/dodo.$(EXE)
-UPDATE = ../update.ksh
+UPDATE = ../update.sh
 
 .SUFFIXES: .cpp .h .comc .comcx .comh .dod .exp .idl .fidl .implc .implh .comt .cppt .refh .frefh
 
@@ -132,7 +132,7 @@ $(INCLUDE_DIR)/com-api/AAFPrivate.idl : $(PRIVATE_FIDL_DOD_FILES) macros/fidl.ma
 
 AAFPrivate.idl.tmp : $(PRIVATE_FIDL_TARGETS) aafobjects.mk CopyrightMessage.idl GenAafPrivateIdl.sh
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenAafPrivateIdl.sh >> tmp.sh
 	$(CAT) CopyrightMessage.idl > AAFPrivate.idl.tmp
 	$(SH) tmp.sh >> AAFPrivate.idl.tmp
@@ -148,7 +148,7 @@ $(INCLUDE_DIR)/com-api/AAF.idl : $(FIDL_DOD_FILES) macros/fidl.mac macros/base.m
 
 AAF.idl.tmp : $(FIDL_TARGETS) aafobjects.mk CopyrightMessage.idl GenAafIdl.sh
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenAafIdl.sh >> tmp.sh
 	$(CAT) CopyrightMessage.idl > AAF.idl.tmp
 	$(SH) tmp.sh >> AAF.idl.tmp
@@ -164,7 +164,7 @@ $(INCLUDE_DIR)/com-api/AAFPlugin.idl : $(PLUGIN_FIDL_DOD_FILES) macros/fidl.mac 
 
 AAFPlugin.idl.tmp : $(PLUGIN_FIDL_TARGETS) aafobjects.mk CopyrightMessage.idl GenPluginIdl.sh
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenPluginIdl.sh >> tmp.sh
 	$(CAT) CopyrightMessage.idl > AAFPlugin.idl.tmp
 	$(SH) tmp.sh >> AAFPlugin.idl.tmp
@@ -180,7 +180,7 @@ $(INCLUDE_DIR)/ref-api/AAFPrivate.h : aafobjects.mk $(PRIVATE_FREFH_DOD_FILES) m
 
 AAFPrivate.h.tmp : aafobjects.mk $(PRIVATE_FREFH_TARGETS) CopyrightMessage.cpp GenAafPrivateh.sh
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenAafPrivateh.sh >> tmp.sh
 	$(CAT) CopyrightMessage.cpp > AAFPrivate.h.tmp
 	$(SH) tmp.sh >> AAFPrivate.h.tmp
@@ -196,7 +196,7 @@ $(INCLUDE_DIR)/ref-api/AAF.h : $(FREFH_DOD_FILES) macros/frefh.mac macros/base.m
 
 AAF.h.tmp : $(FREFH_TARGETS) aafobjects.mk CopyrightMessage.cpp GenAafh.sh
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenAafh.sh >> tmp.sh
 	$(CAT) CopyrightMessage.cpp > AAF.h.tmp
 	$(SH) tmp.sh >> AAF.h.tmp
@@ -212,7 +212,7 @@ $(INCLUDE_DIR)/ref-api/AAFPlugin.h : $(PLUGIN_FREFH_DOD_FILES) macros/frefh.mac 
 
 AAFPlugin.h.tmp : $(PLUGIN_FREFH_TARGETS) aafobjects.mk CopyrightMessage.cpp GenPluginh.sh
 	$(CP) aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenPluginh.sh >> tmp.sh
 	$(CAT) CopyrightMessage.cpp > AAFPlugin.h.tmp
 	$(SH) tmp.sh >> AAFPlugin.h.tmp
@@ -228,7 +228,7 @@ $(INCLUDE_DIR)/ref-api/AAF_i.c : aafobjects.mk dod2iid.awk CopyrightMessage.txt 
 
 AAF_i.refh.tmp : aafobjects.mk dod2iid.awk CopyrightMessage.cpp GenAaf_i.sh
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenAaf_i.sh >> tmp.sh
 	$(CAT) CopyrightMessage.cpp > AAF_i.refh.tmp
 	$(SH) tmp.sh >> AAF_i.refh.tmp
@@ -244,7 +244,7 @@ $(INCLUDE_DIR)/ref-api/AAFPlugin_i.c : aafobjects.mk dod2iid.awk CopyrightMessag
 
 AAFPlugin_i.refh.tmp : aafobjects.mk dod2iid.awk CopyrightMessage.cpp GenPlugin_i.sh
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenPlugin_i.sh >> tmp.sh
 	$(CAT) CopyrightMessage.cpp > AAFPlugin_i.refh.tmp
 	$(SH) tmp.sh >> AAFPlugin_i.refh.tmp
@@ -260,7 +260,7 @@ $(INCLUDE_DIR)/ref-api/AAFPrivate_i.c : aafobjects.mk dod2iid.awk CopyrightMessa
 
 AAFPrivate_i.refh.tmp : aafobjects.mk dod2iid.awk CopyrightMessage.cpp GenAafPrivate_i.sh
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenAafPrivate_i.sh >> tmp.sh
 	$(CAT) CopyrightMessage.cpp > AAFPrivate_i.refh.tmp
 	$(SH) tmp.sh >> AAFPrivate_i.refh.tmp
@@ -276,7 +276,7 @@ $(IMPL_DIR)/AAFClassIDs.h : aafobjects.mk CopyrightMessage.txt GenClassIDs.sh
 
 AAFClassIDs.impl.tmp : aafobjects.mk CopyrightMessage.cpp GenClassIDs.sh
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenClassIDs.sh >> tmp.sh
 	$(CAT) CopyrightMessage.cpp > AAFClassIDs.impl.tmp
 	$(SH) tmp.sh >> AAFClassIDs.impl.tmp
@@ -292,7 +292,7 @@ $(COMAPI_DIR)/AAFCLSIDs.h : aafobjects.mk CopyrightMessage.txt GenCLSIDs.sh
 
 AAFCLSIDs.comh.tmp : aafobjects.mk CopyrightMessage.cpp GenCLSIDs.sh
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenCLSIDs.sh >> tmp.sh
 	$(CAT) CopyrightMessage.cpp > AAFCLSIDs.comh.tmp
 	$(SH) tmp.sh >> AAFCLSIDs.comh.tmp
@@ -308,7 +308,7 @@ $(COMAPI_DIR)/AAFObjectTable.h : aafobjects.mk CopyrightMessage.txt GenObjectTab
 
 AAFObjectTable.comh.tmp : aafobjects.mk CopyrightMessage.cpp GenObjectTable.sh
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenObjectTable.sh >> tmp.sh
 	$(CAT) CopyrightMessage.cpp > AAFObjectTable.comh.tmp
 	$(SH) tmp.sh >> AAFObjectTable.comh.tmp
@@ -324,7 +324,7 @@ $(COMAPI_DIR)/AAFObjectTable_i.cpp : aafobjects.mk CopyrightMessage.txt GenObjec
 
 AAFObjectTable_i.refh.tmp : aafobjects.mk CopyrightMessage.cpp GenObjectTable_i.sh
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenObjectTable_i.sh >> tmp.sh
 	$(CAT) CopyrightMessage.cpp > AAFObjectTable_i.refh.tmp
 	$(SH) tmp.sh >> AAFObjectTable_i.refh.tmp
@@ -456,67 +456,67 @@ $(INCLUDE_DIR)/ref-api/%.h : %.dod macros/refh.mac macros/base.mac
 	$(RM) -f $*.exp
 	$(DODO) -f macros/exp.mac < $*.dod > $*.tmp
 	$(MV) $*.tmp $*.exp
-	$(CHMOD) -w $*.exp
+	$(CHMOD) u-w $*.exp
 
 .dod.h :
 	$(RM) -f $*.h
 	$(DODO) -f macros/h.mac < $*.dod > $*.tmp
 	$(MV) $*.tmp $*.h
-	$(CHMOD) -w $*.h
+	$(CHMOD) u-w $*.h
 
 .dod.cppt :
 	$(RM) -f $*.cppt
 	$(DODO) -f macros/cppt.mac < $*.dod > $*.tmp
 	$(MV) $*.tmp $*.cppt
-	$(CHMOD) -w $*.cppt
+	$(CHMOD) u-w $*.cppt
 
 .dod.comh :
 	$(RM) -f $*.comh
 	$(DODO) -f macros/comh.mac < $*.dod > $*.tmp
 	$(MV) $*.tmp $*.comh
-	$(CHMOD) -w $*.comh
+	$(CHMOD) u-w $*.comh
 
 .dod.comc :
 	$(RM) -f $*.comc
 	$(DODO) -f macros/comc.mac < $*.dod > $*.tmp
 	$(MV) $*.tmp $*.comc
-	$(CHMOD) -w $*.comc
+	$(CHMOD) u-w $*.comc
 
 .dod.comcx :
 	$(RM) -f $*.comcx
 	$(DODO) -f macros/comcx.mac < $*.dod > $*.tmp
 	$(MV) $*.tmp $*.comcx
-	$(CHMOD) -w $*.comcx
+	$(CHMOD) u-w $*.comcx
 
 .dod.comt :
 	$(RM) -f $*.comt
 	$(DODO) -f macros/comt.mac < $*.dod > $*.tmp
 	$(MV) $*.tmp $*.comt
-	$(CHMOD) -w $*.comt
+	$(CHMOD) u-w $*.comt
 
 .dod.implh :
 	$(RM) -f $*.implh ;
 	$(DODO) -f macros/implh.mac < $*.dod > $*.tmp ;
 	$(MV) $*.tmp $*.implh ;
-	$(CHMOD) -w $*.implh ;
+	$(CHMOD) u-w $*.implh ;
 
 .dod.implc :
 	$(RM) -f $*.implc ;
 	$(DODO) -f macros/implc.mac < $*.dod > $*.tmp ;
 	$(MV) $*.tmp $*.implc ;
-	$(CHMOD) -w $*.implc ;
+	$(CHMOD) u-w $*.implc ;
 
 .dod.cpp :
 	$(RM) -f $*.cpp
 	$(DODO) -f macros/cpp.mac < $*.dod > $*.tmp
 	$(MV) $*.tmp $*.cpp
-	$(CHMOD) -w $*.cpp
+	$(CHMOD) u-w $*.cpp
 
 .dod.idl :
 	$(RM) -f $*.idl
 	$(DODO) -f macros/idl.mac < $*.dod > $*.tmp
 	$(MV) $*.tmp $*.idl
-	$(CHMOD) -w $*.idl
+	$(CHMOD) u-w $*.idl
 
 .dod.fidl :
 	$(RM) -f $*.fidl
@@ -527,20 +527,20 @@ $(INCLUDE_DIR)/ref-api/%.h : %.dod macros/refh.mac macros/base.mac
 		-e 's/^\n\n\n+OBJ_INT/OBJ_INT/mg;'\
 		$*.tmp > $*X.tmp
 	sed -e '/OBJ_INT/r ObjInt.tmp' -e '/OBJ_INT/d' $*X.tmp > $*.fidl
-	$(CHMOD) -w $*.fidl
+	$(CHMOD) u-w $*.fidl
 	$(RM) -f ObjInt.tmp $*.tmp $*X.tmp
 
 .dod.refh :
 	$(RM) -f $*.refh
 	$(DODO) -f macros/refh.mac < $*.dod > $*.tmp
 	$(MV) $*.tmp $*.refh
-	$(CHMOD) -w $*.refh
+	$(CHMOD) u-w $*.refh
 
 .dod.frefh :
 	$(RM) -f $*.frefh
 	$(DODO) -f macros/frefh.mac < $*.dod > $*.tmp
 	$(MV) $*.tmp $*.frefh
-	$(CHMOD) -w $*.frefh
+	$(CHMOD) u-w $*.frefh
 
 
 clean:
@@ -589,7 +589,7 @@ realclean : clean
 	$(RM) -f $(COMAPI_DIR)/CAAFRoot.h
 	$(RM) -f $(COMAPI_DIR)/CAAFRoot.cpp
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(ECHO) SRC_DIR=$(SRC_DIR) >> tmp.sh
 	$(ECHO) INCLUDE_DIR=$(INCLUDE_DIR) >> tmp.sh
 	$(ECHO) TEST_DIR=$(TEST_DIR) >> tmp.sh

@@ -142,7 +142,7 @@ bool OMSetPropertyIterator<Element>::valid(void) const
   //   @rdesc The number of <p Element>s
   //   @this const
 template <typename Element>
-size_t OMSetPropertyIterator<Element>::count(void) const
+OMUInt32 OMSetPropertyIterator<Element>::count(void) const
 {
   return _iterator.count();
 }

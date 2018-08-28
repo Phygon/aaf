@@ -300,6 +300,86 @@ protected:
 public:
 #endm
 
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT5_CLASS_BEGIN 05
+#ifndef __C.parent-module_h__
+#include "C.parent-module.h"
+#endif
+
+
+//
+// Forward declaration
+//
+class Impl.this-module;
+
+
+class C.this-module
+  : public I.this-module,
+    %01,
+    %02,
+    %03,
+    %04,
+    %05,
+    public C.parent-module
+{
+protected:
+
+  //********
+  //
+  // Constructor/destructor
+  //
+  C.this-module (IUnknown * pControllingUnknown, aafBool doInit = kAAFTrue);
+  virtual ~C.this-module ();
+
+public:
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT6_CLASS_BEGIN 06
+#ifndef __C.parent-module_h__
+#include "C.parent-module.h"
+#endif
+
+
+//
+// Forward declaration
+//
+class Impl.this-module;
+
+
+class C.this-module
+  : public I.this-module,
+    %01,
+    %02,
+    %03,
+    %04,
+    %05,
+    %06,
+    public C.parent-module
+{
+protected:
+
+  //********
+  //
+  // Constructor/destructor
+  //
+  C.this-module (IUnknown * pControllingUnknown, aafBool doInit = kAAFTrue);
+  virtual ~C.this-module ();
+
+public:
+#endm
 
 #ccccccccccccccccccccccccccc
 #c
@@ -1171,6 +1251,29 @@ AD_CLASS_END\
 #c Arguments: additional interface name
 #c
 #startm AD_COM_EXT4_CLASS_END 04
+AD_CLASS_END\
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support 5 more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT5_CLASS_END 05
+AD_CLASS_END\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support 5 more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT6_CLASS_END 06
 AD_CLASS_END\
 #endm
 

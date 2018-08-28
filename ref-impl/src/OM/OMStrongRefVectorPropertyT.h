@@ -378,11 +378,9 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::insertAt(
   PRECONDITION("Valid object", object != 0);
 
   OMUInt32 localKey = nextLocalKey();
-  wchar_t* name = elementName(localKey);
-  VectorElement newElement(this, name, localKey);
+  VectorElement newElement(this, nullOMUniqueObjectIdentification, localKey);
   newElement.setValue(object);
   _vector.insertAt(newElement, index);
-  delete [] name;
   setPresent();
 
   POSTCONDITION("Object properly inserted",
@@ -1019,7 +1017,8 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::shallowCopyTo(
 template <typename ReferencedObject>
 void OMStrongReferenceVectorProperty<ReferencedObject>::deepCopyTo(
                                                      OMProperty* destination,
-                                                     void* clientContext) const
+                                                     void* clientContext,
+                                                     bool deferStreamData) const
 {
   TRACE("OMStrongReferenceVectorProperty<ReferencedObject>::deepCopyTo");
   PRECONDITION("Valid destination", destination != 0);
@@ -1038,10 +1037,11 @@ void OMStrongReferenceVectorProperty<ReferencedObject>::deepCopyTo(
   while (++iterator) {
     VectorElement& element = iterator.value();
     OMStorable* source = element.getValue();
+    ASSERT("Valid source", source != 0);
     OMStorable* d = source->shallowCopy(factory);
     dest->insertObject(d);
     d->onCopy(clientContext);
-    source->deepCopyTo(d, clientContext);
+    source->deepCopyTo(d, clientContext, deferStreamData);
   }
 }
 

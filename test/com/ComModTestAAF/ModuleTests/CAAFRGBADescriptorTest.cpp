@@ -77,9 +77,9 @@ using namespace std;
 #define kScanningDirectionTestVal			kAAFScanningDirection_BottomToTopRightToLeft
 
 
-#define NUM_TEST_ELEMENTS	3
-aafRGBAComponent_t	testElements[NUM_TEST_ELEMENTS] = { {kAAFCompRed,8}, {kAAFCompGreen,8}, {kAAFCompBlue,8} };
-aafRGBAComponent_t	testElements2[NUM_TEST_ELEMENTS] = { {kAAFCompGreen,8}, {kAAFCompBlue,8}, {kAAFCompRed,8} };
+#define NUM_TEST_ELEMENTS	6
+aafRGBAComponent_t	testElements[NUM_TEST_ELEMENTS] = { {kAAFCompRed,8}, {kAAFCompGreen,8}, {kAAFCompBlue,8}, {kAAFCompLuma,8}, {kAAFCompRedLSBs,8}, {kAAFCompColorZ,8} };
+aafRGBAComponent_t	testElements2[NUM_TEST_ELEMENTS] = { {kAAFCompGreen,8}, {kAAFCompBlue,8}, {kAAFCompRed,8}, {kAAFCompColorY,8}, {kAAFCompDepth,8}, {kAAFCompAlphaLSBs,8} };
 #define TEST_PALETTE_SIZE	16
 aafUInt8	bogusPalette[TEST_PALETTE_SIZE] = { 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31 };
 
@@ -153,6 +153,38 @@ static HRESULT CreateAAFFile(
 				CreateInstance(IID_IAAFRGBADescriptor, 
 							   (IUnknown **)&pRGBADesc));		
     checkResult(pRGBADesc->QueryInterface(IID_IAAFDigitalImageDescriptor, (void **)&pDIDesc));
+    checkResult(pRGBADesc->QueryInterface (IID_IAAFRGBADescriptor2, (void **)&pRGBADesc2));
+
+    // Access to AAFRGBADescriptor optional properties which aren't present should fail
+    aafUInt8 dummyPalette[TEST_PALETTE_SIZE];
+    checkExpression(pRGBADesc->GetPalette(TEST_PALETTE_SIZE, dummyPalette) == AAFRESULT_PROP_NOT_PRESENT,
+                    AAFRESULT_TEST_FAILED);
+    aafUInt32 dummyPaletteSize = 0;
+    checkExpression(pRGBADesc->GetPaletteSize(&dummyPaletteSize) == AAFRESULT_PROP_NOT_PRESENT,
+                    AAFRESULT_TEST_FAILED);
+    aafUInt32 dummyPaletteLayoutElementCount = 0;
+    checkExpression(pRGBADesc->CountPaletteLayoutElements(&dummyPaletteLayoutElementCount) == AAFRESULT_PROP_NOT_PRESENT,
+                    AAFRESULT_TEST_FAILED);
+    aafRGBAComponent_t dummyPaletteLayout[NUM_TEST_ELEMENTS];
+    checkExpression(pRGBADesc->GetPaletteLayout(NUM_TEST_ELEMENTS, dummyPaletteLayout) == AAFRESULT_PROP_NOT_PRESENT,
+                    AAFRESULT_TEST_FAILED);
+
+    // Access to AAFRGBADescriptor2 optional properties which aren't present should fail
+    aafUInt32 dummyComponentMaxRef = 0;
+    checkExpression(pRGBADesc2->GetComponentMaxRef(&dummyComponentMaxRef) == AAFRESULT_PROP_NOT_PRESENT,
+                    AAFRESULT_TEST_FAILED);
+    aafUInt32 dummyComponentMinRef = 0;
+    checkExpression(pRGBADesc2->GetComponentMinRef(&dummyComponentMinRef) == AAFRESULT_PROP_NOT_PRESENT,
+                    AAFRESULT_TEST_FAILED);
+    aafUInt32 dummyAlphaMaxRef = 0;
+    checkExpression(pRGBADesc2->GetAlphaMaxRef(&dummyAlphaMaxRef) == AAFRESULT_PROP_NOT_PRESENT,
+                    AAFRESULT_TEST_FAILED);
+    aafUInt32 dummyAlphaMinRef = 0;
+    checkExpression(pRGBADesc2->GetAlphaMinRef(&dummyAlphaMinRef) == AAFRESULT_PROP_NOT_PRESENT,
+                    AAFRESULT_TEST_FAILED);
+    aafScanningDirection_t dummyScanningDirection = kAAFScanningDirection_BottomToTopRightToLeft;
+    checkExpression(pRGBADesc2->GetScanningDirection(&dummyScanningDirection) == AAFRESULT_PROP_NOT_PRESENT,
+                    AAFRESULT_TEST_FAILED);
 
     aafRational_t	ratio;
     aafInt32		VideoLineMap[kVideoLineMapMaxElement] = {kVideoLineMap1TestVal,kVideoLineMap2TestVal};
@@ -184,8 +216,6 @@ static HRESULT CreateAAFFile(
     checkResult(pRGBADesc->SetPaletteLayout(NUM_TEST_ELEMENTS, testElements2));
   
     // Optional Properties accessed using IAAFRGBADescriptor2
-		checkResult(pRGBADesc->QueryInterface (IID_IAAFRGBADescriptor2, (void **)&pRGBADesc2));
-
     checkResult(pRGBADesc2->SetComponentMaxRef(kComponentMaxRefTestVal));
     checkResult(pRGBADesc2->SetComponentMinRef(kComponentMinRefTestVal));
     checkResult(pRGBADesc2->SetAlphaMaxRef(kAlphaMaxRefTestVal));
@@ -470,10 +500,10 @@ extern "C" HRESULT CAAFRGBADescriptor_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IAAFParameter methods have not been implemented:" << endl; 
-//		cout << "     GetPalette" << endl; 
-//		cout << "     GetPaletteSize" << endl; 
-//		cout << "     GetPaletteLayout" << endl; 
+//		cout << "The following IAAFParameter methods have not been implemented:" << endl;
+//		cout << "     GetPalette" << endl;
+//		cout << "     GetPaletteSize" << endl;
+//		cout << "     GetPaletteLayout" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

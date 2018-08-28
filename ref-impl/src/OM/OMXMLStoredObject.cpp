@@ -436,12 +436,72 @@ OMXMLStoredObject::create(const wchar_t* /* name */)
     return new OMXMLStoredObject(_store, false);
 }
 
+  // @mfunc Create a new <c OMXMLStoredObject>, contained by this
+  //        <c OMXMLStoredObject>. The new <c OMXMLStoredObject> is
+  //        a stored representatin of an <c OMStorable> referenced by
+  //        <p containingProperty>.
+  //   @parm The property that references the new <c OMXMLStoredObject>.
+  //   @rdesc A new <c OMXMLStoredObject> contained by this
+  //          <c OMXMLStoredObject>.
+OMStoredObject* OMXMLStoredObject::create(const OMProperty* /*containingProperty*/)
+{
+  TRACE("OMXMLStoredObject::create");
+  return create(static_cast<const wchar_t*>(0));
+}
+
+  // @mfunc Create a new <c OMXMLStoredObject>, contained by this
+  //        <c OMXMLStoredObject>. The new <c OMXMLStoredObject> is
+  //        a stored representatin of an <c OMStorable> referenced by
+  //        an element <p localKey> of <p containingProperty>.
+  //   @parm The vector/set property that references the new
+  //         <c OMXMLStoredObject>.
+  //   @parm The local key of the element of the vector/set property that
+  //         references the new <c OMXMLStoredObject>.
+  //   @rdesc A new <c OMXMLStoredObject> contained by this
+  //          <c OMXMLStoredObject>.
+OMStoredObject* OMXMLStoredObject::create(const OMProperty* containingProperty,
+                                          OMUInt32 /*localKey*/)
+{
+  TRACE("OMXMLStoredObject::create");
+  return create(containingProperty);
+}
+
 OMStoredObject*
 OMXMLStoredObject::open(const wchar_t* /*name*/)
 {
     TRACE("OMXMLStoredObject::open");
 
     return new OMXMLStoredObject(_store, false);
+}
+
+  // @mfunc Open an existing <c OMXMLStoredObject>, contained by this
+  //        <c OMXMLStoredObject>. The existing <c OMXMLStoredObject> is
+  //        a stored representatin of an <c OMStorable> referenced by
+  //        <p containingProperty>.
+  //   @parm The property that references the existing <c OMXMLStoredObject>.
+  //   @rdesc The existing <c OMXMLStoredObject> contained by this
+  //          <c OMXMLStoredObject>.
+OMStoredObject* OMXMLStoredObject::open(const OMProperty* /*containingProperty*/)
+{
+  TRACE("OMXMLStoredObject::open");
+  return open(static_cast<const wchar_t*>(0));
+}
+
+  // @mfunc Open an existing <c OMXMLStoredObject>, contained by this
+  //        <c OMXMLStoredObject>. The existing <c OMXMLStoredObject> is
+  //        a stored representatin of an <c OMStorable> referenced by
+  //        an element <p localKey> of <p containingProperty>.
+  //   @parm The vector/set property that references the existing
+  //         <c OMXMLStoredObject>.
+  //   @parm The local key of the element of the vector/set property that
+  //         references the existing <c OMXMLStoredObject>.
+  //   @rdesc The existing <c OMXMLStoredObject> contained by this
+  //          <c OMXMLStoredObject>.
+OMStoredObject* OMXMLStoredObject::open(const OMProperty* containingProperty,
+                                        OMUInt32 /*localKey*/)
+{
+  TRACE("OMXMLStoredObject::open");
+  return open(containingProperty);
 }
 
 void
@@ -1031,7 +1091,10 @@ OMXMLStoredObject::restoreObject(const OMStrongObjectReference& reference)
 {
     TRACE("OMXMLStoredObject::restoreObject");
 
+#if 1 // HACK: Compile against new OMStrongReference classes.
+#else
     const wchar_t* name = reference.name();
+#endif
     OMProperty* property = reference.property();
     OMStorable* containingObject = property->propertySet()->container();
 
@@ -1045,7 +1108,11 @@ OMXMLStoredObject::restoreObject(const OMStrongObjectReference& reference)
 
     ASSERT("Valid class definition", object->definition() != 0);
 #endif
+#if 1 // HACK: Compile against new OMStrongReference classes.
+    object->attach(property, reference);
+#else
     object->attach(containingObject, name);
+#endif
     object->setStore(this);
     object->restoreContents(); // note: 'this' is deleted in the restoreContents function
     return object;
@@ -1228,11 +1295,18 @@ OMXMLStoredObject::restore(OMStrongReference& singleton,
         throw OMException("Empty strong reference singleton found");
     }
 
+#if 1 // HACK: Compile against new OMStrongReference classes.
+    OMStrongObjectReference newReference(&singleton,
+                                         nullOMUniqueObjectIdentification);
+    singleton.reference() = newReference;
+    singleton.reference().restore();
+#else
     wchar_t* name = referenceName(singleton.name(), singleton.propertyId());
     OMStrongObjectReference newReference(&singleton, name);
     singleton.reference() = newReference;
     singleton.reference().restore();
     delete [] name;
+#endif
 
     getReader()->nextEndElement();
 }
@@ -1250,6 +1324,13 @@ OMXMLStoredObject::restore(OMStrongReferenceVector& vector,
     OMList<OMStrongReferenceVectorElement> elements;
     while (getReader()->nextElement())
     {
+#if 1 // HACK: Compile against new OMStrongReference classes.
+        OMStrongReferenceVectorElement element(&vector,
+                                               nullOMUniqueObjectIdentification,
+                                               localKey);
+        element.restore();
+        elements.append(element);
+#else
         wchar_t* name = elementName(vectorName, vectorId, localKey);
 
         OMStrongReferenceVectorElement element(&vector, name, localKey);
@@ -1257,6 +1338,7 @@ OMXMLStoredObject::restore(OMStrongReferenceVector& vector,
         elements.append(element);
 
         delete [] name;
+#endif
         localKey++;
     }
     getReader()->moveToEndElement();
@@ -1310,8 +1392,13 @@ OMXMLStoredObject::restore(OMStrongReferenceSet& set,
         }
 
         // restore the object using a dummy (key and keySize not yet known)
+#if 1 // HACK: Compile against new OMStrongReference classes.
+        OMStrongReferenceSetElement dummy(&set, nullOMUniqueObjectIdentification, localKey, 0, 0);
+        dummy.restore();
+#else
         OMStrongReferenceSetElement dummy(&set, name, localKey, 0, 0);
         dummy.restore();
+#endif
 
         // get the key from the property identified to be the key
         // Handle the special case of OperationGroup::Parameters
@@ -1352,7 +1439,11 @@ OMXMLStoredObject::restore(OMStrongReferenceSet& set,
         }
         
         // insert the element into the set
+#if 1 // HACK: Compile against new OMStrongReference classes.
+        OMStrongReferenceSetElement element(&set, nullOMUniqueObjectIdentification, localKey, key, keySize);
+#else
         OMStrongReferenceSetElement element(&set, name, localKey, key, keySize);
+#endif
         element.setValue(key, storable);
         set.insert(key, element);
         

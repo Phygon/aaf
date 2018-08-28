@@ -61,6 +61,7 @@
 //             file.
 //
 
+#include <math.h>
 #include <iostream>
 #include <iomanip>
 using namespace std;
@@ -437,15 +438,15 @@ unsigned long int lLimit = 0;
 
 // Statistics gathering
 //
-size_t totalStorages;
-size_t totalStreams;
+OMUInt32 totalStorages;
+OMUInt32 totalStreams;
 
-size_t totalPropertyBytes;
-size_t totalObjects;
-size_t totalProperties;
+OMUInt32 totalPropertyBytes;
+OMUInt32 totalObjects;
+OMUInt32 totalProperties;
 
-size_t totalStreamBytes;
-size_t totalFileBytes;
+OMUInt32 totalStreamBytes;
+OMUInt32 totalFileBytes;
 
 // Validity checking
 //
@@ -491,8 +492,9 @@ static void convert(wchar_t* wcName, size_t length, const char* name);
 static void convert(char* cName, size_t length, const wchar_t* name);
 #else
 static void convert(char* cName, size_t length, const OMCharacter* name);
-#endif
 static void convert(char* cName, size_t length, const char* name);
+#endif
+void convertOMString(char* cStr, size_t length, const OMCharacter* omStr);
 static void convertName(char* cName,
                         size_t length,
                         OMCHAR* wideName,
@@ -511,15 +513,18 @@ static void openStream(IStorage* storage,
 static HRESULT openStreamTry(IStorage* storage,
                              const char* streamName,
                              IStream** stream);
-static size_t sizeOfStream(IStream* stream, const char* streamName);
+static OMUInt32 sizeOfStream(IStream* stream, const char* streamName);
 static void printStat(STATSTG* statstg, char* tag);
 static void dumpStream(IStream* stream, STATSTG* statstg, char* pathName);
 static void dumpStorage(IStorage* storage,
                         STATSTG* statstg,
                         char* pathName,
                         int isRoot);
-static void read(IStream* stream, void* address, size_t size);
-static void read(IStream* stream, size_t offset, void* address, size_t size);
+static void read(IStream* stream, void* address, OMUInt32 size);
+static void read(IStream* stream,
+                 OMUInt32 offset,
+                 void* address,
+                 OMUInt32 size);
 static void readUInt8(IStream* stream, OMUInt8* value);
 static void readUInt16(IStream* stream, OMUInt16* value, bool swapNeeded);
 static void readUInt32(IStream* stream, OMUInt32* value, bool swapNeeded);
@@ -527,14 +532,14 @@ static void swapUInt16(OMUInt16* value);
 static void swapUInt32(OMUInt32* value);
 static void readOMString(IStream* stream,
                          OMCharacter* string,
-                         size_t characterCount,
+                         OMUInt32 characterCount,
                          bool swapNeeded);
 static void printOMString(const OMCharacter* string);
 static void swapOMString(OMCharacter* string,
                          size_t characterCount);
 static void readPidString(IStream* stream,
                           OMPropertyId* string,
-                          size_t pidCount,
+                          OMUInt32 pidCount,
                           bool swapNeeded);
 static void printPidString(const OMPropertyId* string);
 static void swapPidString(OMPropertyId* string,
@@ -565,7 +570,8 @@ static bool isValid(const IndexEntry* index,
                     const OMUInt32 entries,
                     const CLSID& clsid,
                     const char* path);
-static size_t valueStreamSize(const IndexEntry* index, const OMUInt32 entries);
+static OMUInt32 valueStreamSize(const IndexEntry* index,
+                                const OMUInt32 entries);
 static char* typeName(OMUInt32 type);
 static void openStorage(IStorage* parentStorage,
                         char* storageName,
@@ -690,8 +696,8 @@ static void printFixedPercent(const double value, char* label);
 
 static void resetStatistics(void);
 static void printStatistics(void);
-static double divide(size_t dividend, size_t divisor);
-static double percent(size_t whole, size_t part);
+static double divide(OMUInt32 dividend, OMUInt32 divisor);
+static double percent(OMUInt32 whole, OMUInt32 part);
 
 static bool ignoring(OMUInt32 pid);
 static void ignore(OMUInt32 pid);
@@ -722,18 +728,14 @@ static char* readName(IStream* stream,
       swapOMString((OMCharacter*)buffer, characterCount);
     }
     char* name = new char[characterCount];
-#ifdef OM_UNICODE_APIS
-    convert(name, characterCount, (wchar_t*)buffer);
-#else
-    convert(name, characterCount, (OMCharacter*)buffer);
-#endif
+    convertOMString(name, characterCount, (OMCharacter*)buffer);
     delete [] buffer;
     result = name;
   }
   return result;
 }
 
-static size_t fileSize(const char* fileName)
+static OMUInt32 fileSize(const char* fileName)
 {
   FILE* f = fopen(fileName, "r");
   if (f == 0) {
@@ -744,11 +746,12 @@ static size_t fileSize(const char* fileName)
     fatalError("fileSize", "seek() failed");
   }
   errno = 0;
-  size_t result = ftell(f);
-  if ((result == (size_t)-1) && (errno != 0)) {
+  size_t p = ftell(f);
+  if ((p == (size_t)-1) && (errno != 0)) {
     fatalError("fileSize", "ftell() failed");
   }
   fclose(f);
+  OMUInt32 result = static_cast<OMUInt32>(p);
   return result;
 }
 
@@ -1044,12 +1047,12 @@ void formatError(DWORD errorCode)
       sizeof(buffer)/sizeof(buffer[0]),
       NULL);
     if (status != 0) {
-      convert(message, 256, buffer);
+      strncpy(message, buffer, 256);
     }
   }
 
   if (status != 0) {
-    int length = strlen(message);
+    size_t length = strlen(message);
     if (length >= 2) {
       message[length - 2] = '\0';
     }
@@ -1155,7 +1158,6 @@ void convert(char* cName, size_t length, const OMCharacter* name)
     }
   }
 }
-#endif
 
 void convert(char* cName, size_t length, const char* name)
 {
@@ -1165,6 +1167,27 @@ void convert(char* cName, size_t length, const char* name)
   } else {
     fatalError("convert", "Conversion failed.");
   }
+}
+#endif
+
+void convertOMString(char* cStr, size_t length, const OMCharacter* omStr)
+{
+  // Convert OMCharacter string to wchar_t string
+  wchar_t* wcStr = new wchar_t[ length ];
+  ASSERT("Successfully allocated wchar string", wcStr != 0);
+  for (size_t i = 0; i < length; i++) {
+    wcStr[i] = omStr[i];
+    if (omStr[i] == 0) {
+      break;
+    }
+  }
+  // Convert wchar_t string to char string
+  size_t status = wcstombs(cStr, wcStr, length);
+  if (status == (size_t)-1) {
+    fatalError("convertOMString", "Conversion failed.");
+  }
+  delete[] wcStr;
+  wcStr = 0;
 }
 
 void convertName(char* cName, size_t length, OMCHAR* wideName, char** tag)
@@ -1315,17 +1338,17 @@ HRESULT openStreamTry(IStorage* storage,
   return result;
 }
 
-size_t sizeOfStream(IStream* stream, const char* streamName)
+OMUInt32 sizeOfStream(IStream* stream, const char* streamName)
 {
   STATSTG statstg;
   HRESULT result = stream->Stat(&statstg, STATFLAG_NONAME);
   if (!checkStatus(streamName, result)) {
     fatalError("sizeOfStream", "Failed to Stat() stream.");
   }
-  unsigned long int streamBytes = statstg.cbSize.LowPart;
+  OMUInt32 streamBytes = statstg.cbSize.LowPart;
   if (statstg.cbSize.HighPart != 0) {
     warning("sizeOfStream", "Large streams not handled.");
-    streamBytes = (unsigned long int)-1;
+    streamBytes = (OMUInt32)-1;
   }
   return streamBytes;
 }
@@ -1366,10 +1389,10 @@ void printStat(STATSTG* statstg, char* tag)
   }
 
   if ((statstg->type == STGTY_STREAM) || (statstg->type == STGTY_LOCKBYTES)) {
-    unsigned long int byteCount = statstg->cbSize.LowPart;
+    OMUInt32 byteCount = statstg->cbSize.LowPart;
     if (statstg->cbSize.HighPart != 0) {
       warning("printStat", "Large streams not handled.");
-      byteCount = (unsigned long int)-1;
+      byteCount = (OMUInt32)-1;
     }
 
     indent(6);
@@ -1423,15 +1446,18 @@ void dumpStream(IStream* stream, STATSTG* statstg, char* pathName)
   HRESULT result;
   unsigned long int bytesRead;
 
-  unsigned long int byteCount = statstg->cbSize.LowPart;
+  OMUInt32 byteCount = statstg->cbSize.LowPart;
   if (statstg->cbSize.HighPart != 0) {
     warning("dumpStream", "Large streams not handled.");
-    byteCount = (unsigned long int)-1;
+    byteCount = (OMUInt32)-1;
   }
   totalStreamBytes = totalStreamBytes + byteCount;
 
   for (unsigned long int i = 0; i < byteCount; i++) {
-    result = stream->Read(&ch, 1, &bytesRead);
+    // HACK ALERT for GCC/Linux - Accomodate any variety of int and long incompatibility
+    ULONG tempLong;
+    result = stream->Read(&ch, 1, &tempLong);
+    bytesRead=static_cast<OMUInt32>(tempLong);
     if (!checkStatus(pathName, result)) {
       fatalError("dumpStream", "IStream::Read() failed.");
     }
@@ -1483,7 +1509,7 @@ void dumpStorage(IStorage* storage,
   }
 
   HRESULT result;
-  size_t status;
+  OMUInt32 status;
 
   IEnumSTATSTG* enumerator;
   result = storage->EnumElements(0, NULL, 0, &enumerator);
@@ -1567,7 +1593,7 @@ void dumpStorage(IStorage* storage,
   }
 }
 
-void read(IStream* stream, void* address, size_t size)
+void read(IStream* stream, void* address, OMUInt32 size)
 {
   DWORD bytesRead;
   HRESULT result = stream->Read(address, size, &bytesRead);
@@ -1580,9 +1606,9 @@ void read(IStream* stream, void* address, size_t size)
 
 }
 
-void read(IStream* stream, size_t offset, void* address, size_t size)
+void read(IStream* stream, OMUInt32 offset, void* address, OMUInt32 size)
 {
-  LARGE_INTEGER newPosition = {offset, 0};
+  LARGE_INTEGER newPosition = {offset, 0}; // Currently only 32-bit offsets
   ULARGE_INTEGER oldPosition;
   HRESULT status = stream->Seek(newPosition, STREAM_SEEK_SET, &oldPosition);
   if (!checks(status)) {
@@ -1640,7 +1666,7 @@ void swapUInt32(OMUInt32* value)
 
 void readOMString(IStream* stream,
                   OMCharacter* string,
-                  size_t characterCount,
+                  OMUInt32 characterCount,
                   bool swapNeeded)
 {
   read(stream, string, characterCount * sizeof(OMCharacter));
@@ -1670,7 +1696,7 @@ void swapOMString(OMCharacter* string,
 
 void readPidString(IStream* stream,
                    OMPropertyId* string,
-                   size_t pidCount,
+                   OMUInt32 pidCount,
                    bool swapNeeded)
 {
   read(stream, string, pidCount * sizeof(OMPropertyId));
@@ -1713,7 +1739,9 @@ static void readCLSID(IStream* stream, CLSID* value, bool swapNeeded)
 
 void swapCLSID(CLSID* value)
 {
-  swapUInt32(&value->Data1);
+  OMUInt32 tempUInt=static_cast<OMUInt32>(value->Data1);
+  swapUInt32(&tempUInt);
+  value->Data1=static_cast<DWORD>(tempUInt);
   swapUInt16(&value->Data2);
   swapUInt16(&value->Data3);
   // no need to swap Data4
@@ -1861,7 +1889,7 @@ bool isValid(const IndexEntry* index,
   size_t currentOffset;
   size_t currentLength;
 
-  for (size_t i = 0; i < entries; i++) {
+  for (OMUInt32 i = 0; i < entries; i++) {
     currentOffset = index[i]._offset;
     currentLength = index[i]._length;
     // Check length
@@ -1898,9 +1926,9 @@ bool isValid(const IndexEntry* index,
 
 // Minimum value stream size for a value stream with this index.
 //
-size_t valueStreamSize(const IndexEntry* index, const OMUInt32 entries)
+OMUInt32 valueStreamSize(const IndexEntry* index, const OMUInt32 entries)
 {
-  size_t result = 0;
+  OMUInt32 result = 0;
 
   for (size_t i = 0; i < entries; i++) {
     result = result + index[i]._length;
@@ -2474,7 +2502,7 @@ void checkObject(IStorage* storage,
   // Count actual storages and streams
   //
   HRESULT result;
-  size_t status;
+  OMUInt32 status;
 
   IEnumSTATSTG* enumerator;
   result = storage->EnumElements(0, NULL, 0, &enumerator);
@@ -2654,7 +2682,8 @@ void dumpContainedObjects(IStorage* storage,
       if (subStream == 0) {
         fatalError("dumpContainedObjects", "openStream() failed.");
       }
-      size_t vectorIndexStreamSize = sizeOfStream(subStream, vectorIndexName);
+      OMUInt32 vectorIndexStreamSize = sizeOfStream(subStream,
+                                                    vectorIndexName);
       totalStreamBytes = totalStreamBytes + vectorIndexStreamSize;
 
       OMUInt32 _count = 0;
@@ -2774,7 +2803,7 @@ void dumpContainedObjects(IStorage* storage,
       if (subStream == 0) {
         fatalError("dumpContainedObjects", "openStream() failed.");
       }
-      size_t setIndexStreamSize = sizeOfStream(subStream, setIndexName);
+      OMUInt32 setIndexStreamSize = sizeOfStream(subStream, setIndexName);
       totalStreamBytes = totalStreamBytes + setIndexStreamSize;
 
       OMUInt32 _count = 0;
@@ -2951,7 +2980,7 @@ void dumpContainedObjects(IStorage* storage,
       if (subStream == 0) {
         fatalError("dumpContainedObjects", "openStream() failed.");
       }
-      size_t setIndexStreamSize = sizeOfStream(subStream, setIndexName);
+      OMUInt32 setIndexStreamSize = sizeOfStream(subStream, setIndexName);
       totalStreamBytes = totalStreamBytes + setIndexStreamSize;
 
       OMUInt32 _count;
@@ -3053,10 +3082,10 @@ void dumpDataStream(IStream* stream,
   if (!checkStatus(streamName, result)) {
     fatalError("dumpdataStream", "Failed to Stat() stream.");
   }
-  unsigned long int streamBytes = statstg.cbSize.LowPart;
+  OMUInt32 streamBytes = statstg.cbSize.LowPart;
   if (statstg.cbSize.HighPart != 0) {
     warning("dumpDataStream", "Large streams not handled.");
-    streamBytes = (unsigned long int)-1;
+    streamBytes = (OMUInt32)-1;
   }
   totalStreamBytes = totalStreamBytes + streamBytes;
   totalPropertyBytes = totalPropertyBytes + streamBytes;
@@ -3145,15 +3174,15 @@ void dumpProperties(IStorage* storage,
   // Check that the property value stream is the correct size for the
   // given index.
   //
-  size_t actualStreamSize = sizeOfStream(stream, _propertyValueStreamName);
-  size_t expectedStreamSize = valueStreamSize(index, entries);
+  OMUInt32 actualStreamSize = sizeOfStream(stream, _propertyValueStreamName);
+  OMUInt32 expectedStreamSize = valueStreamSize(index, entries);
 
   if (actualStreamSize < expectedStreamSize) {
     fatalError("dumpProperties", "Property value stream too small.");
   }
 
   if (version > 23) {
-    size_t correctSize = expectedStreamSize + 4 + (entries * 6);
+    OMUInt32 correctSize = expectedStreamSize + 4 + (entries * 6);
     if (actualStreamSize != correctSize) {
       warning("dumpProperties", "Incorrect property stream size.");
       OMUInt16 bo = hostByteOrder();
@@ -3265,7 +3294,7 @@ void dumpObject(IStorage* storage,
 
   // Check that the stream is not empty.
   //
-  size_t indexStreamSize = sizeOfStream(stream, _propertyIndexStreamName);
+  OMUInt32 indexStreamSize = sizeOfStream(stream, _propertyIndexStreamName);
   if (indexStreamSize == 0){
     fatalError("dumpObject", "Property index stream empty.");
   }
@@ -3347,7 +3376,7 @@ void dumpObject(IStorage* storage,
   //   _formatVersion 4
   //   _entryCount    4
   //
-  size_t headSize;
+  OMUInt32 headSize;
   if (version < 2) {
     headSize = 8;
   } else {
@@ -3358,7 +3387,7 @@ void dumpObject(IStorage* storage,
   //
   if (version >= 21) {
     // stream must be at least big enough to contain the index
-    size_t expectedSize;
+    OMUInt32 expectedSize;
     if (version >= 24) {
       expectedSize = 4 + (_entryCount * 6);
     } else {
@@ -4075,7 +4104,7 @@ void resetStatistics(void)
 
 void printStatistics(void)
 {
-  size_t totalMetadataBytes = totalStreamBytes - totalPropertyBytes;
+  OMUInt32 totalMetadataBytes = totalStreamBytes - totalPropertyBytes;
   if (printStats) {
     cout << endl;
     printInteger(totalFileBytes,
@@ -4141,7 +4170,7 @@ void printStatistics(void)
   }
 }
 
-double divide(size_t dividend, size_t divisor)
+double divide(OMUInt32 dividend, OMUInt32 divisor)
 {
   double result;
   double x = dividend;
@@ -4155,7 +4184,7 @@ double divide(size_t dividend, size_t divisor)
   return result;
 }
 
-static double percent(size_t whole, size_t part)
+static double percent(OMUInt32 whole, OMUInt32 part)
 {
   return divide(part, whole) * 100.0;
 }
@@ -4480,7 +4509,7 @@ int main(int argumentCount, char* argumentVector[])
       wchar_t wcFileName[FILENAME_MAX];
       size_t status = mbstowcs(wcFileName, argumentVector[i], FILENAME_MAX);
       ASSERT("Convert succeeded", status != (size_t)-1);
-      CLSID x = {0};
+      CLSID x = nullCLSID;
       bool b = false;
       int s = isAnAAFFile(wcFileName, &x, &b);
       if (s == 0) {

@@ -55,6 +55,7 @@
 
 class CAAFRandomRawStorage
   : public IAAFRandomRawStorage,
+    public IAAFCopyByte,
     public CAAFRawStorage
 {
 protected:
@@ -67,7 +68,6 @@ protected:
   virtual ~CAAFRandomRawStorage ();
 
 public:
-
 
   //***********************************************************
   //
@@ -123,7 +123,7 @@ public:
   /// extended sufficiently to complete the request.  The client can
   /// call SetSize() to attempt to reserve capacity for the storage;
   /// if the SetSize() call succeeds, subsequent Write() calls
-  /// within requested that capacty are guaranteed to succeed.
+  /// within requested that capacity are guaranteed to succeed.
   ///
   /// This call will advance the current position by bufSize bytes.
   ///
@@ -262,6 +262,60 @@ public:
   STDMETHOD (SetExtent) (
     // Number of bytes capacity requested for this storage 
     /*[in]*/ aafUInt64  extent);
+  //***********************************************************
+  // METHOD NAME: WriteCopyByteAt()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFCopyByte | WriteCopyByteAt |
+  // Writes byteCount copies of theByte to the raw storage at position.
+  ///
+  /// This call may fail if the capacity of this storage cannot be
+  /// extended sufficiently to complete the request.  The client can
+  /// call SetSize() to attempt to reserve capacity for the storage;
+  /// if the SetSize() call succeeds, subsequent Write() calls
+  /// within requested that capacity are guaranteed to succeed.
+  ///
+  /// This call will advance the current position by byteCount bytes.
+  ///
+  /// Succeeds if:
+  /// - The pNumWritten pointer is valid.
+  /// - This storage is open for write or read/write.
+  /// - Sufficient capacity exists in this storage to perform the
+  ///   write.
+  //
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - pNumWritten arg is NULL.
+  ///
+  /// AAFRESULT_NOT_WRITEABLE
+  ///   - This storage is not open for write or read/write.
+  ///
+  /// AAFRESULT_OFFSET_SIZE
+  ///   - It is not possible to extend the allocated size of this
+  ///     storage.
+  // @end
+  // 
+  STDMETHOD (WriteCopyByteAt)
+   (
+    // @parm [in] aafUInt64 | position | position in this storage into which data is written
+    aafUInt64  position,
+
+    // @parm [in] aafUInt8 | theByte | The byte to write
+    aafUInt8  theByte,
+
+    // @parm [in] aafUInt32 | byteCount | Number of copies of 'theByte' to write
+    aafUInt32  byteCount,
+
+    // @parm [out] aafUInt32 * | pNumWritten | Number of bytes written
+    aafUInt32 *  pNumWritten
+  );
+
 
 protected:
   // 
@@ -283,5 +337,4 @@ public:
 };
 
 #endif // ! __CAAFRandomRawStorage_h__
-
 

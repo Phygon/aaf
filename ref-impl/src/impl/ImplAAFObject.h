@@ -54,7 +54,6 @@ typedef ImplAAFEnumerator<ImplAAFProperty> ImplEnumAAFProperties;
 
 
 #include "AAFTypes.h"
-#include "OMStorable.h"
 #include "OMFixedSizeProperty.h"
 #include "ImplAAFStorable.h"
 
@@ -195,6 +194,7 @@ protected:
   // the given class definition. NOTE: This call is recursive, it calls itself again
   // for the parent class of the given class until current class is a "root" class.
   virtual void InitOMProperties (ImplAAFClassDef * pClassDef);
+
 public:
   
   // Same as above for a single property (not recursive).
@@ -228,6 +228,7 @@ public:
   // Override callbacks from OMStorable
   virtual void onSave(void* clientContext) const;
   virtual void onRestore(void* clientContext) const;
+  virtual void onCopy(void* clientContext) const;
 
   
   // Overrides of ImplAAFStorable.
@@ -237,8 +238,6 @@ public:
   
   // Return true is this is a data object (Interchange object).
   virtual bool dataObject(void) const;
-
-  AAFRESULT CreatePropertyInstanceAndAdd( ImplAAFPropertyDef* pPropDef );
 
 private:
 
@@ -287,7 +286,6 @@ private:
 //
 
 #ifndef __ImplAAFSmartPointer_h__
-// caution! includes assert.h
 #include "ImplAAFSmartPointer.h"
 #endif
 

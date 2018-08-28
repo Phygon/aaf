@@ -45,7 +45,9 @@ using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <wchar.h>
+
+#include "AAFWideString.h"
+
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
@@ -301,7 +303,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IEnumAAFCodecDefs *pEnumPluggable = NULL;
 	IAAFCodecDef *pCodecDef = NULL;
 	IAAFDefObject *pDefObj = NULL;
-	IEnumAAFPluginDefs *pEnumDesc;
+	IEnumAAFPluginDefs *pEnumDesc = NULL;
 	IAAFPluginDef *pPlugin = NULL;
 	IAAFNetworkLocator	*pNetLoc = NULL;
 	IAAFLocator			*pLoc = NULL;

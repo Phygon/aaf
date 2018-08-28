@@ -271,22 +271,13 @@ AAFRESULT STDMETHODCALLTYPE
 	
 	ImplAAFTimecodeSP tccp;
 	ImplAAFSequenceSP aSequ;
-	aafFrameLength_t maxLength;
 	aafPosition_t	zeroPos;
 	aafLength_t		length;
 	ImplAAFTimelineMobSlotSP	newSlot, mobSlot;
-	aafBool			fullLength = kAAFFalse;
 	ImplAAFDictionarySP pDictionary;
 
 	//!!!Validate tape mobs only, return AAFRESULT_TAPE_DESC_ONLY
-	if(length64 == FULL_LENGTH)
-	  {
-		 fullLength = kAAFTrue;
-		 length64 = 1;
-	  }
-	else
-	  fullLength = kAAFFalse;
-	
+
 	zeroPos = 0;
  	length = length64;
 
@@ -297,37 +288,24 @@ AAFRESULT STDMETHODCALLTYPE
 			  CreateInstance ((ImplAAFObject**) &tccp));
 		tccp->Initialize(length, &startTC);	
 
-			CHECK(pDictionary->GetBuiltinDefs()->cdSequence()->
+		CHECK(pDictionary->GetBuiltinDefs()->cdSequence()->
 				  CreateInstance((ImplAAFObject**) &aSequ));
-			CHECK(aSequ->Initialize(pDictionary->
-									GetBuiltinDefs()->
-									ddTimecode()));
+		CHECK(aSequ->Initialize(pDictionary->
+								GetBuiltinDefs()->
+								ddkAAFTimecode()));
 
 			 
-			CHECK(aSequ->AppendComponent(tccp));
+		CHECK(aSequ->AppendComponent(tccp));
 
  		if (FindSlotBySlotID(slotID, (ImplAAFMobSlot **)&mobSlot)
 			== AAFRESULT_SUCCESS)
 		{
 			CHECK(mobSlot->SetSegment(aSequ));
-
 		} /* FindTimecodeSlot */
 		else
 		{
 			CHECK(AppendNewTimelineSlot(editrate, aSequ, slotID,
 										L"Timecode", zeroPos, &newSlot));
-		}
-
-		if(fullLength)
-		{
-			CHECK(PvtTimecodeToOffset(startTC.fps, 24, 0, 0, 0, 
-											 startTC.drop, &maxLength));
-			{
-				length = maxLength;
-				CHECK(tccp->SetLength(length) );
-				/* NOTE: What if the sequence already existed? */
-				CHECK(aSequ->SetLength(length) );
-			}
 		}
 
 	} /* XPROTECT */
@@ -399,8 +377,8 @@ AAFRESULT STDMETHODCALLTYPE
 		}
 		else
 		{
-		CHECK(AppendNewTimelineSlot(editrate, ecSequence, slotID,
-									L"Edgecode", zeroPos, &newSlot));
+			CHECK(AppendNewTimelineSlot(editrate, ecSequence, slotID,
+										L"Edgecode", zeroPos, &newSlot));
 		}
 
 	} /* XPROTECT */
@@ -450,11 +428,6 @@ AAFRESULT STDMETHODCALLTYPE
 								&tcSlotLen));
 		CHECK(timecodeClip->GetLength(&tcLen));
 		CHECK(timecodeClip->GetTimecode(&timecode));
-		if(length64 == FULL_LENGTH)
-		{
-			CHECK(PvtTimecodeToOffset(timecode.fps, 24, 0, 0, 0,
-			  						timecode.drop, &length64));
-		}
 		length = length64;
 		zeroLen = 0;
 		
@@ -767,13 +740,18 @@ AAFRESULT STDMETHODCALLTYPE
 				}
 				for(n = 0; n < numSegments; n++)
 				{
-					CHECK(sequence->GetNthComponent (0, &subSeg));
+					CHECK(sequence->GetNthComponent (n, &subSeg));
 					CHECK(subSeg->GetLength(&foundLen));
 
 					if(foundLen != zero)
 					{
 						CHECK(sequence->SetNthComponent(n, pdwn));
 						sclp = dynamic_cast<ImplAAFSourceClip*>(subSeg);
+						if (!sclp)
+						{
+							subSeg->ReleaseReference();
+							subSeg = NULL;
+						}
 						break;
 					}
 					subSeg->ReleaseReference();
@@ -784,10 +762,18 @@ AAFRESULT STDMETHODCALLTYPE
 			{
 				CHECK(slot->SetSegment(pdwn));
 				sclp = dynamic_cast<ImplAAFSourceClip*>(seg);
+				if (sclp)
+					sclp->AcquireReference();
 			}
 			
+			seg->ReleaseReference();
+			seg = NULL;
+
 			XASSERT(sclp != NULL, AAFRESULT_NOT_SOURCE_CLIP);
 			CHECK(sclp->Initialize(pEssenceKind, srcRefLength, ref));
+
+			slot->ReleaseReference();
+			slot = NULL;
 		}
 		else
 		{
@@ -795,7 +781,9 @@ AAFRESULT STDMETHODCALLTYPE
 				  CreateInstance((ImplAAFObject **)&sclp));
 			CHECK(sclp->Initialize(pEssenceKind, srcRefLength, ref));
 			CHECK(AppendNewTimelineSlot(editrate, pdwn,
-								aMobSlot, NULL, zeroPos, &trkd) );
+								aMobSlot, L"Slot", zeroPos, &trkd) );
+			trkd->ReleaseReference();
+			trkd = NULL;
 		}
 
 		/* Patch the MASK into the file mob if this is a Film Editrate */
@@ -812,12 +800,28 @@ AAFRESULT STDMETHODCALLTYPE
 		}
 		dict->ReleaseReference();
 		dict = NULL;
+		pdwn->ReleaseReference();
+		pdwn = NULL;
+		sclp->ReleaseReference();
+		sclp = NULL;
 	} /* XPROTECT */
 	XEXCEPT
 	{
 		if(dict)
 		  dict->ReleaseReference();
 		dict = 0;
+		if(pdwn)
+		  pdwn->ReleaseReference();
+		pdwn = 0;
+		if(sclp)
+		  sclp->ReleaseReference();
+		sclp = 0;
+		if(trkd)
+		  trkd->ReleaseReference();
+		trkd = 0;
+		if(slot)
+		  slot->ReleaseReference();
+		slot = 0;
 	}
 	XEND;
 
@@ -837,10 +841,60 @@ AAFRESULT STDMETHODCALLTYPE
                            aafOperationChoice_t *pOperationChoice,
                            ImplAAFFindSourceInfo **ppSourceInfo)
 {
-	return(InternalSearchSource(slotID, offset, mobKind, pMediaCrit, pOperationChoice,
+	return(InternalSearchSource(slotID, kDistinguishedChannelID, offset, mobKind, pMediaCrit, pOperationChoice, kRoundFloor,
 										   ppSourceInfo));
 }
 
+
+AAFRESULT STDMETHODCALLTYPE
+	ImplAAFSourceMob::SearchMultichannelSource (aafSlotID_t				slotID,
+												aafUInt32				channelID,
+												aafPosition_t			offset,
+												aafMobKind_t			mobKind,
+												aafMediaCriteria_t*		pMediaCrit,
+												aafOperationChoice_t*	pOperationChoice,
+												ImplAAFFindSourceInfo**	ppSourceInfo)
+{
+	if (channelID == 0)
+		return AAFRESULT_INVALID_PARAM;
+
+	return(InternalSearchSource(slotID, channelID, offset, mobKind, pMediaCrit, pOperationChoice, kRoundFloor,
+		ppSourceInfo));
+}
+
+
+
+//****************
+// SearchSourceAdvanced()
+//
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFSourceMob::SearchSourceAdvanced (aafSlotID_t slotID,
+                           aafPosition_t  offset,
+                           aafMobKind_t  mobKind,
+                           aafMediaCriteria_t *pMediaCrit,
+                           aafOperationChoice_t *pOperationChoice,
+                           ImplAAFFindSourceInfo **ppSourceInfo)
+{
+	return(InternalSearchSource(slotID, kDistinguishedChannelID, offset, mobKind, pMediaCrit, pOperationChoice, kRoundAuto,
+										   ppSourceInfo));
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+	ImplAAFSourceMob::SearchMultichannelSourceAdvanced (aafSlotID_t				slotID,
+														aafUInt32				channelID,
+														aafPosition_t			offset,
+														aafMobKind_t			mobKind,
+														aafMediaCriteria_t*		pMediaCrit,
+														aafOperationChoice_t*	pOperationChoice,
+														ImplAAFFindSourceInfo**	ppSourceInfo)
+{
+	if (channelID == 0)
+		return AAFRESULT_INVALID_PARAM;
+
+	return(InternalSearchSource(slotID, channelID, offset, mobKind, pMediaCrit, pOperationChoice, kRoundAuto,
+		ppSourceInfo));
+}
 
 
 //****************

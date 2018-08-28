@@ -181,13 +181,15 @@ static HRESULT TestPropertyValue (
 
 	  pTypeDefUnknown->Release();
 	  pPropUnknown->Release();
-	  pTypeDef->Release();
 	  propType->Release();
 	  pv->Release();
-	  pDict->Release();
-	  pHeader->Release();
 	  hr = pFile->Save();
 	}
+
+	pTypeDef->Release();
+	pDict->Release();
+	pHeader->Release();
+
   if (! SUCCEEDED (hr)) return hr;
   hr = pFile->Close();
   if (! SUCCEEDED (hr)) return hr;

@@ -157,7 +157,7 @@ bool OMListIterator<Element>::after(void) const
   //   @rdesc The number of <p Elements>s
   //   @this const
 template <typename Element>
-size_t OMListIterator<Element>::count(void) const
+OMUInt32 OMListIterator<Element>::count(void) const
 {
   TRACE("OMListIterator<Element>::count");
 

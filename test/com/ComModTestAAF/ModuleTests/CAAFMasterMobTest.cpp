@@ -1,4 +1,3 @@
-
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -38,7 +37,7 @@
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
+#include "AAFWideString.h"
 #include <string.h>
 
 #include "AAFStoredObjectIDs.h"
@@ -50,14 +49,16 @@ using namespace std;
 #include "CAAFBuiltinDefs.h"
 
 #include "AAFSmartPointer.h"
+typedef IAAFSmartPointer<IAAFComponent> IAAFComponentSP;
 typedef IAAFSmartPointer<IAAFDataDef> IAAFDataDefSP;
 
 #define	MobName			L"MasterMOBTest"
-#define	NumMobSlots		4
+#define	NumMobSlots		6
 
-static const aafWChar *		slotNames[NumMobSlots] = { L"VIDEO SLOT", L"AUDIO SLOT1", L"AUDIO SLOT2", L"VIDEO SLOT MXF style"};
-static const aafUID_t *	slotDDefs[NumMobSlots] = {&kAAFDataDef_Picture, &kAAFDataDef_Sound, &kAAFDataDef_Sound, &kAAFDataDef_Picture};
-static aafRational_t	slotRates[NumMobSlots] = { {297,1}, {44100, 1}, {44100, 1}, {25,1}};
+static const aafWChar *		slotNames[NumMobSlots] = { L"VIDEO SLOT", L"AUDIO SLOT1", L"AUDIO SLOT2", L"VIDEO SLOT MXF style", L"AUDIO SLOT OF UNKNOWN LENGTH", L"VIDEO SLOT OF UNKNOWN LENGTH MXF style"};
+static const aafUID_t *	slotDDefs[NumMobSlots] = {&kAAFDataDef_Picture, &kAAFDataDef_Sound, &kAAFDataDef_Sound, &kAAFDataDef_Picture, &kAAFDataDef_Sound, &kAAFDataDef_Picture};
+static aafRational_t	slotRates[NumMobSlots] = { {297,1}, {44100, 1}, {44100, 1}, {25,1}, {48000, 1}, {25,1}};
+static aafLength_t		slotLengths[NumMobSlots] = { 60, 60, 60, 60, AAF_UNKNOWN_LENGTH, AAF_UNKNOWN_LENGTH };
 static const aafWChar* Manufacturer = L"Sony";
 static const aafWChar* Model = L"MyModel";
 static aafTapeCaseType_t FormFactor = kAAFVHSVideoTape;
@@ -69,7 +70,7 @@ static aafUInt32 TapeLength = 3200 ;
 #define TAPE_MOB_LENGTH	60
 #define TAPE_MOB_NAME	L"A Tape Mob"
 
-//--cf  This will require some work!!! 
+//--cf  This will require some work!!!
 static const 	aafMobID_t	TEST_Master_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
@@ -96,7 +97,17 @@ static const 	aafMobID_t	TEST_Source_MobIDs[NumMobSlots] =
 	//fourth id
 	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 	0x13, 0x00, 0x00, 0x00,
-	{0x462c6792, 0x0403, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}}
+	{0x462c6792, 0x0403, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}},
+
+	//fifth id
+	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+	0x13, 0x00, 0x00, 0x00,
+	{0x768f48a6, 0x69f4, 0x446e, { 0xa0, 0x8a, 0x71, 0x94, 0xc2, 0xff, 0x73, 0x01}}},
+
+	//sixth id
+	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+	0x13, 0x00, 0x00, 0x00,
+	{0x47aebebd, 0x20b8, 0x4067, { 0xa6, 0x05, 0x1c, 0x0f, 0x63, 0xc1, 0x4a, 0xc7}}},
 
 };	//end mobid block
 
@@ -213,7 +224,7 @@ static HRESULT CreateAAFFile(
 		{
 		  IAAFDataDefSP pDataDef;
 		  checkResult (pDictionary->LookupDataDef (*slotDDefs[test], &pDataDef));
-		  checkResult(pTapeMob->AddNilReference (test, TAPE_MOB_LENGTH, pDataDef, slotRates[test]));
+		  checkResult(pTapeMob->AddNilReference (test, slotLengths[test], pDataDef, slotRates[test]));
 		}
 		checkResult(pTapeMob->QueryInterface(IID_IAAFMob, (void **) &pTempMob));
 		checkResult(pTempMob->SetName(TAPE_MOB_NAME));
@@ -241,7 +252,7 @@ static HRESULT CreateAAFFile(
 													  test,
 													  pDDef,
 													  ref,
-													  TAPE_MOB_LENGTH));
+													  slotLengths[test]));
 			}
 			else
 			{
@@ -249,7 +260,7 @@ static HRESULT CreateAAFFile(
 													  test,
 													  pDDef,
 													  ref,
-													  TAPE_MOB_LENGTH));
+													  slotLengths[test]));
 			}
 			
 			// Create concrete subclass of EssenceDescriptor
@@ -279,7 +290,7 @@ static HRESULT CreateAAFFile(
 			IAAFDataDefSP pDataDef;
 			checkResult (pDictionary->LookupDataDef (*slotDDefs[test], &pDataDef));
 
-			if (test == NumMobSlots-1)		// last slot?
+			if (test == NumMobSlots-3 || test == NumMobSlots-1)	// third to last or last slot?
 			{
 				// The last slot to test is added using AAFMasterMob3 to test whether
 				// it is added inside a sequence rather than just on the SourceClip.
@@ -377,7 +388,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
   {
 	  // Open the AAF file
 	  checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
-    bFileOpen = true;
+	  bFileOpen = true;
 
 	  // Get the AAF file header.
 	  checkResult(pFile->GetHeader(&pHeader));
@@ -430,11 +441,11 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 				checkResult(pSlot->GetSlotID(&slotID));
 				checkExpression(slotID == s+1, AAFRESULT_TEST_FAILED);
 
-				// Get the segment and check that the last slot contains a
+				// Get the segment and check that the last and third to last slots contain a
 				// Sequence since it was added with AddMasterSlotWithSequence().
 				checkResult(pSlot->GetSegment(&pSeg));
 				HRESULT qr = pSeg->QueryInterface(IID_IAAFSequence, (void **)&pSequence);
-				if (slotID == NumMobSlots)
+				if (slotID == NumMobSlots-2 || slotID == NumMobSlots)
 				{
 					checkResult(qr);
 					aafUInt32			numCpnts = 0;
@@ -444,19 +455,39 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 				}
 				else
 				{
+					// Disable the following check till after AddMasterSlot's behavior
+					// is reverted back to not wrapping the new SourceClip inside
+					// a Sequence.
+#if 0
 					checkExpression(qr != AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED);
+#else
+					pSequence->Release();
+					pSequence = NULL;
+#endif
 				}
+
+				// Validate the segment length
+				IAAFComponentSP pComponent;
+				checkResult(pSeg->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+				aafLength_t length = 0;
+				checkResult(pComponent->GetLength(&length));
+				checkExpression(length == slotLengths[s], AAFRESULT_TEST_FAILED);
+
 				pSeg->Release();
 				pSeg = NULL;
 
-				checkResult(pMasterMob->GetTapeNameBufLen(slotID, &bufSize));
-				if (bufSize)
+				// TODO: Enable the tape name for -1 length test once SearchSource() is updated to support search across components of unknown (-1) length.
+				if (length != AAF_UNKNOWN_LENGTH)
 				{
-					pTapeName = new aafWChar [bufSize];
-					checkExpression(NULL != pTapeName, E_OUTOFMEMORY);
+					checkResult(pMasterMob->GetTapeNameBufLen(slotID, &bufSize));
+					if (bufSize)
+					{
+						pTapeName = new aafWChar [bufSize];
+						checkExpression(NULL != pTapeName, E_OUTOFMEMORY);
 
-					checkResult(pMasterMob->GetTapeName(slotID, pTapeName, bufSize));
-					delete [] pTapeName;
+						checkResult(pMasterMob->GetTapeName(slotID, pTapeName, bufSize));
+						delete [] pTapeName;
+					}
 				}
 
 				checkResult(pMasterMob->GetNumRepresentations(slotID, &numReps));
@@ -558,8 +589,8 @@ extern "C" HRESULT CAAFMasterMob_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IAAFMasterMob tests have not been implemented:" << endl; 
-//		cout << "     GetCriteriaSegment" << endl; 
+//		cout << "The following IAAFMasterMob tests have not been implemented:" << endl;
+//		cout << "     GetCriteriaSegment" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

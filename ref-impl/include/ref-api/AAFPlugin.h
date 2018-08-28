@@ -50,24 +50,28 @@
 
 #ifdef __cplusplus
 interface IAAFClassExtension;
+interface IAAFDictionaryExtension;
 interface IAAFEssenceCodec;
 interface IAAFEssenceCodec2;
 interface IAAFEssenceCodec3;
 interface IAAFEssenceContainer;
 interface IAAFEssenceDataStream;
 interface IAAFEssenceDataStream2;
+interface IAAFEssenceDataStreamEx;
 interface IAAFEssenceStream;
 interface IAAFInterpolator;
 interface IAAFMultiEssenceCodec;
 interface IAAFPlugin;
 #else
 typedef interface IAAFClassExtension IAAFClassExtension;
+typedef interface IAAFDictionaryExtension IAAFDictionaryExtension;
 typedef interface IAAFEssenceCodec IAAFEssenceCodec;
 typedef interface IAAFEssenceCodec2 IAAFEssenceCodec2;
 typedef interface IAAFEssenceCodec3 IAAFEssenceCodec3;
 typedef interface IAAFEssenceContainer IAAFEssenceContainer;
 typedef interface IAAFEssenceDataStream IAAFEssenceDataStream;
 typedef interface IAAFEssenceDataStream2 IAAFEssenceDataStream2;
+typedef interface IAAFEssenceDataStreamEx IAAFEssenceDataStreamEx;
 typedef interface IAAFEssenceStream IAAFEssenceStream;
 typedef interface IAAFInterpolator IAAFInterpolator;
 typedef interface IAAFMultiEssenceCodec IAAFMultiEssenceCodec;
@@ -137,6 +141,78 @@ DECLARE_INTERFACE_(IAAFClassExtension, IUnknown)
   END_INTERFACE
 };
 #endif // __IAAFClassExtension_INTERFACE_DEFINED__
+
+
+
+// IAAFDictionaryExtension
+
+// ************************
+//
+// Interface IAAFDictionaryExtension
+//
+// ************************
+
+
+
+
+
+
+#ifndef __IAAFDictionaryExtension_INTERFACE_DEFINED__
+#define __IAAFDictionaryExtension_INTERFACE_DEFINED__
+
+EXTERN_C const IID IID_IAAFDictionaryExtension;
+
+#undef  INTERFACE
+#define INTERFACE   IAAFDictionaryExtension
+
+DECLARE_INTERFACE_(IAAFDictionaryExtension, IUnknown)
+{
+  BEGIN_INTERFACE
+
+  /* *** IUnknown methods *** */
+  STDMETHOD(QueryInterface) (THIS_ REFIID riid, void **ppvObj) PURE;
+  STDMETHOD_(ULONG,AddRef) (THIS)  PURE;
+  STDMETHOD_(ULONG,Release) (THIS) PURE;
+
+  /* *** IAAFDictionaryExtension methods *** */
+
+
+  //***********************************************************
+  //
+  // RegisterExtensionDefinitions()
+  //
+  /// This method registers the extension definitions
+  /// into the given dictionary.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pDictionary pointer is valid.
+  ///
+  ///   Note that this method should be prepared for the case that the
+  ///   definition it wishes to register has already been registered,
+  ///   this is not an error. 
+  ///
+  ///   The implementation of this method should handle this by simply
+  ///   looking up each definition before attempting to regisister it.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pDictionary arg is NULL.
+  ///
+  /// @param pDictionary [in] The dictionary in which to register the definitions
+  ///
+  STDMETHOD(RegisterExtensionDefinitions) (THIS_
+    IAAFDictionary * pDictionary) PURE;
+
+
+  END_INTERFACE
+};
+#endif // __IAAFDictionaryExtension_INTERFACE_DEFINED__
 
 
 
@@ -3206,6 +3282,179 @@ DECLARE_INTERFACE_(IAAFEssenceDataStream2, IUnknown)
   END_INTERFACE
 };
 #endif // __IAAFEssenceDataStream2_INTERFACE_DEFINED__
+
+
+
+
+// IAAFEssenceDataStreamEx
+
+// ************************
+//
+// Interface IAAFEssenceDataStreamEx
+//
+// ************************
+
+
+
+
+
+#ifndef __IAAFEssenceDataStreamEx_INTERFACE_DEFINED__
+#define __IAAFEssenceDataStreamEx_INTERFACE_DEFINED__
+
+EXTERN_C const IID IID_IAAFEssenceDataStreamEx;
+
+#undef  INTERFACE
+#define INTERFACE   IAAFEssenceDataStreamEx
+
+DECLARE_INTERFACE_(IAAFEssenceDataStreamEx, IUnknown)
+{
+  BEGIN_INTERFACE
+
+  /* *** IUnknown methods *** */
+  STDMETHOD(QueryInterface) (THIS_ REFIID riid, void **ppvObj) PURE;
+  STDMETHOD_(ULONG,AddRef) (THIS)  PURE;
+  STDMETHOD_(ULONG,Release) (THIS) PURE;
+
+  /* *** IAAFEssenceDataStreamEx methods *** */
+
+
+  //***********************************************************
+  //
+  // Init()
+  //
+  /// Init the stream over a particular EssenceData.
+  ///
+  /// @param essenceData [in] The EssenceData to stream over
+  ///
+  STDMETHOD(Init) (THIS_
+    IUnknown * essenceData) PURE;
+
+  //***********************************************************
+  //
+  // WriteSampleIndex()
+  //
+  /// Write some number of bytes to the stream exactly and with no formatting or compression.
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  (This is the only code indicating success.)
+	//
+	// AAFRESULT_NULL_PARAM
+	//   - pBuffer or pBytesRead is null.
+	//
+	// AAFRESULT_STREAM_FULL
+	//   - The essence can not be written because of a fault such as a disk full error in the
+	// underlying operating system.
+  ///
+  /// @param bytes [in] the number of bytes to write
+  /// @param buffer [out, size_is(bytes)] the buffer that contains at least bytes
+  /// @param bytesWritten [out,ref] the number of bytes actually written from the buffer
+  ///
+  STDMETHOD(WriteSampleIndex) (THIS_
+    aafUInt32  bytes,
+    aafDataBuffer_t  buffer,
+    aafUInt32 *  bytesWritten) PURE;
+
+
+  //***********************************************************
+  //
+  // ReadSampleIndex()
+  //
+  /// Read some number of bytes from the stream exactly and with no formatting or compression.
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  (This is the only code indicating success.)
+	//
+	// AAFRESULT_NULL_PARAM
+	//   - pBuffer or pBytesRead is null.
+	//
+	// AAFRESULT_END_OF_ESSENCE
+	//   - Hit either the end-of-file on a raw essence file, or the end of the essence property.
+	//	The pBytesRead parameter correctly reflects the number of bytes actually read.
+  ///
+  /// @param buflen [in] to a buffer of this size
+  /// @param pBuffer [out, size_is(buflen), length_is(*pBytesRead)] here is the buffer
+  /// @param pBytesRead [out,ref] Return bytes actually read
+  ///
+  STDMETHOD(ReadSampleIndex) (THIS_
+    aafUInt32  buflen,
+    aafDataBuffer_t  pBuffer,
+    aafUInt32 *  pBytesRead) PURE;
+
+  //***********************************************************
+  //
+  // SeekSampleIndex()
+  //
+  /// Seek to the absolute byte offset into the stream.
+  ///
+  /// @param byteOffset [in] The absolute byte offset into the stream.
+  ///
+  STDMETHOD(SeekSampleIndex) (THIS_
+    aafPosition_t  byteOffset) PURE;
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect\\\, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  \\\(This is the only code indicating success.\\\)
+	//
+	// AAFRESULT_STREAM_BOUNDS
+	//   - The new position would be outside of the bounds of the stream.)
+
+  //***********************************************************
+  //
+  // GetSampleIndexPosition()
+  //
+  /// Returns the position within the stream.
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  (This is the only code indicating success.)
+	//
+	// AAFRESULT_NULL_PARAM
+	//   - pPosition is null.
+  ///
+  /// @param pPosition [out] The position within the stream.
+  ///
+  STDMETHOD(GetSampleIndexPosition) (THIS_
+    aafPosition_t *  pPosition) PURE;
+
+  //***********************************************************
+  //
+  // GetSampleIndexLength()
+  //
+  /// Returns the length of the stream.
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  (This is the only code indicating success.)
+	//
+	// AAFRESULT_NULL_PARAM
+	//   - pLength is null.
+  ///
+  /// @param pLength [out] The length of the stream.
+  ///
+  STDMETHOD(GetSampleIndexLength) (THIS_
+    aafLength_t *  pLength) PURE;
+
+
+  END_INTERFACE
+};
+#endif // __IAAFEssenceDataStreamEx_INTERFACE_DEFINED__
 
 
 

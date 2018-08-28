@@ -60,6 +60,39 @@ public:
                     const OMUInt32 bytes,
                     OMUInt32& bytesRead) const = 0;
 
+    // @cmember Attempt to read the vector of buffers given by <p buffers>
+    //          from this <c OMStoredStream>. This is "read scatter". The
+    //          <p bufferCount> buffers are read in order until all have
+    //          been successfully read or an error is encountered. Once
+    //          an error has been encountered on one buffer no additional
+    //          buffers are read.
+    //          The number of bytes read is returned in <p bytesRead>.
+  virtual void read(OMIOBufferDescriptor* buffers,
+                    OMUInt32 bufferCount,
+                    OMUInt32& bytesRead) const = 0;
+
+    // Asynchronous read - single buffer
+  virtual void read(OMUInt64 position,
+                    OMByte* buffer,
+                    const OMUInt32 bytes,
+                    void* /* */ completion,
+                    const void* clientArgument) = 0;
+
+    // Asynchronous read - multiple buffers
+  virtual void read(OMUInt64 position,
+                    OMIOBufferDescriptor* buffers,
+                    OMUInt32 bufferCount,
+                    void* /* */ completion,
+                    const void* clientArgument) const = 0;
+
+    // @cmember Find out if <p bytesRequired> contiguous bytes, starting at
+    //          <p position>, in this <c OMStoredStream> are available for
+    //          writing. The actual number of bytes available is returned
+    //          in <p bytesAvailable>.
+  virtual void probe(OMUInt64 position,
+                     OMUInt32 bytesRequired,
+                     OMUInt32& bytesAvailable) const = 0;
+
     // @cmember Write <p size> bytes from the buffer at address
     //          <p data> to this <c OMStoredStream>.
   virtual void write(void* data, OMUInt32 size) = 0;
@@ -70,6 +103,31 @@ public:
   virtual void write(const OMByte* data,
                      const OMUInt32 bytes,
                      OMUInt32& bytesWritten) = 0;
+
+    // @cmember Attempt to write the vector of buffers given by <p buffers>
+    //          to this <c OMStoredStream>. This is "write gather". The
+    //          <p bufferCount> buffers are written in order until all have
+    //          been successfully written or an error is encountered. Once
+    //          an error has been encountered on one buffer no additional
+    //          buffers are written.
+    //          The number of bytes written is returned in <p bytesWritten>.
+  virtual void write(OMIOBufferDescriptor* buffers,
+                     OMUInt32 bufferCount,
+                     OMUInt32& bytesWritten) = 0;
+
+    // Asynchronous write - single buffer
+  virtual void write(OMUInt64 position,
+                     const OMByte* buffer,
+                     const OMUInt32 bytes,
+                     void* /* */ completion,
+                     const void* clientArgument) = 0;
+
+    // Asynchronous write - multiple buffers
+  virtual void write(OMUInt64 position,
+                     const OMIOBufferDescriptor* buffers,
+                     OMUInt32 bufferCount,
+                     void* /* */ completion,
+                     const void* clientArgument) = 0;
 
     // @cmember The size of this <c OMStoredStream> in bytes.
   virtual OMUInt64 size(void) const = 0;

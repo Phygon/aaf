@@ -50,7 +50,10 @@
 #include "ImplAAFModule.h"
 #include "OMAssertions.h"
 
-ImplAAFStorable::ImplAAFStorable ()
+#include "AAFUtils.h"
+
+ImplAAFStorable::ImplAAFStorable () :
+  _initializedOMStorable(false)
 {
 }
 
@@ -64,15 +67,25 @@ ImplAAFStorable::~ImplAAFStorable ()
 void ImplAAFStorable::InitializeOMStorable(ImplAAFClassDef * pClassDef)
 {
   ASSERTU (NULL != pClassDef);
+  ASSERTU(!_initializedOMStorable);
   
   // Install the class definition for this storable.
   setDefinition(pClassDef);
   
   // Make sure all of the properties exist and have property definitions.
   InitOMProperties(pClassDef);
+
+  _initializedOMStorable = true;
 }
 
   
+// Return 'true' if this object has been initialized via InitializeOMStorable().
+bool ImplAAFStorable::IsOMStorableInitialized() const
+{
+  return _initializedOMStorable;
+}
+
+
 AAFRESULT ImplAAFStorable::GetDefinition(ImplAAFClassDef ** ppClassDef)
 {
   if (NULL == ppClassDef)

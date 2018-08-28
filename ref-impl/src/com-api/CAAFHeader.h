@@ -59,6 +59,7 @@
 #include "CAAFObject.h"
 #endif
 
+
 //
 // Forward declaration
 //
@@ -68,7 +69,8 @@ class ImplAAFHeader;
 class CAAFHeader
   : public IAAFHeader,
     public IAAFEndian,
-	public IAAFHeader2,
+    public IAAFHeader2,
+    public IAAFHeader3,
     public CAAFObject
 {
 protected:
@@ -1235,6 +1237,47 @@ public:
     // @parm [in] aafUID_constref | descriptiveSchemeID | Descriptive scheme to remove.
     aafUID_constref  descriptiveSchemeID
   );
+
+  //***********************************************************
+  // METHOD NAME: CreateEmptyDescriptiveSchemes()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFHeader3 | CreateEmptyDescriptiveSchemes |
+  // Appends an empty descriptive scheme property to the file
+  /// 
+  ///
+  /// Succeeds if all of the following are true:
+  /// - a descriptive scheme ID is not already contained.
+  ///
+  /// If this method fails, the property will not be changed.
+  ///
+  /// This method will return the following codes:
+  ///
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_ALREADY_INITIALIZED
+  ///   - The given descriptive scheme ID is already contained.
+  // @end
+  STDMETHOD (CreateEmptyDescriptiveSchemes)
+    ();
+
+  //***********************************************************
+  // METHOD NAME: RemoveDescriptiveSchemes()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFHeader3 | RemoveDescriptiveSchemes |
+  // Removes the descriptive schemes from the file.
+  /// 
+  ///
+  /// Succeeds:
+  /// - always
+  ///
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  // @end
+  STDMETHOD (RemoveDescriptiveSchemes)
+    ();
 
 
 

@@ -103,11 +103,16 @@ void OMList<Element>::insertAfter(
 
 template <typename Element>
 void OMList<Element>::insertBefore(
-                                 const Element /* value */,
-                                 const OMListIterator<Element>& /* position */)
+                                 const Element value,
+                                 const OMListIterator<Element>& position)
 {
   TRACE("OMList<Element>::insertBefore");
-  ASSERT("Unimplemented code not reached", false);
+  PRECONDITION("Valid iterator", position.valid());
+  PRECONDITION("Consistent iterator and list", position._list == this);
+
+  Node* node = position._current;
+  ASSERT("Valid node", node != 0);
+  insertBefore(value, node);
 }
 
   // @mfunc Does this <c OMList> contain <p value> ?
@@ -148,7 +153,7 @@ OMUInt32 OMList<Element>::count(void) const
 
 #if defined(OM_DEBUG)
   OMUInt32 n = 0;
-  Node* p = _nil->_next;;
+  Node* p = _nil->_next;
   while (p != _nil) {
     n = n + 1;
     p = p->_next;

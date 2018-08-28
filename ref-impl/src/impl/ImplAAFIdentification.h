@@ -234,9 +234,6 @@ public:
 		// @parm [out] The unique generation
         (aafUID_t *  pGeneration);
 
-  // OM callbacks
-  virtual void onCopy(void* clientContext) const;
-
 private:
   OMWideStringProperty                      _companyName;
   OMWideStringProperty						_productName;

@@ -1360,13 +1360,550 @@ HRESULT STDMETHODCALLTYPE
 }
 
 
+HRESULT STDMETHODCALLTYPE
+    CAAFPlainStreamData::ReadScatter (IAAFPropertyValue * pStreamPropertyValue,
+        aafUInt32  bufCount,
+        aafIOBufferDesc_t *  pBufs,
+        aafUInt32 *  pBytesRead)
+{
+  HRESULT hr;
+
+  ImplAAFPlainStreamData * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFPlainStreamData*> (pO);
+  assert (ptr);
+
+  //
+  // set up for pStreamPropertyValue
+  //
+  ImplAAFPropertyValue * internalpStreamPropertyValue = NULL;
+  if (pStreamPropertyValue)
+    {
+      HRESULT hStat;
+      IAAFRoot * iObj;
+      ImplAAFRoot *arg;
+      hStat = pStreamPropertyValue->QueryInterface (IID_IAAFRoot, (void **)&iObj);
+      assert (SUCCEEDED (hStat));
+      assert (iObj);
+      hStat = iObj->GetImplRep((void **)&arg);
+      assert (SUCCEEDED (hStat));
+      iObj->Release(); // we are through with this interface pointer.
+      internalpStreamPropertyValue = static_cast<ImplAAFPropertyValue*>(arg);
+      assert (internalpStreamPropertyValue);
+    }
+
+
+
+
+  try
+    {
+      hr = ptr->ReadScatter (internalpStreamPropertyValue,
+    bufCount,
+    pBufs,
+    pBytesRead);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+  //
+  // no cleanup necessary for pStreamPropertyValue
+  //
+
+
+
+
+  return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFPlainStreamData::WriteGather (IAAFPropertyValue * pStreamPropertyValue,
+        aafUInt32  bufCount,
+        aafIOBufferDesc_constptr  pBufs,
+        aafUInt32 *  pBytesWritten)
+{
+  HRESULT hr;
+
+  ImplAAFPlainStreamData * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFPlainStreamData*> (pO);
+  assert (ptr);
+
+  //
+  // set up for pStreamPropertyValue
+  //
+  ImplAAFPropertyValue * internalpStreamPropertyValue = NULL;
+  if (pStreamPropertyValue)
+    {
+      HRESULT hStat;
+      IAAFRoot * iObj;
+      ImplAAFRoot *arg;
+      hStat = pStreamPropertyValue->QueryInterface (IID_IAAFRoot, (void **)&iObj);
+      assert (SUCCEEDED (hStat));
+      assert (iObj);
+      hStat = iObj->GetImplRep((void **)&arg);
+      assert (SUCCEEDED (hStat));
+      iObj->Release(); // we are through with this interface pointer.
+      internalpStreamPropertyValue = static_cast<ImplAAFPropertyValue*>(arg);
+      assert (internalpStreamPropertyValue);
+    }
+
+
+
+
+  try
+    {
+      hr = ptr->WriteGather (internalpStreamPropertyValue,
+    bufCount,
+    pBufs,
+    pBytesWritten);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+  //
+  // no cleanup necessary for pStreamPropertyValue
+  //
+
+
+
+
+  return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFPlainStreamData::ReadAsyncAt (IAAFPropertyValue * pStreamPropertyValue,
+        aafUInt64  position,
+        aafUInt32  dataSize,
+        aafMemPtr_t  pData,
+        IAAFIOCompletion *  pCompletion,
+        aafMemConstPtr_t  pClientArg)
+{
+  HRESULT hr;
+
+  ImplAAFPlainStreamData * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFPlainStreamData*> (pO);
+  assert (ptr);
+
+  //
+  // set up for pStreamPropertyValue
+  //
+  ImplAAFPropertyValue * internalpStreamPropertyValue = NULL;
+  if (pStreamPropertyValue)
+    {
+      HRESULT hStat;
+      IAAFRoot * iObj;
+      ImplAAFRoot *arg;
+      hStat = pStreamPropertyValue->QueryInterface (IID_IAAFRoot, (void **)&iObj);
+      assert (SUCCEEDED (hStat));
+      assert (iObj);
+      hStat = iObj->GetImplRep((void **)&arg);
+      assert (SUCCEEDED (hStat));
+      iObj->Release(); // we are through with this interface pointer.
+      internalpStreamPropertyValue = static_cast<ImplAAFPropertyValue*>(arg);
+      assert (internalpStreamPropertyValue);
+    }
+
+
+
+
+
+
+  try
+    {
+      hr = ptr->ReadAsyncAt (internalpStreamPropertyValue,
+    position,
+    dataSize,
+    pData,
+    pCompletion,
+    pClientArg);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+  //
+  // no cleanup necessary for pStreamPropertyValue
+  //
+
+
+
+
+
+
+  return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFPlainStreamData::WriteAsyncAt (IAAFPropertyValue * pStreamPropertyValue,
+        aafUInt64  position,
+        aafUInt32  dataSize,
+        aafMemConstPtr_t  pData,
+        IAAFIOCompletion *  pCompletion,
+        aafMemConstPtr_t  pClientArg)
+{
+  HRESULT hr;
+
+  ImplAAFPlainStreamData * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFPlainStreamData*> (pO);
+  assert (ptr);
+
+  //
+  // set up for pStreamPropertyValue
+  //
+  ImplAAFPropertyValue * internalpStreamPropertyValue = NULL;
+  if (pStreamPropertyValue)
+    {
+      HRESULT hStat;
+      IAAFRoot * iObj;
+      ImplAAFRoot *arg;
+      hStat = pStreamPropertyValue->QueryInterface (IID_IAAFRoot, (void **)&iObj);
+      assert (SUCCEEDED (hStat));
+      assert (iObj);
+      hStat = iObj->GetImplRep((void **)&arg);
+      assert (SUCCEEDED (hStat));
+      iObj->Release(); // we are through with this interface pointer.
+      internalpStreamPropertyValue = static_cast<ImplAAFPropertyValue*>(arg);
+      assert (internalpStreamPropertyValue);
+    }
+
+
+
+
+
+
+  try
+    {
+      hr = ptr->WriteAsyncAt (internalpStreamPropertyValue,
+    position,
+    dataSize,
+    pData,
+    pCompletion,
+    pClientArg);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+  //
+  // no cleanup necessary for pStreamPropertyValue
+  //
+
+
+
+
+
+
+  return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFPlainStreamData::ReadScatterAsyncAt (IAAFPropertyValue * pStreamPropertyValue,
+        aafUInt64  position,
+        aafUInt32  bufCount,
+        aafIOBufferDesc_t *  pBufs,
+        IAAFIOCompletion *  pCompletion,
+        aafMemConstPtr_t  pClientArg)
+{
+  HRESULT hr;
+
+  ImplAAFPlainStreamData * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFPlainStreamData*> (pO);
+  assert (ptr);
+
+  //
+  // set up for pStreamPropertyValue
+  //
+  ImplAAFPropertyValue * internalpStreamPropertyValue = NULL;
+  if (pStreamPropertyValue)
+    {
+      HRESULT hStat;
+      IAAFRoot * iObj;
+      ImplAAFRoot *arg;
+      hStat = pStreamPropertyValue->QueryInterface (IID_IAAFRoot, (void **)&iObj);
+      assert (SUCCEEDED (hStat));
+      assert (iObj);
+      hStat = iObj->GetImplRep((void **)&arg);
+      assert (SUCCEEDED (hStat));
+      iObj->Release(); // we are through with this interface pointer.
+      internalpStreamPropertyValue = static_cast<ImplAAFPropertyValue*>(arg);
+      assert (internalpStreamPropertyValue);
+    }
+
+
+
+
+
+
+  try
+    {
+      hr = ptr->ReadScatterAsyncAt (internalpStreamPropertyValue,
+    position,
+    bufCount,
+    pBufs,
+    pCompletion,
+    pClientArg);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+  //
+  // no cleanup necessary for pStreamPropertyValue
+  //
+
+
+
+
+
+
+  return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFPlainStreamData::WriteGatherAsyncAt (IAAFPropertyValue * pStreamPropertyValue,
+        aafUInt64  position,
+        aafUInt32  bufCount,
+        aafIOBufferDesc_constptr  pBufs,
+        IAAFIOCompletion *  pCompletion,
+        aafMemConstPtr_t  pClientArg)
+{
+  HRESULT hr;
+
+  ImplAAFPlainStreamData * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFPlainStreamData*> (pO);
+  assert (ptr);
+
+  //
+  // set up for pStreamPropertyValue
+  //
+  ImplAAFPropertyValue * internalpStreamPropertyValue = NULL;
+  if (pStreamPropertyValue)
+    {
+      HRESULT hStat;
+      IAAFRoot * iObj;
+      ImplAAFRoot *arg;
+      hStat = pStreamPropertyValue->QueryInterface (IID_IAAFRoot, (void **)&iObj);
+      assert (SUCCEEDED (hStat));
+      assert (iObj);
+      hStat = iObj->GetImplRep((void **)&arg);
+      assert (SUCCEEDED (hStat));
+      iObj->Release(); // we are through with this interface pointer.
+      internalpStreamPropertyValue = static_cast<ImplAAFPropertyValue*>(arg);
+      assert (internalpStreamPropertyValue);
+    }
+
+
+
+
+
+
+  try
+    {
+      hr = ptr->WriteGatherAsyncAt (internalpStreamPropertyValue,
+    position,
+    bufCount,
+    pBufs,
+    pCompletion,
+    pClientArg);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+  //
+  // no cleanup necessary for pStreamPropertyValue
+  //
+
+
+
+
+
+
+  return hr;
+}
+
+
+
 //
 // 
-// 
+//
 inline int EQUAL_UID(const GUID & a, const GUID & b)
 {
   return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
-}
+} 
 HRESULT CAAFPlainStreamData::InternalQueryInterface
 (
     REFIID riid,
@@ -1386,6 +1923,12 @@ HRESULT CAAFPlainStreamData::InternalQueryInterface
     if (EQUAL_UID(riid,IID_IAAFKLVStreamParameters)) 
     { 
         *ppvObj = (IAAFKLVStreamParameters *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
+    if (EQUAL_UID(riid,IID_IAAFPlainStreamData2)) 
+    { 
+        *ppvObj = (IAAFPlainStreamData2 *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }

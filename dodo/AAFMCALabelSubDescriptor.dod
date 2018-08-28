@@ -1,0 +1,334 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFMCALabelSubDescriptor\
+#endm
+#c
+#startm .parent-module 0
+AAFSubDescriptor\
+#endm
+#c
+#c #import ./AAFSubDescriptor.exp
+AD_HEAD
+AD_IDL(///
+/// The IAAFMCALabelSubDescriptor interface.
+///
+/// In addition to the specific error results listed for each method\,
+/// all methods in this interface may also return one of the following
+/// values:
+/// 
+/// AAFRESULT_NOMEMORY
+///   - insufficient system memory is available to perform the
+///     operation.
+///)
+AD_CLASS_UUID(01CFCC20, 3C24, 468E, 92, 05, 4C, 5F, F7, 7A, 57, EC)
+
+AD_DEFAULT_UUID(F649256B, C44B, 4B31, A3, B1, 43, 0C, AD, 2D, 61, 82)
+AD_XCLASS_BEGIN(Abstract, StoredObject)
+AD_XMETHOD1(SetLabelDictionaryID,
+			[in],
+				objPass,
+				aafUID_constref,
+				dictionaryID,
+				Label dictionary ID.,
+			Set the globally registered SMPTE UL that defines the meaning
+  /// of this MCALabelSubDescriptor instance.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MCALabelDictionaryID property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetLabelDictionaryID,
+			[out],
+				objPass,
+				aafUID_t *,
+				pDictionaryID,
+				Label dictionary ID.,
+			Get the globally registered SMPTE UL that defines the meaning
+  /// of this MCALabelSubDescriptor instance.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pDictionaryID pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pDictionaryID.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pDictionaryID arg is NULL.)
+
+
+AD_XMETHOD1(SetLinkID,
+			[in],
+				objPass,
+				aafUID_constref,
+				linkID,
+				Link ID.,
+			Set UUID that uniquely identifies this MCALabelSubDescriptor
+  /// instance and is used to link to it.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MCALinkID property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetLinkID,
+			[out],
+				objPass,
+				aafUID_t *,
+				pLinkID,
+				Link ID.,
+			Get UUID that uniquely identifies this MCALabelSubDescriptor
+  /// instance and is used to link to it.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pLinkID pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pLinkID.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pLinkID arg is NULL.)
+
+
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(TagSymbol,
+     Symbol identifying this MCALabelSubDescriptor.)
+
+
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(TagName,
+     Name.)
+
+
+AD_XMETHOD1(SetChannelID,
+            [in],
+                objPass,
+                aafUInt32,
+                channelID,
+            Channel ID.,
+
+     Set the numerical channel identifier within the essence
+  /// described by this MCALabelSubDescriptor.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MCAChannelID property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetChannelID,
+            [out],
+                objPass,
+                aafUInt32 *,
+                pChannelID,
+            Channel ID.,
+
+     Get the numerical channel identifier within the essence
+  /// described by this MCALabelSubDescriptor.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pChannelID pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pChannelID.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pChannelID arg is NULL.)
+
+
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(Title,
+     Program title.)
+
+
+AD_XMETHOD1(SetRFC5646SpokenLanguage,
+			[in\, string],
+			objPass,
+			const char *,
+			pRFC5646SpokenLanguage,
+            NULL-terminated US-ASCII string specifying RFC 5646 compliant language tag.,
+
+     Sets RFC 5646 Spoken Language.
+  ///
+  /// Set the RFC5646SpokenLanguage property to the value specified in
+  /// pRFC5646SpokenLanguage.  A copy is made of the data so the caller
+  /// retains ownership of the *pRFC5646SpokenLanguage buffer and is
+  /// responsible for de-allocating it.  There is no pre-set limit to
+  /// the length of the name\, other than available system memory or
+  /// disk space.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the pRFC5646SpokenLanguage pointer is valid.
+  /// 
+  /// If this method fails the RFC5646SpokenLanguage property will not be
+  /// changed.
+  /// 
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pRFC5646SpokenLanguage\))
+
+
+AD_XMETHOD2(GetRFC5646SpokenLanguage,
+			[out\, string\, size_is\(bufSize\)],
+			objPass,
+			char *,
+			pRFC5646SpokenLanguage,
+			buffer into which RFC5646SpokenLanguage is to be written,
+
+			[in],
+			objPass,
+			aafUInt32,
+			bufSize,
+			size of *pRFC5646SpokenLanguage buffer in bytes,
+
+     Gets RFC 5646 Spoken Language.
+  /// 
+  /// Writes the RFC5646SpokenLanguage property\, with a trailing null
+  /// character\, into the pRFC5646SpokenLanguage buffer.  The
+  /// buffer is allocated by the caller.  The size of the buffer is
+  /// given by bufSize.  If the RFC5646SpokenLanguage property has not yet
+  /// been set\, a zero-length string will be written \(that is\,
+  /// only the trailing null character\). 
+  /// 
+  /// Caller may call GetRFC5646SpokenLanguageBufLen\(\) to determine the
+  /// required buffer size.
+  /// 
+  /// If this method fails nothing will be written to
+  /// *pRFC5646SpokenLanguage.
+  /// 
+  /// Succeeds if:
+  /// - The pRFC5646SpokenLanguage pointer is valid.
+  /// - bufSize indicates that the buffer is large enough to hold
+  ///   RFC5646SpokenLanguage.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pRFC5646SpokenLanguage\)
+  ///
+  /// AAFRESULT_SMALL_BUF
+  ///   - bufSize indicates that the allocated buffer is not large
+  ///     enough to hold RFC5646SpokenLanguage.)
+
+
+AD_XMETHOD1(GetRFC5646SpokenLanguageBufLen,
+			[out],
+			objPass,
+			aafUInt32 *,
+			pBufSize,
+			size of required buffer\, in bytes,
+
+     Returns size of buffer \(in bytes\) required for GetRFC5646SpokenLanguage\(\).
+  /// 
+  /// Succeeds if:
+  /// - The pBufSize pointer is valid.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pBufSize\))
+
+
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(TitleVersion,
+     Program version.)
+
+
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(TitleSubVersion,
+     Program sub-version.)
+
+
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(Episode,
+     Program episode.)
+
+
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(PartitionKind,
+     Program partition kind.)
+
+
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(PartitionNumber,
+     Program partition number.)
+
+
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(AudioContentKind,
+     Description of the audio content.)
+
+
+AD_STD_METHOD_STRING_MULTI_SET_GET_SIZE(AudioElementKind,
+     Description of the audio element.)
+
+
+AD_XCLASS_END(Abstract, StoredObject)

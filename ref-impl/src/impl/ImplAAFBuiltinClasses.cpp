@@ -77,6 +77,7 @@ ImplAAFBuiltinClasses::ImplAAFBuiltinClasses (ImplAAFDictionary* dictionary)
 
 ImplAAFBuiltinClasses::~ImplAAFBuiltinClasses ()
 {
+  _dynamicPropertyIDs.clear();
 }
 
 
@@ -103,15 +104,17 @@ ImplAAFBuiltinClasses::NewBuiltinClassDef (const aafUID_t & rClassID,
 		
 	  // We've found the desired class in our table.
 	  ImplAAFClassDef * pcd = (ImplAAFClassDef*)(_dictionary->metaDictionary())->pvtCreateMetaDefinition(AUID_AAFClassDef);
-	  ASSERTU (pcd);
-    pcd->InitializeOMStorable(_dictionary->GetBuiltinDefs()->cdClassDef());
+	  if (pcd)
+	  {
+		pcd->InitializeOMStorable(_dictionary->GetBuiltinDefs()->cdClassDef());
 
-	  status = InitBuiltinClassDef (rClassID, classDefinition, pcd);
-	  if (AAFRESULT_SUCCEEDED (status))
-		{
-		  ASSERTU (ppResult);
-		  *ppResult = pcd;
-		}
+		status = InitBuiltinClassDef (rClassID, classDefinition, pcd);
+		if (AAFRESULT_SUCCEEDED (status))
+		  {
+			ASSERTU (ppResult);
+			*ppResult = pcd;
+		  }
+	  }
 	}
 
   popped = _createStack.pop ();
@@ -173,6 +176,11 @@ AAFRESULT ImplAAFBuiltinClasses::LookupOmPid
   (const aafUID_t & rAuid,
    OMPropertyId & outPid) const
 {
+  // Check if the PID is one of the dynamically allocated PIDs.
+  if (_dynamicPropertyIDs.find(rAuid, outPid))
+  {
+    return AAFRESULT_SUCCESS;
+  }
   // Find the builtin class definition template.
 	const AAFObjectModel * objectModel = AAFObjectModel::singleton();
 	const PropertyDefinition * propertyDefinition = objectModel->findPropertyDefinition(&rAuid);
@@ -204,9 +212,16 @@ AAFRESULT ImplAAFBuiltinClasses::MapOmPid
 		  // Yup, matches.  Set the pid.
           OMPropertyId ePid = propertyDefinition->pid();
           if ((ePid == 0) || (ePid >= 0x8000)) {
+            // Make sure a property with the same PID does not already exist
+            const PropertyDefinition * duplicatePropertyDefinition = objectModel->findPropertyDefinition(pid);
+            if (duplicatePropertyDefinition && !duplicatePropertyDefinition->isNil() &&
+                duplicatePropertyDefinition != propertyDefinition)
+              return E_FAIL;
             // remap from zero or another dynamic pid
-		    propertyDefinition->setPid(pid);
-		    return AAFRESULT_SUCCESS;
+            if (_dynamicPropertyIDs.contains(rAuid))
+              _dynamicPropertyIDs.remove(rAuid);
+            _dynamicPropertyIDs.append(rAuid, pid);
+            return AAFRESULT_SUCCESS;
           } else {
             // Cannot remap from non-dynamic pid
             return E_FAIL;

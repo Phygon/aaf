@@ -36,6 +36,8 @@
 
 #include "AAF.h"
 
+#include <string.h>
+
 
 typedef enum unitTestMode
 {
@@ -165,6 +167,14 @@ const aafUID_t testFileKindDefault =
 aafUID_t EffectiveTestFileEncoding( const aafUID_t& encoding );
 
 
+bool isSSFileKind(const aafUID_t& fileKind);
+
+// FileKInd helper function
+inline int equalUID(const aafUID_t & a, const aafUID_t & b)
+{
+  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
+}
+
 //
 // KLV parsing
 //
@@ -174,8 +184,8 @@ aafUID_t EffectiveTestFileEncoding( const aafUID_t& encoding );
 // If defined, TEST_NEW_STREAM_WRITING turns on
 // the code to accomodate the new KLV stream writing
 // mechanism.
-//#define TEST_NEW_STREAM_WRITING
-
+#define TEST_NEW_STREAM_WRITING
+#define TEST_NEW_STREAM_PARSING
 
 // KLV key
 struct testKLVKey_t
@@ -252,11 +262,23 @@ AAFRESULT GetPropertyType(
 bool operator ==( const aafUID_t uid1, const aafUID_t uid2 );
 bool operator !=( const aafUID_t uid1, const aafUID_t uid2 );
 
+bool operator ==( const aafMobID_t& mobID1, const aafMobID_t& mobID2 );
+bool operator !=( const aafMobID_t& mobID1, const aafMobID_t& mobID2 );
+
 bool operator ==( const aafRational_t& a, const aafRational_t& b );
 bool operator !=( const aafRational_t& a, const aafRational_t& b );
 
 bool operator ==( const aafTimeStamp_t& a, const aafTimeStamp_t& b );
 bool operator !=( const aafTimeStamp_t& a, const aafTimeStamp_t& b );
+
+bool operator ==( const aafSourceRef_t& a, const aafSourceRef_t& b );
+bool operator !=( const aafSourceRef_t& a, const aafSourceRef_t& b );
+
+bool operator ==( const aafTimecode_t& a, const aafTimecode_t& b );
+bool operator !=( const aafTimecode_t& a, const aafTimecode_t& b );
+
+bool operator ==( const aafEdgecode_t& a, const aafEdgecode_t& b );
+bool operator !=( const aafEdgecode_t& a, const aafEdgecode_t& b );
 
 
 #endif  // MODULE_TEST_COMMON_H

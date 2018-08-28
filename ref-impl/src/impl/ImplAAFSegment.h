@@ -46,6 +46,7 @@
 class ImplAAFPulldown;
 class ImplAAFTimecode;
 class ImplAAFSequence;
+class ImplAAFSourceClip;
 
 class ImplAAFSegment : public ImplAAFComponent
 {
@@ -93,12 +94,13 @@ public:
 	virtual AAFRESULT AccumulateLength(aafLength_t *length);
 
 	virtual AAFRESULT FindSubSegment( aafPosition_t offset,
+									  aafMediaCriteria_t *mediaCrit,
 									  aafPosition_t *sequPosPtr,
 									  ImplAAFSegment **subseg,
 									  aafBool *found);
 
 	virtual AAFRESULT TraverseToClip( aafLength_t length,
-									  ImplAAFSegment **sclp,
+									  ImplAAFSourceClip **sclp,
 									  ImplAAFPulldown **pulldownObj,
 									  aafInt32 *pulldownPhase,
 									  aafLength_t *sclpLen,

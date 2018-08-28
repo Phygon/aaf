@@ -765,8 +765,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppSlot->ReleaseReference(); // We are through with this pointer.
+          internalppSlot = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppSlot should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppSlot == 0);
+
   return hr;
 }
 
@@ -843,8 +854,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEnum->ReleaseReference(); // We are through with this pointer.
+          internalppEnum = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppEnum should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEnum == 0);
+
   return hr;
 }
 
@@ -1235,8 +1257,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEnum->ReleaseReference(); // We are through with this pointer.
+          internalppEnum = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppEnum should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEnum == 0);
+
   return hr;
 }
 
@@ -1417,8 +1450,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppNewSlot->ReleaseReference(); // We are through with this pointer.
+          internalppNewSlot = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppNewSlot should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppNewSlot == 0);
+
   return hr;
 }
 
@@ -1632,8 +1676,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppDestSlot->ReleaseReference(); // We are through with this pointer.
+          internalppDestSlot = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppDestSlot should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppDestSlot == 0);
+
   return hr;
 }
 
@@ -1801,8 +1856,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppDestMob->ReleaseReference(); // We are through with this pointer.
+          internalppDestMob = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppDestMob should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppDestMob == 0);
+
   return hr;
 }
 
@@ -1881,8 +1947,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppDestMob->ReleaseReference(); // We are through with this pointer.
+          internalppDestMob = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppDestMob should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppDestMob == 0);
+
   return hr;
 }
 
@@ -2084,8 +2161,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEnum->ReleaseReference(); // We are through with this pointer.
+          internalppEnum = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppEnum should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEnum == 0);
+
   return hr;
 }
 
@@ -2341,8 +2429,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEnum->ReleaseReference(); // We are through with this pointer.
+          internalppEnum = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppEnum should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEnum == 0);
+
 
   return hr;
 }
@@ -2621,8 +2720,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppNewSlot->ReleaseReference(); // We are through with this pointer.
+          internalppNewSlot = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppNewSlot should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppNewSlot == 0);
+
 
   return hr;
 }
@@ -2739,21 +2849,169 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppNewSlot->ReleaseReference(); // We are through with this pointer.
+          internalppNewSlot = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppNewSlot should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppNewSlot == 0);
+
 
   return hr;
 }
 
 
 
+HRESULT STDMETHODCALLTYPE
+    CAAFMob::CloneExternalAdvanced (aafDepend_t  resolveDependencies,
+        aafIncMedia_t  includeMedia,
+        aafBoolean_t  deferStreams,
+        IAAFFile * pDestFile,
+        IAAFMob ** ppDestMob)
+{
+  HRESULT hr;
+
+  ImplAAFMob * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFMob*> (pO);
+  assert (ptr);
+
+  //
+  // set up for resolveDependencies
+  //
+  if (! Is_aafDepend_t_Valid(resolveDependencies))
+    return AAFRESULT_INVALID_ENUM_VALUE;
+
+  //
+  // set up for includeMedia
+  //
+  if (! Is_aafIncMedia_t_Valid(includeMedia))
+    return AAFRESULT_INVALID_ENUM_VALUE;
+
+
+  //
+  // set up for pDestFile
+  //
+  ImplAAFFile * internalpDestFile = NULL;
+  if (pDestFile)
+    {
+      HRESULT hStat;
+      IAAFRoot * iObj;
+      ImplAAFRoot *arg;
+      hStat = pDestFile->QueryInterface (IID_IAAFRoot, (void **)&iObj);
+      assert (SUCCEEDED (hStat));
+      assert (iObj);
+      hStat = iObj->GetImplRep((void **)&arg);
+      assert (SUCCEEDED (hStat));
+      iObj->Release(); // we are through with this interface pointer.
+      internalpDestFile = static_cast<ImplAAFFile*>(arg);
+      assert (internalpDestFile);
+    }
+
+  //
+  // set up for ppDestMob
+  //
+  ImplAAFMob * internalppDestMob = NULL;
+  ImplAAFMob ** pinternalppDestMob = NULL;
+  if (ppDestMob)
+    {
+      pinternalppDestMob = &internalppDestMob;
+    }
+
+  try
+    {
+      hr = ptr->CloneExternalAdvanced (resolveDependencies,
+    includeMedia,
+    deferStreams,
+    internalpDestFile,
+    pinternalppDestMob);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+
+
+
+  //
+  // no cleanup necessary for pDestFile
+  //
+
+  //
+  // cleanup for ppDestMob
+  //
+  if (SUCCEEDED(hr))
+    {
+      IUnknown *pUnknown;
+      HRESULT hStat;
+
+      if (internalppDestMob)
+        {
+          pUnknown = static_cast<IUnknown *> (internalppDestMob->GetContainer());
+          hStat = pUnknown->QueryInterface(IID_IAAFMob, (void **)ppDestMob);
+          assert (SUCCEEDED (hStat));
+          //pUnknown->Release();
+          internalppDestMob->ReleaseReference(); // We are through with this pointer.
+          internalppDestMob = 0;
+        }
+    }
+
+  // If the call to the Impl method above fails, internalppDestMob should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppDestMob == 0);
+
+
+  return hr;
+}
+
+
+
+
 //
 // 
-// 
+//
 inline int EQUAL_UID(const GUID & a, const GUID & b)
 {
   return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
-}
+} 
 HRESULT CAAFMob::InternalQueryInterface
 (
     REFIID riid,
@@ -2773,6 +3031,12 @@ HRESULT CAAFMob::InternalQueryInterface
     if (EQUAL_UID(riid,IID_IAAFMob2)) 
     { 
         *ppvObj = (IAAFMob2 *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
+    if (EQUAL_UID(riid,IID_IAAFMob3)) 
+    { 
+        *ppvObj = (IAAFMob3 *)this; 
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }

@@ -34,11 +34,9 @@
 #ifndef __AifVersions_h__
 #define __AifVersions_h__
 
-#include <AAFSDKBuild.h>
-
-#if   AAF_MAJOR_VERSION == 1  &&  AAF_MINOR_VERSION == 1  && AAF_MAINT_RELEASE == 0
+#if   AAFSDK_VERSION_MAJOR == 1  &&  AAFSDK_VERSION_MINOR == 1  && AAFSDK_VERSION_PATCH == 0
 #define AIF_V110
-#elif AAF_MAJOR_VERSION == 1  &&  AAF_MINOR_VERSION == 0  && AAF_MAINT_RELEASE == 2
+#elif AAFSDK_VERSION_MAJOR == 1  &&  AAFSDK_VERSION_MINOR == 0  && AAFSDK_VERSION_PATCH == 2
 #define AIF_V102
 #else
 #error "unsupported AAF SDK version"

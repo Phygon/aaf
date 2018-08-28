@@ -50,6 +50,7 @@ using namespace std;
 #include "AutoRelease.h"
 
 #include "CAAFBuiltinDefs.h"
+#include "AAFCodecDefs.h"
 
 #define CHECKAAF
 
@@ -227,6 +228,123 @@ IAAFParameterDef *AAFDomainUtils::CreateParameterDefinition(IAAFDictionary *pDic
 
 	return(parmDef);
 }
+
+
+
+typedef struct
+{
+    const aafUID_t  *AAFCodecID;
+    const aafUID_t  *AAFDescClassID;
+    const aafUID_t  *AAFDataDefID;
+    aafCharacter    *AAFCodecName;
+} codecIDTable_t;
+
+static const codecIDTable_t codecIDTable[] = {
+    { &kAAFCodecJPEG,   &AUID_AAFCDCIDescriptor,    &kAAFDataDef_Picture,  L"JPEG" },
+    { &kAAFCodecCDCI,   &AUID_AAFCDCIDescriptor,    &kAAFDataDef_Picture,  L"CDCI" },
+    { &kAAFCodecRGBA,   &AUID_AAFRGBADescriptor,    &kAAFDataDef_Picture,  L"RGBA" },
+    { &kAAFCodecWAVE,   &AUID_AAFWAVEDescriptor,    &kAAFDataDef_Sound,    L"WAVE" },
+    { &kAAFCODEC_AIFC,  &AUID_AAFAIFCDescriptor,    &kAAFDataDef_Sound,    L"AIFC" },
+    { NULL,             NULL,                       NULL,           NULL }
+};
+
+IAAFCodecDef *AAFDomainUtils::CreateCodecDefinition(
+	IAAFDictionary		*p_dict,
+	const aafUID_t&		codec_def_id )
+{
+    AAFRESULT			hr = AAFRESULT_SUCCESS;
+	codecIDTable_t		*p_codec_info = NULL;
+	IAAFCodecDef		*p_codec_def = NULL;  // return value
+	IAAFClassDef		*p_class_def = NULL;
+	IAAFDataDef			*p_data_def = NULL;
+
+
+	for( int i=0; codecIDTable[i].AAFCodecID!=NULL; i++ )
+	{
+		if( memcmp( codecIDTable[i].AAFCodecID, &codec_def_id, sizeof(aafUID_t)  ) == 0 )
+		{
+			p_codec_info = const_cast<codecIDTable_t*>( codecIDTable ) + i;
+			break;
+		}
+	}
+
+	if( p_codec_info != NULL )
+	{
+        // Create and initialize codec
+		hr = p_dict->CreateInstance(
+				AUID_AAFCodecDefinition,
+				IID_IAAFCodecDef,
+				(IUnknown**)&p_codec_def );
+
+		if( hr == AAFRESULT_SUCCESS )
+			hr = p_codec_def->Initialize(
+					*(p_codec_info->AAFCodecID),
+					p_codec_info->AAFCodecName,
+					L"" );
+
+
+        // Set essence descriptor class definition
+		if( hr == AAFRESULT_SUCCESS )
+			hr = p_dict->LookupClassDef( *(p_codec_info->AAFDescClassID), &p_class_def );
+
+        if( hr == AAFRESULT_SUCCESS )
+            hr = p_codec_def->SetFileDescriptorClass( p_class_def );
+
+
+        // Set essence data definition
+        if( hr == AAFRESULT_SUCCESS )
+            hr = p_dict->LookupDataDef( *(p_codec_info->AAFDataDefID), &p_data_def );
+
+        if( hr == AAFRESULT_SUCCESS )
+			hr = p_codec_def->AddEssenceKind( p_data_def );
+	}
+
+
+	if( p_class_def )
+		p_class_def->Release();
+	if( p_data_def )
+		p_data_def->Release();
+
+
+	return p_codec_def;
+}
+
+
+
+HRESULT AAFDomainUtils::RegisterAAFCodecs( IAAFDictionary *p_dict )
+{
+    AAFRESULT			hr = AAFRESULT_SUCCESS;
+	IAAFCodecDef		*p_codec_def = NULL;
+
+
+	for( int i=0; codecIDTable[i].AAFCodecID!=NULL; i++ )
+	{
+		hr = p_dict->LookupCodecDef( *(codecIDTable[i].AAFCodecID), &p_codec_def );
+		if( hr == AAFRESULT_SUCCESS )
+		{
+			p_codec_def->Release();
+			continue;
+		}
+
+
+		p_codec_def = CreateCodecDefinition( p_dict, *(codecIDTable[i].AAFCodecID) );
+		if( p_codec_def != NULL )
+		{
+			hr = p_dict->RegisterCodecDef( p_codec_def );
+			p_codec_def->Release();
+		}
+		else
+			hr = AAFRESULT_CODEC_INVALID;
+
+		if( hr != AAFRESULT_SUCCESS )
+			break;
+	}
+
+
+	return hr;
+}
+
+
 
 //***********************************************************
 //

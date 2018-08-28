@@ -72,12 +72,12 @@ protected:
 
     // @cmember Compute the name of an element in this <c OMContainter>
     //          given the element's <p localKey>.
+    //
+    //          Obsolete?
   wchar_t* elementName(OMUInt32 localKey);
 
     // @cmember Obtain the next available local key.
   OMUInt32 nextLocalKey(void);
-
-  virtual const wchar_t* storedName(void) const;
 
 private:
   // @access Private members.

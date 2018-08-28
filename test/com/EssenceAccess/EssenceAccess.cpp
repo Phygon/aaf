@@ -756,6 +756,7 @@ struct CAAFInitialize
 	  fprintf(stderr, "check environment variables -\n");
 	  fprintf(stderr, "  Windows    - $PATH\n");
 	  fprintf(stderr, "  Unix/Linux - $LD_LIBRARY_PATH\n");
+	  fprintf(stderr, "  MacOS X/Darwin - $DYLD_LIBRARY_PATH\n");
 	  exit(hr);
 	}
   }

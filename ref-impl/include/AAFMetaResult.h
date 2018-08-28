@@ -1,3 +1,6 @@
+#ifndef __AAFMetaResult_h__
+#define __AAFMetaResult_h__
+
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -1009,3 +1012,5 @@ AAF_DEFINE_ERROR_ALIAS(HRESULT_SUCCESS, SUCCESS)
 /*** Testing Error Codes ***/
 //localErrorStrings[TEST_FAILED] =
 //"AAF_TESTING_ERR: Test Failed";
+
+#endif

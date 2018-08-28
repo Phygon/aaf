@@ -46,6 +46,13 @@ OMStoredObject::~OMStoredObject(void)
   TRACE("OMStoredObject::~OMStoredObject");
 }
 
+void OMStoredObject::save(OMFile& file, bool /*finalize*/)
+{
+  TRACE("OMStoredObject::save");
+
+  save(file);
+}
+
 wchar_t* OMStoredObject::streamName(const wchar_t* propertyName,
                                     OMPropertyId pid)
 {
@@ -145,3 +152,56 @@ void OMStoredObject::mangleName(const wchar_t* clearName,
   mangledName[newSize] = L'-';
   toWideString(pid, &mangledName[newSize+1], stringSize(pid));
 }
+
+#ifdef HACK_SKIP_PRIMARY_MOB_DEF
+bool isPrimaryMobPresent(const OMFile* file)
+{
+  static const OMPropertyId PID_Root_Header       = 0x0002;
+  static const OMPropertyId PID_Header_PrimaryMob = 0x3b08;
+  static const OMPropertyId propertyPath[] = {
+    PID_Root_Header, PID_Header_PrimaryMob, 0};
+
+  const OMProperty* primaryMobProperty =
+                           file->findProperty(propertyPath);
+  const bool present = primaryMobProperty && primaryMobProperty->isPresent();
+  return present;
+}
+
+#include "OMContainerElement.h"
+#include "OMStrongReferenceSet.h"
+bool elementHasPrimaryMobDefinition(const OMStrongReferenceSet& set,
+                                    const OMStrongReferenceSetElement& element)
+{
+  static const OMPropertyId PID_ClassDefinition_Properties = 0x0009;
+  static const OMUniqueObjectIdentification Property_PrimaryMob =
+  {0x06010104, 0x0108, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x04}};
+
+  bool result = false;
+  const bool isPropertyDefinitionsSet =
+	                        (set.propertyId() == PID_ClassDefinition_Properties);
+  if (isPropertyDefinitionsSet) {
+    const OMUniqueObjectIdentification* id =
+      reinterpret_cast<const OMUniqueObjectIdentification*>(
+                                                     element.identification());
+    result = (id && *id == Property_PrimaryMob);
+  }
+
+  return result;
+}
+
+bool setHasPrimaryMobDefinition(const OMStrongReferenceSet& set)
+{
+  static const OMPropertyId PID_ClassDefinition_Properties = 0x0009;
+  static const OMUniqueObjectIdentification Property_PrimaryMob =
+  {0x06010104, 0x0108, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x04}};
+
+  bool result = false;
+  const bool isPropertyDefinitionsSet =
+	                        (set.propertyId() == PID_ClassDefinition_Properties);
+  if (isPropertyDefinitionsSet) {
+	  result = set.contains(const_cast<OMUniqueObjectIdentification*>(&Property_PrimaryMob));
+  }
+
+  return result;
+}
+#endif

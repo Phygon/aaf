@@ -40,7 +40,7 @@
 #include "OMFile.h"
 #include "OMDataTypes.h"
 
-  // @class Wrappers for ISO FILE*s.
+  // @class Wrapper for file system.
   //        Additionally supporting wchar_t file names and 64-bit positions.
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
 class OMStream {
@@ -49,49 +49,73 @@ public:
     // @cmember Create an <c OMStream> object by opening an existing
     //          file for read-only access, the file is named <p fileName>.
     //          The file must already exist.
+    //   @precondition <f readable()>
   static OMStream* openExistingRead(const wchar_t* fileName);
 
     // @cmember Create an <c OMStream> object by opening an existing
     //          file for modify access, the file is named <p fileName>.
     //          The file must already exist.
+    //   @precondition <f modifiable()>
   static OMStream* openExistingModify(const wchar_t* fileName);
 
     // @cmember Create an <c OMStream> object by creating a new
     //          file for modify access, the file is named <p fileName>.
     //          The file must not already exist.
+    //   @precondition <f creatable()>
   static OMStream* openNewModify(const wchar_t* fileName);
 
     // @cmember Create an <c OMStream> object by creating a new
     //          file temporary for modify access.
   static OMStream* openNewModify(void);
 
-  void read(OMByte* bytes,
-            OMUInt32 byteCount,
-            OMUInt32& bytesRead) const;
+    // @cmember Can an existing file named <p fileName> be opened
+    //          for read access ? The file must already exist and be readable.
+  static bool readable(const wchar_t* fileName);
 
-  void write(const OMByte* bytes,
-             OMUInt32 byteCount,
-             OMUInt32& bytesWritten);
+    // @cmember Can an existing file named <p fileName> be opened
+    //          for read/write access ? The file must already exist and be
+    //          both readable and writable.
+  static bool modifiable(const wchar_t* fileName);
 
-  OMUInt64 size(void) const ;
+    // @cmember Can a new file named <p fileName> be created for read access ?
+    //          The file must not already exist.
+  static bool creatable(const wchar_t* fileName);
 
-  void setSize(OMUInt64 newSize);
+    // @cmember Attempt to read the number of bytes given by <p byteCount>
+    //          from the current position in this <c OMStream>
+    //          into the buffer at address <p bytes>.
+    //          The actual number of bytes read is returned in <p bytesRead>.
+  virtual void read(OMByte* bytes,
+                    OMUInt32 byteCount,
+                    OMUInt32& bytesRead) const = 0;
 
-  OMUInt64 position(void) const;
+    // @cmember Attempt to write the number of bytes given by <p byteCount>
+    //          to the current position in this <c OMStream>
+    //          from the buffer at address <p bytes>.
+    //          The actual number of bytes written is returned in
+    //          <p bytesWritten>.
+  virtual void write(const OMByte* bytes,
+                     OMUInt32 byteCount,
+                     OMUInt32& bytesWritten) = 0;
 
-  void setPosition(OMUInt64 newPosition);
+  virtual OMUInt64 size(void) const = 0;
 
-  void synchronize(void);
+  virtual void setSize(OMUInt64 newSize) = 0;
+
+  virtual OMUInt64 position(void) const = 0;
+
+  virtual void setPosition(OMUInt64 newPosition) = 0;
+
+  virtual void synchronize(void) = 0;
 
   bool isWritable(void) const;
 
   virtual ~OMStream(void);
 
+protected:
+  OMStream(bool isWritable);
+
 private:
-
-  OMStream(FILE* file, bool isWritable);
-
-  FILE* _file;
   bool _isWritable;
 };
 

@@ -208,7 +208,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
 	IEnumAAFMobs*	pMobIter = NULL;
-	IAAFMob*		pMob;
+	IAAFMob*		pMob = NULL;
 	IEnumAAFMobSlots*	pSlotIter = NULL;
 	IAAFMobSlot*		pSlot = NULL;
 	IAAFComponent*		pComp = NULL;
@@ -234,7 +234,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 		// Get the AAF file header.
 		checkResult(pFile->GetHeader(&pHeader));
-		
+
 		// Validate that there is only one composition mob.
 		checkResult(pHeader->CountMobs(kAAFCompMob, &numMobs));
 		checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
@@ -512,8 +512,8 @@ extern "C" HRESULT CEnumAAFDataDefs_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following EnumAAFDataDef methods have not been implemented:" << endl; 
-//		cout << "     IsDataDefOf - needs unit test" << endl; 
+//		cout << "The following EnumAAFDataDef methods have not been implemented:" << endl;
+//		cout << "     IsDataDefOf - needs unit test" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

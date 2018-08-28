@@ -1,4 +1,3 @@
-
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -160,7 +159,7 @@ static HRESULT CreateAAFFile(
 		if (pWavFile)
 		{
 			// read in the essence data
-		        int rc = fread(dataBuff, sizeof(unsigned char), sizeof(dataBuff), pWavFile);
+			int rc = fread(dataBuff, sizeof(unsigned char), sizeof(dataBuff), pWavFile);
 			(void)rc;
 
 			// We have the data in memory so
@@ -341,7 +340,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		// Open the AAF file
 		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = true;
-		
+
 		// Get the AAF file header.
 		checkResult(pFile->GetHeader(&pHeader));
 	}
@@ -402,8 +401,8 @@ extern "C" HRESULT CAAFEssenceFormat_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IAAFEssenceFormat tests have not been implemented:" << endl; 
-//		cout << "     GetIndexedFormatSpecifier" << endl; 
+//		cout << "The following IAAFEssenceFormat tests have not been implemented:" << endl;
+//		cout << "     GetIndexedFormatSpecifier" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 	

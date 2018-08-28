@@ -50,7 +50,7 @@ OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty(
   TRACE(
      "OMStrongReferenceProperty<ReferencedObject>::OMStrongReferenceProperty");
 
-  _reference = OMStrongObjectReference(this, storedName());
+  _reference = OMStrongObjectReference(this, nullOMUniqueObjectIdentification);
 }
 
 template <typename ReferencedObject>
@@ -471,7 +471,8 @@ void OMStrongReferenceProperty<ReferencedObject>::shallowCopyTo(
 template <typename ReferencedObject>
 void OMStrongReferenceProperty<ReferencedObject>::deepCopyTo(
                                                      OMProperty* destination,
-                                                     void* clientContext) const
+                                                     void* clientContext,
+                                                     bool deferStreamData) const
 {
   TRACE("OMStrongReferenceProperty<ReferencedObject>::deepCopyTo");
   PRECONDITION("Valid destination", destination != 0);
@@ -491,7 +492,7 @@ void OMStrongReferenceProperty<ReferencedObject>::deepCopyTo(
   OMStorable* d = source->shallowCopy(factory);
   dest->setObject(d);
   d->onCopy(clientContext);
-  source->deepCopyTo(d, clientContext);
+  source->deepCopyTo(d, clientContext, deferStreamData);
 }
 
 #endif

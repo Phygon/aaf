@@ -40,6 +40,10 @@
 #include "ImplAAFDictionary.h"
 #endif
 
+#ifndef __ImplAAFTypeDefCharacter_h__
+#include "ImplAAFTypeDefGenericCharacter.h"
+#endif
+
 #ifndef __ImplAAFTypeDefRecord_h__
 #include "ImplAAFTypeDefRecord.h"
 #endif
@@ -134,6 +138,66 @@
 #include "OMAssertions.h"
 
 
+static AAFRESULT CreateNewCharacterType (const aafUID_t & idToCreate,
+								  ImplAAFDictionary * pDict,
+								  ImplAAFTypeDef ** ppCreatedTypeDef)
+{
+  ASSERTU (pDict);
+  AAFRESULT hr;
+
+  // Go through the character list, attempting to identify the requested
+  // ID.
+  TypeCharacter * curCharacter = s_AAFAllTypeCharacters;
+  while (curCharacter->isValid)
+	{
+	  // Check to see if the current ID matches the ID of the type
+	  // def we want to create.
+	  if (idToCreate == curCharacter->typeID)
+		{		
+		  // Create an impl typedefcharacter object (as yet uninitialized)
+		  ImplAAFTypeDefGenericCharacter * ptd = 0;
+		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefinitionGenericCharacter, (ImplAAFMetaDefinition **) &ptd);
+		  if (AAFRESULT_FAILED (hr))
+			return hr;
+		  ASSERTU (ptd);
+
+		  // HACK: Need to support arbitrary character sizes.
+		  //
+		  // The metadata dictionary (meta\AAFMetaDict.xls) needs to be
+		  // updated to specify size of characters defined by generic
+		  // character type definitions (e.g. Char type).
+		  // The scripts that generate AAFMetaDictionary.h need to be
+		  // updated to include character size as part of the
+		  // AAF_TYPE_DEFINITION_CHARACTER() macro and a new macro needs
+		  // to be added for generic character types.
+		  //
+		  // For now instead of encoding the character size in
+		  // AAFMetaDictionary.h it is encoded here.
+		  //
+		  aafUInt8 characterSize = 0;
+		  if (curCharacter->typeID == kAAFTypeID_Char)
+			  characterSize = 1;
+
+		  hr = ptd->Initialize (curCharacter->typeID,
+								characterSize,
+								curCharacter->typeName,
+								NULL);
+		  if (AAFRESULT_FAILED (hr))
+			return hr;
+
+		  ASSERTU (ppCreatedTypeDef);
+		  *ppCreatedTypeDef = ptd;
+		  (*ppCreatedTypeDef)->AcquireReference ();
+		  ptd->ReleaseReference ();
+		  ptd = 0;
+		  return AAFRESULT_SUCCESS;
+		}
+
+	  curCharacter++;
+	}
+  return AAFRESULT_NO_MORE_OBJECTS;
+}
+
 static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
 								  ImplAAFDictionary * pDict,
 								  ImplAAFTypeDef ** ppCreatedTypeDef)
@@ -148,7 +212,7 @@ static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current ID matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curInteger->typeID, sizeof (aafUID_t)))
+	  if (idToCreate == curInteger->typeID)
 		{		
 		  // Yes, this is the one.
 		  // Create an impl typedefinteger object (as yet uninitialized)
@@ -158,10 +222,10 @@ static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
 			return hr;
 		  ASSERTU (ptd);
 
-		  AAFRESULT hr = ptd->Initialize (curInteger->typeID,
-										  curInteger->size,
-										  curInteger->isSigned,
-										  curInteger->typeName);
+		  hr = ptd->Initialize (curInteger->typeID,
+								curInteger->size,
+								curInteger->isSigned,
+								curInteger->typeName);
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 
 		  ASSERTU (ppCreatedTypeDef);
@@ -186,7 +250,7 @@ static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
 //
 // struct TypeEnumerationMember
 // {                              
-//   wchar_t *        memberName; 
+//   const wchar_t *  memberName; 
 //   aafInt64         memberValue; 
 // };                             
 //                                
@@ -196,7 +260,7 @@ static AAFRESULT CreateNewIntegerType (const aafUID_t & idToCreate,
 // struct TypeEnumeration              
 // {                              
 //   aafUID_t   typeID;           
-//   wchar_t *  typeName;         
+//   const wchar_t *  typeName;         
 //   aafUID_t * elementType;
 //   size_t     size;
 //   TypeEnumerationMember * members;
@@ -228,7 +292,7 @@ static AAFRESULT CreateNewEnumerationType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current enumeration matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &(*curEnumeration)->typeID, sizeof (aafUID_t)))
+	  if (idToCreate == (*curEnumeration)->typeID)
 		{		
 		  // Yes, this is the one.
 
@@ -258,8 +322,8 @@ static AAFRESULT CreateNewEnumerationType (const aafUID_t & idToCreate,
 		  aafInt64 * memberValues =	new aafInt64 [numMembers];
 		  ASSERTU (memberValues);
 	  
-		  const aafCharacter* * memberNames = 
-			new const aafCharacter*[numMembers];
+		  aafString_t * memberNames = 
+			new aafString_t[numMembers];
 		  ASSERTU (memberNames);
 
 		  // fill the types and names arrays.
@@ -267,7 +331,7 @@ static AAFRESULT CreateNewEnumerationType (const aafUID_t & idToCreate,
 		  for (i = 0; i < numMembers; i++)
 			{
 			  memberValues[i] = (*curEnumeration)->members[i]->memberValue;
-			  memberNames[i] = (*curEnumeration)->members[i]->memberName;
+			  memberNames[i] = const_cast<wchar_t *>((*curEnumeration)->members[i]->memberName);
 			  ASSERTU (memberNames[i]);
 			}
 
@@ -350,7 +414,7 @@ static AAFRESULT CreateNewExtendibleEnumerationType (const aafUID_t & idToCreate
 	{
 	  // Check to see if the current extendible enumeration matches
 	  // the ID of the type def we want to create.
-	  if (! memcmp (&idToCreate, &(*curExtEnumeration)->typeID, sizeof (aafUID_t)))
+	  if (idToCreate == (*curExtEnumeration)->typeID)
 		{		
 		  // Yes, this is the one.
 
@@ -442,7 +506,7 @@ static AAFRESULT CreateNewRecordType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current record matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &(*curRecord)->typeID, sizeof (aafUID_t)))
+	  if (idToCreate == (*curRecord)->typeID)
 		{		
 		  // Yes, this is the one.
 
@@ -468,8 +532,8 @@ static AAFRESULT CreateNewRecordType (const aafUID_t & idToCreate,
 			new ImplAAFTypeDef * [numMembers];
 		  ASSERTU (memberTypes);
 	  
-		  const aafCharacter* * memberNames = 
-			new const aafCharacter*[numMembers];
+		  aafString_t * memberNames = 
+			new aafString_t[numMembers];
 		  ASSERTU (memberNames);
 
 		  aafUInt32 * memberOffsets =
@@ -485,7 +549,7 @@ static AAFRESULT CreateNewRecordType (const aafUID_t & idToCreate,
 			  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 			  ASSERTU (memberTypes[i]);
 
-			  memberNames[i] = (*curRecord)->members[i]->memberName;
+			  memberNames[i] = const_cast<wchar_t *>((*curRecord)->members[i]->memberName);
 			  ASSERTU (memberNames[i]);
 
 			  memberOffsets[i] = (*curRecord)->members[i]->memberOffset;
@@ -542,7 +606,7 @@ static AAFRESULT CreateNewVaryingArrayType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current ID matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
+	  if (idToCreate == curElem->typeId)
 		{		
 		  // Yes, this is the one.
 		  // Create an impl typedefvaryingArray object (as yet uninitialized)
@@ -557,9 +621,9 @@ static AAFRESULT CreateNewVaryingArrayType (const aafUID_t & idToCreate,
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 		  ASSERTU (pElemType);
 
-		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
-										  pElemType,
-										  curElem->typeName);
+		  hr = ptd->Initialize (curElem->typeId,
+								pElemType,
+								curElem->typeName);
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 
 		  ASSERTU (ppCreatedTypeDef);
@@ -590,7 +654,7 @@ static AAFRESULT CreateNewFixedArrayType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current ID matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
+	  if (idToCreate == curElem->typeId)
 		{		
 		  // Yes, this is the one.
 		  // Create an impl typedeffixedArray object (as yet uninitialized)
@@ -605,10 +669,10 @@ static AAFRESULT CreateNewFixedArrayType (const aafUID_t & idToCreate,
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 		  ASSERTU (pElemType);
 
-		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
-										  pElemType,
-										  curElem->count,
-										  curElem->typeName);
+		  hr = ptd->Initialize (curElem->typeId,
+								pElemType,
+								curElem->count,
+								curElem->typeName);
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 
 		  ASSERTU (ppCreatedTypeDef);
@@ -639,7 +703,7 @@ static AAFRESULT CreateNewRenameType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current ID matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
+	  if (idToCreate == curElem->typeId)
 		{		
 		  // Yes, this is the one.
 		  // Create an impl typedefRename object (as yet uninitialized)
@@ -654,9 +718,9 @@ static AAFRESULT CreateNewRenameType (const aafUID_t & idToCreate,
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 		  ASSERTU (pBaseType);
 
-		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
-										  pBaseType,
-										  curElem->typeName);
+		  hr = ptd->Initialize (curElem->typeId,
+								pBaseType,
+								curElem->typeName);
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 
 		  ASSERTU (ppCreatedTypeDef);
@@ -687,7 +751,7 @@ static AAFRESULT CreateNewStringType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current ID matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
+	  if (idToCreate == curElem->typeId)
 		{		
 		  // Yes, this is the one.
 		  // Create an impl typedefString object (as yet uninitialized)
@@ -702,9 +766,9 @@ static AAFRESULT CreateNewStringType (const aafUID_t & idToCreate,
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 		  ASSERTU (pElemType);
 
-		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
-										  pElemType,
-										  curElem->typeName);
+		  hr = ptd->Initialize (curElem->typeId,
+								pElemType,
+								curElem->typeName);
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 
 		  ASSERTU (ppCreatedTypeDef);
@@ -736,7 +800,7 @@ static AAFRESULT CreateNewStrongRefType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current ID matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
+	  if (idToCreate == curElem->typeId)
 		{		
 		  // Yes, this is the one.
 		  // Create an impl typedefStrongRef object (as yet uninitialized)
@@ -751,9 +815,9 @@ static AAFRESULT CreateNewStrongRefType (const aafUID_t & idToCreate,
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 		  ASSERTU (pBaseClass);
 
-		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
-										  pBaseClass,
-										  curElem->typeName);
+		  hr = ptd->Initialize (curElem->typeId,
+								pBaseClass,
+								curElem->typeName);
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 
 		  ASSERTU (ppCreatedTypeDef);
@@ -784,7 +848,7 @@ static AAFRESULT CreateNewStrongRefSetType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current ID matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
+	  if (idToCreate == curElem->typeId)
 		{		
 #if 0
 		  // Yes, this is the one.
@@ -806,9 +870,9 @@ static AAFRESULT CreateNewStrongRefSetType (const aafUID_t & idToCreate,
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 		  ASSERTU (pRefdType);
 
-		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
-										  pRefdType,
-										  curElem->typeName);
+		  hr = ptd->Initialize (curElem->typeId,
+								pRefdType,
+								curElem->typeName);
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 
 		  ASSERTU (ppCreatedTypeDef);
@@ -839,7 +903,7 @@ static AAFRESULT CreateNewStrongRefVectorType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current ID matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
+	  if (idToCreate == curElem->typeId)
 		{		
 		  // Yes, this is the one.
 		  // Create an impl typedefvariablearray object (as yet uninitialized)
@@ -854,9 +918,9 @@ static AAFRESULT CreateNewStrongRefVectorType (const aafUID_t & idToCreate,
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 		  ASSERTU (pRefdType);
 
-		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
-										  pRefdType,
-										  curElem->typeName);
+		  hr = ptd->Initialize (curElem->typeId,
+								pRefdType,
+								curElem->typeName);
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 
 		  ASSERTU (ppCreatedTypeDef);
@@ -888,7 +952,7 @@ static AAFRESULT CreateNewWeakRefType
 	{
 	  // Check to see if the current ID matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
+	  if (idToCreate == curElem->typeId)
 		{		
       ImplAAFClassDefSP pTargetClass;
       hr = pDict->LookupClassDef (*curElem->pRefdTypeId, &pTargetClass);
@@ -961,7 +1025,7 @@ static AAFRESULT CreateNewWeakRefSetType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current ID matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
+	  if (idToCreate == curElem->typeId)
 		{		
 			ImplAAFTypeDefSet* ptd = NULL;
 		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefSet, (ImplAAFMetaDefinition **) &ptd);
@@ -1013,7 +1077,7 @@ static AAFRESULT CreateNewWeakRefVectorType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current ID matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
+	  if (idToCreate == curElem->typeId)
 		{		
 		  // Yes, this is the one.
 		  // Create an impl typedefvariablearray object (as yet uninitialized)
@@ -1066,7 +1130,7 @@ static AAFRESULT CreateNewSetType (const aafUID_t & idToCreate,
 	{
 	  // Check to see if the current ID matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToCreate, &curElem->typeId, sizeof (aafUID_t)))
+	  if (idToCreate == curElem->typeId)
 		{		
 		  ImplAAFTypeDefSet* ptd = NULL;
 		  hr = pDict->CreateMetaInstance (AUID_AAFTypeDefSet, (ImplAAFMetaDefinition **) &ptd);
@@ -1078,9 +1142,9 @@ static AAFRESULT CreateNewSetType (const aafUID_t & idToCreate,
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 		  ASSERTU (pRefdType);
 
-		  AAFRESULT hr = ptd->Initialize (curElem->typeId,
-										  pRefdType,
-										  curElem->typeName);
+		  hr = ptd->Initialize (curElem->typeId,
+								pRefdType,
+								curElem->typeName);
 		  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 
 		  ASSERTU (ppCreatedTypeDef);
@@ -1138,6 +1202,11 @@ AAFRESULT ImplAAFBuiltinTypes::NewBuiltinTypeDef
  ImplAAFTypeDef ** ppCreatedTypeDef)
 {
   AAFRESULT hr;
+
+  hr = CreateNewCharacterType (idToCreate,
+							   _dictionary,
+							   ppCreatedTypeDef);
+  if (AAFRESULT_SUCCEEDED (hr))	return hr;
 
   hr = CreateNewIntegerType (idToCreate,
 							 _dictionary,
@@ -1238,7 +1307,7 @@ void ImplAAFBuiltinTypes::RegisterExistingType
 	{
 	  // Check to see if the current enumeration matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToRegister, &(*curEnumeration)->typeID, sizeof (aafUID_t)))
+	  if (idToRegister == (*curEnumeration)->typeID)
 		{		
 		  // Yes, this is the one.
 
@@ -1270,7 +1339,7 @@ void ImplAAFBuiltinTypes::RegisterExistingType
 	{
 	  // Check to see if the current record matches the ID of the type
 	  // def we want to create.
-	  if (! memcmp (&idToRegister, &(*curRecord)->typeID, sizeof (aafUID_t)))
+	  if (idToRegister == (*curRecord)->typeID)
 		{		
 		  // Yes, this is the one.
 

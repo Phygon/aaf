@@ -73,5 +73,5 @@
   temporarily modifying the line that says
     touch $2
   in your working copy of the file
-    update.ksh
+    update.sh
 

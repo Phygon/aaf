@@ -288,6 +288,7 @@ char* convertWideString(const wchar_t* string)
 #endif
   wcstou8s(result, string, length + 1);
   ASSERT("Successful conversion", status != (size_t)-1);
+  ASSERT("Successful conversion", status != length + 1);
   return result;
 }
 
@@ -495,7 +496,7 @@ bool validWideString(const wchar_t* string)
 
 static const char digits[] = "0123456789ABCDEF";
 
-void toString(const OMUInt8&i, char* is)
+void toString(const OMUInt8& i, char* is)
 {
   TRACE("toString");
   PRECONDITION("Valid buffer", is != 0);
@@ -506,28 +507,46 @@ void toString(const OMUInt8&i, char* is)
   *op++ = '\0';
 }
 
-void toString(const OMUInt16&i, char* is)
+void toString(const OMUInt16& i, char* is)
 {
   TRACE("toString");
   PRECONDITION("Valid buffer", is != 0);
 
+  const OMUInt16 mask1 = 0xff;
+  const OMUInt16 mask0 = mask1 << 8;
   char* op = is;
-  OMUInt8 b0 = (OMUInt8)((i & 0xff00) >> 8);
-  OMUInt8 b1 = (OMUInt8)((i & 0x00ff));
+  OMUInt8 b0 = (OMUInt8)((i & mask0) >> 8);
+  OMUInt8 b1 = (OMUInt8)((i & mask1));
   toString(b0, op); op = op + 2;
   toString(b1, op); op = op + 2;
 }
 
-void toString(const OMUInt32&i, char* is)
+void toString(const OMUInt32& i, char* is)
 {
   TRACE("toString");
   PRECONDITION("Valid buffer", is != 0);
 
+  const OMUInt32 mask1 = 0xffff;
+  const OMUInt32 mask0 = mask1 << 16;
   char* op = is;
-  OMUInt16 w0 = (OMUInt16)((i & 0xffff0000) >> 16);
-  OMUInt16 w1 = (OMUInt16)((i & 0x0000ffff));
+  OMUInt16 w0 = (OMUInt16)((i & mask0) >> 16);
+  OMUInt16 w1 = (OMUInt16)((i & mask1));
   toString(w0, op); op = op + 4;
   toString(w1, op); op = op + 4;
+}
+
+void toString(const OMUInt64& i, char* is)
+{
+  TRACE("toString");
+  PRECONDITION("Valid buffer", is != 0);
+
+  const OMUInt64 mask1 = 0xffffffff;
+  const OMUInt64 mask0 = mask1 << 32;
+  char* op = is;
+  OMUInt32 l0 = (OMUInt32)((i & mask0) >> 32);
+  OMUInt32 l1 = (OMUInt32)((i & mask1));
+  toString(l0, op); op = op + 8;
+  toString(l1, op); op = op + 8;
 }
 
 void toString(const OMObjectIdentification& id, char* idString)
@@ -573,8 +592,27 @@ void toString(const OMObjectIdentification& id, char* idString)
   *op = '\0';
 }
 
+void toString(const OMKLVKey& key, char* keyString)
+{
+  TRACE("toString");
+  PRECONDITION("Valid buffer", keyString != 0);
+
+  char* op = keyString;
+  OMUInt8* bp = (OMUInt8*)&key;
+  for (size_t i = 0; i < sizeof(OMKLVKey); i++) {
+    toString(*bp++, op); op = op + 2;
+    if (i < sizeof(OMKLVKey) - 1) {
+      *op = '.'; op = op + 1;
+    }
+  }
+  *op = '\0';
+}
+
 void fromString(OMUInt8& i, const char* is)
 {
+  TRACE("fromString");
+  PRECONDITION("Valid string", is != 0);
+  PRECONDITION("Valid string", strlen(is) >= (OMUInt8StringBufferSize - 1));
   OMByte b = *is++;
   b = b - 0x30;
   if (b > 9) b = b - 7;
@@ -588,6 +626,9 @@ void fromString(OMUInt8& i, const char* is)
 
 void fromString(OMUInt16& i, const char* is)
 {
+  TRACE("fromString");
+  PRECONDITION("Valid string", is != 0);
+  PRECONDITION("Valid string", strlen(is) >= (OMUInt16StringBufferSize - 1));
   const char* p = is;
   OMUInt8 b;
   fromString(b, p); p = p + 2;
@@ -599,6 +640,9 @@ void fromString(OMUInt16& i, const char* is)
 
 void fromString(OMUInt32& i, const char* is)
 {
+  TRACE("fromString");
+  PRECONDITION("Valid string", is != 0);
+  PRECONDITION("Valid string", strlen(is) >= (OMUInt32StringBufferSize - 1));
   const char* p = is;
   OMUInt16 w;
   fromString(w, p); p = p + 4;
@@ -606,6 +650,20 @@ void fromString(OMUInt32& i, const char* is)
   i = i << 16;
   fromString(w, p);
   i = i + w;
+}
+
+void fromString(OMUInt64& i, const char* is)
+{
+  TRACE("fromString");
+  PRECONDITION("Valid string", is != 0);
+  PRECONDITION("Valid string", strlen(is) >= (OMUInt64StringBufferSize - 1));
+  const char* p = is;
+  OMUInt32 l;
+  fromString(l, p); p = p + 8;
+  i = l;
+  i = i << 32;
+  fromString(l, p);
+  i = i + l;
 }
 
 void fromString(OMObjectIdentification& id, const char* idString)
@@ -651,9 +709,44 @@ bool isValidObjectIdentificationString(const char* idString)
     result = false;
   } else if (strlen(idString) != OMObjectIdentificationStringBufferSize - 1) {
     result = false;
+  } else {
+    const char* pattern = "{xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx}";
+    ASSERT("Valid pattern length", strlen(pattern) == strlen(idString));
+
+    const char* idChar = idString;
+    const char* patternChar = pattern;
+    while (*patternChar != 0) {
+      if (*patternChar == 'x') {
+        if (!isxdigit(*idChar)) {
+          result = false;
+          break;
+        }
+      } else {
+        if (*idChar != *patternChar) {
+          result = false;
+          break;
+        }
+      }
+      ++idChar;
+      ++patternChar;
+    }
   }
 
   return result;
+}
+
+void fromString(OMKLVKey& /* key */, const char* /* keyString */)
+{
+  TRACE("fromString");
+  ASSERT("Unimplemented code not reached", false); // tjb TBS
+}
+
+
+bool isValidKLVKeyString(const char* /* keyString */)
+{
+  TRACE("isValidKLVKeyString(");
+  ASSERT("Unimplemented code not reached", false); // tjb TBS
+  return false;
 }
 
 void convert(OMKLVKey& key, const OMUniqueObjectIdentification& id)
@@ -747,6 +840,32 @@ void checkTypes(void)
   ASSERT("Correct size for OMUInt16", sizeof(OMUInt16) == 2);
   ASSERT("Correct size for OMUInt32", sizeof(OMUInt32) == 4);
   ASSERT("Correct size for OMUInt64", sizeof(OMUInt64) == 8);
+
+  ASSERT("Correct size for OMObjectIdentification",
+                                         sizeof(OMObjectIdentification) == 16);
+  ASSERT("Correct size for OMKLVKey", sizeof(OMKLVKey) == 16);
+
+  ASSERT("Correct value for OMINT8_MIN",
+                            OMINT8_MIN  == (-OMINT8_MAX  - 1));
+  ASSERT("Correct value for OMINT8_MAX",
+                            OMINT8_MAX  == (OMInt8) ~((OMInt8) 1 << ( 8 - 1)));
+  ASSERT("Correct value for OMINT16_MIN",
+                            OMINT16_MIN == (-OMINT16_MAX - 1));
+  ASSERT("Correct value for OMINT16_MAX",
+                            OMINT16_MAX == (OMInt16)~((OMInt16)1 << (16 - 1)));
+  ASSERT("Correct value for OMINT32_MIN",
+                            OMINT32_MIN == (-OMINT32_MAX - 1));
+  ASSERT("Correct value for OMINT32_MAX",
+                            OMINT32_MAX == (OMInt32)~((OMInt32)1 << (32 - 1)));
+  ASSERT("Correct value for OMINT64_MIN",
+                            OMINT64_MIN == (-OMINT64_MAX - 1));
+  ASSERT("Correct value for OMINT64_MAX",
+                            OMINT64_MAX == (OMInt64)~((OMInt64)1 << (64 - 1)));
+
+  ASSERT("Correct value for OMUINT8_MAX",  OMUINT8_MAX   == (OMUInt8) ~0);
+  ASSERT("Correct value for OMUINT16_MAX", OMUINT16_MAX  == (OMUInt16)~0);
+  ASSERT("Correct value for OMUINT32_MAX", OMUINT32_MAX  == (OMUInt32)~0);
+  ASSERT("Correct value for OMUINT64_MAX", OMUINT64_MAX  == (OMUInt64)~0);
 }
 
   // Manipulation of property paths (eventually these will be
@@ -863,7 +982,7 @@ static WindowsKind getWindowsKind(void)
 // ME but with an implementation that always fails. So we only call
 // them if getWindowsKind() == wkProfessional.
 
-// Just like ANSI fopen() except for wchar_t* file names and modes.
+// Just like ISO fopen() except for wchar_t* file names and modes.
 //
 FILE* wfopen(const wchar_t* fileName, const wchar_t* mode)
 {
@@ -877,13 +996,15 @@ FILE* wfopen(const wchar_t* fileName, const wchar_t* mode)
     result = _wfopen(fileName, mode);
   } else {
 #endif
-    char cFileName[FILENAME_MAX];
-	size_t status = wcstou8s(cFileName, fileName, FILENAME_MAX);
+    char cFileName[FILENAME_MAX + 1];
+    size_t status = wcstou8s(cFileName, fileName, FILENAME_MAX + 1);
     ASSERT("Convert succeeded", status != (size_t)-1);
+    ASSERT("Convert succeeded", status != FILENAME_MAX + 1);
 
-    char cMode[FILENAME_MAX];
-	 status = wcstou8s(cMode, mode, FILENAME_MAX);
+    char cMode[FILENAME_MAX + 1];
+    status = wcstou8s(cMode, mode, FILENAME_MAX + 1);
     ASSERT("Convert succeeded", status != (size_t)-1);
+    ASSERT("Convert succeeded", status != FILENAME_MAX + 1);
 
     result = fopen(cFileName, cMode);
 #if defined(OM_OS_WINDOWS)
@@ -892,7 +1013,7 @@ FILE* wfopen(const wchar_t* fileName, const wchar_t* mode)
   return result;
 }
 
-// Just like ANSI remove() except for wchar_t* file names.
+// Just like ISO remove() except for wchar_t* file names.
 int wremove(const wchar_t* fileName)
 {
   TRACE("wremove");
@@ -910,6 +1031,7 @@ int wremove(const wchar_t* fileName)
 #endif
     wcstou8s(cFileName, fileName, FILENAME_MAX);
     ASSERT("Convert succeeded", status != (size_t)-1);
+    ASSERT("Convert succeeded", status != FILENAME_MAX + 1);
 
     result = remove(cFileName);
 #if defined(OM_OS_WINDOWS)
@@ -1027,3 +1149,18 @@ OMUniqueObjectIdentification createUniqueIdentifier(void)
 }
 
 #endif
+
+OMUInt64 ioVectorByteCount(const OMIOBufferDescriptor* buffers,
+						   const OMUInt32 bufferCount)
+{
+  TRACE( "ioVectorByteCount" );
+  PRECONDITION( "Valid buffers", buffers != 0 );
+
+  OMUInt64 size = 0;
+  for( OMUInt32 i=0; i<bufferCount; i++ )
+  {
+    size = size + buffers[i]._bufferSize;
+  }
+
+  return size;
+}

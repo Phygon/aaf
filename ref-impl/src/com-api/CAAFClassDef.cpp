@@ -241,8 +241,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEnum->ReleaseReference(); // We are through with this pointer.
+          internalppEnum = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppEnum should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEnum == 0);
+
   return hr;
 }
 
@@ -412,8 +423,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppPropDef->ReleaseReference(); // We are through with this pointer.
+          internalppPropDef = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppPropDef should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppPropDef == 0);
+
   return hr;
 }
 
@@ -517,8 +539,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppPropDef->ReleaseReference(); // We are through with this pointer.
+          internalppPropDef = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppPropDef should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppPropDef == 0);
+
   return hr;
 }
 
@@ -597,8 +630,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppPropDef->ReleaseReference(); // We are through with this pointer.
+          internalppPropDef = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppPropDef should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppPropDef == 0);
+
   return hr;
 }
 
@@ -781,8 +825,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppClassDef->ReleaseReference(); // We are through with this pointer.
+          internalppClassDef = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppClassDef should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppClassDef == 0);
+
   return hr;
 }
 
@@ -1015,8 +1070,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppUniqueIdentifier->ReleaseReference(); // We are through with this pointer.
+          internalppUniqueIdentifier = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppUniqueIdentifier should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppUniqueIdentifier == 0);
+
   return hr;
 }
 

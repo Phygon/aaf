@@ -35,9 +35,8 @@
 #ifndef OMREFERENCECONTAINERITER_H
 #define OMREFERENCECONTAINERITER_H
 
+#include "OMDataTypes.h"
 #include "OMContainerIterator.h"
-
-#include <stddef.h>
 
 class OMObject;
 
@@ -84,7 +83,7 @@ public:
 
     // @cmember The number of <p OMObject>s in the associated
     //          reference container.
-  virtual size_t count(void) const = 0;
+  virtual OMUInt32 count(void) const = 0;
 
     // @cmember Advance this <c OMReferenceContainerIterator> to the next
     //          <p OMObject>, if any.

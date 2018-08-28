@@ -35,162 +35,19 @@
 #ifndef OMMXFSTORAGE_H
 #define OMMXFSTORAGE_H
 
-#include "OMWrappedRawStorage.h"
+#include "OMMXFStorageBase.h"
 #include "OMDataTypes.h"
 #include "OMIdentitySet.h"
 #include "OMDataStream.h"
 #include "OMList.h"
 #include "OMListIterator.h"
+#include "OMSet.h"
 #include "OMVector.h"
 
-//#define OM_NEW_STREAM_PARSING
 #define OM_FASTER_STREAM_PARSING
 #define OM_NEW_STREAM_WRITING
 
-static const OMKLVKey OpenIncompleteHeaderPartitionKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x02, 0x01, 0x00};
-
-static const OMKLVKey IncompleteHeaderPartitionKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x02, 0x02, 0x00};
-
-static const OMKLVKey OpenHeaderPartitionKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x02, 0x03, 0x00};
-
-static const OMKLVKey HeaderPartitionKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x02, 0x04, 0x00};
-
-static const OMKLVKey OpenIncompleteBodyPartitionKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x03, 0x01, 0x00};
-
-static const OMKLVKey IncompleteBodyPartitionKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x03, 0x02, 0x00};
-
-static const OMKLVKey OpenBodyPartitionKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x03, 0x03, 0x00};
-
-static const OMKLVKey BodyPartitionKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x03, 0x04, 0x00};
-
-static const OMKLVKey IncompleteFooterKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x04, 0x02, 0x00};
-
-static const OMKLVKey FooterKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x04, 0x04, 0x00};
-
-static const OMKLVKey primerKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x05, 0x01, 0x00};
-
-static const OMKLVKey fillKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x01,
-   0x03, 0x01, 0x02, 0x10, 0x01, 0x00, 0x00, 0x00};
-
-static const OMKLVKey V2FillKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x01, 0x01, 0x02,
-   0x03, 0x01, 0x02, 0x10, 0x01, 0x00, 0x00, 0x00};
-
-static const OMKLVKey IndexTableSegmentKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x53, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x10, 0x01, 0x00};
-
-static const OMKLVKey V10IndexTableSegmentKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x53, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x10, 0x00, 0x00};
-
-static const OMKLVKey RandomIndexMetadataKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x02, 0x01, 0x01, 0x11, 0x01, 0x00};
-
-static const OMKLVKey SystemMetadataKey =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01, 0x01,
-   0x0d, 0x01, 0x03, 0x01, 0x04, 0x01, 0x01, 0x00};
-
-static const OMByte EssenceElementPrefix[] =
-  {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x02, 0x01, 0x01};
-
-static const OMByte HeaderPrefix[] =
-  {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x05, 0x01,
-   0x01, 0x0d, 0x01, 0x02, 0x01, 0x01, 0x02};
-
-static const OMUInt32 RunInLimit = 64 * 1024;
-
-// Minimum size of a fill KLV triplet (when L not known a priori)
-// K (16 bytes)
-// L (1 + 8 bytes BER encoded)
-// V (0 fill bytes)
-static const OMUInt64 minimumFill = sizeof(OMKLVKey) + 1 + sizeof(OMUInt64);
-
-// Coalesced with preceeding fill of any size.
-// (value of fillBufferZoneSize must be > minimumFill)
-//
-static const OMUInt64 fillBufferZoneSize = 32;
-
-static const OMUInt32 preallocatedMetadataSize = 0x40000;
-static const OMUInt64 bodyPartitionOffset = preallocatedMetadataSize +
-                                            fillBufferZoneSize;
-
-static const OMUInt32 defaultKAGSize = 0x100;
-
-static const OMUInt16 currentMajorVersion = 0x0001;
-static const OMUInt16 currentMinorVersion = 0x0002;
-
-// Total size of the fixed-size portions of a partition value
-static const OMUInt32 fixedPartitionSize =
-  sizeof(OMUInt16) + // Major Version
-  sizeof(OMUInt16) + // Minor Version
-  sizeof(OMUInt32) + // KAGSize
-  sizeof(OMUInt64) + // ThisPartition
-  sizeof(OMUInt64) + // PreviousPartition
-  sizeof(OMUInt64) + // FooterPartition
-  sizeof(OMUInt64) + // HeaderByteCount
-  sizeof(OMUInt64) + // IndexByteCount
-  sizeof(OMUInt32) + // IndexSID
-  sizeof(OMUInt64) + // BodyOffset
-  sizeof(OMUInt32) + // BodySID
-  sizeof(OMKLVKey) + // Operational Pattern
-  sizeof(OMUInt32) + // count of essence container labels
-  sizeof(OMUInt32);  // size of each essence container label
-
-static const OMPropertyId PID_InterchangeObject_InstanceUID = 0x3c0a;
-
-// {01011502-0000-0000-060E-2B3401010101}
-static const OMObjectIdentification Property_InterchangeObject_InstanceUID =
-{0x01011502, 0x0000, 0x0000, {0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01}};
-
-static const OMPropertyId PID_Root_ObjectDirectory = 0x003;
-static const OMPropertyId PID_Root_FormatVersion   = 0x004;
-
-// Incrementing the following value serves to distinguish between
-// files with minor but compatible differences.  Incrementing the
-// following value does not invalidate files.
-//
-// History
-//
-// 0x005 - First forwards and backwards compatible version
-// 0x006 - Use closed and complete keys for body and footer
-// 0x007 - Fill in index byte count in the footer
-// 0x008 - Add InterchangeObject::InstanceUID to primer
-static const OMUInt32 formatVersion = 0x008;
-
-static const OMKLVKey objectDirectoryKey =
-  {0x96, 0x13, 0xb3, 0x8a, 0x87, 0x34, 0x87, 0x46,
-   0xf1, 0x02, 0x96, 0xf0, 0x56, 0xe0, 0x4d, 0x2a};
-
-// Fixup tags
-static const OMUInt8 FUT_UNDEFINED       = 0x80;
-static const OMUInt8 FUT_RESOLVED        = 0x81;
-
-static const OMUInt8 FUT_OBJECTDIRECTORY = 0xff;
+class OMMXFIndexStream;
 
 class OMStorable;
 template <typename Key, typename Element>
@@ -200,11 +57,13 @@ class OMSetIterator;
 template <typename Element>
 class OMIdentitySetIterator;
 
+class OMDataStreamProperty; // tjb !!! we shouldn't know about this here
+
   // @class Class supporting access to the raw bytes of MXF
   //        files supported by the Object Manager.
   //   @base public | <c OMRawStorage>
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
-class OMMXFStorage : public OMWrappedRawStorage {
+class OMMXFStorage : public OMMXFStorageBase {
 public:
   // @access Public members.
 
@@ -214,11 +73,27 @@ public:
     // @cmember Destructor.
   virtual ~OMMXFStorage(void);
 
+    // @cmember Called when this <c OMMXFStorage> is opened for reading.
+  virtual void openRead(void);
+
+    // @cmember Called when this <c OMMXFStorage> is opened for modification.
+  virtual void openModify(void);
+
+    // @cmember Called when this <c OMMXFStorage> is created for writing.
+  virtual void createWrite(void);
+
+    // @cmember Called when this <c OMMXFStorage> is created for for
+    //          modification.
+  virtual void createModify(void);
+
     // @cmember Open this <c OMMXFStorage>.
   virtual void open(void);
 
     // @cmember Close this <c OMMXFStorage>.
   virtual void close(void);
+
+    // @cmember Called after we Save() this <c OMMXFStorage>.
+  virtual void postSave(bool finalize);
 
     // @cmember Set the operational pattern to <p pattern>.
   virtual void setOperationalPattern(const OMKLVKey& pattern);
@@ -243,21 +118,8 @@ public:
 
   virtual OMUniqueObjectIdentification generation(void) const;
 
-  static bool findHeader(const OMRawStorage* store, OMUInt64& headerPosition);
-
-  static bool isHeader(const OMKLVKey& k);
-
-  static bool isBody(const OMKLVKey& k);
-
-  static bool isFooter(const OMKLVKey& k);
-
-  static bool isPartition(const OMKLVKey& k);
-
-  static bool isIndex(const OMKLVKey& k);
-
-  static bool isEssence(const OMKLVKey& k);
-
-  static bool isFill(const OMKLVKey& k);
+    // @cmember findMetadata.
+  virtual bool findMetadata(OMUInt64& partitionPosition);
 
   virtual void writeHeaderPartition(OMUInt32 bodySID,
                                     OMUInt32 indexSID,
@@ -280,6 +142,10 @@ public:
                                OMUInt64& indexPosition);
 
   virtual bool isRandomIndex(OMUInt64 fileSize, OMUInt32 ripSize);
+
+    // @cmember Write a fill key, a BER encoded length and
+    //          fill between <p from> and <p to>.
+  virtual void writeKLVFill(const OMUInt64& from, const OMUInt64& to);
 
     // @cmember Write a fill key, a BER encoded length and
     //          <p length> bytes of fill.
@@ -323,16 +189,6 @@ public:
 
   virtual void writeBerLength(OMUInt32 lengthSize, const OMUInt64& length);
 
-    // @cmember The minimum size of <p i> when encoded using <f berEncode>.
-    //          The returned size includes the BER length byte.
-  static size_t berEncodedSize(const OMUInt64 i);
-
-    // @cmember BER encode <p value> into <p berValueBuffer>.
-  static void berEncode(OMByte* berValueBuffer,
-                        size_t berValueBufferSize,
-                        const OMUInt32& berValueSize,
-                        const OMUInt64& value);
-
   virtual void readPartition(OMUInt64 length,
                              OMUInt32& bodySID,
                              OMUInt32& indexSID,
@@ -348,18 +204,12 @@ public:
 
   virtual void readHeaderPartition(void);
 
-  static bool read(const OMRawStorage* store, OMUInt8& i);
-  static bool read(const OMRawStorage* store, OMUInt16& i, bool reorderBytes);
-  static bool read(const OMRawStorage* store, OMUInt32& i, bool reorderBytes);
-  static bool read(const OMRawStorage* store, OMUInt64& i, bool reorderBytes);
-  static bool read(const OMRawStorage* store, OMKLVKey& key);
-  static bool readKLVLength(const OMRawStorage* store, OMUInt64& length);
-  static bool skipBytes(const OMRawStorage* store, OMUInt64 length);
-
   virtual void read(OMUInt8& i) const;
+  virtual void read(OMInt8& i) const;
   virtual void read(OMUInt16& i, bool reorderBytes) const;
   virtual void read(OMUInt32& i, bool reorderBytes) const;
   virtual void read(OMUInt64& i, bool reorderBytes) const;
+  virtual void read(OMInt64& i, bool reorderBytes) const;
   virtual void read(OMUniqueObjectIdentification& id, bool reorderBytes) const;
   virtual void read(OMByte* buffer, const OMUInt32& bufferSize) const;
   virtual void read(OMByte* bytes,
@@ -378,7 +228,9 @@ public:
 
   virtual void skipV(OMUInt64 length) const;
 
+  /*
   static OMUInt64 readBerLength(const OMRawStorage* store);
+  */
 
 
   // A weak reference in MXF file is stored as 16-byte InstanceUID of the
@@ -392,32 +244,32 @@ public:
   //
     // @cmember Given pointer to a weak reference property return
     //          the InstanceUID of the referenced object.
-  bool findReferencedInstanceId(const void* reference,
-                                OMUniqueObjectIdentification* id);
+  virtual bool findReferencedInstanceId(const void* reference,
+                                        OMUniqueObjectIdentification* id);
     // @cmember Remember the InstanceUID of the object referenced
     //          by the specified weak reference property.
-  void associate(const void* reference,
-                 const OMUniqueObjectIdentification& referencedInstanceId);
+  virtual void associate(const void* reference,
+                         const OMUniqueObjectIdentification& referencedInstanceId);
 
 
     // Object -> instanceId
-  OMUniqueObjectIdentification instanceId(OMStorable* object);
+  virtual OMUniqueObjectIdentification instanceId(OMStorable* object);
 
     // instanceId -> object
-  OMStorable* object(const OMUniqueObjectIdentification& instanceId);
+  virtual OMStorable* object(const OMUniqueObjectIdentification& instanceId);
 
     // object <-> instanceId
-  void associate(OMStorable* object,
-                 const OMUniqueObjectIdentification& instanceId);
+  virtual void associate(OMStorable* object,
+                         const OMUniqueObjectIdentification& instanceId);
 
     // enter object into object directory
-  void enterObject(OMStorable& object, OMUInt64 position);
+  virtual void enterObject(OMStorable& object, OMUInt64 position);
 
-  void removeObject(OMStorable& object);
+  virtual void removeObject(OMStorable& object);
 
-  bool containsObject(const OMUniqueObjectIdentification& instanceId);
+  virtual bool containsObject(const OMUniqueObjectIdentification& instanceId);
 
-  void resolve(const OMUniqueObjectIdentification& instanceId);
+  virtual void resolve(const OMUniqueObjectIdentification& instanceId);
 
   virtual OMUInt64 primerOffset(void);
 
@@ -432,6 +284,14 @@ public:
   virtual void setObjectDirectoryOffset(OMUInt64 objectDirectoryOffset);
 
   virtual OMUInt64 objectDirectoryOffset(void) const;
+
+  virtual bool streamExists(OMUInt32 sid);
+
+  virtual void createStreamAndAddSegment(OMUInt32 sid,
+                            const OMKLVKey& label,
+                            OMUInt32 blockSize,
+                            OMUInt32 allocationSize,
+                            bool alignV);
 
   virtual OMUInt32 addStream(OMDataStream* stream);
 
@@ -472,6 +332,26 @@ public:
                              OMUInt32 byteCount,
                              OMUInt32& bytesWritten);
 
+  virtual void writeStreamAt(OMUInt32 sid,
+                             OMUInt64 position,
+                             OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             OMUInt32& bytesWritten);
+
+  virtual void writeStreamAt(OMUInt32 sid,
+                             OMUInt64 position,
+                             const OMByte* buffer,
+                             const OMUInt32 bytes,
+                             void* /* */ completion,
+                             const void* clientArgument);
+
+  virtual void writeStreamAt(OMUInt32 sid,
+                             OMUInt64 position,
+                             const OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             void* /* */ completion,
+                             const void* clientArgument);
+
   virtual void streamRawRead(OMUInt32 sid,
                              OMUInt64 rawPosition,
                              OMByte* rawBytes,
@@ -489,6 +369,26 @@ public:
                             OMUInt32 byteCount,
                             OMUInt32& bytesRead);
 
+  virtual void readStreamAt(OMUInt32 sid,
+                            OMUInt64 position,
+                            OMIOBufferDescriptor* buffers,
+                            OMUInt32 bufferCount,
+                            OMUInt32& bytesRead);
+
+  virtual void readStreamAt(OMUInt32 sid,
+                            OMUInt64 position,
+                            OMByte* buffer,
+                            const OMUInt32 bytes,
+                            void* /* */ completion,
+                            const void* clientArgument);
+
+  virtual void readStreamAt(OMUInt32 sid,
+                            OMUInt64 position,
+                            OMIOBufferDescriptor* buffers,
+                            OMUInt32 bufferCount,
+                            void* /* */ completion,
+                            const void* clientArgument);
+
   virtual void streamRestoreSegment(OMUInt32 sid,
                                     OMUInt64 start,
                                     OMUInt64 allocatedSize,
@@ -500,6 +400,8 @@ public:
 
   virtual void saveStreams(void);
   virtual void restoreStreams(void);
+
+  virtual const OMMXFIndexStream* indexStream(const OMUInt32 streamId) const;
 
   virtual void checkStreams(void);
 
@@ -521,34 +423,35 @@ public:
     OMUInt32 _sid;
   };
 
+  virtual bool findStream(OMUInt32 sid, Stream*& stream);
+
   virtual SegmentListIterator* streamSegments(OMUInt32 sid) const;
 
     // @cmember Record a reference to <p tag> at <p address>.
-  void reference(OMUInt64 address, OMUInt8 tag);
+  virtual void reference(OMUInt64 address, OMUInt8 tag);
 
     // @cmember Provide a definition for <p tag> of <p value>.
-  void definition(OMUInt64 value, OMUInt8 tag);
+  virtual void definition(OMUInt64 value, OMUInt8 tag);
 
     // @cmember Apply <c Fixup>s for <p tag>.
-  void fixup(OMUInt8 tag);
+  virtual void fixup(OMUInt8 tag);
 
     // @cmember Apply all <c Fixup>s.
-  void fixup(void);
+  virtual void fixup(void);
 
     // @cmember Destroy all <c Fixup>s.
-  void destroyFixups(void);
+  virtual void destroyFixups(void);
 
-  static bool endsMetadata(const OMKLVKey& k);
+  // Deferred streams
+  virtual void addDeferredStream(OMDataStreamProperty* stream);
+
+  virtual void performDeferredIO(void);
+
+  virtual void postMetadataSavePosition(void);
+  void postMetadataFill(void);
 
 private:
   // @access Private members.
-
-  static bool findPattern(const OMRawStorage* store,
-                          OMUInt64 currentPosition,
-                          OMUInt64& patternPosition,
-                          const OMByte* pattern,
-                          OMUInt64 patternSize,
-                          OMUInt32 limit);
 
   void markMetadataStart(OMUInt64 primerKeyPosition);
   void markMetadataEnd(OMUInt64 endKeyPosition);
@@ -631,7 +534,7 @@ private:
   virtual Stream* createStream(OMUInt32 sid,
                                OMUInt64 size,
                                OMKLVKey label,
-                               OMUInt32 gridSize);
+                               OMUInt32 allocationSize);
   virtual Segment* addSegment(Stream* s,
                               OMUInt64 start,
                               OMUInt64 size,
@@ -640,7 +543,7 @@ private:
   virtual Segment* findLastSegment(Stream* s);
   virtual OMUInt64 allocatedSize(Stream* s);
   virtual Segment* streamSegment(OMUInt32 sid, OMUInt64 position);
-  virtual OMUInt64 validSize(Segment* segment);
+  virtual OMUInt64 validSize(const Segment* segment);
 
     // debugging
   void printPartitions(void);
@@ -661,11 +564,15 @@ private:
     OMUInt32 _indexSID;
   };
   void destroyPartitions(void);
-  bool findPartition(OMUInt64 address, OMUInt32& index);
+  bool findPartition(OMUInt64 address, OMUInt32& index) const;
   void addPartition(OMUInt64 address,  OMUInt32 bodySID, OMUInt32 index);
   OMVector<Partition*> _partitions;
   OMUInt64 _primerOffset;
   OMUInt64 _metadataEnd;
+  typedef OMList<OMDataStreamProperty*> StreamList;
+  typedef OMListIterator<OMDataStreamProperty*> StreamListIterator;
+  StreamList _deferredStreams;
+
 };
 
 #endif

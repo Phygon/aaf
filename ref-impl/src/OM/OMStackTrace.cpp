@@ -209,13 +209,61 @@ void printStackTrace(OMOStream& s)
     DWORD options = _SymGetOptions();
     options = _SymSetOptions(options | SYMOPT_DEFERRED_LOADS);
 
+    // Include the following items in the symbol search path.
+    //  - the directory containing the main program
+    //  - $WINDIR
+    //  - $PATH
+    //
+    wchar_t programName[MAX_PATH];
+    DWORD r = GetModuleFileName(0,
+                                programName,
+                                sizeof(programName)/sizeof(programName[0]));
+    size_t length = 1;
+    char* d = 0;
+    if (r != 0) {
+      d = convertWideString(programName);
+      char* t = strrchr(d, '\\');
+      if (t != 0) {
+        *t = 0;
+        length = length + strlen(d) + 1;
+      }
+    }
+    char* w = getenv("WINDIR");
+    if (w != 0) {
+      length = length + strlen(w) + 1;
+    }
+    char* p = getenv("PATH");
+    if (p != 0) {
+      length = length + strlen(p) + 1;
+    }
+
+    char* searchPath = new char[length];
+    if (searchPath != 0) {
+
+      searchPath[0] = 0;
+
+      if (d != 0) {
+        strcat(searchPath, d);
+        strcat(searchPath, ";");
+      }
+      if (w != 0) {
+        strcat(searchPath, w);
+        strcat(searchPath, ";");
+      }
+      if (p != 0) {
+        strcat(searchPath, p);
+        strcat(searchPath, ";");
+      }
+    }
+    delete [] d;
     BOOL status;
 
-    status = _SymInitialize(GetCurrentProcess(), 0, TRUE);
+    status = _SymInitialize(GetCurrentProcess(), searchPath, TRUE);
     if (!status) {
       DWORD error = GetLastError();
       s << "SymInitialize() failed, result = " << error << endl;
     }
+    delete [] searchPath;
 
     CONTEXT context;
     memset(&context, 0, sizeof(CONTEXT));
@@ -296,25 +344,35 @@ void printStackTrace(OMOStream& s)
         wchar_t moduleName[MAX_PATH];
         MEMORY_BASIC_INFORMATION mbi;
 
-        BOOL modStatus = VirtualQuery((void*)address, &mbi, sizeof(mbi));
+        // Find the memory region containing address
+        //
+        memset(&mbi, 0, sizeof(mbi));
+        DWORD result = VirtualQuery((void*)address, &mbi, sizeof(mbi));
 
-        DWORD moduleHandle = (DWORD)mbi.AllocationBase;
+        if ((result == sizeof(mbi)) && (mbi.Protect != PAGE_READONLY)) {
 
-        modStatus = GetModuleFileName(
-                                     (HMODULE)moduleHandle,
+          // A module's handle _is_ its base address
+          //
+          HMODULE moduleHandle = (HMODULE)mbi.AllocationBase;
+
+          result = GetModuleFileName(moduleHandle,
                                      moduleName,
                                      sizeof(moduleName)/sizeof(moduleName[0]));
 
-        if (modStatus) {
-          char* fullName = convertWideString(moduleName);
-          char* name = strrchr(fullName, '\\');
-          if (name != 0) {
-            name = name + 1;
+          if (result != 0) {
+            char* fullName = convertWideString(moduleName);
+            char* name = strrchr(fullName, '\\');
+            if (name != 0) {
+              name = name + 1;
+            } else {
+              name = fullName;
+            }
+            s << " in " << name;
+            delete [] fullName;
           } else {
-            name = fullName;
+            DWORD error = GetLastError();
           }
-          s << " in " << name;
-          delete [] fullName;
+
         }
         s << endl;
       }

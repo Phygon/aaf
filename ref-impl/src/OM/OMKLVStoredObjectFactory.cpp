@@ -38,7 +38,7 @@
 #include "OMKLVStoredObject.h"
 #include "OMUtilities.h"
 #include "OMAssertions.h"
-#include "OMDiskRawStorage.h"
+#include "OMCachedDiskRawStorage.h"
 #include "OMMXFStorage.h"
 
   // @mfunc Constructor.
@@ -207,7 +207,8 @@ OMKLVStoredObjectFactory::isRecognized(const wchar_t* fileName)
 {
   TRACE("OMKLVStoredObjectFactory::isRecognized");
   bool result;
-  OMRawStorage* rawStorage = OMDiskRawStorage::openExistingRead(fileName);
+  OMRawStorage* rawStorage = OMCachedDiskRawStorage::openExistingRead(
+                                                                     fileName);
   if (rawStorage != 0) {
     result = isRecognized(rawStorage);
     delete rawStorage;
@@ -229,6 +230,82 @@ OMKLVStoredObjectFactory::isRecognized(OMRawStorage* rawStorage)
   PRECONDITION("Positionable raw storage", rawStorage->isPositionable());
 
   bool result = OMKLVStoredObject::isRecognized(rawStorage);
+  return result;
+}
+
+  // @mfunc Is the file named <p fileName> an incomplete (in-progress) file ?
+  //          If so, the result is true.
+bool OMKLVStoredObjectFactory::isBeingModified(const wchar_t* fileName)
+{
+  TRACE("OMKLVStoredObjectFactory::isBeingModified");
+  bool result;
+  OMRawStorage* rawStorage = OMCachedDiskRawStorage::openExistingRead(
+                                                                     fileName);
+  if (rawStorage != 0) {
+    result = isBeingModified(rawStorage);
+    delete rawStorage;
+  } else {
+    result = false;
+  }
+  return result;
+}
+
+  // @mfunc Does <p rawStorage> contain an incomplete (in-progress) file ?
+  //          If so, the result is true.
+bool OMKLVStoredObjectFactory::isBeingModified(OMRawStorage* rawStorage)
+{
+  TRACE("OMKLVStoredObjectFactory::isBeingModified");
+  PRECONDITION("Valid raw storage", rawStorage != 0);
+  PRECONDITION("Positionable raw storage", rawStorage->isPositionable());
+
+  return false;
+}
+
+  // @mfunc Does the file in <p rawStorage> comply to operational
+  //        pattern <p operationalPattern>?
+  //        If so, the result is true.
+  //   @parm The raw storage.
+  //   @parm The operational pattern label.
+  //   @rdesc True if the file complies to the operational pattern,
+  //          false otherwise.
+bool OMKLVStoredObjectFactory::readOperationalPattern(
+                                            OMRawStorage* rawStorage,
+                                            OMKLVKey& operationalPattern)
+{
+  TRACE("OMKLVStoredObject::readOperationalPattern");
+  PRECONDITION("Valid raw storage", rawStorage != 0);
+  PRECONDITION("Positionable raw storage", rawStorage->isPositionable());
+
+  bool reorderBytes;
+  if (hostByteOrder() == bigEndian) {
+    reorderBytes = false;
+  } else {
+    reorderBytes = true;
+  }
+  bool result = false;
+  OMUInt64 headerPosition;
+  bool foundHeader = OMMXFStorageBase::findHeader(rawStorage, headerPosition);
+  if (foundHeader) {
+    rawStorage->setPosition(headerPosition);
+    OMKLVKey k;
+    if (OMMXFStorageBase::read(rawStorage, k)) {
+      if (OMMXFStorageBase::isHeader(k)) {
+        OMUInt64 length;
+        if (OMMXFStorageBase::readKLVLength(rawStorage, length)) {
+          // Skip up to operational pattern key.
+          OMUInt64 skip = fixedPartitionSize -
+                          sizeof(OMKLVKey) -       // Operational Pattern
+                          (2 * sizeof(OMUInt32));  // ecl count/size
+          OMMXFStorageBase::skipBytes(rawStorage, skip);
+          if (OMMXFStorageBase::read(rawStorage, k)) {
+            operationalPattern = k;
+            result = true;
+          }
+        }
+      }
+    }
+  }
+  rawStorage->setPosition(0);
   return result;
 }
 
@@ -265,6 +342,26 @@ bool OMKLVStoredObjectFactory::compatibleNamedFile(
   return result;
 }
 
+  // @mfunc Can the contents of a file on the given <c OMRawStorage>
+  //        be accessed successfully in the mode specified by
+  //        <p accessMode> ?
+  //        This method attempts to identify issues with the file
+  //        contents before opening the file and restoring its metadata.
+  //   @parm The <c OMRawStorage>.
+  //   @parm The <t OMAccessMode>.
+  //   @rdesc True if the file contents can be accessed, false otherwise.
+bool OMKLVStoredObjectFactory::compatibleStoredFormat(
+                                         const OMRawStorage* rawStorage,
+                                         const OMFile::OMAccessMode accessMode)
+{
+  TRACE("OMKLVStoredObjectFactory::compatibleStoredFormat");
+  bool result = true;
+  if (accessMode == OMFile::modifyMode) {
+    result = OMKLVStoredObject::modifiableStoredFormat(rawStorage);
+  }
+  return result;
+}
+
   // @mfunc Perform any necessary actions when <p file> is closed.
   //   @parm The <c OMFile>
 void OMKLVStoredObjectFactory::close(OMFile* file)
@@ -279,7 +376,7 @@ void OMKLVStoredObjectFactory::close(OMFile* file)
   }
 
   if (OMKLVStoredObject::hasMxfStorage(file)) {
-    OMMXFStorage* store = OMKLVStoredObject::mxfStorage(file);
+    OMMXFStorageBase* store = OMKLVStoredObject::mxfStorage(file);
     ASSERT("Valid store", store != 0);
     store->checkStreams();
     delete store;

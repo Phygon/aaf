@@ -37,6 +37,7 @@ AAFRandomRawStorage\
 AAFRawStorage\
 #endm
 #c
+#import ./AAFCopyByte.exp
 AD_HEAD
 AD_IDL(///
 /// This interface is used by the toolkit to access storage in which
@@ -49,7 +50,7 @@ AD_STD_COMMENT_IFC_HEADER)
 AD_CLASS_UUID(B1341781, 71FE, 11d4, B8, 0D, 00, 00, 86, 3F, 2C, 27)
 
 AD_DEFAULT_UUID(B1341782, 71FE, 11d4, B8, 0D, 00, 00, 86, 3F, 2C, 27)
-AD_XCLASS_BEGIN(Concrete, Transient)
+AD_COM_EXT_CLASS_BEGIN(public IAAFCopyByte)
 AD_XMETHOD4(ReadAt,
 			[in],
 			objPass,
@@ -125,7 +126,7 @@ AD_XMETHOD4(WriteAt,
   /// extended sufficiently to complete the request.  The client can
   /// call SetSize\(\) to attempt to reserve capacity for the storage;
   /// if the SetSize\(\) call succeeds\, subsequent Write\(\) calls
-  /// within requested that capacty are guaranteed to succeed.
+  /// within requested that capacity are guaranteed to succeed.
   ///
   /// This call will advance the current position by bufSize bytes.
   ///
@@ -209,4 +210,5 @@ AD_XMETHOD1(SetExtent,
   ///
   /// AAFRESULT_OFFSET_SIZE
   ///   - This storage has insufficient capacity to perform the write.)
-AD_XCLASS_END(Concrete, Transient)
+AD_COM_METH(.method-WriteCopyByteAt)
+AD_COM_EXT_CLASS_END(AAFCopyByte)

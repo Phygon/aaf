@@ -67,6 +67,7 @@
 #include "ImplAAFTypeDefFixedArray.h"
 #endif
 
+#include "AAFUtils.h"
 #include "ImplAAFObjectCreation.h"
 
 #include "OMAssertions.h"
@@ -675,6 +676,14 @@ AAFRESULT STDMETHODCALLTYPE
   if (AAFRESULT_FAILED(result))
     return result;
 
+  // Get the external size of the actual value.
+  aafUInt32 actualExternalSize = 0;
+  actualExternalSize = pActualType->type()->externalSize((OMByte *)pActualValueDataBits, actualInternalSize);
+
+  // Make sure the  new value plus the indirect value overhead
+  // do not exceed the simple property size limit.
+  if ((_externalIndirectSize + actualExternalSize) > OMPROPERTYSIZE_MAX)
+    return AAFRESULT_BAD_SIZE;
 
   //
   // Now we are ready to allocate and initialize the indirect value
@@ -690,10 +699,6 @@ AAFRESULT STDMETHODCALLTYPE
   result = pIndirectValueData->Initialize (this);
   if (AAFRESULT_FAILED(result))
     return result;
-
-  // Get the external size of the actual value.
-  aafUInt32 actualExternalSize = 0;
-	actualExternalSize = pActualType->type()->externalSize((OMByte *)pActualValueDataBits, actualInternalSize);
 
   aafMemPtr_t pIndirectValueDataBits = NULL;
   result = pIndirectValueData->AllocateBits (_externalIndirectSize + actualExternalSize,
@@ -775,6 +780,15 @@ AAFRESULT STDMETHODCALLTYPE
       return AAFRESULT_ILLEGAL_VALUE;
   }
 
+  // Get the external size of the actual value.
+  aafUInt32 actualExternalSize = 0;
+  actualExternalSize = pActualType->type()->externalSize((OMByte *)pInitData, initDataSize);
+
+  // Make sure the  new value plus the indirect value overhead
+  // do not exceed the simple property size limit.
+  if ((_externalIndirectSize + actualExternalSize) > OMPROPERTYSIZE_MAX)
+    return AAFRESULT_BAD_SIZE;
+
   //
   // Now we are ready to allocate and initialize the indirect value
   // that will contain a copy of the bits from the actaul value.
@@ -789,10 +803,6 @@ AAFRESULT STDMETHODCALLTYPE
   result = pIndirectValueData->Initialize (this);
   if (AAFRESULT_FAILED(result))
     return result;
-
-  // Get the external size of the actual value.
-  aafUInt32 actualExternalSize = 0;
-	actualExternalSize = pActualType->type()->externalSize((OMByte *)pInitData, initDataSize);
 
   aafMemPtr_t pIndirectValueDataBits = NULL;
   result = pIndirectValueData->AllocateBits (_externalIndirectSize + actualExternalSize,
@@ -1536,8 +1546,10 @@ aafBool ImplAAFTypeDefIndirect::IsFixedSize (void) const
 
 OMUInt32 ImplAAFTypeDefIndirect::PropValSize (void) const
 {
-  ASSERTU (0);
-  return 0; // not reached!
+  // This method should not be called for ImplAAFTypeDefIndirect because
+  // ImplAAFTypeDefIndirect does not define fixed size types.
+  check(AAFRESULT_INTERNAL_ERROR);
+  return 0;
 }
 
 
@@ -1550,8 +1562,10 @@ aafBool ImplAAFTypeDefIndirect::IsRegistered (void) const
 
 OMUInt32 ImplAAFTypeDefIndirect::NativeSize (void) const
 {
-  ASSERTU (0);
-  return 0; // not reached!
+  // This method should not be called for ImplAAFTypeDefIndirect because
+  // ImplAAFTypeDefIndirect does not define fixed size types.
+  check(AAFRESULT_INTERNAL_ERROR);
+  return 0;
 }
 
 

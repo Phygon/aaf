@@ -70,7 +70,8 @@ ImplAAFComponent::ImplAAFComponent ():
   _userComments( PID_Component_UserComments,
             L"UserComments" ),
   _attributes( PID_Component_Attributes,
-	       L"Attributes" )
+	       L"Attributes" ),
+  _mobSlotType(ImplAAFComponent::MobSlotType_Undefined)
 {
 	_persistentProperties.put(   _dataDef.address());
 	_persistentProperties.put(   _length.address());
@@ -123,10 +124,11 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFComponent::SetLength (const aafLength_t & length)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
-	if ( length < 0 )
-	  aafError = AAFRESULT_BAD_LENGTH;
+	// TODO: do not allow to assign Length when Component is attached to StaticMobSlot
+	if (length >= 0 || (length == AAF_UNKNOWN_LENGTH && _mobSlotType != MobSlotType_Static))
+		_length = length;
 	else
-	  _length = length;
+		aafError = AAFRESULT_BAD_LENGTH;
 	return aafError;
 }
 
@@ -362,13 +364,17 @@ AAFRESULT ImplAAFComponent::SetNewProps(
 	if (! pDataDef)
 	  return AAFRESULT_NULL_PARAM;
 
-	if ( length < 0 )
-	  aafError = AAFRESULT_BAD_LENGTH;
-	else
-	  {
-		_length	= length;
+	// TODO: do not allow to assign Length when Component is attached to StaticMobSlot
+	if (length >= 0 || (length == AAF_UNKNOWN_LENGTH && _mobSlotType != MobSlotType_Static))
+	{
+		_length = length;
 		_dataDef = pDataDef;
-	  }
+	}
+	else
+	{
+		aafError = AAFRESULT_BAD_LENGTH;
+	}
+
 	return aafError;
 }
 
@@ -400,22 +406,46 @@ AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t 
 	{
 		*foundTransition = kAAFFalse;
 		*found = this;
-    AcquireReference(); // We are returning a reference so bump the reference count!
+		AcquireReference(); // We are returning a reference so bump the reference count!
 		CHECK(GetLength(&tmpMinLen));
-		if (tmpMinLen < rootLen)
+		if (rootLen != AAF_UNKNOWN_LENGTH && tmpMinLen != AAF_UNKNOWN_LENGTH)
 		{
-			*minLength = tmpMinLen;
-			if(diffPos != NULL)
+			if (tmpMinLen < rootLen)
 			{
-				/* Figure out diffPos */
-				*diffPos = rootPos - currentObjPos;
+				*minLength = tmpMinLen;
+				if(diffPos != NULL)
+				{
+					/* Figure out diffPos */
+					*diffPos = rootPos - currentObjPos;
+				}
+			}
+			else
+			{
+				*minLength = rootLen;
+				if(diffPos != NULL)
+					*diffPos = 0;
 			}
 		}
 		else
 		{
-			*minLength = rootLen;
-			if(diffPos != NULL)
-				*diffPos = 0;
+			// One if the legths is unknown (-1)
+			if (tmpMinLen != AAF_UNKNOWN_LENGTH)
+			{
+				ASSERTU (rootLen == AAF_UNKNOWN_LENGTH);
+				*minLength = tmpMinLen;
+				if(diffPos != NULL)
+				{
+					/* Figure out diffPos */
+					*diffPos = rootPos - currentObjPos;
+				}
+			}
+			else
+			{
+				ASSERTU (tmpMinLen == AAF_UNKNOWN_LENGTH);
+				*minLength = rootLen;
+				if(diffPos != NULL)
+					*diffPos = 0;
+			}
 		}
 	} /* XPROTECT */
 	XEXCEPT
@@ -438,3 +468,13 @@ void ImplAAFComponent::Accept(AAFComponentVisitor&)
 	// do nothing
 }
 
+
+void ImplAAFComponent::SetMobSlotType(ImplAAFComponent::MobSlotType type)
+{
+	_mobSlotType = type;
+}
+
+ImplAAFComponent::MobSlotType ImplAAFComponent::GetMobSlotType() const
+{
+	return _mobSlotType;
+}

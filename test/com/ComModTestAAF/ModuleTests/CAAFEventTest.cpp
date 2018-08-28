@@ -1,4 +1,3 @@
-
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -40,23 +39,27 @@ using namespace std;
 #include <assert.h>
 #include <memory.h>
 #include <stdlib.h>
-#include <wchar.h>
-#include "AAFDefUIDs.h"
 
+#include "AAFDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
+#include "AAFWideString.h"
 #include "ModuleTest.h"
 
 #include "CAAFBuiltinDefs.h"
 //{060c2b340205110101001000-13-00-00-00-{f5fedc56-8d6f-11d4-a380-009027dfca6a}}
-
 static const aafMobID_t gMobID = {
+	{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
+	0x13, 0x00, 0x00, 0x00, 
+	{0xf5fedc56, 0x8d6f, 0x11d4, {0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}}
+};
 
-{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00}, 
-
-0x13, 0x00, 0x00, 0x00, 
-
-{0xf5fedc56, 0x8d6f, 0x11d4, {0xa3, 0x80, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}}};
+//{060c2b340205110101001000-13-00-00-00-{779461e8-9c3d-461d-be8e-98bbdaad0b95}}
+static const aafMobID_t gMobID2 = {
+	{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+	0x13, 0x00, 0x00, 0x00,
+	{0x779461e8, 0x9c3d, 0x461d, {0xbe, 0x8e, 0x98, 0xbb, 0xda, 0xad, 0x0b, 0x95}}
+};
 
 
 // convenient error handlers.
@@ -88,8 +91,8 @@ public:
   void Open(wchar_t *pFileName);
   void Close();
 
-  void CreateEvent();
-  void OpenEvent();
+  void CreateEvent(aafMobID_constref mob_ID, aafLength_t * comp_length);
+  void OpenEvent(aafMobID_constref mob_ID, aafLength_t * comp_length);
 
 private:
   IAAFFile *_pFile;
@@ -193,7 +196,11 @@ void EventTest::Create(
   checkResult(_pHeader->GetDictionary(&_pDictionary));
 
   // Make a text clip.
-  CreateEvent();
+  CreateEvent(gMobID, NULL);
+
+  // Make a text clip.
+  aafLength_t comp_length = AAF_UNKNOWN_LENGTH;
+  CreateEvent(gMobID2, &comp_length);
 
   // cleanup
   Close();
@@ -212,7 +219,11 @@ void EventTest::Open(wchar_t *pFileName)
   checkResult(_pFile->GetHeader(&_pHeader));
 
   // Open and validate the text clip.
-  OpenEvent();
+  OpenEvent(gMobID, NULL);
+
+  // Open and validate the text clip.
+  aafLength_t comp_length = AAF_UNKNOWN_LENGTH;
+  OpenEvent(gMobID2, &comp_length);
 
   // cleanup
   Close();
@@ -246,7 +257,7 @@ void EventTest::Close()
 }
 
 
-void EventTest::CreateEvent()
+void EventTest::CreateEvent(aafMobID_constref mob_ID, aafLength_t * comp_length)
 {
   assert(_pHeader && _pDictionary);
 
@@ -263,12 +274,15 @@ void EventTest::CreateEvent()
 
   try
   {
-	  // not already in dictionary
+	if (AAFRESULT_FAILED(_pDictionary->LookupDataDef(kAAFDataDef_Test, &pDataDef)))
+	{
+		// not already in dictionary
 		checkResult(defs.cdDataDef()->
-					CreateInstance (IID_IAAFDataDef,
-									(IUnknown **)&pDataDef));
-	  hr = pDataDef->Initialize (kAAFDataDef_Test, L"Test", L"Test data");
-	  hr = _pDictionary->RegisterDataDef (pDataDef);
+			CreateInstance(IID_IAAFDataDef,
+			(IUnknown **)&pDataDef));
+		hr = pDataDef->Initialize(kAAFDataDef_Test, L"Test", L"Test data");
+		hr = _pDictionary->RegisterDataDef(pDataDef);
+	}
 
 	// Create a concrete subclass of event
     checkResult(defs.cdCommentMarker()->
@@ -278,8 +292,12 @@ void EventTest::CreateEvent()
     checkResult(pEvent->SetComment(const_cast<wchar_t*>(_eventComment)));
 	checkResult(pEvent->QueryInterface(IID_IAAFComponent, (void **)&pComp));
 	checkResult(pComp->SetDataDef(pDataDef));
-	pComp->Release();
-	pComp = NULL;
+
+	if (comp_length)
+	{
+		// Test Component with Length, including AAF_UNKNOWN_LENGTH, can be attached to EventMobSlot
+		checkResult(pComp->SetLength(*comp_length));
+	}
 
     // Get the segment inteface to the event to install into the mob slot.
     checkResult(pEvent->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
@@ -307,11 +325,16 @@ void EventTest::CreateEvent()
 
     // Save the id of the composition mob that contains our test
     // event mob slot.
-    checkResult(pMob->SetMobID(gMobID));
+    checkResult(pMob->SetMobID(mob_ID));
     
     // Attach the mob to the header...
     checkResult(_pHeader->AddMob(pMob));
 
+	if (comp_length)
+	{
+		// When Component is attached to EventMobSlot its Length can be set to AAF_UNKNOWN_LENGTH
+		checkResult(pComp->SetLength(*comp_length));
+	}
   }
   catch (HRESULT& rHR)
   {
@@ -362,14 +385,12 @@ void EventTest::CreateEvent()
     pEvent = NULL;
   }
 
-
-
   // Propogate the error if necessary.
   checkResult(hr);
 }
 
 
-void EventTest::OpenEvent()
+void EventTest::OpenEvent(aafMobID_constref mob_ID, aafLength_t * comp_length)
 {
   assert(_pHeader);
 
@@ -381,6 +402,7 @@ void EventTest::OpenEvent()
   aafRational_t editRate = {0};
   IAAFSegment *pSegment = NULL;
   IAAFEvent *pEvent = NULL;
+  IAAFComponent *pComp = NULL;
   aafPosition_t position;
   wchar_t eventComment[128];
 
@@ -388,7 +410,7 @@ void EventTest::OpenEvent()
   try
   {
     // Get the composition mob that we created to hold the
-    checkResult(_pHeader->LookupMob(gMobID, &pMob));
+    checkResult(_pHeader->LookupMob(mob_ID, &pMob));
 
     // Get the first mob slot and check that it is an event mob slot.
     checkResult(pMob->GetSlots(&pEnumSlots));
@@ -418,12 +440,26 @@ void EventTest::OpenEvent()
     // Validate the event comment.
     checkExpression(commentBufSize <= sizeof(eventComment), AAFRESULT_TEST_FAILED);
     checkResult(pEvent->GetComment(eventComment, commentBufSize));
-    checkExpression(0 == memcmp(eventComment, _eventComment, commentBufSize), AAFRESULT_TEST_FAILED); 
+    checkExpression(0 == memcmp(eventComment, _eventComment, commentBufSize), AAFRESULT_TEST_FAILED);
+
+	checkResult(pEvent->QueryInterface(IID_IAAFComponent, (void **)&pComp));
+	if (comp_length)
+	{
+		aafLength_t componnetLength;
+		checkResult(pComp->GetLength(&componnetLength));
+		checkExpression(*comp_length == componnetLength, AAFRESULT_TEST_FAILED);
+	}
   }
   catch (HRESULT& rHR)
   {
     hr = rHR;
     // fall through and handle cleanup
+  }
+
+  if (pComp)
+  {
+	  pComp->Release();
+	  pComp = NULL;
   }
 
   // Cleanup local references

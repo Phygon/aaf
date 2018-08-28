@@ -305,7 +305,7 @@ void OMWeakReferenceSetProperty<Key, ReferencedObject>::appendValue(
 template <typename Key, typename ReferencedObject>
 ReferencedObject*
 OMWeakReferenceSetProperty<Key, ReferencedObject>::remove(
-                            const Key& identification)
+                                                     const Key& identification)
 {
   TRACE("OMWeakReferenceSetProperty<Key, ReferencedObject>::remove");
 
@@ -349,7 +349,7 @@ bool OMWeakReferenceSetProperty<Key, ReferencedObject>::ensureAbsent(
   SetElement* element = 0;
   bool result = _set.find(identification, &element);
   if (result) {
-    element->setValue(&nullOMUniqueObjectIdentification, 0);
+    element->setValue(&(OMConstant<Key>::null), 0);
     _set.remove(identification);
   }
 
@@ -491,8 +491,8 @@ ReferencedObject* OMWeakReferenceSetProperty<Key, ReferencedObject>::value(
   //   @this const
 template <typename Key, typename ReferencedObject>
 bool OMWeakReferenceSetProperty<Key, ReferencedObject>::find(
-                            const Key& identification,
-                            ReferencedObject*& object) const
+                                               const Key& identification,
+                                               ReferencedObject*& object) const
 {
   TRACE("OMWeakReferenceSetProperty<Key, ReferencedObject>::find");
 
@@ -963,7 +963,7 @@ OMWeakReferenceSetProperty<Key, ReferencedObject>::targetName(void) const
 template <typename Key, typename ReferencedObject>
 bool
 OMWeakReferenceSetProperty<Key, ReferencedObject>::isResolved(
-                const OMUniqueObjectIdentification& /* identification */) const
+                                         const Key& /* identification */) const
 {
   TRACE("OMWeakReferenceSetProperty<Key, ReferencedObject>::isResolved");
 
@@ -975,7 +975,7 @@ OMWeakReferenceSetProperty<Key, ReferencedObject>::isResolved(
 template <typename Key, typename ReferencedObject>
 bool
 OMWeakReferenceSetProperty<Key, ReferencedObject>::isResolvable(
-                const OMUniqueObjectIdentification& /* identification */) const
+                                         const Key& /* identification */) const
 {
   TRACE("OMWeakReferenceSetProperty<Key, ReferencedObject>::isResolvable");
 
@@ -1020,7 +1020,8 @@ void OMWeakReferenceSetProperty<Key, ReferencedObject>::shallowCopyTo(
 template <typename Key, typename ReferencedObject>
 void OMWeakReferenceSetProperty<Key, ReferencedObject>::deepCopyTo(
                                                      OMProperty* destination,
-                                                     void* clientContext) const
+                                                     void* clientContext,
+                                                     bool deferStreamData) const
 {
   TRACE("OMWeakReferenceSetProperty<Key, ReferencedObject>::deepCopyTo");
   PRECONDITION( "Valid destination", destination != 0 );
@@ -1055,7 +1056,7 @@ void OMWeakReferenceSetProperty<Key, ReferencedObject>::deepCopyTo(
         OMStorable* d = source->shallowCopy(factory);
         dest->insertObject(d);
         d->onCopy(clientContext);
-        source->deepCopyTo(d, clientContext);
+        source->deepCopyTo(d, clientContext, deferStreamData);
       }
     }
   }

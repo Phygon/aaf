@@ -53,9 +53,6 @@
 #endif
 
 
-class OMDataStreamPropertyFilter;
-
-
 class ImplAAFTimecodeStream : public ImplAAFSegment
 {
 public:
@@ -250,7 +247,6 @@ private:
 	OMFixedSizeProperty<aafRational_t>				_sampleRate;
 	OMDataStreamProperty							_source;
 	OMFixedSizeProperty<aafTimecodeSourceType_t>	_sourceType;
-	OMDataStreamPropertyFilter*						_sourceStreamFilter;
 };
 
 #endif // ! __ImplAAFTimecodeStream_h__

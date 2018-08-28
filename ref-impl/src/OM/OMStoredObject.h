@@ -67,11 +67,37 @@ public:
     //            make sense for all derived instances of <c OMStoredObject>.
   virtual OMStoredObject* create(const wchar_t* name) = 0;
 
-    // @cmember Open an exsiting <c OMStoredObject>, named <p name>,
+    // @cmember Create a new <c OMStoredObject>, contained by this
+    //          <c OMStoredObject>. New <c OMStoredObject> is a stored
+    //          representatin of an <c OMStorable> referenced by
+    //          <p containingProperty>.
+  virtual OMStoredObject* create(const OMProperty* containingProperty) = 0;
+
+    // @cmember Create a new <c OMStoredObject>, contained by this
+    //          <c OMStoredObject>. New <c OMStoredObject> is a stored
+    //          representatin of an <c OMStorable> referenced by
+    //          an element <p localKey> of <p containingProperty>.
+  virtual OMStoredObject* create(const OMProperty* containingProperty,
+                                 OMUInt32 localKey) = 0;
+
+    // @cmember Open an existing <c OMStoredObject>, named <p name>,
     //          contained by this <c OMStoredObject>.
     //   @devnote The name argument to this member function doesn't
     //            make sense for all derived instances of <c OMStoredObject>.
   virtual OMStoredObject* open(const wchar_t* name) = 0;
+
+    // @cmember Open an existing <c OMStoredObject>, contained by this
+    //          <c OMStoredObject>. <c OMStoredObject> is a stored
+    //          representatin of an <c OMStorable> referenced by
+    //          <p containingProperty>.
+  virtual OMStoredObject* open(const OMProperty* containingProperty) = 0;
+
+    // @cmember Open an existing <c OMStoredObject>, contained by this
+    //          <c OMStoredObject>. <c OMStoredObject> is a stored
+    //          representatin of an <c OMStorable> referenced by
+    //          an element <p localKey> of <p containingProperty>.
+  virtual OMStoredObject* open(const OMProperty* containingProperty,
+                               OMUInt32 localKey) = 0;
 
     // @cmember Close this <c OMStoredObject>.
   virtual void close(void) = 0;
@@ -84,6 +110,8 @@ public:
   // Saving and restoring properties
 
   virtual void save(OMFile& file) = 0;
+
+  virtual void save(OMFile& file, bool finalize);
 
   virtual void save(OMStorable& object) = 0;
 
@@ -264,5 +292,51 @@ protected:
                          size_t mangledNameSize);
 
 };
+
+//
+// Define HACK_SKIP_PRIMARY_MOB_DEF to avoid writing Header::PrimaryMob
+// property definition when the PrimaryMob property value is not set.
+// This helps to reduce compatibility impact on older versions of AAF SDK
+// that cannot open files containing definitions or instances of weak
+// references to mobs, such as PrimaryMob.
+//
+// TODO: This should (probably) be implemented using the existing but
+// disabled mechanism for omitting non-referenced elements of strong
+// reference sets. To find it look for isSticky() calls.
+//
+#define HACK_SKIP_PRIMARY_MOB_DEF
+#ifdef HACK_SKIP_PRIMARY_MOB_DEF
+
+//
+// Utility functions used as part of temporary hack to skip
+// saving PrimaryMob property definition.
+//
+
+  // @func Does <p file> have Header::PrimaryMob property set?
+  //   @parm The <c OMFile>.
+  //   @rdesc <e bool.true> if the given <c OMFile> has
+  //          PrimaryMob set, <e bool.false> otherwise.
+bool isPrimaryMobPresent(const OMFile* file);
+
+class OMStrongReferenceSet;
+class OMStrongReferenceSetElement;
+
+  // @func Does <p element> of <p set> contain Header::PrimaryMob
+  //       property definition?
+  //   @parm The <c OMStrongReferenceSet>.
+  //   @parm The <c OMStrongReferenceSetElement>.
+  //   @rdesc <e bool.true> if the given <c OMStrongReferenceSet> contains
+  //          PrimaryMob property definition, <e bool.false> otherwise.
+bool elementHasPrimaryMobDefinition(const OMStrongReferenceSet& set,
+                                    const OMStrongReferenceSetElement& element);
+
+  // @func Does <p set> contain an element with Header::PrimaryMob property
+  //       definition?
+  //   @parm The <c OMStrongReferenceSet>.
+  //   @rdesc <e bool.true> if the given <c OMStrongReferenceSet> contains
+  //          PrimaryMob property definition, <e bool.false> otherwise.
+bool setHasPrimaryMobDefinition(const OMStrongReferenceSet& set);
+
+#endif // HACK_SKIP_PRIMARY_MOB_DEF
 
 #endif

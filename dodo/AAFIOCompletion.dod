@@ -1,0 +1,80 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFIOCompletion\
+#endm
+#startm .parent-module 0
+AAFRoot\
+#endm
+#c
+AD_HEAD
+AD_IDL(///
+/// This interface is used by the toolkit to signal completion of an
+/// asynchronous I\/O operation.
+/// This interface is typically implemented by clients who want to be
+/// notified when I\/O is completed. The object implementing the interface
+/// is passed in as an argument to a toolkit I\/O method.
+/// The interface may also be used by the toolkit itself to receive
+/// a completion notification from client-implemented I\/O routines.
+///
+AD_STD_COMMENT_IFC_HEADER)
+AD_CLASS_UUID(5002F2F3, BAB9, 4662, B1, F5, 84, B8, 68, 09, E6, 8A)
+
+AD_DEFAULT_UUID(5002F2F4, BAB9, 4662, B1, F5, 84, B8, 68, 09, E6, 8A)
+
+AD_XCLASS_BEGIN(Concrete, Transient)
+
+AD_XMETHOD3(Completed,
+			[in],
+			objPass,
+			HRESULT,
+			completionStatus,
+			Status of a completed I\/O operation,
+
+			[in],
+			objPass,
+			aafUInt32,
+			numTransferred,
+			Number of bytes transferred by an I\/O operation,
+
+			[in],
+			objPass,
+			aafMemConstPtr_t,
+			pClientData,
+			A pointer to client-specific data,
+
+     This method is called back by the AAF toolkit when the I\/O operation
+  /// associated with the instance of AAFIOCompletion completes.
+  ///  )
+
+AD_XCLASS_END(Concrete, Transient)

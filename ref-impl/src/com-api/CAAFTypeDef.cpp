@@ -196,8 +196,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppRawTypeDef->ReleaseReference(); // We are through with this pointer.
+          internalppRawTypeDef = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppRawTypeDef should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppRawTypeDef == 0);
+
   return hr;
 }
 

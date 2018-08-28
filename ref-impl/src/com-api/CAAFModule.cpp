@@ -175,8 +175,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppFile->ReleaseReference(); // We are through with this pointer.
+          internalppFile = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppFile should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppFile == 0);
+
   return hr;
 }
 
@@ -252,8 +263,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppFile->ReleaseReference(); // We are through with this pointer.
+          internalppFile = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppFile should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppFile == 0);
+
   return hr;
 }
 
@@ -329,8 +351,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppFile->ReleaseReference(); // We are through with this pointer.
+          internalppFile = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppFile should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppFile == 0);
+
   return hr;
 }
 
@@ -408,8 +441,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppFile->ReleaseReference(); // We are through with this pointer.
+          internalppFile = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppFile should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppFile == 0);
+
   return hr;
 }
 
@@ -481,8 +525,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppFile->ReleaseReference(); // We are through with this pointer.
+          internalppFile = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppFile should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppFile == 0);
+
   return hr;
 }
 
@@ -747,8 +802,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppPluginManager->ReleaseReference(); // We are through with this pointer.
+          internalppPluginManager = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppPluginManager should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppPluginManager == 0);
+
   return hr;
 }
 
@@ -820,8 +886,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppNewRawStorage->ReleaseReference(); // We are through with this pointer.
+          internalppNewRawStorage = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppNewRawStorage should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppNewRawStorage == 0);
+
   return hr;
 }
 
@@ -897,8 +974,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppNewRawStorage->ReleaseReference(); // We are through with this pointer.
+          internalppNewRawStorage = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppNewRawStorage should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppNewRawStorage == 0);
+
   return hr;
 }
 
@@ -978,8 +1066,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppNewRawStorage->ReleaseReference(); // We are through with this pointer.
+          internalppNewRawStorage = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppNewRawStorage should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppNewRawStorage == 0);
+
   return hr;
 }
 
@@ -1054,8 +1153,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppNewRawStorage->ReleaseReference(); // We are through with this pointer.
+          internalppNewRawStorage = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppNewRawStorage should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppNewRawStorage == 0);
+
   return hr;
 }
 
@@ -1132,8 +1242,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppNewRawStorage->ReleaseReference(); // We are through with this pointer.
+          internalppNewRawStorage = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppNewRawStorage should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppNewRawStorage == 0);
+
   return hr;
 }
 
@@ -1214,8 +1335,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppNewFile->ReleaseReference(); // We are through with this pointer.
+          internalppNewFile = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppNewFile should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppNewFile == 0);
+
   return hr;
 }
 
@@ -1328,8 +1460,19 @@ STDAPI
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppFileEncodings->ReleaseReference(); // We are through with this pointer.
+          internalppFileEncodings = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppFileEncodings should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppFileEncodings == 0);
+
   return hr;
 }
 

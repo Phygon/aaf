@@ -36,15 +36,172 @@
 
 #include "OMStream.h"
 
+#include "OMUtilities.h"
+#include "OMRawStorage.h"
+#include "OMExceptions.h"
+
+#if defined(OM_OS_WINDOWS)
+#define OM_USE_WINDOWS_FILES
+#elif defined(OM_OS_MACOSX)
+//#define OM_USE_MACOSX_FILES
+#define OM_USE_ISO_FILES
+#else
+#define OM_USE_ISO_FILES
+#endif
+
+#if defined(OM_USE_WINDOWS_FILES)
+
+#include <windows.h>
+
+  // @class Wrappers for Windows files.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+class OMWindowsStream : public OMStream {
+public:
+
+  static OMWindowsStream* openExistingRead(const wchar_t* fileName);
+
+  static OMWindowsStream* openExistingModify(const wchar_t* fileName);
+
+  static OMWindowsStream* openNewModify(const wchar_t* fileName);
+
+  static OMWindowsStream* openNewModify(void);
+
+  static bool readable(const wchar_t* fileName);
+
+  static bool modifiable(const wchar_t* fileName);
+
+  static bool creatable(const wchar_t* fileName);
+
+  virtual void read(OMByte* bytes,
+                    OMUInt32 byteCount,
+                    OMUInt32& bytesRead) const;
+
+  virtual void write(const OMByte* bytes,
+                     OMUInt32 byteCount,
+                     OMUInt32& bytesWritten);
+
+  virtual OMUInt64 size(void) const;
+
+  virtual void setSize(OMUInt64 newSize);
+
+  virtual OMUInt64 position(void) const;
+
+  virtual void setPosition(OMUInt64 newPosition);
+
+  virtual void synchronize(void);
+
+  virtual ~OMWindowsStream(void);
+
+protected:
+  OMWindowsStream(HANDLE file, bool isWritable);
+
+private:
+  HANDLE _file;
+};
+
+#elif defined(OM_USE_MACOSX_FILES)
+
+#include <CoreServices/CoreServices.h>
+
+  // @class Wrappers for Macintosh OS X files.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+class OMMacOSXStream : public OMStream {
+public:
+
+  static OMMacOSXStream* openExistingRead(const wchar_t* fileName);
+
+  static OMMacOSXStream* openExistingModify(const wchar_t* fileName);
+
+  static OMMacOSXStream* openNewModify(const wchar_t* fileName);
+
+  static OMMacOSXStream* openNewModify(void);
+
+  static bool readable(const wchar_t* fileName);
+
+  static bool modifiable(const wchar_t* fileName);
+
+  static bool creatable(const wchar_t* fileName);
+
+  virtual void read(OMByte* bytes,
+                    OMUInt32 byteCount,
+                    OMUInt32& bytesRead) const;
+
+  virtual void write(const OMByte* bytes,
+                     OMUInt32 byteCount,
+                     OMUInt32& bytesWritten);
+
+  virtual OMUInt64 size(void) const;
+
+  virtual void setSize(OMUInt64 newSize);
+
+  virtual OMUInt64 position(void) const;
+
+  virtual void setPosition(OMUInt64 newPosition);
+
+  virtual void synchronize(void);
+
+  virtual ~OMMacOSXStream(void);
+
+protected:
+  OMMacOSXStream(SInt16 file, bool isWritable);
+
+private:
+  SInt16 _file;
+};
+
+#elif defined(OM_USE_ISO_FILES)
+
 #include <limits.h>
 #include <errno.h>
-#include <stdio.h>
-#include <sys/stat.h>
+#include <sys/types.h>
 
-#include "OMUtilities.h"
-#include "OMExceptions.h"
-#include "OMRawStorage.h"
+  // @class Wrappers for ISO FILE*s.
+  //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
+class OMISOStream : public OMStream {
+public:
 
+  static OMISOStream* openExistingRead(const wchar_t* fileName);
+
+  static OMISOStream* openExistingModify(const wchar_t* fileName);
+
+  static OMISOStream* openNewModify(const wchar_t* fileName);
+
+  static OMISOStream* openNewModify(void);
+
+  static bool readable(const wchar_t* fileName);
+
+  static bool modifiable(const wchar_t* fileName);
+
+  static bool creatable(const wchar_t* fileName);
+
+  virtual void read(OMByte* bytes,
+                    OMUInt32 byteCount,
+                    OMUInt32& bytesRead) const;
+
+  virtual void write(const OMByte* bytes,
+                     OMUInt32 byteCount,
+                     OMUInt32& bytesWritten);
+
+  virtual OMUInt64 size(void) const;
+
+  virtual void setSize(OMUInt64 newSize);
+
+  virtual OMUInt64 position(void) const;
+
+  virtual void setPosition(OMUInt64 newPosition);
+
+  virtual void synchronize(void);
+
+  virtual ~OMISOStream(void);
+
+protected:
+  OMISOStream(FILE* file, bool isWritable);
+
+private:
+  FILE* _file;
+};
+
+#endif
 
   // @mfunc Create an <c OMStream> object by opening an existing
   //        file for read-only access, the file is named <p fileName>.
@@ -57,13 +214,15 @@ OMStream::openExistingRead(const wchar_t* fileName)
   TRACE("OMStream::openExistingRead");
 
   PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be read", readable(fileName));
 
-  FILE* file = wfopen(fileName, L"rb");
-  ASSERT("File successfully opened", file != 0); // tjb - error
-
-  OMStream* result = new OMStream(file, false);
-  ASSERT("Valid heap pointer", result != 0);
-
+#if defined(OM_USE_WINDOWS_FILES)
+  OMStream* result = OMWindowsStream::openExistingRead(fileName);
+#elif defined(OM_USE_MACOSX_FILES)
+  OMStream* result = OMMacOSXStream::openExistingRead(fileName);
+#elif defined(OM_USE_ISO_FILES)
+  OMStream* result = OMISOStream::openExistingRead(fileName);
+#endif
   return result;
 }
 
@@ -78,13 +237,15 @@ OMStream::openExistingModify(const wchar_t* fileName)
   TRACE("OMStream::openExistingModify");
 
   PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be modified", modifiable(fileName));
 
-  FILE* file = wfopen(fileName, L"r+b");
-  ASSERT("File successfully opened", file != 0); // tjb - error
-
-  OMStream* result = new OMStream(file, true);
-  ASSERT("Valid heap pointer", result != 0);
-
+#if defined(OM_USE_WINDOWS_FILES)
+  OMStream* result = OMWindowsStream::openExistingModify(fileName);
+#elif defined(OM_USE_MACOSX_FILES)
+  OMStream* result = OMMacOSXStream::openExistingModify(fileName);
+#elif defined(OM_USE_ISO_FILES)
+  OMStream* result = OMISOStream::openExistingModify(fileName);
+#endif
   return result;
 }
 
@@ -99,23 +260,15 @@ OMStream::openNewModify(const wchar_t* fileName)
   TRACE("OMStream::openNewModify");
 
   PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be created", creatable(fileName));
 
-  // Check that the file doesn't already exist.
-  // This is the ISO way to do it.
-  //
-  FILE* f = wfopen(fileName, L"r");
-  if (f != 0) {
-    fclose(f);
-    f = 0;
-    throw OMException("File already exists.");
-  }
-
-  FILE* file = wfopen(fileName, L"w+b");
-  ASSERT("File successfully opened", file != 0); // tjb - error
-
-  OMStream* result = new OMStream(file, true);
-  ASSERT("Valid heap pointer", result != 0);
-
+#if defined(OM_USE_WINDOWS_FILES)
+  OMStream* result = OMWindowsStream::openNewModify(fileName);
+#elif defined(OM_USE_MACOSX_FILES)
+  OMStream* result = OMMacOSXStream::openNewModify(fileName);
+#elif defined(OM_USE_ISO_FILES)
+  OMStream* result = OMISOStream::openNewModify(fileName);
+#endif
   return result;
 }
 
@@ -127,20 +280,651 @@ OMStream::openNewModify(void)
 {
   TRACE("OMStream::openNewModify");
 
-  FILE* file = tmpfile();
+#if defined(OM_USE_WINDOWS_FILES)
+  OMStream* result = OMWindowsStream::openNewModify();
+#elif defined(OM_USE_MACOSX_FILES)
+  OMStream* result = OMMacOSXStream::openNewModify();
+#elif defined(OM_USE_ISO_FILES)
+  OMStream* result = OMISOStream::openNewModify();
+#endif
+  return result;
+}
+
+  // @mfunc Can an existing file named <p fileName> be opened
+  //        for read access ? The file must already exist and be readable.
+  //   @parm The name of the file.
+  //   @rdesc <e bool.true> if <p fileName> is readable,
+  //          <e bool.false> otherwise.
+bool OMStream::readable(const wchar_t* fileName)
+{
+  TRACE("OMStream::readable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+#if defined(OM_USE_WINDOWS_FILES)
+  bool result = OMWindowsStream::readable(fileName);
+#elif defined(OM_USE_MACOSX_FILES)
+  bool result = OMMacOSXStream::readable(fileName);
+#elif defined(OM_USE_ISO_FILES)
+  bool result = OMISOStream::readable(fileName);
+#endif
+  return result;
+}
+
+  // @mfunc Can an existing file named <p fileName> be opened
+  //        for read/write access ? The file must already exist and be
+  //        both readable and writable.
+  //   @rdesc <e bool.true> if <p fileName> is modifiable,
+  //          <e bool.false> otherwise.
+bool OMStream::modifiable(const wchar_t* fileName)
+{
+  TRACE("OMStream::modifiable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+#if defined(OM_USE_WINDOWS_FILES)
+  bool result = OMWindowsStream::readable(fileName);
+#elif defined(OM_USE_MACOSX_FILES)
+  bool result = OMMacOSXStream::readable(fileName);
+#elif defined(OM_USE_ISO_FILES)
+  bool result = OMISOStream::readable(fileName);
+#endif
+  return result;
+}
+
+  // @mfunc Can a new file named <p fileName> be created for read access ?
+  //        The file must not already exist.
+  //   @rdesc <e bool.true> if <p fileName> is creatable,
+  //          <e bool.false> otherwise.
+bool OMStream::creatable(const wchar_t* fileName)
+{
+  TRACE("OMStream::creatable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+#if defined(OM_USE_WINDOWS_FILES)
+  bool result = OMWindowsStream::creatable(fileName);
+#elif defined(OM_USE_MACOSX_FILES)
+  bool result = OMMacOSXStream::creatable(fileName);
+#elif defined(OM_USE_ISO_FILES)
+  bool result = OMISOStream::creatable(fileName);
+#endif
+  return result;
+}
+
+bool OMStream::isWritable(void) const
+{
+  TRACE("OMStream::isWritable");
+  return _isWritable;
+}
+
+OMStream::~OMStream(void)
+{
+  TRACE("OMStream::~OMStream");
+}
+
+OMStream::OMStream(bool isWritable)
+: _isWritable(isWritable)
+{
+  TRACE("OMStream::OMStream");
+}
+
+#if defined(OM_USE_WINDOWS_FILES)
+
+#if (_MSC_VER > 1200)
+#define OM_INVALID_FILE_ATTRIBUTES INVALID_FILE_ATTRIBUTES
+#else
+#define OM_INVALID_FILE_ATTRIBUTES 0xffffffff
+#endif
+
+OMWindowsStream*
+OMWindowsStream::openExistingRead(const wchar_t* fileName)
+{
+  TRACE("OMWindowsStream::openExistingRead");
+
+  PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be read", readable(fileName));
+
+  OMWindowsStream* result = 0;
+  HANDLE file = CreateFile(fileName,
+                           GENERIC_READ,
+                           FILE_SHARE_READ | FILE_SHARE_WRITE,
+                           0,
+                           OPEN_EXISTING,
+                           0,
+                           0);
+  if (file != INVALID_HANDLE_VALUE) {
+    result = new OMWindowsStream(file, false);
+    ASSERT("Valid heap pointer", result != 0);
+  } else {
+    throw OMException("CreateFile() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+  return result;
+}
+
+OMWindowsStream*
+OMWindowsStream::openExistingModify(const wchar_t* fileName)
+{
+  TRACE("OMWindowsStream::openExistingModify");
+
+  PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be modified", modifiable(fileName));
+
+  OMWindowsStream* result = 0;
+  HANDLE file = CreateFile(fileName,
+                           GENERIC_WRITE | GENERIC_READ,
+                           FILE_SHARE_READ,
+                           0,
+                           OPEN_EXISTING,
+                           0,
+                           0);
+  if (file != INVALID_HANDLE_VALUE) {
+    result = new OMWindowsStream(file, true);
+    ASSERT("Valid heap pointer", result != 0);
+  } else {
+    throw OMException("CreateFile() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+  return result;
+}
+
+OMWindowsStream*
+OMWindowsStream::openNewModify(const wchar_t* fileName)
+{
+  TRACE("OMWindowsStream::openNewModify");
+
+  PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be created", creatable(fileName));
+
+  OMWindowsStream* result = 0;
+  HANDLE file = CreateFile(fileName,
+                           GENERIC_WRITE | GENERIC_READ,
+                           FILE_SHARE_READ,
+                           0,
+                           CREATE_NEW,
+                           0,
+                           0);
+  if (file != INVALID_HANDLE_VALUE) {
+    result = new OMWindowsStream(file, true);
+    ASSERT("Valid heap pointer", result != 0);
+  } else {
+    throw OMException("CreateFile() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+  return result;
+}
+
+OMWindowsStream*
+OMWindowsStream::openNewModify(void)
+{
+  TRACE("OMWindowsStream::openNewModify");
+
+  wchar_t tempPath[MAX_PATH];
+  DWORD length = GetTempPath(MAX_PATH, tempPath);
+  if ((length == 0) || (length > MAX_PATH)) {
+    throw OMException("GetTempPath() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+  wchar_t fileName[MAX_PATH];
+  UINT status = GetTempFileName(tempPath, L"xxx", 0, fileName);
+  if (status == 0) {
+    throw OMException("GetTempFileName() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+  OMWindowsStream* result = 0;
+  HANDLE file = CreateFile(fileName,
+                           GENERIC_WRITE | GENERIC_READ,
+                           FILE_SHARE_READ,
+                           0,
+                           CREATE_ALWAYS,
+                           0,
+                           0);
+  if (file != INVALID_HANDLE_VALUE) {
+    result = new OMWindowsStream(file, true);
+    ASSERT("Valid heap pointer", result != 0);
+  } else {
+    throw OMException("CreateFile() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+  return result;
+}
+
+bool OMWindowsStream::readable(const wchar_t* fileName)
+{
+  TRACE("OMWindowsStream::readable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+  bool result;
+  DWORD attributes = GetFileAttributes(fileName);
+  if (attributes != OM_INVALID_FILE_ATTRIBUTES) {
+    result = true; // File exists (and is readable)
+  } else {
+    result = false; // File does not exist
+  }
+  return result;
+}
+
+bool OMWindowsStream::modifiable(const wchar_t* fileName)
+{
+  TRACE("OMWindowsStream::modifiable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+  bool result;
+  DWORD attributes = GetFileAttributes(fileName);
+  if (attributes != OM_INVALID_FILE_ATTRIBUTES) {
+    if (attributes & FILE_ATTRIBUTE_READONLY) {
+      result = false; // File exists (and may not be written)
+    } else {
+      result = true; // File exists (and may be written)
+    }
+  } else {
+    result = false; // File does not exist
+  }
+  return result;
+}
+
+bool OMWindowsStream::creatable(const wchar_t* fileName)
+{
+  TRACE("OMWindowsStream::creatable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+  bool result;
+  DWORD attributes = GetFileAttributes(fileName);
+  if (attributes != OM_INVALID_FILE_ATTRIBUTES) {
+    result = false; // File exists
+  } else {
+    result = true; // File does not exist
+  }
+  return result;
+}
+
+void OMWindowsStream::read(OMByte* bytes,
+                           OMUInt32 byteCount,
+                           OMUInt32& bytesRead) const
+{
+  TRACE("OMWindowsStream::read");
+
+  DWORD readBytes;
+  BOOL result = ReadFile(_file, bytes, byteCount, &readBytes, 0);
+  if (!result) {
+    throw OMException("ReadFile() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+  bytesRead = readBytes;
+}
+
+void OMWindowsStream::write(const OMByte* bytes,
+                            OMUInt32 byteCount,
+                            OMUInt32& bytesWritten)
+{
+  TRACE("OMWindowsStream::write");
+  PRECONDITION("Stream is writable", isWritable());
+
+  DWORD writtenBytes;
+  BOOL result = WriteFile(_file, bytes, byteCount, &writtenBytes, 0);
+  if (!result) {
+    throw OMException("WriteFile() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+  bytesWritten = writtenBytes;
+}
+
+OMUInt64 OMWindowsStream::size(void) const
+{
+  TRACE("OMWindowsStream::size");
+
+  OMUInt64 result;
+  ULARGE_INTEGER li;
+  li.LowPart = GetFileSize(_file, &li.HighPart);
+  if ((li.LowPart == -1) && GetLastError() != NO_ERROR) {
+    throw OMException("GetFileSize() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+  result = li.QuadPart;
+  return result;
+}
+
+void OMWindowsStream::setSize(OMUInt64 newSize)
+{
+  TRACE("OMWindowsStream::setSize");
+  PRECONDITION("Stream is writable", isWritable());
+
+  OMUInt64 savedPosition = position();
+  setPosition(newSize);
+  BOOL result = SetEndOfFile(_file);
+  if (!result) {
+    setPosition(savedPosition);
+    throw OMException("SetEndOfFile() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+  setPosition(savedPosition);
+}
+
+OMUInt64 OMWindowsStream::position(void) const
+{
+  TRACE("OMWindowsStream::position");
+
+  OMUInt64 result;
+  LARGE_INTEGER li;
+  li.QuadPart = 0;
+  li.LowPart = SetFilePointer(_file, li.LowPart, &li.HighPart, FILE_CURRENT);
+  if ((li.LowPart == -1) && GetLastError() != NO_ERROR) {
+    throw OMException("SetFilePointer() failed", HRESULT_FROM_WIN32(GetLastError()));
+  }
+  result = li.QuadPart;
+  return result;
+}
+
+void OMWindowsStream::setPosition(OMUInt64 newPosition)
+{
+  TRACE("OMWindowsStream::setPosition");
+
+  LARGE_INTEGER li;
+  li.QuadPart = newPosition;
+  li.LowPart = SetFilePointer(_file, li.LowPart, &li.HighPart, FILE_BEGIN);
+  if ((li.LowPart == -1) && GetLastError() != NO_ERROR) {
+    throw OMException("SetFilePointer() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+}
+
+void OMWindowsStream::synchronize(void)
+{
+  TRACE("OMWindowsStream::synchronize");
+  PRECONDITION("Stream is writable", isWritable());
+
+  BOOL result = FlushFileBuffers(_file);
+  if (!result) {
+    throw OMException("FlushFileBuffers() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+}
+
+OMWindowsStream::~OMWindowsStream(void)
+{
+  TRACE("OMWindowsStream::~OMWindowsStream");
+
+  if (isWritable()) {
+    synchronize();
+  }
+  BOOL result = CloseHandle(_file);
+  if (!result) {
+    throw OMException("CloseHandle() failed.", HRESULT_FROM_WIN32(GetLastError()));
+  }
+}
+
+OMWindowsStream::OMWindowsStream(HANDLE file, bool isWritable)
+: OMStream(isWritable),
+  _file(file)
+{
+  TRACE("OMWindowsStream::OMWindowsStream");
+}
+
+#elif defined(OM_USE_MACOSX_FILES)
+
+OMMacOSXStream*
+OMMacOSXStream::openExistingRead(const wchar_t* fileName)
+{
+  TRACE("OMMacOSXStream::openExistingRead");
+
+  PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be read", readable(fileName));
+
+  OMMacOSXStream* result = 0;
+  ASSERT("Unimplemented code not reached", false);
+  return result;
+}
+
+OMMacOSXStream*
+OMMacOSXStream::openExistingModify(const wchar_t* fileName)
+{
+  TRACE("OMMacOSXStream::openExistingModify");
+
+  PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be modified", modifiable(fileName));
+
+  OMMacOSXStream* result = 0;
+  ASSERT("Unimplemented code not reached", false);
+  return result;
+}
+
+OMMacOSXStream*
+OMMacOSXStream::openNewModify(const wchar_t* fileName)
+{
+  TRACE("OMMacOSXStream::openNewModify");
+
+  PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be created", creatable(fileName));
+
+  OMMacOSXStream* result = 0;
+  ASSERT("Unimplemented code not reached", false);
+  return result;
+}
+
+OMMacOSXStream*
+OMMacOSXStream::openNewModify(void)
+{
+  TRACE("OMMacOSXStream::openNewModify");
+
+  OMMacOSXStream* result = 0;
+  ASSERT("Unimplemented code not reached", false);
+  return result;
+}
+
+bool OMMacOSXStream::readable(const wchar_t* fileName)
+{
+  TRACE("OMMacOSXStream::readable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+  bool result = false;
+  ASSERT("Unimplemented code not reached", false);
+  return result;
+}
+
+bool OMMacOSXStream::modifiable(const wchar_t* fileName)
+{
+  TRACE("OMMacOSXStream::modifiable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+  bool result = false;
+  ASSERT("Unimplemented code not reached", false);
+  return result;
+}
+
+bool OMMacOSXStream::creatable(const wchar_t* fileName)
+{
+  TRACE("OMMacOSXStream::creatable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+  bool result = false;
+  ASSERT("Unimplemented code not reached", false);
+  return result;
+}
+
+void OMMacOSXStream::read(OMByte* /* bytes */,
+                          OMUInt32 /* byteCount */,
+                          OMUInt32& /* bytesRead */) const
+{
+  TRACE("OMMacOSXStream::read");
+
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMMacOSXStream::write(const OMByte* /* bytes */,
+                           OMUInt32 /* byteCount */,
+                           OMUInt32& /* bytesWritten */)
+{
+  TRACE("OMMacOSXStream::write");
+  PRECONDITION("Stream is writable", isWritable());
+
+  ASSERT("Unimplemented code not reached", false);
+}
+
+OMUInt64 OMMacOSXStream::size(void) const
+{
+  TRACE("OMMacOSXStream::size");
+
+  OMUInt64 result = 0;
+  ASSERT("Unimplemented code not reached", false);
+  return result;
+}
+
+void OMMacOSXStream::setSize(OMUInt64 /* newSize */)
+{
+  TRACE("OMMacOSXStream::setSize");
+  PRECONDITION("Stream is writable", isWritable());
+
+  ASSERT("Unimplemented code not reached", false);
+}
+
+OMUInt64 OMMacOSXStream::position(void) const
+{
+  TRACE("OMMacOSXStream::position");
+
+  OMUInt64 result = 0;
+  ASSERT("Unimplemented code not reached", false);
+  return result;
+}
+
+void OMMacOSXStream::setPosition(OMUInt64 /* newPosition */)
+{
+  TRACE("OMMacOSXStream::setPosition");
+
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMMacOSXStream::synchronize(void)
+{
+  TRACE("OMMacOSXStream::synchronize");
+  PRECONDITION("Stream is writable", isWritable());
+
+  ASSERT("Unimplemented code not reached", false);
+}
+
+OMMacOSXStream::~OMMacOSXStream(void)
+{
+  TRACE("OMMacOSXStream::~OMMacOSXStream");
+
+  ASSERT("Unimplemented code not reached", false);
+}
+
+OMMacOSXStream::OMMacOSXStream(SInt16 file, bool isWritable)
+: OMStream(isWritable),
+  _file(file)
+{
+  TRACE("OMMacOSXStream::OMMacOSXStream");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+#elif defined(OM_USE_ISO_FILES)
+
+OMISOStream*
+OMISOStream::openExistingRead(const wchar_t* fileName)
+{
+  TRACE("OMISOStream::openExistingRead");
+
+  PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be read", readable(fileName));
+
+  FILE* file = wfopen(fileName, L"rb");
   ASSERT("File successfully opened", file != 0); // tjb - error
 
-  OMStream* result = new OMStream(file, true);
+  OMISOStream* result = new OMISOStream(file, false);
   ASSERT("Valid heap pointer", result != 0);
 
   return result;
 }
 
-void OMStream::read(OMByte* bytes,
-                    OMUInt32 byteCount,
-                    OMUInt32& bytesRead) const
+OMISOStream*
+OMISOStream::openExistingModify(const wchar_t* fileName)
 {
-  TRACE("OMStream::read");
+  TRACE("OMISOStream::openExistingModify");
+
+  PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be modified", modifiable(fileName));
+
+  FILE* file = wfopen(fileName, L"r+b");
+  ASSERT("File successfully opened", file != 0); // tjb - error
+
+  OMISOStream* result = new OMISOStream(file, true);
+  ASSERT("Valid heap pointer", result != 0);
+
+  return result;
+}
+
+OMISOStream*
+OMISOStream::openNewModify(const wchar_t* fileName)
+{
+  TRACE("OMISOStream::openNewModify");
+
+  PRECONDITION("Valid file name", validWideString(fileName));
+  PRECONDITION("File can be created", creatable(fileName));
+
+  FILE* file = wfopen(fileName, L"w+b");
+  ASSERT("File successfully opened", file != 0); // tjb - error
+
+  OMISOStream* result = new OMISOStream(file, true);
+  ASSERT("Valid heap pointer", result != 0);
+
+  return result;
+}
+
+OMISOStream*
+OMISOStream::openNewModify(void)
+{
+  TRACE("OMISOStream::openNewModify");
+
+  FILE* file = tmpfile();
+  ASSERT("File successfully opened", file != 0); // tjb - error
+
+  OMISOStream* result = new OMISOStream(file, true);
+  ASSERT("Valid heap pointer", result != 0);
+
+  return result;
+}
+
+bool OMISOStream::readable(const wchar_t* fileName)
+{
+  TRACE("OMISOStream::readable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+  bool result;
+  FILE* f = wfopen(fileName, L"rb");
+  if (f != 0) {
+    result = true;
+    fclose(f);
+  } else {
+    result = false;
+  }
+  return result;
+}
+
+bool OMISOStream::modifiable(const wchar_t* fileName)
+{
+  TRACE("OMISOStream::modifiable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+  bool result;
+  FILE* f = wfopen(fileName, L"r+b");
+  if (f != 0) {
+    result = true;
+    fclose(f);
+  } else {
+    result = false;
+  }
+  return result;
+}
+
+bool OMISOStream::creatable(const wchar_t* fileName)
+{
+  TRACE("OMISOStream::creatable");
+  PRECONDITION("Valid file name", validWideString(fileName));
+
+  // Check that the file doesn't already exist.
+  // This is the ISO way to do it.
+  //
+  bool result;
+  FILE* f = wfopen(fileName, L"r");
+  if (f != 0) {
+    result = false;
+    fclose(f);
+  } else {
+    result = true;
+  }
+  return result;
+}
+
+void OMISOStream::read(OMByte* bytes,
+                       OMUInt32 byteCount,
+                       OMUInt32& bytesRead) const
+{
+  TRACE("OMISOStream::read");
   PRECONDITION("No error on stream", ferror(_file) == 0);
 
   size_t actualByteCount = fread(bytes, 1, byteCount, _file);
@@ -149,11 +933,11 @@ void OMStream::read(OMByte* bytes,
   bytesRead = static_cast<OMUInt32>(actualByteCount);
 }
 
-void OMStream::write(const OMByte* bytes,
-                     OMUInt32 byteCount,
-                     OMUInt32& bytesWritten)
+void OMISOStream::write(const OMByte* bytes,
+                        OMUInt32 byteCount,
+                        OMUInt32& bytesWritten)
 {
-  TRACE("OMStream::write");
+  TRACE("OMISOStream::write");
   PRECONDITION("Stream is writable", isWritable());
   PRECONDITION("No error on stream", ferror(_file) == 0);
 
@@ -163,40 +947,32 @@ void OMStream::write(const OMByte* bytes,
   bytesWritten = static_cast<OMUInt32>(actualByteCount);
 }
 
-OMUInt64 OMStream::size(void) const
+OMUInt64 OMISOStream::size(void) const
 {
-  TRACE("OMStream::size");
+  TRACE("OMISOStream::size");
   PRECONDITION("No error on stream", ferror(_file) == 0);
 
-  // Microsoft Visual C's fstat() is broken for 64bit filesizes
-  // so use custom _fstati64() instead.
-  // N.B. gcc's fstat() is 64bit safe on Win32.
-#if defined(_MSC_VER)
-  struct _stati64 fileStat;
-#else
-  struct stat fileStat;
-#endif
+  errno = 0;
+  off_t oldPosition = ftello(_file);
+  ASSERT("Successful tell", IMPLIES(oldPosition == static_cast<off_t>(-1), errno == 0));
 
-  fflush( _file );
+  long int status = fseeko(_file, 0, SEEK_END);
+  ASSERT("Successful seek", status == 0); // tjb - error
 
-#if defined(OM_DEBUG)
-  OMInt64 status =
-#endif
-#if defined(_MSC_VER)
-  _fstati64( _fileno( _file ), &fileStat );
-#else
-  fstat( fileno( _file ), &fileStat );
-#endif
+  errno = 0;
+  off_t position = ftello(_file);
+  ASSERT("Successful tell", IMPLIES(position == static_cast<off_t>(-1), errno == 0));
 
-  ASSERT( "Successful fstat", status == 0 );
-  OMUInt64 result = fileStat.st_size;
+  status = fseeko(_file, oldPosition, SEEK_SET);
+  ASSERT("Successful seek", status == 0); // tjb - error
 
+  OMUInt64 result = position;
   return result;
 }
 
-void OMStream::setSize(OMUInt64 newSize)
+void OMISOStream::setSize(OMUInt64 newSize)
 {
-  TRACE("OMStream::setSize");
+  TRACE("OMISOStream::setSize");
   PRECONDITION("Stream is writable", isWritable());
 
   OMUInt64 currentSize = size();
@@ -215,131 +991,75 @@ void OMStream::setSize(OMUInt64 newSize)
     ASSERT("Size properly changed", size() == newSize);
     setPosition(oldPosition); // Restore position
   }
-  // else no ISO/ANSI way to truncate the file in place
+  // else no ISO way to truncate the file in place
 }
 
-OMUInt64 OMStream::position(void) const
+OMUInt64 OMISOStream::position(void) const
 {
-  TRACE("OMStream::position");
+  TRACE("OMISOStream::position");
   PRECONDITION("No error on stream", ferror(_file) == 0);
 
   errno = 0;
-
-#if defined( OM_OS_UNIX )
-
-#if defined(OM_COMPILER_SGICC_MIPS_SGI)
-  OMInt64 position = ftell64( _file );
-  ASSERT("Successful tell", IMPLIES(position == static_cast<OMInt64>(-1), errno == 0));
-#else
-	// all POSIX 1003.1 compliant
-  off_t position = ftello( _file );
-  ASSERT("Successful tell", IMPLIES(position == (off_t)-1, errno == 0));
-#endif
-	
-#elif defined( OM_OS_WINDOWS )
-
-	// we have to rely upon Windows typedef __int64 fpos_t;
-	fpos_t position;
-	if( fgetpos( _file, &position ) ) {
-		ASSERT( "Successful tell", errno==0 );
-	}
-
-#else
-
-	// have to be regular ISO
-  long int position = ftell(_file);
-
-#endif
+  const off_t position = ftello(_file);
+  ASSERT("Successful tell", IMPLIES(position == static_cast<off_t>(-1), errno == 0));
 
   OMUInt64 result = position;
   return result;
-
 }
 
-void OMStream::setPosition(OMUInt64 newPosition)
+void OMISOStream::setPosition(OMUInt64 newPosition)
 {
-  TRACE("OMStream::setPosition");
+  TRACE("OMISOStream::setPosition");
+
+#define OMOFF_MAX (sizeof(off_t) == sizeof(OMInt64) ? OMINT64_MAX : OMINT32_MAX)
+  ASSERT("Supported position", newPosition <= OMOFF_MAX); // tjb - limit
 
   ASSERT("No error on stream", ferror(_file) == 0);
-  errno = 0;
-
-#if defined( OM_OS_UNIX )
-
-
-#if defined(OM_COMPILER_SGICC_MIPS_SGI)
-	OMUInt64 position = newPosition;
-	int status = fseek64( _file, position, SEEK_SET );
-
-#else
-	// all POSIX 1003.1 compliant
-	off_t position = newPosition;
+  off_t osNewPosition = static_cast<off_t>(newPosition);
 #if defined(OM_DEBUG)
-	int status =
-#endif
-	fseeko( _file, position, SEEK_SET);
-#endif
-
-	ASSERT("Successful seek", status == 0);
-	
-#elif defined( OM_OS_WINDOWS )
-
-	// we have to rely upon Windows typedef __int64 fpos_t;
-	fpos_t position = newPosition;
-	if( fsetpos( _file, &position ) ) {
-		ASSERT( "Successful seek", errno==0 );
-	}
-
+  int status = fseeko(_file, osNewPosition, SEEK_SET);
+  ASSERT("Successful seek", status == 0); // tjb - error
 #else
-
-	// have to be regular ISO
-  ASSERT("Supported position", newPosition <= LONG_MAX); // tjb - limit
-  long int liNewPosition = static_cast<long int>(newPosition);
-  int status = fseek(_file, liNewPosition, SEEK_SET);
-  ASSERT("Successful seek", status == 0);
-
+  fseeko(_file, osNewPosition, SEEK_SET);
 #endif
-
-
 }
 
-bool OMStream::isWritable(void) const
+void OMISOStream::synchronize(void)
 {
-  TRACE("OMStream::isWritable");
-  return _isWritable;
-}
-
-void OMStream::synchronize(void)
-{
-  TRACE("OMStream::synchronize");
+  TRACE("OMISOStream::synchronize");
   PRECONDITION("Stream is writable", isWritable());
   PRECONDITION("No error on stream", ferror(_file) == 0);
 
 #if defined(OM_DEBUG)
-  int status =
-#endif
+  int status = fflush(_file);
+  ASSERT("Successful flush", status == 0); // tjb - error
+#else
   fflush(_file);
-  ASSERT("Successful flush", status == 0);
+#endif
 }
 
-OMStream::~OMStream(void)
+OMISOStream::~OMISOStream(void)
 {
-  TRACE("OMStream::~OMStream");
+  TRACE("OMISOStream::~OMISOStream");
 
   if (isWritable()) {
     synchronize();
   }
   ASSERT("No error on stream", ferror(_file) == 0);
 #if defined(OM_DEBUG)
-  int status =
-#endif
+  int status = fclose(_file);
+  ASSERT("Successful close", status == 0); // tjb - error
+#else
   fclose(_file);
-  ASSERT("Successful close", status == 0);
+#endif
   _file = 0;
 }
 
-OMStream::OMStream(FILE* file, bool isWritable)
-: _file(file),
-  _isWritable(isWritable)
+OMISOStream::OMISOStream(FILE* file, bool isWritable)
+: OMStream(isWritable),
+  _file(file)
 {
-  TRACE("OMStream::OMStream");
+  TRACE("OMISOStream::OMISOStream");
 }
+
+#endif

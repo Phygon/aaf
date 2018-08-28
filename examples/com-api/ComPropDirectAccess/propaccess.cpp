@@ -31,8 +31,8 @@
 //
 //=---------------------------------------------------------------------=
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 
 #include "AAF.h"
 #include "AAFFileMode.h"
@@ -732,6 +732,6 @@ int main(int /* argc */, char** /* argv */)
   cout << "***Re-opening file " << pFileName << endl;
   ReadAAFFile(pwFileName, createdMobID);
   
-  cout << "Done" << endl;;
+  cout << "Done" << endl;
   return(0);
 }

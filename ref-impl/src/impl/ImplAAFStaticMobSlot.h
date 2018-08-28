@@ -58,6 +58,10 @@ public:
   //********
   ImplAAFStaticMobSlot ();
 
+  // Override from AAFMobSlot
+  virtual AAFRESULT STDMETHODCALLTYPE
+    SetSegment (/*[in]*/ ImplAAFSegment * pSegment);
+
 protected:
   virtual ~ImplAAFStaticMobSlot ();
 };

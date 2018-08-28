@@ -36,11 +36,11 @@ AAFModule\
 AD_IDL(\  ///***********************************************************
   ///
   /// Global functions for AAF files:
-  /// 
+  ///
   /// In addition to the specific error results listed for each function\,
   /// all factory functions may also return one of the following
   /// values:
-  /// 
+  ///
   /// AAFRESULT_NOMEMORY
   ///   - insufficient system memory is available to perform the
   ///     operation.
@@ -71,7 +71,7 @@ AD_XFUNCTION1(AAFLoad,
   /// called all subsequent access to AAF interfaces will fail
   ///
   /// To use this function link to the stub library aaf.lib
-  /// \(or aafd.lib for the debugging version\). 
+  /// \(or aafd.lib for the debugging version\).
   /// If the client is statically linking to the AAF dll's export
   /// library then the function will always succeed.)
 
@@ -110,7 +110,7 @@ AD_XFUNCTION3(AAFFileOpenExistingRead,
 			  AAFFile,
 			  ppFile,
 			  Pointer to buffer to receive pointer to new file.,
-			Creates an object associated with with an existing filesystem
+			Creates an object associated with an existing filesystem
   /// file that contains data which is only to be read.
   /// Does the following:
   ///
@@ -132,7 +132,7 @@ AD_XFUNCTION3(AAFFileOpenExistingRead,
   /// This function will return the following codes.  If more than one of
   /// the listed errors is in effect\, it will return the first one
   /// encountered in the order given below:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
@@ -187,7 +187,7 @@ AD_XFUNCTION4(AAFFileOpenExistingModify,
 			  AAFFile,
 			  ppFile,
 			  Pointer to buffer to receive pointer to new file.,
-			Creates an object associated with with an existing
+			Creates an object associated with an existing
   /// filesystem file that contains data which is to be read and
   /// written.  Associates the given identification with it.
   /// Does the following:
@@ -214,7 +214,7 @@ AD_XFUNCTION4(AAFFileOpenExistingModify,
   /// This function will return the following codes.  If more than one of
   /// the listed errors is in effect\, it will return the first one
   /// encountered in the order given below:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
@@ -271,7 +271,7 @@ AD_XFUNCTION4(AAFFileOpenNewModify,
 			  AAFFile,
 			  ppFile,
 			  Pointer to buffer to receive pointer to new file.,
-			Creates an object associated with with a new
+			Creates an object associated with a new
   /// filesystem file that contains data which is to be read and
   /// written.  Associates the given identification with it.
   /// Does the following:
@@ -294,7 +294,7 @@ AD_XFUNCTION4(AAFFileOpenNewModify,
   /// This function will return the following codes.  If more than one of
   /// the listed errors is in effect\, it will return the first one
   /// encountered in the order given below:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
@@ -345,7 +345,7 @@ AD_XFUNCTION5(AAFFileOpenNewModifyEx,
 			  AAFFile,
 			  ppFile,
 			  Pointer to buffer to receive pointer to new file.,
-			Creates an object associated with with a new
+			Creates an object associated with a new
   /// filesystem file that contains data which is to be read and
   /// written.  Associates the given identification with it.
   /// Does the following:
@@ -369,7 +369,7 @@ AD_XFUNCTION5(AAFFileOpenNewModifyEx,
   /// This function will return the following codes.  If more than one of
   /// the listed errors is in effect\, it will return the first one
   /// encountered in the order given below:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
@@ -401,7 +401,7 @@ AD_XFUNCTION2(AAFFileOpenTransient,
 			  AAFFile,
 			  ppFile,
 			  Pointer to buffer to receive pointer to new file.,
-			Creates an object associated with with a transient file\,
+			Creates an object associated with a transient file\,
   /// meaning that it is not associated with any filesystem file but
   /// may still be used to contain AAF objects as if it was associated
   /// with a filesystem file.  Associates the given identification with
@@ -417,7 +417,7 @@ AD_XFUNCTION2(AAFFileOpenTransient,
   /// This function will return the following codes.  If more than one of
   /// the listed errors is in effect\, it will return the first one
   /// encountered in the order given below:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
@@ -456,7 +456,7 @@ AD_XFUNCTION3(AAFFileIsAAFFile,
   /// This function will return the following codes.  If more than one of
   /// the listed errors is in effect\, it will return the first one
   /// encountered in the order given below:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
@@ -491,7 +491,7 @@ AD_XFUNCTION3(AAFRawStorageIsAAFFile,
   /// This function will return the following codes.  If more than one of
   /// the listed errors is in effect\, it will return the first one
   /// encountered in the order given below:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
@@ -525,7 +525,7 @@ AD_XFUNCTION3(AAFFileIsAAFFileKind,
   /// This function will return the following codes.  If more than one of
   /// the listed errors is in effect\, it will return the first one
   /// encountered in the order given below:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
@@ -562,7 +562,7 @@ AD_XFUNCTION3(AAFRawStorageIsAAFFileKind,
   /// This function will return the following codes.  If more than one of
   /// the listed errors is in effect\, it will return the first one
   /// encountered in the order given below:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
@@ -772,7 +772,7 @@ AD_XFUNCTION5(AAFCreateRawStorageCached2,
   /// Note that pages are allocated as needed so that the toolkit calls
   /// Allocate\(\) a maximum of pageCount times \(fewer than pageCount calls
   /// will be made if the data fits entirely within the cache\).
-  /// 
+  ///
   /// Succeeds if:
   /// - The pRawStorage pointer is valid.
   /// - The pCachePageAllocator pointer is valid.
@@ -845,7 +845,7 @@ AD_XFUNCTION7(AAFCreateAAFFileOnRawStorage,
   /// - The pRawStorage pointer is valid.
   /// - The ppNewFile pointer is valid.
   /// - The accessibility of the specified raw storage matches that of the desired AAF File; additionally\, if the file kind is
-  ///   Structured Storage Binary\, the raw storage is also required to be at least readable. 
+  ///   Structured Storage Binary\, the raw storage is also required to be at least readable.
   /// - A legal combination of existence and access flags is given.
   AD_STD_COMMENT_METH_ERR_HEADER
   AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pRawStorage or ppNewFile\)
@@ -898,7 +898,7 @@ AD_XFUNCTION1(AAFSetDiagnosticOutput,
   /// By default the diagnostic output goes to stderr. The passed in pointer is AddRefed.
   /// The pointer will be Released the next time AAFSetDiagnosticOutput is called or when
   /// the AAF DLL is unloaded.
-  /// 
+  ///
   ///
   /// This method will succeed if the following are true:
   /// - The pOutput pointer is valid.
@@ -913,16 +913,16 @@ AD_XFUNCTION1(AAFGetLibraryVersion,
 			  The library version,
 			Return the version of the AAF library currently
   /// running on this machine\, which implements these interfaces.
-  /// 
+  ///
   /// Succeeds if all of the following are true:
   /// - the pVersion pointer is valid.
-  /// 
+  ///
   /// If this method fails nothing is written to *pVersion.
-  /// 
+  ///
   /// This method will return the following codes.  If more than one of
   /// the listed errors is in effect\, it will return the first one
   /// encountered in the order given below:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
@@ -940,16 +940,16 @@ AD_XFUNCTION1(AAFGetStaticLibraryVersion,
   /// or different from the version of the \(dynamically linked\) AAF Library
   /// containing the implementation of the various interfaces.  The version
   /// of the AAF Library may be obtained by calling AAFGetLibraryVersion\(\).
-  /// 
+  ///
   /// Succeeds if all of the following are true:
   /// - the pVersion pointer is valid.
-  /// 
+  ///
   /// If this method fails nothing is written to *pVersion.
-  /// 
+  ///
   /// This method will return the following codes.  If more than one of
   /// the listed errors is in effect\, it will return the first one
   /// encountered in the order given below:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
@@ -963,7 +963,7 @@ AD_XFUNCTION1(AAFGetLibraryPathNameBufLen,
 			  pBufSize,
 			  size of required buffer\, in bytes,
 			Returns size of buffer \(in bytes\) required for AAFGetLibraryPathName\(\).
-  /// 
+  ///
   /// Succeeds if:
   /// - The pBufSize pointer is valid.
   AD_STD_COMMENT_METH_ERR_HEADER
@@ -981,18 +981,18 @@ AD_XFUNCTION2(AAFGetLibraryPathName,
     			  bufSize,
 			  size of *pLibraryPathName buffer in bytes,
 			Get the pathname of the AAF library.
-  /// 
+  ///
   /// Writes the LibraryPathName\, with a trailing null
   /// character\, into the pLibraryPathName buffer.  The
   /// buffer is allocated by the caller.  The size of the buffer is
   /// given by bufSize.
-  /// 
+  ///
   /// Caller may call AAFGetLibraryPathNameBufLen\(\) to determine the
   /// required buffer size.
-  /// 
+  ///
   /// If this method fails nothing will be written to
   /// *pLibraryPathName.
-  /// 
+  ///
   /// Succeeds if:
   /// - The pLibraryPathName pointer is valid.
   /// - bufSize indicates that the buffer is large enough to hold
@@ -1001,7 +1001,7 @@ AD_XFUNCTION2(AAFGetLibraryPathName,
   /// This method will return the following codes.  If more than one of
   /// the listed errors is in effect\, it will return the first one
   /// encountered in the order given below:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.  \(This is the only code indicating success.\)
   ///
@@ -1033,7 +1033,7 @@ AD_XFUNCTION2(AAFResultToTextBufLen,
   /// If this method fails nothing will be written to *pResultTextSize.
   ///
   /// This method will return the following codes:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.
   ///
@@ -1074,7 +1074,7 @@ AD_XFUNCTION3(AAFResultToText,
   /// If this method fails nothing will be written to resultText.
   ///
   /// This method will return the following codes:
-  /// 
+  ///
   /// AAFRESULT_SUCCESS
   ///   - succeeded.
   ///

@@ -31,12 +31,12 @@
 //
 //=---------------------------------------------------------------------=
 
-#ifndef OMSSSSTRUCTUREDSTORAGE_H
-#define OMSSSSTRUCTUREDSTORAGE_H
+#ifndef OMSSSTRUCTUREDSTORAGE_H
+#define OMSSSTRUCTUREDSTORAGE_H
 
 #ifndef OM_NO_STRUCTURED_STORAGE
 
-#include "OMMSStructuredStorage.h"
+#include "OMStructuredStorage.h"
 
 #if defined(OM_USE_SCHEMASOFT_SS)
 
@@ -260,4 +260,4 @@ private:
 
 #endif // !OM_NO_STRUCTURED_STORAGE
 
-#endif
+#endif // !OMSSSTRUCTUREDSTORAGE_H

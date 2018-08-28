@@ -35,6 +35,7 @@
 // @author Tim Bingham | tjb | Avid Technology, Inc. |
 //         OMStrongReferenceSetIterator
 #include "OMAssertions.h"
+#include "OMUtilities.h"
 
   // @mfunc Create an <c OMStrongReferenceSetIterator> over the given
   //        <c OMStrongReferenceSetProperty> <p set> and initialize it
@@ -165,7 +166,7 @@ OMStrongReferenceSetIterator<UniqueIdentification,
   //   @rdesc The number of <p ReferencedObject>s
   //   @this const
 template <typename UniqueIdentification, typename ReferencedObject>
-size_t
+OMUInt32
 OMStrongReferenceSetIterator<UniqueIdentification,
                              ReferencedObject>::count(void) const
 {
@@ -241,7 +242,7 @@ OMStrongReferenceSetIterator<UniqueIdentification,
   OMStorable* p = element.getValue();
   ReferencedObject* result = 0;
   if (p != 0) {
-    result = dynamic_cast<ReferencedObject*>(p);
+    result = fast_dynamic_cast<ReferencedObject*>(p);
     ASSERT("Object is correct type", result != 0);
   }
 
@@ -282,7 +283,7 @@ OMStrongReferenceSetIterator<UniqueIdentification,
   }
   OMStorable* p = element.setValue(&id, newObject);
   if (p != 0) {
-    result = dynamic_cast<ReferencedObject*>(p);
+    result = fast_dynamic_cast<ReferencedObject*>(p);
     ASSERT("Object is correct type", result != 0);
   }
   return result;
@@ -309,7 +310,7 @@ OMStrongReferenceSetIterator<UniqueIdentification,
   memset(&nullUniqueIdentification, 0, sizeof(UniqueIdentification));
   OMStorable* p = element.setValue(&nullUniqueIdentification, 0);
   if (p != 0) {
-    result = dynamic_cast<ReferencedObject*>(p);
+    result = fast_dynamic_cast<ReferencedObject*>(p);
     ASSERT("Object is correct type", result != 0);
   }
   return result;

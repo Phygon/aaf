@@ -64,6 +64,7 @@
 #include "ImplEnumAAFPluginDefs.h"
 #include "ImplAAFDictionary.h"
 #include "ImplAAFDataDef.h"
+#include "ImplAAFModule.h"
 
 #include "ImplAAFBuiltinDefs.h"
 #include "ImplAAFSmartPointer.h"
@@ -271,7 +272,6 @@ ImplAAFEssenceAccess::CreateEx (ImplAAFMasterMob *    masterMob,
 	ImplAAFPluginManager *plugins = NULL;
 	ImplAAFEssenceData	*implData = NULL;
 	aafUInt32			buflen;
-	aafUID_t			aafFormat = ContainerAAF;
 
 
 	XPROTECT()
@@ -282,7 +282,8 @@ ImplAAFEssenceAccess::CreateEx (ImplAAFMasterMob *    masterMob,
 		CHECK(masterMob->MyHeadObject(&compHead));
 		CHECK(compHead->GetDictionary(&compDict));
 		
-		if((_destination != NULL) && EqualAUID(&_containerDefID, &ContainerAAF))
+		if((_destination != NULL) &&
+		   ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 		{
 			CHECK(CreateEssenceFileFromLocator (compHead, _destination, &_dataFile));
 			CHECK(_dataFile->GetHeader(&dataHead));
@@ -295,7 +296,8 @@ ImplAAFEssenceAccess::CreateEx (ImplAAFMasterMob *    masterMob,
 		CHECK(dataHead->GetDictionary(&dataDict));
 
 		// Can't put raw media inside of an AAF File
-		if(_destination == NULL && !EqualAUID(&_containerDefID, &aafFormat))
+		if(_destination == NULL &&
+		   !ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 			RAISE(AAFRESULT_WRONG_MEDIATYPE);
 		
 		
@@ -345,7 +347,7 @@ ImplAAFEssenceAccess::CreateEx (ImplAAFMasterMob *    masterMob,
 		CHECK(masterMob->AddMasterSlot (pMediaKind, DEFAULT_FILE_SLOT, _compFileMob, masterSlotID, L"A Slot"));	// Should be NULL or something useful!!!
 		if(_destination != NULL)
 		{
-			if(EqualAUID(&_containerDefID, &aafFormat))
+			if(ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 			{
 				//!!!				ImplAAFMob	*destmob;
 				
@@ -358,7 +360,7 @@ ImplAAFEssenceAccess::CreateEx (ImplAAFMasterMob *    masterMob,
 		// This can be just a copy because there shouldn't be any definitions there yet...
 		
 		// There isn't yet a container for AAF data, so this must be special-cased
-		if(EqualAUID(&_containerDefID, &aafFormat))
+		if(ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 		{
 			aafUID_t	essenceDataID;
 			CHECK(_codec->GetEssenceDataID(&essenceDataID));
@@ -543,7 +545,6 @@ AAFRESULT STDMETHODCALLTYPE
 	aafSubChannel_t			*destPtr;
 	aafUInt32				buflen;
 	aafUInt32				n;
-	aafUID_t				aafFormat = ContainerAAF;
 	aafmMultiCreate_t		*initPtr;
 	aafRational_t			sampleRate;
 	
@@ -556,7 +557,8 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(masterMob->MyHeadObject(&compHead));
 		CHECK(compHead->GetDictionary(&compDict));
 		
-		if((_destination != NULL) && EqualAUID(&_containerDefID, &ContainerAAF))
+		if((_destination != NULL) &&
+		   ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 		{
 			CHECK(CreateEssenceFileFromLocator (compHead, _destination, &_dataFile));
 			CHECK(_dataFile->GetHeader(&dataHead));
@@ -569,7 +571,8 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(dataHead->GetDictionary(&dataDict));
 		
 		// Can't put raw media inside of an AAF File
-		if(_destination == NULL && !EqualAUID(&_containerDefID, &aafFormat))
+		if(_destination == NULL &&
+		   !ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 			RAISE(AAFRESULT_WRONG_MEDIATYPE);
 		
 		_masterMob = masterMob;
@@ -604,7 +607,7 @@ AAFRESULT STDMETHODCALLTYPE
 		// This can be just a copy because there shouldn't be any definitions there yet...
 		if(_destination != NULL)
 		{
-			if(EqualAUID(&_containerDefID, &aafFormat))
+			if(ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 			{
 				//!!!				ImplAAFMob	*destmob;
 				
@@ -686,7 +689,7 @@ AAFRESULT STDMETHODCALLTYPE
 			}
 		
 		// There isn't yet a container for AAF data, so this must be special-cased
-		if(EqualAUID(&_containerDefID, &aafFormat))
+		if(ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 		{
 			aafUID_t	essenceDataID;
 			
@@ -887,7 +890,6 @@ AAFRESULT STDMETHODCALLTYPE
 	aafSourceRef_t		ref;
 	aafPosition_t		zeroPos;
 	aafUInt32			buflen;
-	aafUID_t			aafFormat = ContainerAAF;
 
 	XPROTECT()
 	{
@@ -976,7 +978,8 @@ AAFRESULT STDMETHODCALLTYPE
 
 		CHECK(masterMob->MyHeadObject(&compHead));
 		
-		if((_destination != NULL) && EqualAUID(&_containerDefID, &ContainerAAF))
+		if((_destination != NULL) &&
+		   ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 		{
 			CHECK(CreateEssenceFileFromLocator (compHead, _destination, &_dataFile));
 			CHECK(_dataFile->GetHeader(&dataHead));
@@ -989,7 +992,8 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK(dataHead->GetDictionary(&dataDict));
 
 		// Can't put raw media inside of an AAF File
-		if(_destination == NULL && !EqualAUID(&_containerDefID, &aafFormat))
+		if(_destination == NULL &&
+		   !ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 			RAISE(AAFRESULT_WRONG_MEDIATYPE);
 		
 		
@@ -1050,7 +1054,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 		if(_destination != NULL)
 		{
-			if(EqualAUID(&_containerDefID, &aafFormat))
+			if(ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 			{
 				//!!!				ImplAAFMob	*destmob;
 				
@@ -1063,7 +1067,7 @@ AAFRESULT STDMETHODCALLTYPE
 		// This can be just a copy because there shouldn't be any definitions there yet...
 		
 		// There isn't yet a container for AAF data, so this must be special-cased
-		if(EqualAUID(&_containerDefID, &aafFormat))
+		if(ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 		{
 			aafUID_t	essenceDataID;
 			CHECK(_codec->GetEssenceDataID(&essenceDataID));
@@ -1279,7 +1283,6 @@ ImplAAFEssenceAccess::MultiAppend (ImplAAFMasterMob *masterMob,
 	aafSubChannel_t			*destPtr;
 	aafUInt32				buflen;
 	aafUInt32				n;
-	aafUID_t				aafFormat = ContainerAAF;
 	aafmMultiCreate_t		*initPtr;
 	aafRational_t			sampleRate;
 	
@@ -1290,7 +1293,8 @@ ImplAAFEssenceAccess::MultiAppend (ImplAAFMasterMob *masterMob,
 		
 		CHECK(masterMob->MyHeadObject(&compHead));
 		
-		if((_destination != NULL) && EqualAUID(&_containerDefID, &ContainerAAF))
+		if((_destination != NULL) &&
+		   ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 		{
 			CHECK(CreateEssenceFileFromLocator (compHead, _destination, &_dataFile));
 			CHECK(_dataFile->GetHeader(&dataHead));
@@ -1303,7 +1307,8 @@ ImplAAFEssenceAccess::MultiAppend (ImplAAFMasterMob *masterMob,
 		CHECK(dataHead->GetDictionary(&dataDict));
 		
 		// Can't put raw media inside of an AAF File
-		if(_destination == NULL && !EqualAUID(&_containerDefID, &aafFormat))
+		if(_destination == NULL &&
+		   !ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 			RAISE(AAFRESULT_WRONG_MEDIATYPE);
 		
 		_masterMob = masterMob;
@@ -1338,7 +1343,7 @@ ImplAAFEssenceAccess::MultiAppend (ImplAAFMasterMob *masterMob,
 			
 			if(_destination != NULL)
 			{
-				if(EqualAUID(&_containerDefID, &aafFormat))
+				if(ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 				{
 					//!!!				ImplAAFMob	*destmob;
 					
@@ -1502,7 +1507,7 @@ ImplAAFEssenceAccess::MultiAppend (ImplAAFMasterMob *masterMob,
 		
 		
 		// There isn't yet a container for AAF data, so this must be special-cased
-		if(EqualAUID(&_containerDefID, &aafFormat))
+		if(ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 		{
 			aafUID_t	essenceDataID;
 			
@@ -1769,7 +1774,8 @@ AAFRESULT STDMETHODCALLTYPE
 			}
 			else
 			{
-				access.containerDefID = ContainerAAF;
+				// Use current container format as default avalue.
+				access.containerDefID = _containerDefID;
 				CHECK(compHead->GetDictionary (&dict));
 				CHECK(dict->LookupContainerDef (access.containerDefID, &containerDef));
 				dict->ReleaseReference();
@@ -1923,7 +1929,7 @@ AAFRESULT STDMETHODCALLTYPE
 						RAISE(AAFRESULT_NOMEMORY);
 					CHECK(pLoc->GetPath(nameBuf, buflen));
 					wcsconvertURLtoFilepath(nameBuf, fileBuf);
-					if(EqualAUID(&access.containerDefID, &ContainerAAF) == kAAFTrue)
+					if(ImplAAFDictionary::IsAAFContainerDefinitionID(access.containerDefID))
 					{
 						if(openMode == kAAFMediaOpenAppend)
 							status = ModifyEssenceFileFromLocator (compHead, pLoc, &access.dataFile);
@@ -1944,7 +1950,7 @@ AAFRESULT STDMETHODCALLTYPE
 							cStore->ReleaseReference();
 							cStore = NULL;
 							
-							if(found && EqualAUID(&access.containerDefID, &ContainerAAF))
+							if(found && ImplAAFDictionary::IsAAFContainerDefinitionID(access.containerDefID))
 							{
 								CHECK(plugins->CreateInstance(CLSID_AAFEssenceDataStream,
 									NULL, 
@@ -2256,7 +2262,8 @@ AAFRESULT STDMETHODCALLTYPE
 			}
 			else
 			{
-				access.containerDefID = ContainerAAF;
+				// Use current container format as default avalue.
+				access.containerDefID = _containerDefID;
 				CHECK(compHead->GetDictionary (&dict));
 				CHECK(dict->LookupContainerDef (access.containerDefID, &containerDef));
 				dict->ReleaseReference();
@@ -2333,7 +2340,7 @@ AAFRESULT STDMETHODCALLTYPE
 						RAISE(AAFRESULT_NOMEMORY);
 					CHECK(pLoc->GetPath(nameBuf, buflen));
 					wcsconvertURLtoFilepath(nameBuf, fileBuf);
-					if(EqualAUID(&access.containerDefID, &ContainerAAF) == kAAFTrue)
+					if(ImplAAFDictionary::IsAAFContainerDefinitionID(access.containerDefID))
 					{
 						if(openMode == kAAFMediaOpenAppend)
 							status = ModifyEssenceFileFromLocator (compHead, pLoc, &access.dataFile);
@@ -2354,7 +2361,7 @@ AAFRESULT STDMETHODCALLTYPE
 							cStore->ReleaseReference();
 							cStore = NULL;
 							
-							if(found && EqualAUID(&access.containerDefID, &ContainerAAF))
+							if(found && ImplAAFDictionary::IsAAFContainerDefinitionID(access.containerDefID))
 							{
 								CHECK(plugins->CreateInstance(CLSID_AAFEssenceDataStream,
 									NULL, 
@@ -3492,7 +3499,7 @@ ImplAAFEssenceAccess::CreateContainerDef (ImplAAFHeader *head)
 		{
 			
 			//!!!This should call into the pluginmanager instead of using if?
-			if(EqualAUID(&_containerDefID, &ContainerAAF))
+			if(ImplAAFDictionary::IsAAFContainerDefinitionID(_containerDefID))
 			{
 				CHECK(MakeAAFContainerDef(head, &implContainerDef));
 				CHECK(dict->RegisterContainerDef (implContainerDef));
@@ -3689,7 +3696,6 @@ ImplAAFEssenceAccess::CreateEssenceFileFromLocator (ImplAAFHeader *srcHead, Impl
 	aafUInt32						length;
 	aafUInt32						buflen;
 	ImplAAFFile						*theFile = NULL;
-	aafUID_t						myFileCLSID;
 
 	identSetup.companyName = NULL;
 	identSetup.productName = NULL;
@@ -3725,10 +3731,29 @@ ImplAAFEssenceAccess::CreateEssenceFileFromLocator (ImplAAFHeader *srcHead, Impl
 		identSetup.platform = new wchar_t[length];
 		CHECK(xferIdent->GetPlatform(identSetup.platform, length));
 
-		memcpy((void *)&myFileCLSID, (void *)&CLSID_AAFFile, sizeof(aafUID_t));
-		theFile = (ImplAAFFile *)CreateImpl(myFileCLSID);
-		CHECK(theFile->Initialize());
-	    CHECK(theFile->OpenNewModify(fileBuf, 0, &identSetup));
+		// If container format is ContainerAAF use
+		// the current file encoding.
+                aafUID_t fileEncoding = {0};
+		if(EqualAUID(&_containerDefID, &ContainerAAF))
+		{
+			if(srcHead->attached() == false)
+			{
+				RAISE(AAFRESULT_OBJECT_NOT_ATTACHED);
+			}
+			const OMStoredObjectEncoding omEncoding = srcHead->file()->encoding();
+			fileEncoding = *reinterpret_cast<const aafUID_t*>(&omEncoding);
+		}
+		else
+		{
+			// Container definition IDs are identical to file encoding IDs
+			fileEncoding = _containerDefID;
+		}
+		CHECK(ImplAAFFileOpenNewModifyEx(
+			fileBuf,
+			&fileEncoding,
+			0,
+			&identSetup,
+			&theFile));
 		*result = theFile;
 		AcquireImplReference(theFile);
 
@@ -3775,7 +3800,7 @@ ImplAAFEssenceAccess::CreateEssenceFileFromLocator (ImplAAFHeader *srcHead, Impl
 AAFRESULT
 ImplAAFEssenceAccess::ModifyEssenceFileFromLocator (ImplAAFHeader *srcHead, ImplAAFLocator *loc, ImplAAFFile **result)
 {
-	ImplAAFIdentification			*xferIdent;
+	ImplAAFIdentification			*xferIdent = NULL;
 	aafProductIdentification_t		identSetup;
 	aafUInt32						length;
 	aafUInt32						buflen;

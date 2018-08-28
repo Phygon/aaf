@@ -76,7 +76,7 @@ static HRESULT SetFileBitsTest ()
   // reading.  We'll use this to get the SetFileBits to be tested.
   IAAFRawStorageSP pReadStg;
   checkResult
-	(AAFCreateRawStorageMemory (kAAFFileAccess_read,
+	(AAFCreateRawStorageMemory (kAAFFileAccess_modify,
 								&pReadStg));
   IAAFFileSP pReadFile;
   checkResult
@@ -110,7 +110,7 @@ static HRESULT SetFileBitsTest ()
 
   // Test size too large
   hr = psfb->SetSize (kBig);
-  checkExpression (AAFRESULT_DATA_SIZE == hr, AAFRESULT_TEST_FAILED);
+  checkExpression ((AAFRESULT_DATA_SIZE == hr) || (AAFRESULT_SMALLBUF == hr), AAFRESULT_TEST_FAILED);
 
   // Try to set a reasonable size
   checkResult (psfb->SetSize (100));
@@ -126,7 +126,7 @@ static HRESULT SetFileBitsTest ()
   // Attempt to write way off end
   aafUInt8 foo[100];
   hr = psfb->WriteAt (foo, sizeof (foo), kBig);
-  checkExpression (AAFRESULT_DATA_SIZE == hr, AAFRESULT_TEST_FAILED);
+  checkExpression ((AAFRESULT_DATA_SIZE == hr) || (AAFRESULT_SMALLBUF == hr), AAFRESULT_TEST_FAILED);
 
   // try a couple of reasonable writes
   checkResult (psfb->WriteAt (foo, sizeof (foo), 0));

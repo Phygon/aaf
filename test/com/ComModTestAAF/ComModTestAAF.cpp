@@ -146,7 +146,7 @@ dumpLibInfo(std::wostream &wos)
 				<< static_cast<unsigned int>(vers.major) << L"."
 				<< static_cast<unsigned int>(vers.minor) << L"."
 				<< static_cast<unsigned int>(vers.tertiary) << L" ("
-				<< static_cast<unsigned int>(vers.patchLevel) << L')' << std::endl;
+				<< static_cast<unsigned int>(vers.patchLevel) << L")" << std::endl;
 		}
 	}
 }
@@ -187,7 +187,7 @@ listFileEncodings()
 		pEncoding = 0;
 	}
 
-	std::cout << std::endl;
+	std::wcout << std::endl;
 }
 
 // simple helper class to initialize and cleanup AAF library.
@@ -213,7 +213,7 @@ struct CAAFInitialize
 		HRESULT hr = AAFLoad(dllname);
 		if (S_OK != hr)
 		{
-			std::wcout << L"FAILED!" << std::endl;;
+			std::wcout << L"FAILED!" << std::endl;
 			throwIfError(hr);
 		}
 		std::wcout << L"DONE" << std::endl;

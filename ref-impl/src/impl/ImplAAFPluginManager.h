@@ -132,6 +132,9 @@ AAFRESULT MakeCodecFromEssenceDesc(
 // Attempt to register all of the plugin files in the installation directory.
 AAFRESULT RegisterSharedPlugins(void);
 
+// Attempt to register all of the meta-dictionary plugin files.
+AAFRESULT RegisterMetaDictionaryPlugins(void);
+
 // Attempt to register all of the plugin files in the given directory.
 AAFRESULT RegisterPluginDirectory(const char *directoryName);
 AAFRESULT RegisterPluginDirectory(aafCharacter_constptr wdirectoryName);

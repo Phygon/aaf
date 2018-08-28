@@ -99,7 +99,7 @@ endif
 # The command to copy given source file over to destination 
 # file if they are different.
 #
-UPDATE = $(AAFTOOLKIT)/update.ksh
+UPDATE = $(AAFTOOLKIT)/update.sh
 
 #
 # Common definitions

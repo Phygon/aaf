@@ -1,3 +1,5 @@
+//@doc
+//@class    AAFStreamPropertyValue | Implementation class for AAFPropertyValue
 #ifndef __ImplAAFStreamPropertyValue_h__
 #define __ImplAAFStreamPropertyValue_h__
 //=---------------------------------------------------------------------=
@@ -37,7 +39,7 @@
 class ImplAAFRoot;
 class ImplAAFTypeDefStream;
 class OMDataStreamProperty;
-class OMDataStreamPropertyFilter;
+struct IAAFIOCompletion;
 
 #ifndef __ImplAAFPropertyValue_h__
 #include "ImplAAFPropertyValue.h"
@@ -141,6 +143,138 @@ public:
 
          // @parm [in, ref, size_is(dataSize)] buffer into which should contain one element to be written to the stream
          aafMemPtr_t  pData);
+
+
+  // Sequential access, multiple buffers
+
+  //****************
+  // ReadScatter()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    ReadScatter
+        (// @parm [in] number of buffers
+         aafUInt32  bufCount,
+
+         // @parm [out, size_is(bufCount)] buffers into which bytes
+         // from the stream are written
+         aafIOBufferDesc_t *  pBufs,
+
+         // @parm [out,ref] number of bytes actually read (will be
+         // either dataSize or 0 if there is an error)
+         aafUInt32 *  pBytesRead);
+
+  //****************
+  // WriteGather()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    WriteGather
+        (// @parm [in] number of buffers
+         aafUInt32  bufCount,
+
+         // @parm [in, ref, size_is(bufCount)] buffers containing data
+         // to be written to the stream
+         aafIOBufferDesc_constptr  pBufs,
+
+         // @parm [out,ref] number of bytes actually written
+         aafUInt32 *  pBytesWritten);
+
+
+  // Asyncrounous sequential access, single buffer
+
+  //****************
+  // ReadAsyncAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    ReadAsyncAt
+        (// @parm [in] stream position at which to start the read
+         aafUInt64  position,
+
+         // @parm [in] number of bytes to read
+         aafUInt32  dataSize,
+
+         // @parm [out, size_is(dataSize)] buffer into which bytes from
+         // the stream are written
+         aafMemPtr_t  pData,
+
+         // @parm [in, ref] object implementing the IAAFIOCompletion
+         // interface to be called when the read is completed
+         IAAFIOCompletion *  pCompletion,
+
+         // @parm [in, ref] client-specific data to be returned to the
+         // as a part of the I/O completion routine
+         aafMemConstPtr_t  pClientArg);
+
+  //****************
+  // WriteAsyncAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    WriteAsyncAt
+        (// @parm [in] stream position at which to start the write
+         aafUInt64  position,
+
+         // @parm [in] number of bytes to write
+         aafUInt32  dataSize,
+
+         // @parm [out, size_is(dataSize)] buffer containing data
+         // to be written to the stream
+         aafMemConstPtr_t  pData,
+
+         // @parm [in, ref] object implementing the IAAFIOCompletion
+         // interface to be called when the write is completed
+         IAAFIOCompletion *  pCompletion,
+
+         // @parm [in, ref] client-specific data to be returned to the
+         // as a part of the I/O completion routine
+         aafMemConstPtr_t  pClientArg);
+
+
+  // Asyncrounous sequential access, multiple buffers
+
+  //****************
+  // ReadScatterAsyncAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    ReadScatterAsyncAt
+        (// @parm [in] stream position at which to start the read
+         aafUInt64  position,
+
+         // @parm [in] number of buffers
+         aafUInt32  bufCount,
+
+         // @parm [out, size_is(bufCount)] buffers into which bytes
+         // from the stream are written
+         aafIOBufferDesc_t *  pBufs,
+
+         // @parm [in, ref] object implementing the IAAFIOCompletion
+         // interface to be called when the read is completed
+         IAAFIOCompletion *  pCompletion,
+
+         // @parm [in, ref] client-specific data to be returned to the
+         // as a part of the I/O completion routine
+         aafMemConstPtr_t  pClientArg);
+
+  //****************
+  // WriteGatherAsyncAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    WriteGatherAsyncAt
+        (// @parm [in] stream position at which to start the write
+        aafUInt64  position,
+
+         // @parm [in] number of buffers
+        aafUInt32  bufCount,
+
+         // @parm [in, ref, size_is(bufCount)] buffers containing data
+         // to be written to the stream
+         aafIOBufferDesc_constptr  pBufs,
+
+         // @parm [in, ref] object implementing the IAAFIOCompletion
+         // interface to be called when the write is completed
+        IAAFIOCompletion *  pCompletion,
+
+         // @parm [in, ref] client-specific data to be returned to the
+         // as a part of the I/O completion routine
+        aafMemConstPtr_t  pClientArg);
 
 
 
@@ -317,6 +451,139 @@ public:
 
 
 
+  // Sequential access, multiple buffers
+
+  //****************
+  // ReadScatter()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    ReadScatterFiltered
+        (// @parm [in] number of buffers
+         aafUInt32  bufCount,
+
+         // @parm [out, size_is(bufCount)] buffers into which bytes
+         // from the stream are written
+         aafIOBufferDesc_t *  pBufs,
+
+         // @parm [out,ref] number of bytes actually read (will be
+         // either dataSize or 0 if there is an error)
+         aafUInt32 *  pBytesRead);
+
+  //****************
+  // WriteGather()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    WriteGatherFiltered
+        (// @parm [in] number of buffers
+         aafUInt32  bufCount,
+
+         // @parm [in, ref, size_is(bufCount)] buffers containing data
+         // to be written to the stream
+         aafIOBufferDesc_constptr  pBufs,
+
+         // @parm [out,ref] number of bytes actually written
+         aafUInt32 *  pBytesWritten);
+
+
+  // Asyncrounous sequential access, single buffer
+
+  //****************
+  // ReadAsyncAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    ReadAsyncFilteredAt
+        (// @parm [in] stream position at which to start the read
+         aafUInt64  position,
+
+         // @parm [in] number of bytes to read
+         aafUInt32  dataSize,
+
+         // @parm [out, size_is(dataSize)] buffer into which bytes from
+         // the stream are written
+         aafMemPtr_t  pData,
+
+         // @parm [in, ref] object implementing the IAAFIOCompletion
+         // interface to be called when the read is completed
+         IAAFIOCompletion *  pCompletion,
+
+         // @parm [in, ref] client-specific data to be returned to the
+         // as a part of the I/O completion routine
+         aafMemConstPtr_t  pClientArg);
+
+  //****************
+  // WriteAsyncAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    WriteAsyncFilteredAt
+        (// @parm [in] stream position at which to start the write
+         aafUInt64  position,
+
+         // @parm [in] number of bytes to write
+         aafUInt32  dataSize,
+
+         // @parm [out, size_is(dataSize)] buffer containing data
+         // to be written to the stream
+         aafMemConstPtr_t  pData,
+
+         // @parm [in, ref] object implementing the IAAFIOCompletion
+         // interface to be called when the write is completed
+         IAAFIOCompletion *  pCompletion,
+
+         // @parm [in, ref] client-specific data to be returned to the
+         // as a part of the I/O completion routine
+         aafMemConstPtr_t  pClientArg);
+
+
+  // Asyncrounous sequential access, multiple buffers
+
+  //****************
+  // ReadScatterAsyncAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    ReadScatterAsyncFilteredAt
+        (// @parm [in] stream position at which to start the read
+         aafUInt64  position,
+
+         // @parm [in] number of buffers
+         aafUInt32  bufCount,
+
+         // @parm [out, size_is(bufCount)] buffers into which bytes
+         // from the stream are written
+         aafIOBufferDesc_t *  pBufs,
+
+         // @parm [in, ref] object implementing the IAAFIOCompletion
+         // interface to be called when the read is completed
+         IAAFIOCompletion *  pCompletion,
+
+         // @parm [in, ref] client-specific data to be returned to the
+         // as a part of the I/O completion routine
+         aafMemConstPtr_t  pClientArg);
+
+  //****************
+  // WriteGatherAsyncAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    WriteGatherAsyncFilteredAt
+        (// @parm [in] stream position at which to start the write
+        aafUInt64  position,
+
+         // @parm [in] number of buffers
+        aafUInt32  bufCount,
+
+         // @parm [in, ref, size_is(bufCount)] buffers containing data
+         // to be written to the stream
+         aafIOBufferDesc_constptr  pBufs,
+
+         // @parm [in, ref] object implementing the IAAFIOCompletion
+         // interface to be called when the write is completed
+        IAAFIOCompletion *  pCompletion,
+
+         // @parm [in, ref] client-specific data to be returned to the
+         // as a part of the I/O completion routine
+        aafMemConstPtr_t  pClientArg);
+
+
+
   // 
   // Access in typed chunks of Elements in filtered stream
   // 
@@ -409,10 +676,9 @@ protected:
   
   // special accessor
   aafUInt32 internalElementSize(void) const;
-  
+
 private:
 	OMDataStreamProperty * _streamProperty;
-	OMDataStreamPropertyFilter * _streamPropertyFilter;
 };
 
 //

@@ -369,7 +369,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		// Open the AAF file
 		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = true;
-		
+
 		// Get the AAF file header.
 		checkResult(pFile->GetHeader(&pHeader));
 

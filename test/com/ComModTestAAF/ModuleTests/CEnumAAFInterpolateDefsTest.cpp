@@ -1,4 +1,3 @@
-
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -40,8 +39,8 @@ using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <wchar.h>
 
+#include "AAFWideString.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
@@ -102,8 +101,8 @@ static HRESULT CreateAAFFile(
 	// We can't really do anthing in AAF without the header.
 	checkResult(pFile->GetHeader(&pHeader));
 
-    // Get the AAF Dictionary so that we can create valid AAF objects.
-    checkResult(pHeader->GetDictionary(&pDictionary));
+	// Get the AAF Dictionary so that we can create valid AAF objects.
+	checkResult(pHeader->GetDictionary(&pDictionary));
 	CAAFBuiltinDefs defs (pDictionary);
     
 	checkResult(defs.cdInterpolationDefinition()->

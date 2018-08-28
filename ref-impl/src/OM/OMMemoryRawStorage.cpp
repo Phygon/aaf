@@ -213,10 +213,14 @@ void OMMemoryRawStorage::write(const OMByte* bytes,
   PRECONDITION("Valid buffer", bytes != 0);
   PRECONDITION("Valid byte count", byteCount > 0);
 
-  // Make sure there is space
   OMUInt64 lastPosition = _position + byteCount;
   if (lastPosition > _size) {
-    extend(lastPosition);
+    if (lastPosition > extent()) {
+      // Make sure there is space
+      extend(lastPosition);
+    }
+    // Update high water mark
+    _size = lastPosition;
   }
 
   OMUInt64 firstPage64 = (position() / _pageSize);
@@ -296,6 +300,28 @@ void OMMemoryRawStorage::writeAt(OMUInt64 position,
   write(bytes, byteCount, bytesWritten);
 }
 
+void OMMemoryRawStorage::writeCopyByteAt(OMUInt64 position,
+                                         OMByte theByte,
+                                         OMUInt32 byteCount,
+                                         OMUInt32& bytesWritten)
+{
+  TRACE("OMMemoryRawStorage::writeCopyByteAt");
+
+  PRECONDITION("Writable", isWritable());
+  PRECONDITION("Positionable", isPositionable());
+  PRECONDITION("Valid byte count", byteCount > 0);
+
+  setPosition(position);
+  for (OMUInt32 i=0; i<byteCount; i++) {
+    OMUInt32 localBytesWritten = 0;
+    write(&theByte, 1, localBytesWritten);
+    bytesWritten += localBytesWritten;
+    if (localBytesWritten != 1) {
+      break;
+    }
+  }
+}
+
   // @mfunc May this <c OMMemoryRawStorage> be changed in size ?
   //   @rdesc Always <e bool.true>.
   //   @this const
@@ -316,8 +342,7 @@ OMUInt64 OMMemoryRawStorage::extent(void) const
 
   PRECONDITION("Positionable", isPositionable());
 
-  // TBS tjb - For now extent and size are the same
-  return size();
+  return _pageVector.count() * _pageSize;
 }
 
   // @mfunc Set the size of this <c OMMemoryRawStorage> to <p newSize>
@@ -336,15 +361,19 @@ void OMMemoryRawStorage::extend(OMUInt64 newSize)
 
   PRECONDITION("Extendible", isExtendible());
 
-  if (newSize != _size) {
+  if (newSize != extent()) {
 
     // Calculate new page count
     OMUInt32 oldPageCount = _pageVector.count();
     OMUInt32 pageCount;
     if (newSize != 0) {
       OMUInt64 pageCount64 = ((newSize - 1) / _pageSize) + 1;
-      ASSERT("Supported page count", pageCount64 < ~(OMUInt32)0);
-      pageCount = static_cast<OMUInt32>(pageCount64);
+      if (pageCount64 < ~(OMUInt32)0) {
+        pageCount = static_cast<OMUInt32>(pageCount64);
+      } else {
+        // We can't honor this request so keep the size the same
+        pageCount = oldPageCount;
+      }
     } else {
       pageCount = 0;
     }
@@ -363,10 +392,10 @@ void OMMemoryRawStorage::extend(OMUInt64 newSize)
     } else if (pageCount < oldPageCount) {
 
       // deallocate old pages
-      for (OMUInt32 i = oldPageCount - 1; i >= pageCount; --i) {
-        OMByte* page = _pageVector.valueAt(i);
+      for (OMUInt32 i = oldPageCount; i > pageCount; --i) {
+        OMByte* page = _pageVector.valueAt(i - 1);
         delete [] page;
-        _pageVector.removeAt(i);
+        _pageVector.removeAt(i - 1);
       }
 
       // shrink vector
@@ -374,7 +403,9 @@ void OMMemoryRawStorage::extend(OMUInt64 newSize)
 
     } // else vector contains correct number of pages
 
-    _size = newSize;
+    if (_size > extent()) {
+      _size = extent();
+    }
     POSTCONDITION("Consistent size and page count",
                                    _size <= (_pageVector.count() * _pageSize));
   }
@@ -448,7 +479,9 @@ void OMMemoryRawStorage::setPosition(OMUInt64 newPosition) const
   TRACE("OMMemoryRawStorage::setPosition");
 
   PRECONDITION("Positionable", isPositionable());
-  PRECONDITION("Valid position", newPosition <= _size);
+  // TODO: This precondition is violated when using
+  // OMMS_SSStoredObjectFactory::createFile()
+  //PRECONDITION("Valid position", newPosition <= _size);
 
   OMMemoryRawStorage* nonConstThis = const_cast<OMMemoryRawStorage*>(this);
   nonConstThis->_position = newPosition;
@@ -496,4 +529,81 @@ void OMMemoryRawStorage::read(OMUInt32 page,
   OMByte* pageStart = _pageVector.valueAt(page);
 
   memcpy(destination, pageStart + offset, byteCount);
+}
+
+void OMMemoryRawStorage::streamReadAt(OMUInt64 /* position */,
+                                      OMByte* /* bytes */,
+                                      OMUInt32 /* byteCount */,
+                                      OMUInt32& /* bytesRead */) const
+{
+  TRACE("OMMemoryRawStorage::");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMMemoryRawStorage::streamReadAt(OMUInt64 /* position */,
+                                      OMIOBufferDescriptor* /* buffers */,
+                                      OMUInt32 /* bufferCount */,
+                                      OMUInt32& /* bytesRead */) const
+{
+  TRACE("OMMemoryRawStorage::streamReadAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMMemoryRawStorage::streamReadAt(OMUInt64 /* position */,
+                                      OMByte* /* buffer */,
+                                      const OMUInt32 /* bytes */,
+                                      void* /* */ /* completion */,
+                                      const void* /* clientArgument */) const
+{
+  TRACE("OMMemoryRawStorage::streamReadAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMMemoryRawStorage::streamReadAt(OMUInt64 /* position */,
+                                      OMIOBufferDescriptor* /* buffers */,
+                                      OMUInt32 /* bufferCount */,
+                                      void* /* */ /* completion */,
+                                      const void* /* clientArgument */) const
+{
+  TRACE("OMMemoryRawStorage::streamReadAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMMemoryRawStorage::streamWriteAt(OMUInt64 /* position */,
+                                       const OMByte* /* bytes */,
+                                       OMUInt32 /* byteCount */,
+                                       OMUInt32& /* bytesWritten */)
+{
+  TRACE("OMMemoryRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMMemoryRawStorage::streamWriteAt(OMUInt64 /* position */,
+                                       OMIOBufferDescriptor* /* buffers */,
+                                       OMUInt32 /* bufferCount */,
+                                       OMUInt32& /* bytesWritten */)
+{
+  TRACE("OMMemoryRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMMemoryRawStorage::streamWriteAt(OMUInt64 /* position */,
+                                       const OMByte* /* buffer */,
+                                       const OMUInt32 /* bytes */,
+                                       void* /* */ /* completion */,
+                                       const void* /* clientArgument */)
+{
+  TRACE("OMMemoryRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMMemoryRawStorage::streamWriteAt(
+                                     OMUInt64 /* position */,
+                                     const OMIOBufferDescriptor* /* buffers */,
+                                     OMUInt32 /* bufferCount */,
+                                     void* /* */ /* completion */,
+                                     const void* /* clientArgument */)
+{
+  TRACE("OMMemoryRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
 }

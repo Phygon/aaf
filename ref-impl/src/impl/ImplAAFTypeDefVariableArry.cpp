@@ -371,7 +371,7 @@ ImplAAFTypeDefVariableArray::GetElements (
 ImplAAFTypeDefSP ImplAAFTypeDefVariableArray::BaseType() const
 {
 	ImplAAFTypeDefSP result;
-	AAFRESULT hr = GetType (&result);
+	ARESULT (AAFRESULT hr) GetType (&result);
 	ASSERTU (AAFRESULT_SUCCEEDED (hr));
 	ASSERTU (result);
 	return result;
@@ -430,9 +430,7 @@ OMUInt32 ImplAAFTypeDefVariableArray::externalSize(const OMByte* /*internalBytes
 
 OMUInt32 ImplAAFTypeDefVariableArray::externalSize(void) const
 {
-  // Should be properly implemented
-  ASSERTU (0);
-  return 0; // Not reached!
+	return PropValSize();
 }
 
 
@@ -492,7 +490,7 @@ OMUInt32 ImplAAFTypeDefVariableArray::internalSize(const OMByte* /*externalBytes
 	
 	ASSERTU (ptd->IsFixedSize ());
 	aafUInt32 extElemSize = ptd->PropValSize ();
-	aafUInt32 intElemSize = ptd->ActualSize ();;
+	aafUInt32 intElemSize = ptd->ActualSize ();
 	
 	// aafUInt32 extElemSize = ptd->externalSize (0, 0);
 	// aafUInt32 intElemSize = ptd->internalSize (0, 0);
@@ -504,9 +502,7 @@ OMUInt32 ImplAAFTypeDefVariableArray::internalSize(const OMByte* /*externalBytes
 
 OMUInt32 ImplAAFTypeDefVariableArray::internalSize(void) const
 {
-  // Should be properly implemented
-  ASSERTU (0);
-  return 0; // Not reached!
+	return NativeSize();
 }
 
 
@@ -593,8 +589,10 @@ aafBool ImplAAFTypeDefVariableArray::IsFixedSize (void) const
 
 OMUInt32 ImplAAFTypeDefVariableArray::PropValSize (void) const
 {
-	ASSERTU (0);
-	return 0; // not reached!
+	// This method should not be called for ImplAAFTypeDefVariableArray because
+	// ImplAAFTypeDefVariableArray does not define fixed size types.
+	check(AAFRESULT_INTERNAL_ERROR);
+	return 0;
 }
 
 
@@ -607,8 +605,10 @@ aafBool ImplAAFTypeDefVariableArray::IsRegistered (void) const
 
 OMUInt32 ImplAAFTypeDefVariableArray::NativeSize (void) const
 {
-	ASSERTU (0);
-	return 0; // not reached!
+	// This method should not be called for ImplAAFTypeDefVariableArray because
+	// ImplAAFTypeDefVariableArray does not define fixed size types.
+	check(AAFRESULT_INTERNAL_ERROR);
+	return 0;
 }
 
 

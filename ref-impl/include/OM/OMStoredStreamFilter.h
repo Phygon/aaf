@@ -58,6 +58,31 @@ public:
                     const OMUInt32 bytes,
                     OMUInt32& bytesRead) const = 0;
 
+    // @cmember Attempt to read the vector of buffers given by <p buffers>
+    //          from this <c OMStoredStreamFilter>. This is "read scatter". The
+    //          <p bufferCount> buffers are read in order until all have
+    //          been successfully read or an error is encountered. Once
+    //          an error has been encountered on one buffer no additional
+    //          buffers are read.
+    //          The number of bytes read is returned in <p bytesRead>.
+  virtual void read(OMIOBufferDescriptor* buffers,
+                    OMUInt32 bufferCount,
+                    OMUInt32& bytesRead) const = 0;
+
+    // Asynchronous read - single buffer
+  virtual void read(OMUInt64 position,
+                    OMByte* buffer,
+                    const OMUInt32 bytes,
+                    void* /* */ completion,
+                    const void* clientArgument) const = 0;
+
+    // Asynchronous read - multiple buffers
+  virtual void read(OMUInt64 position,
+                    OMIOBufferDescriptor* buffers,
+                    OMUInt32 bufferCount,
+                    void* /* */ completion,
+                    const void* clientArgument) const = 0;
+
     // @cmember Write <p size> bytes from the buffer at address
     //          <p data> to this <c OMStoredStreamFilter>.
   virtual void write(void* data, OMUInt32 size) = 0;
@@ -68,6 +93,31 @@ public:
   virtual void write(const OMByte* data,
                      const OMUInt32 bytes,
                      OMUInt32& bytesWritten) = 0;
+
+    // @cmember Attempt to write the vector of buffers given by <p buffers>
+    //          to this <c OMStoredStreamFilter>. This is "write gather". The
+    //          <p bufferCount> buffers are written in order until all have
+    //          been successfully written or an error is encountered. Once
+    //          an error has been encountered on one buffer no additional
+    //          buffers are written.
+    //          The number of bytes written is returned in <p bytesWritten>.
+  virtual void write(OMIOBufferDescriptor* buffers,
+                     OMUInt32 bufferCount,
+                     OMUInt32& bytesWritten) = 0;
+
+    // Asynchronous write - single buffer
+  virtual void write(OMUInt64 position,
+                     const OMByte* buffer,
+                     const OMUInt32 bytes,
+                     void* /* */ completion,
+                     const void* clientArgument) = 0;
+
+    // Asynchronous write - multiple buffers
+  virtual void write(OMUInt64 position,
+                     const OMIOBufferDescriptor* buffers,
+                     OMUInt32 bufferCount,
+                     void* /* */ completion,
+                     const void* clientArgument) = 0;
 
     // @cmember The size of this <c OMStoredStreamFilter> in bytes.
   virtual OMUInt64 size(void) const = 0;
@@ -84,6 +134,15 @@ public:
     //          <f write()>, as an offset in bytes from the
     //          begining of this <c OMStoredStreamFilter>.
   virtual void setPosition(const OMUInt64 offset) const = 0;
+
+    // @cmember Synchronize this <c OMStoredStreamFilter> with
+    //          the underlying <c OMStoredStream>.
+    //          An implementation of <c OMStoredStreamFilter> would
+    //          use this method to write and read encoding-specific
+    //          data to and from the underlying <c OMStoredStream>.
+    //          Calling this method brings the encoding-specific
+    //          represenation of <c OMStoredStream> into a valid state.
+  virtual void synchronize(void) const = 0;
 
     // @cmember Close this <c OMStoredStreamFilter>.
 //  virtual void close(void) = 0;

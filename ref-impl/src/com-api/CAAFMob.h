@@ -64,10 +64,16 @@
 #include "CAAFObject.h"
 #endif
 
+//
+// Forward declaration
+//
+class ImplAAFMob;
+
 
 class CAAFMob
   : public IAAFMob,
     public IAAFMob2,
+	public IAAFMob3,
     public CAAFObject
 {
 protected:
@@ -1296,6 +1302,69 @@ public:
 
     // @parm [out] AAFEventMobSlot | ppNewSlot | Newly created slot
     IAAFEventMobSlot ** ppNewSlot
+  );
+
+
+  //***********************************************************
+  // METHOD NAME: CloneExternalAdvanced()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFMob3 | CloneExternalAdvanced |
+  // Clones the specified Source Mob, and optionally all dependent
+  /// Mobs, to an external file, keeping the same MobID.  A pointer
+  /// to the newly created destination mob is returned in *ppDestMob.
+  /// 
+  /// This function clones the specified Source Mob in the source file
+  /// into a destination Mob, with the same MobID, in the destination
+  /// file.  If resolveDependencies is kFollowDepend, the function
+  /// also clones all Mobs referenced by the specified Source Mob.  If
+  /// includeMedia is kIncludeMedia, the function also copies the
+  /// media data associated with the Source Mob, returns the
+  /// destination Mob, and clones all private data. If deferStreams is
+  /// kAAFTrue, the function will defer copying contents of media and
+  /// metadata streams until the pDestFile is saved. Deferred stream
+  //  copy currently is not supported for media and index streams.
+  ///
+  /// If the media data is not in the file, the function does not
+  /// attempt to find it in another file and clone it.  Both AAF files
+  /// must be open before you call this function and both must have the
+  /// same AAF Version number.
+  ///
+  /// The returned mob is AddRef()ed before it is returned.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pDestFile pointer is valid.
+  /// - the ppDestMob pointer is valid.
+  /// 
+  /// If this method fails no state will be changed.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - either pDestFile or ppDestMob arguments is NULL.
+  // @end
+  // 
+  STDMETHOD (CloneExternalAdvanced)
+   (
+    // @parm [in] aafDepend_t | resolveDependencies | Whether to clone dependent mobs
+    aafDepend_t  resolveDependencies,
+
+    // @parm [in] aafIncMedia_t | includeMedia | Whether to include media data
+    aafIncMedia_t  includeMedia,
+
+    // @parm [in] aafBoolean_t | deferStreams | Whether to defer copying contents of stream properties till IAAFFile::Save
+    aafBoolean_t  deferStreams,
+
+    // @parm [in] AAFFile | pDestFile | Destination AAF File
+    IAAFFile * pDestFile,
+
+    // @parm [out] AAFMob | ppDestMob | Destination Mob
+    IAAFMob ** ppDestMob
   );
 
 

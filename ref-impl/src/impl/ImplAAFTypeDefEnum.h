@@ -79,7 +79,7 @@ public:
 
          // @parm [in, size_is(numElems)] array of element names to be represented in this enumerated
     // type
-         aafCharacter_constptr *  pElementNames,
+         aafString_t *  pElementNames,
 
          // @parm [in] number of members in pElementValues and pElementNames arrays
          aafUInt32  numElems,
@@ -348,7 +348,7 @@ public:
 
          // @parm [in, size_is(numElems)] array of element names to be represented in this enumerated
     // type
-         aafCharacter_constptr *  pElementNames,
+         aafString_t *  pElementNames,
 
          // @parm [in] number of members in pElementValues and pElementNames arrays
          aafUInt32  numElems,

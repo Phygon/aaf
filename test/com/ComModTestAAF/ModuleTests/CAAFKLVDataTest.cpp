@@ -38,7 +38,7 @@
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
+#include "AAFWideString.h"
 #include <string.h>
 
 #include "AAFStoredObjectIDs.h"
@@ -640,8 +640,8 @@ extern "C" HRESULT CAAFKLVData_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following AAFKLVDataTest tests have not been implemented:" << endl; 
-//		cout << "     Component::RemoveKLVData" << endl; 
+//		cout << "The following AAFKLVDataTest tests have not been implemented:" << endl;
+//		cout << "     Component::RemoveKLVData" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
   return hr;

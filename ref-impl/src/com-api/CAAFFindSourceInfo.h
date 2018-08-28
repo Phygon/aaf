@@ -60,6 +60,7 @@
 
 class CAAFFindSourceInfo
   : public IAAFFindSourceInfo,
+    public IAAFFindSourceInfo2,
     public CAAFRoot
 {
 protected:
@@ -72,8 +73,6 @@ protected:
   virtual ~CAAFFindSourceInfo ();
 
 public:
-
-
 
   //***********************************************************
   //
@@ -196,6 +195,55 @@ public:
     // Edit rate property value 
     /*[out,retval]*/ aafRational_t *  pEditRate);
 
+  //***********************************************************
+  // METHOD NAME: GetMultichannelSourceReference()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFFindSourceInfo2 | GetMultichannelSourceReference |
+  // This function returns the source reference and channel ID found by the function
+  /// which generated this IAAFFindSourceInfo2 as a result.
+  ///
+  /// Note: the 3 properties that make up the "source
+  /// reference" are sourceID, sourceTrackID, and startTime.
+  ///
+  /// pHasChannelIDs is a flag indicating whether the returned 
+  /// channel ID value is valid.
+  ///
+  /// If the source is a mono channel Mob Slot without an assigned channel 
+  /// the channel ID value returned by the function shall be zero.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - This object has already been Initialize()d.
+  /// - the pSourceRef pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pSourceRef.
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - This object has not yet had Initialize() called on it.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pSourceRef arg is NULL.
+  // @end
+  // 
+  STDMETHOD (GetMultichannelSourceReference)
+   (
+    // @parm [out] aafSourceRef_t * | pSourceRef | Source Reference
+    aafSourceRef_t *  pSourceRef,
+
+    // @parm [out] aafBoolean_t * | pHasChannelIDs | Has Channel IDs
+    aafBoolean_t *  pHasChannelIDs,
+
+    // @parm [out] aafUInt32 * | pChannelID | Channel ID
+    aafUInt32 *  pChannelID
+  );
+
 
 protected:
   // 
@@ -217,5 +265,3 @@ public:
 };
 
 #endif // ! __CAAFFindSourceInfo_h__
-
-

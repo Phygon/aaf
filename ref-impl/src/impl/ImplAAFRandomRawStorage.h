@@ -71,7 +71,7 @@ public:
 
 
   //****************
-  // GetSize()
+  // WriteAt()
   //
   virtual AAFRESULT STDMETHODCALLTYPE
     WriteAt
@@ -125,6 +125,25 @@ public:
     SetExtent
         // @parm [in] Number of bytes capacity requested for this stream
         (aafUInt64  size);
+
+
+  //****************
+  // WriteCopyByteAt()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    WriteCopyByteAt
+        (
+		 // position in this storage into which data is written
+		 aafUInt64  position,
+
+		 // Buffer from which data is written
+		 aafUInt8   byteToWrite,
+
+		 // Number of bytes requested to write
+		 aafUInt32  byteCount,
+
+		 // Number of bytes written
+		 aafUInt32 *  pNumWritten);
 };
 
 #endif // ! __ImplAAFRandomRawStorage_h__

@@ -42,6 +42,8 @@ AAFMob\
 #c #import ./AAFComponent.exp
 #c #import ./AAFMob.exp
 #import ./AAFSearchSource.exp
+#import ./AAFSearchSource2.exp
+#import ./AAFSearchSource3.exp
 AD_HEAD
 AD_IDL(///
 /// This interface is used with an object representing a SourceMob
@@ -87,7 +89,7 @@ AD_CLASS_UUID(B1A2137D, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 
 AD_DEFAULT_UUID(B1A2137C, 1A7D, 11D2, BF, 78, 00, 10, 4B, C9, 15, 6D)
 #c AD_XCLASS_BEGIN(Concrete, StoredObject)
-AD_COM_EXT_CLASS_BEGIN(public IAAFSearchSource)
+AD_COM_EXT3_CLASS_BEGIN(public IAAFSearchSource, public IAAFSearchSource2, public IAAFSearchSource3)
 AD_METHOD0(Initialize,
 		   Initializes a newly allocated\, empty IAAFSourceMob-supporting
   /// object.  This method must be called after allocation\, and before
@@ -252,9 +254,6 @@ AD_XMETHOD4(AppendTimecodeSlot,
   /// Note: The startTC parameter is expressed in frames since
   /// midnight.
   /// 
-  /// The length32 parameter can be the value FULL_RANGE\, in which
-  /// case the length is 24 hours.
-  ///
   /// Succeeds if all of the following are true:
   /// - The specified slot ID is not yet used.
   /// - This source mob references an AAFTapeDescriptor as an essence
@@ -629,7 +628,19 @@ AD_XMETHOD9(AddPulldownRef,
   ///
   /// AAFRESULT_PULLDOWN_DIRECTION
   ///   - an invalid pulldown direction was specified.)
+#c
+#c SearchSource methods
+#c
 AD_COM_METH(.method-SearchSource)
+#c
+#c SearchSource2 methods
+#c
+AD_COM_METH(.method-SearchSourceAdvanced)
+#c
+#c SearchSource3 methods
+#c
+AD_COM_METH(.method-SearchMultichannelSource)
+AD_COM_METH(.method-SearchMultichannelSourceAdvanced)
 #c AD_XCLASS_END(Concrete, StoredObject)
-AD_COM_EXT_CLASS_END(AAFSearchSource)
+AD_COM_EXT3_CLASS_END(AAFSearchSource, AAFSearchSource2, AAFSearchSource3)
 

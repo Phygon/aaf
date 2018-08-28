@@ -43,11 +43,15 @@ using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string>
+#include <iomanip>
 
 #include "CAAFBuiltinDefs.h"
 
 #include "AAFSmartPointer.h"
 typedef IAAFSmartPointer<IAAFCompositionMob>	IAAFCompositionMobSP;
+typedef IAAFSmartPointer<IAAFDefObject>			IAAFDefObjectSP;
+typedef IAAFSmartPointer<IAAFEssenceDescriptor>	IAAFEssenceDescriptorSP;
 typedef IAAFSmartPointer<IAAFFile>				IAAFFileSP;
 typedef IAAFSmartPointer<IAAFHeader>			IAAFHeaderSP;
 typedef IAAFSmartPointer<IAAFIdentification>	IAAFIdentificationSP;
@@ -58,6 +62,7 @@ typedef IAAFSmartPointer<IAAFPropertyDef>		IAAFPropertyDefSP;
 typedef IAAFSmartPointer<IAAFPropertyValue>		IAAFPropertyValueSP;
 typedef IAAFSmartPointer<IAAFSegment>			IAAFSegmentSP;
 typedef IAAFSmartPointer<IAAFSequence>			IAAFSequenceSP;
+typedef IAAFSmartPointer<IAAFSourceMob>			IAAFSourceMobSP;
 typedef IAAFSmartPointer<IAAFTimelineMobSlot>	IAAFTimelineMobSlotSP;
 typedef IAAFSmartPointer<IAAFTypeDefInt>		IAAFTypeDefIntSP;
 typedef IAAFSmartPointer<IEnumAAFProperties> IEnumAAFPropertiesSP;
@@ -80,8 +85,6 @@ inline void checkExpression(bool expression, HRESULT r=AAFRESULT_TEST_FAILED)
     throw r;
 }
 
-const size_t fileNameBufLen = 128;
-static aafWChar testFileName[ fileNameBufLen ] = L"";
 // AUIDs of optional properties we will create
 static const aafUID_t AUID_OptionalProperty = 
 { 0xacf15840, 0x58d6, 0x11d4, { 0x92, 0x2a, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d } };
@@ -101,10 +104,11 @@ static const aafMobID_t	kTestMobID =
 	0x13, 0x00, 0x00, 0x00,
 	{0x49394200, 0x58ed, 0x11d4, {0x92, 0x2a, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d}}};
 
-//static const aafMobID_t	kTestMobID2 =
-//	{{0x07, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-//	0x13, 0x00, 0x00, 0x00,
-//	{0x4d540120, 0x5900, 0x11d4,0x92, 0x2a, 0x0, 0x50, 0x4, 0x9c, 0x3b, 0x9d}};
+static const aafMobID_t	kTestMobID2 =
+	{{0x07, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+	0x13, 0x00, 0x00, 0x00,
+	{0x0690754f, 0xfae4, 0x427e, {0x9f, 0x5d, 0xcb, 0x67, 0x1c, 0x74, 0x31, 0x34}}};
+
 enum traversalType_e
 {
   traversalOnly,
@@ -112,14 +116,44 @@ enum traversalType_e
   traversalRead
 };
 
-static void TraverseObject(IAAFObject *, IAAFPropertyDef *, IAAFTypeDefInt *, traversalType_e); // throw HRESULT
+static void TraverseObject(IAAFObject *, IAAFPropertyDef *, IAAFTypeDefInt *, traversalType_e, testMode_t mode);
+
+static void
+printNotPresent(IAAFObject* object, IAAFPropertyDef* propertyDef)
+{
+	aafUInt32 bufferLen;
+	std::wstring::size_type offset;
+
+	checkResult(propertyDef->GetNameBufLen(&bufferLen));
+	std::wstring propertyName((bufferLen+sizeof(wchar_t))/sizeof(wchar_t)+1, L'\0');
+	checkResult(propertyDef->GetName(&propertyName[0], bufferLen));
+	offset=propertyName.find(L'\0');
+	if (offset!=std::wstring::npos) {
+		propertyName.resize(offset);
+	}
+
+	std::wstring defObjectName(L"N/A");
+	IAAFDefObjectSP defObject;
+	checkResult(object->QueryInterface(IID_IAAFDefObject, (void**) &defObject));
+	if (defObject) {
+		checkResult(defObject->GetNameBufLen(&bufferLen));
+		defObjectName.assign((bufferLen+sizeof(wchar_t))/sizeof(wchar_t)+1, L'\0');
+		checkResult(defObject->GetName(&defObjectName[0], bufferLen));
+		offset=defObjectName.find(L'\0');
+		if (offset!=std::wstring::npos) {
+			defObjectName.resize(offset);
+		}
+	}
+	std::wcout << L"\tOptional property \"" << propertyName
+		<< L"\" not present in AAFDefObject \"" << defObjectName << L'"' << std::endl;
+}
 
 static HRESULT ObjectWriteTest (
+    aafWChar * pFileName,
 	testMode_t mode,
     aafUID_constref fileKind,
     testRawStorageType_t rawStorageType,
     aafProductIdentification_constref productID)
-
 {
   HRESULT hr = AAFRESULT_TEST_FAILED;
 
@@ -133,8 +167,8 @@ static HRESULT ObjectWriteTest (
 
   try
   {
-	  RemoveTestFile (testFileName);
-	  checkResult (CreateTestFile( testFileName, fileKind, rawStorageType, productID, &pFile ));
+	  RemoveTestFile (pFileName);
+	  checkResult (CreateTestFile( pFileName, fileKind, rawStorageType, productID, &pFile ));
 	  assert (pFile);
 	  checkResult (pFile->GetHeader (&pHeader));
 	  assert (pHeader);
@@ -168,6 +202,58 @@ static HRESULT ObjectWriteTest (
 			  defs.tdUInt16(),
 			  &pOptionalPropertyDef2));
 		  checkResult(pDict->RegisterClassDef(pClassDef));
+
+		  //----------------------------------------------------------------
+		  // PID Allocation Test
+		  // Test dynamic property ID (PID) allocation when mixing built-in
+		  // properties that use dynamic PIDs (such as SubDescriptors) with
+		  // extension properties (extension properties always use dynamic
+		  // PIDs.)
+		  //
+		  // The bug that motivated creation of this test was caused by
+		  // assigning dynamic PIDs to property definitions in the built-in
+		  // dictionary (see ImplAAFBuiltinClasses::MapOmPid()). Once
+		  // a built-in's PID has been set it would remain unchanged during
+		  // AAF Toolkit session that may process multiple files. Because
+		  // a PID is unique within a single file, creating multiple files
+		  // that have extension properties could generate dynamic PIDs
+		  // that are duplicates of PIDs in the built-in dictionary.
+		  //
+		  // This test executes the following steps that trigger generation
+		  // of dynamic PIDs first for a built-in property definition and
+		  // then for an extension property definition. The test is performed
+		  // for 2 AAF files to validate allocation of unique dynamic PIDs
+		  // for both built-in and extemsion property definitions.
+		  // On the write side:
+		  // 1. Start dynamic PID allocation sequence by registering at
+		  //    least one extension property. (Done by the
+		  //    RegisterOptionalPropertyDef() calls above.)
+		  // 2. Trigger dynamic PID allocation for a built-in property
+		  //    by getting a class definition that contains built-in
+		  //    properties. (Done here by getting the definition of the
+		  //    EssenceDescriptor class whose SubDescriptors uses dynamic
+		  //    PID.)
+		  // 3. Allocate more dynamic PIDs by registering at least one more
+		  //    extension property. (Done by the RegisterOptionalPropertyDef()
+		  //    calls with AUID_OptionalProperty3 below.)
+		  // 4. Create an instance of a class that contains built-in
+		  //    properties with dynamic PIDs (for this test - ImportDescriptor
+		  //    class that inherits EssenceDescriptor's properties.) Setting
+		  //    property value doesn't seem necessary; in memory the built-in
+		  //    property will still exist with not-present flag and will have
+		  //    a PID assigned to it.
+		  // 5. Create an instance of a property whose dynamic PID was allocated
+		  //    after the built-in's dynamic PID (for this test it's an instance
+		  //    of AUID_OptionalProperty3)
+		  // On the read side:
+		  // 6. Read from a file an instance of a property whose dynamic PID was
+		  //    allocated after the built-in's dynamic PID (for this test it's
+		  //    an instance of AUID_OptionalProperty3.)
+		  // 
+		  //
+		  // This is step 2 of the PID Allocation Test (see comments above.)
+		  // Timing of this call is important!
+		  checkResult(pDict->LookupClassDef(AUID_AAFEssenceDescriptor,&pClassDef));
 
 
       if (ExtendingAAFObjectSupported(testRev))
@@ -441,7 +527,40 @@ static HRESULT ObjectWriteTest (
 		  aafUID_t readAuid2 = { 0 };
 		  checkResult (pReadIdent2->GetProductID(&readAuid2));
 		  checkExpression (2 == readAuid2.Data1, AAFRESULT_TEST_FAILED);
-		  
+
+		  // PID Allocation Test
+		  // This is step 4 of the PID Allocation Test.
+		  // (Search "PID Allocation Test" for details.)
+		  {
+		  // Create an instance of AAFSourceMob using the newly registered
+		  // class definition.
+
+		  IAAFClassDefSP pClassDef;
+		  checkResult(pDict->LookupClassDef(AUID_AAFSourceMob, &pClassDef));
+		  IAAFSourceMobSP pSMob;
+		  checkResult (pClassDef->CreateInstance (IID_IAAFSourceMob,
+			  (IUnknown **) &pSMob));
+		  assert (pSMob);
+
+		  IAAFMobSP pMob;
+		  checkResult (pSMob->QueryInterface (IID_IAAFMob,
+			  (void **) &pMob));
+		  assert (pMob);
+
+		  checkResult(pMob->SetMobID(kTestMobID2));
+		  checkResult (pSMob->Initialize ());
+
+		  IAAFEssenceDescriptorSP pDesc;
+		  checkResult(pDict->LookupClassDef(AUID_AAFImportDescriptor, &pClassDef));
+		  checkResult (pClassDef->CreateInstance (IID_IAAFEssenceDescriptor,
+			  (IUnknown **) &pDesc));
+		  assert (pDesc);
+		  checkResult (pSMob->SetEssenceDescriptor(pDesc));
+
+		  checkResult (pHeader->AddMob (pMob));
+		  }
+
+
 		  if (ExtendingAAFObjectSupported(testRev))
 		  {
         checkResult(pDict->LookupClassDef(AUID_AAFObject,&pClassDef));
@@ -451,7 +570,7 @@ static HRESULT ObjectWriteTest (
         checkResult(defs.tdUInt32()->QueryInterface(IID_IAAFTypeDefInt, (void**)&pOptionalObjectPropertyTypeDef));
         IAAFObjectSP pHeaderObject;
         checkResult(pHeader->QueryInterface(IID_IAAFObject, (void**)&pHeaderObject));
-		    TraverseObject(pHeaderObject, pOptionalObjectPropertyDef, pOptionalObjectPropertyTypeDef, traversalWrite);
+		    TraverseObject(pHeaderObject, pOptionalObjectPropertyDef, pOptionalObjectPropertyTypeDef, traversalWrite, mode);
 		  }
 }
 hr = AAFRESULT_SUCCESS;
@@ -481,14 +600,16 @@ hr = AAFRESULT_SUCCESS;
 }
 
 
-static HRESULT ObjectReadTest ()
+static HRESULT ObjectReadTest (
+    aafWChar * pFileName,
+	testMode_t mode)
 {
   HRESULT hr = AAFRESULT_TEST_FAILED;
 	IAAFFile * pFile = NULL;
 
   try
 	{
-	  checkResult (AAFFileOpenExistingRead(testFileName,
+	  checkResult (AAFFileOpenExistingRead(pFileName,
 										   0,
 										   &pFile));
 	  assert (pFile);
@@ -569,8 +690,35 @@ static HRESULT ObjectReadTest ()
 	  checkResult(pTypeDefInt->GetInteger(pOptionalPropertyValue,
 		  (aafMemPtr_t)&storedValue,sizeof(aafUInt16)));
       checkExpression(storedValue==10);
-      
-		  
+
+	  // PID Allocation Test
+	  // Check for objects created as part of the PID Allocation Test
+	  {
+	  // Look up the Mob we created. If not found assume that the file
+	  // was generated by an older version of the unit test.
+	  IAAFMobSP pMob;
+	  hr = pHeader->LookupMob(kTestMobID2,&pMob);
+	  if (AAFRESULT_SUCCEEDED(hr))
+	  {
+		// Verify that this is a source Mob
+		IAAFSourceMobSP pSourceMob;
+		checkResult(pMob->QueryInterface(IID_IAAFSourceMob,
+		(void**)&pSourceMob));
+
+		IAAFEssenceDescriptorSP pDesc;
+		checkResult(pSourceMob->GetEssenceDescriptor(&pDesc));
+	  }
+	  else if (hr == AAFRESULT_MOB_NOT_FOUND)
+	  {
+		// Assume that the file was generated by an older version of the unit test.
+		hr = AAFRESULT_SUCCESS;
+	  }
+	  else
+	  {
+		checkResult(hr);
+	  }
+	  }
+
 		  if (ExtendingAAFObjectSupported(testRev) && ExtendingAAFObjectSupported(fileRev))
 		  {
         checkResult(pDict->LookupClassDef(AUID_AAFObject,&pClassDef));
@@ -580,7 +728,7 @@ static HRESULT ObjectReadTest ()
         checkResult(defs.tdUInt32()->QueryInterface(IID_IAAFTypeDefInt, (void**)&pOptionalObjectPropertyTypeDef));
         IAAFObjectSP pHeaderObject;
         checkResult(pHeader->QueryInterface(IID_IAAFObject, (void**)&pHeaderObject));
-		    TraverseObject(pHeaderObject, pOptionalObjectPropertyDef, pOptionalObjectPropertyTypeDef, traversalRead);
+		    TraverseObject(pHeaderObject, pOptionalObjectPropertyDef, pOptionalObjectPropertyTypeDef, traversalRead, mode);
 		  }
       
 	  }
@@ -609,18 +757,18 @@ static void TraverseObjectValue(
   IAAFPropertyValue * pPropertyValue, 
   IAAFPropertyDef * pOptionalPropertyDef,
   IAAFTypeDefInt * pTypeDefInt, 
-  traversalType_e traversalType) // throw HRESULT
+  traversalType_e traversalType,
+  testMode_t mode)
 {
   IAAFTypeDefSP pPropertyValueType;
   checkResult(pPropertyValue->GetType(&pPropertyValueType));
 
   IAAFTypeDefObjectRefSP pObjectRefType;
   checkResult(pPropertyValueType->QueryInterface(IID_IAAFTypeDefObjectRef, (void **)&pObjectRefType));
-  
   IAAFObjectSP pObject;
   checkResult(pObjectRefType->GetObject(pPropertyValue, IID_IAAFObject, (IUnknown **)&pObject));
   
-  TraverseObject(pObject, pOptionalPropertyDef, pTypeDefInt, traversalType);
+  TraverseObject(pObject, pOptionalPropertyDef, pTypeDefInt, traversalType, mode);
 }
 
 // Routine to traverse the object tree by following strong references.
@@ -628,7 +776,8 @@ void TraverseObject(
   IAAFObject * pObject,
   IAAFPropertyDef * pOptionalPropertyDef,
   IAAFTypeDefInt * pTypeDefInt, 
-  traversalType_e traversalType) // throw HRESULT
+  traversalType_e traversalType,
+  testMode_t mode)
 {
   checkExpression(pObject && pOptionalPropertyDef && pTypeDefInt);
 
@@ -643,10 +792,16 @@ void TraverseObject(
   else if (traversalRead == traversalType)
   {
     checkExpression(pOptionalPropertyDef && pTypeDefInt);
-    checkResult(pObject->GetPropertyValue(pOptionalPropertyDef, &pOptionalPropertyValue));
-    aafUInt32 testValue = 0;
-    checkResult(pTypeDefInt->GetInteger(pOptionalPropertyValue, (aafMemPtr_t)&testValue, sizeof(testValue)));
-    checkExpression(kOptionalObjectPropertyValue == testValue, AAFRESULT_TEST_FAILED);
+    HRESULT hr=pObject->GetPropertyValue(pOptionalPropertyDef, &pOptionalPropertyValue);
+	if (hr==AAFRESULT_PROP_NOT_PRESENT && mode==kAAFUnitTestReadOnly) {
+		printNotPresent(pObject, pOptionalPropertyDef);
+	} else if (FAILED(hr)) {
+		throw hr;
+	} else {
+		aafUInt32 testValue = 0;
+		checkResult(pTypeDefInt->GetInteger(pOptionalPropertyValue, (aafMemPtr_t)&testValue, sizeof(testValue)));
+		checkExpression(kOptionalObjectPropertyValue == testValue, AAFRESULT_TEST_FAILED);
+	}
   }
   
   //
@@ -670,7 +825,7 @@ void TraverseObject(
     if (kAAFTypeCatStrongObjRef == category)
     {
       checkResult(pProperty->GetValue(&pObjectPropertyValue));
-      TraverseObjectValue(pObjectPropertyValue, pOptionalPropertyDef, pTypeDefInt, traversalType); 
+      TraverseObjectValue(pObjectPropertyValue, pOptionalPropertyDef, pTypeDefInt, traversalType, mode); 
     }
     else if (kAAFTypeCatSet == category || kAAFTypeCatVariableArray == category || kAAFTypeCatFixedArray == category)
     {
@@ -724,7 +879,7 @@ void TraverseObject(
         IAAFPropertyValueSP pElementPropertyValue;
         while (SUCCEEDED(pEnumPropertyValues->NextOne(&pElementPropertyValue)))
         {
-          TraverseObjectValue(pElementPropertyValue, pOptionalPropertyDef, pTypeDefInt, traversalType);
+          TraverseObjectValue(pElementPropertyValue, pOptionalPropertyDef, pTypeDefInt, traversalType, mode);
         }
       }
       
@@ -748,31 +903,65 @@ extern "C" HRESULT CAAFObject_test(
 {
   HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 
+  const size_t fileNameBufLen = 128;
+  aafWChar testFileName[ fileNameBufLen ] = L"";
   GenerateTestFileName( productID.productName, fileKind, fileNameBufLen, testFileName );
 
   try
   {
 		  if(mode == kAAFUnitTestReadWrite)
 		  {
-			  hr = ObjectWriteTest (mode, fileKind, rawStorageType, productID);
+			  hr = ObjectWriteTest (testFileName, mode, fileKind, rawStorageType, productID);
 			  if (FAILED(hr))
 			  {
-				  cerr << "CAAFObject_test...FAILED!" << endl;
+				  std::wcerr << L"CAAFObject_test...FAILED!" << std::endl;
 				  return hr;
 			  }
 		  }
 		  
-		  hr = ObjectReadTest ();
+		  hr = ObjectReadTest (testFileName, mode);
 		  if (FAILED(hr))
 		  {
-			  cerr << "CAAFObject_test...FAILED!" << endl;
+			  std::wcerr << "CAAFObject_test...FAILED!" << std::endl;
+			  return hr;
+		  }
+
+		  // PID Allocation Test
+		  // Run the unit test with a different file, it will reuse the built-in
+		  // dictionary generated for the first file (Search for "PID Allocation Test"
+		  // for more details.)
+		  aafWChar testBaseFileName2[ 128 ] = L"";
+		  wcscpy( testBaseFileName2, productID.productName );
+		  wcscat( testBaseFileName2, L"_2" );
+		  testFileName[0] = L'\0';
+		  GenerateTestFileName( testBaseFileName2, fileKind, fileNameBufLen, testFileName );
+		  if(mode == kAAFUnitTestReadWrite)
+		  {
+			  hr = ObjectWriteTest (testFileName, mode, fileKind, rawStorageType, productID);
+			  if (FAILED(hr))
+			  {
+				  std::wcerr << L"CAAFObject_test...FAILED!" << std::endl;
+				  return hr;
+			  }
+		  }
+
+		  hr = ObjectReadTest (testFileName, mode);
+		  if (hr == AAFRESULT_NOT_READABLE)
+		  {
+			  // File does not exist if running read-only tests on a file set
+			  // generated by an older version of the unit test.
+			  hr = AAFRESULT_SUCCESS;
+		  }
+		  if (FAILED(hr))
+		  {
+			  std::wcerr << "CAAFObject_test...FAILED!" << std::endl;
 			  return hr;
 		  }
   }
   catch (...)
 	{
-	  cerr << "CAAFObject_test...Caught general C++"
-		   << " exception!" << endl; 
+	  std::wcerr << "CAAFObject_test...Caught general C++"
+		   << " exception!" << std::endl; 
 	  hr = AAFRESULT_TEST_FAILED;
 	}
 

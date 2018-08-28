@@ -481,7 +481,7 @@ ImplAAFTypeDefString::GetTypeCategory (/*[out]*/ eAAFTypeCategory_t * pTid)
 ImplAAFTypeDefSP ImplAAFTypeDefString::BaseType() const
 {
   ImplAAFTypeDefSP result;
-  AAFRESULT hr = GetType (&result);
+  ARESULT (AAFRESULT hr) GetType (&result);
   ASSERTU (AAFRESULT_SUCCEEDED (hr));
   ASSERTU (result);
   return result;
@@ -682,8 +682,10 @@ aafBool ImplAAFTypeDefString::IsFixedSize (void) const
 
 OMUInt32 ImplAAFTypeDefString::PropValSize (void) const
 {
-  ASSERTU (0);
-  return 0; // not reached!
+  // This method should not be called for ImplAAFTypeDefString because
+  // ImplAAFTypeDefString does not define fixed size types.
+  check(AAFRESULT_INTERNAL_ERROR);
+  return 0;
 }
 
 
@@ -696,8 +698,10 @@ aafBool ImplAAFTypeDefString::IsRegistered (void) const
 
 OMUInt32 ImplAAFTypeDefString::NativeSize (void) const
 {
-  ASSERTU (0);
-  return 0; // not reached!
+  // This method should not be called for ImplAAFTypeDefString because
+  // ImplAAFTypeDefString does not define fixed size types.
+  check(AAFRESULT_INTERNAL_ERROR);
+  return 0;
 }
 
 

@@ -108,7 +108,12 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFSegment *pOldSeg = _segment.setValue(pSeg);
 
 	if (pOldSeg)
+	{
+		// Clear the type of the containing MobSlot
+		pOldSeg->SetMobSlotType(ImplAAFComponent::MobSlotType_Undefined);
 		pOldSeg->ReleaseReference();
+		pOldSeg = NULL;
+	}
 
 	if (pSeg)
 		pSeg->AcquireReference();
@@ -231,6 +236,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT ImplAAFMobSlot::FindSegment(aafPosition_t offset,
+										  aafMediaCriteria_t *mediaCrit,
 										  ImplAAFSegment **segment,
 										  aafRational_t *srcRate,
 										  aafPosition_t *diffPos)
@@ -252,7 +258,7 @@ AAFRESULT ImplAAFMobSlot::FindSegment(aafPosition_t offset,
 				
 		CHECK(GetSegment(&tmpSegment));
 				
-		CHECK(tmpSegment->FindSubSegment(offset, &begPos, segment, &foundClip));
+		CHECK(tmpSegment->FindSubSegment(offset, mediaCrit, &begPos, segment, &foundClip));
 		if(!foundClip)
 			RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
 
@@ -284,8 +290,30 @@ AAFRESULT ImplAAFMobSlot::ConvertToEditRate(aafPosition_t tmpPos,
 	return AAFRESULT_SUCCESS;
 }
 
+AAFRESULT ImplAAFMobSlot::ConvertToEditRate(aafPosition_t tmpPos,
+										aafRational_t /*destRate*/,
+										aafRounding_t /*editRateConversion*/,
+										aafPosition_t *convertPos)
+{
+	if(convertPos == NULL )
+		return(AAFRESULT_NULL_PARAM);
+	*convertPos = tmpPos;		// if static (not time-based) slot, assume 1-1 mapping
+	return AAFRESULT_SUCCESS;
+}
+
 AAFRESULT ImplAAFMobSlot::ConvertToMyRate(aafPosition_t tmpPos,
 										  ImplAAFMobSlot * /*srcSlot*/,
+										aafPosition_t *convertPos)
+{
+	if(convertPos == NULL )
+		return(AAFRESULT_NULL_PARAM);
+	*convertPos = tmpPos;		// if static (not time-based) slot, assume 1-1 mapping
+	return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT ImplAAFMobSlot::ConvertToMyRate(aafPosition_t tmpPos,
+										  ImplAAFMobSlot * /*srcSlot*/,
+										aafRounding_t /*editRateConversion*/,
 										aafPosition_t *convertPos)
 {
 	if(convertPos == NULL )

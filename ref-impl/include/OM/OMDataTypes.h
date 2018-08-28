@@ -42,7 +42,7 @@
 #include "OMPortability.h"
 
 // If your compiler is not listed please add code to detect it in
-// OMPortability.h and add a section defining the OM[U]Int{8|16|32}64}
+// OMPortability.h and add a section defining the OM[U]Int{8|16|32|64}
 // types below.
 // This allows new platforms to be added without disturbing the code
 // for existing platforms.
@@ -185,14 +185,16 @@ typedef OMObjectIdentification OMUniqueObjectIdentification;
 // nullOMUniqueObjectIdentification should eventually be replaced
 // with OMConstant<OMUniqueObjectIdentification>::null.
 //
-const OMUniqueObjectIdentification nullOMUniqueObjectIdentification = {0,0,0,{0}};
+const OMUniqueObjectIdentification nullOMUniqueObjectIdentification =
+{0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 
 // For backwards compatibility - all instances of OMClassId should
 // eventually be replaced with OMStoredObjectIdentification.
 //
 typedef OMStoredObjectIdentification OMClassId;
 
-const OMClassId nullOMClassId = {0,0,0,{0}};
+const OMClassId nullOMClassId =
+{0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 
 // A UMID in all but name.
 //
@@ -289,13 +291,30 @@ const OMKLVKey nullOMKLVKey =
 // Stored object encodings
 //
 typedef OMObjectIdentification OMStoredObjectEncoding;
-const OMStoredObjectEncoding nullOMStoredObjectEncoding = {0,0,0,{0}};
+const OMStoredObjectEncoding nullOMStoredObjectEncoding =
+{0, 0, 0, {0, 0, 0, 0, 0, 0, 0, 0}};
 
 // Property instance tags.
 //
 typedef OMUInt16 OMPropertyTag;
 
 const OMPropertyTag nullOMPropertyTag = (OMPropertyTag)(~(OMPropertyTag)0);
+
+// @type OMIOVector | An array of <t OMIOBufferDescriptor>s is an I/O vector.
+// @struct OMIOBufferDescriptor | Describes an IO buffer.
+//
+struct OMIOBufferDescriptor {
+  OMByte* _buffer;      // @field The buffer.
+  OMUInt32 _bufferSize; // @field The buffer size.
+};
+
+// @struct OMIndexTableEntry | Index Table entry.
+struct OMIndexTableEntry {
+  OMInt8   _temporalOffset;
+  OMInt8   _keyFrameOffset;
+  OMUInt8  _flags;
+  OMUInt64 _streamOffset;
+};
 
 // wide string format
 //

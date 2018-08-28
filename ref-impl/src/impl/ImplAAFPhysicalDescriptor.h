@@ -1,7 +1,7 @@
 //@doc
 //@class    ImplAAFPhysicalDescriptor | Implementation class for AAFPhysicalDescriptor
 #ifndef __ImplAAFPhysicalDescriptor_h__
-#define __ImplAAFTapeDescriptor_h__
+#define __ImplAAFPhysicalDescriptor_h__
 
 //=---------------------------------------------------------------------=
 //

@@ -1,0 +1,103 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFCopyByte\
+#endm
+#startm .parent-module 0
+AAFRandomRawStorage\
+#endm
+#c
+AD_HEAD
+AD_IDL(///
+/// This interface is used by the toolkit to access storage in which
+/// AAF files are to be read and written.  It is typically implemented
+/// by clients of IAAFFileXXX.  Note that some implementations are
+/// provided as a convenience to IAAFFileXXX clients.
+///
+/// Assumes that the storage has at least random access capability.
+AD_STD_COMMENT_IFC_HEADER)
+AD_CLASS_UUID(9694E910, 7DD0, 40ED, 88, 79, E0, 18, 04, CB, 97, 10)
+
+AD_DEFAULT_UUID(9694E911, 7DD0, 40ED, 88, 79, E0, 18, 04, CB, 97, 10)
+AD_XCLASS_BEGIN(Concrete, Transient)
+AD_XMETHOD4(WriteCopyByteAt,
+			[in],
+			objPass,
+			aafUInt64,
+			position,
+			position in this storage into which data is written,
+
+			[in],
+			objPass,
+			aafUInt8,
+			theByte,
+			The byte to write,
+
+			[in],
+			objPass,
+			aafUInt32,
+			byteCount,
+			Number of copies of 'theByte' to write,
+
+			[out],
+			objPass,
+			aafUInt32 *,
+			pNumWritten,
+			Number of bytes written,
+
+     Writes byteCount copies of theByte to the raw storage at position.
+  ///
+  /// This call may fail if the capacity of this storage cannot be
+  /// extended sufficiently to complete the request.  The client can
+  /// call SetSize\(\) to attempt to reserve capacity for the storage;
+  /// if the SetSize\(\) call succeeds\, subsequent Write\(\) calls
+  /// within requested that capacity are guaranteed to succeed.
+  ///
+  /// This call will advance the current position by byteCount bytes.
+  ///
+  /// Succeeds if:
+  /// - The pNumWritten pointer is valid.
+  /// - This storage is open for write or read/write.
+  /// - Sufficient capacity exists in this storage to perform the
+  ///   write.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pNumWritten\)
+  ///
+  /// AAFRESULT_NOT_WRITEABLE
+  ///   - This storage is not open for write or read/write.
+  ///
+  /// AAFRESULT_OFFSET_SIZE
+  ///   - It is not possible to extend the allocated size of this
+  ///     storage.)
+
+AD_XCLASS_END(Concrete, Transient)

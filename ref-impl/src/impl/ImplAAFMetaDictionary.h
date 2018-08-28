@@ -114,15 +114,17 @@ public:
 
   virtual bool isRegistered(const OMClassId& classId) const;
 
+  void PreloadBuiltinClassDefs();
+
   //
   // Create an instance of the appropriate derived class, given the
   // class id.  Initializes the OM properties.
   // 
   // This method implements the OMClassFactory interface.
   //
-  OMStorable* create(const OMClassId& classId) const;
+  virtual OMStorable* create(const OMClassId& classId) const;
 
-  void destroy(OMStorable* victim) const;
+  virtual void destroy(OMStorable* victim) const;
 
   //
   // This method implements the required OMStorable interface method
@@ -139,7 +141,8 @@ public:
   virtual void associate(const OMObjectIdentification& id,
                          const OMPropertyId propertyId);
 
-                         
+  virtual void initializePropertyMap(void);
+
   virtual void newClass(const OMUniqueObjectIdentification& id,
                         const wchar_t* name,
                         const wchar_t* description,
@@ -249,6 +252,9 @@ public:
   virtual bool registerClassDef(const OMUniqueObjectIdentification& classId);
   virtual bool registerTypeDef(const OMUniqueObjectIdentification& typeId);
 
+  virtual bool isRequired(const OMStoredObjectEncoding& encoding) const;
+
+  virtual void extend(void);
 
   //
   // Class and type access methods ...
@@ -527,6 +533,7 @@ private:
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFPropertyDef> _axiomaticPropertyDefinitions;
   OMReferenceSet<OMUniqueObjectIdentification, ImplAAFTypeDef> _axiomaticTypeDefinitions;
   OMIdentitySet<OMUniqueObjectIdentification> _forwardClassReferences;
+  OMReferenceSet<OMUniqueObjectIdentification, ImplAAFPropertyDef> _properties;
 
   //
   // Temporary data members used while converting to the "two-roots" containment
@@ -534,6 +541,7 @@ private:
   //
 private:
   ImplAAFDictionary *_dataDictionary;
+  bool					_builtinClassesLoaded;
 
 public:
   void setDataDictionary(ImplAAFDictionary *dataDictionary);

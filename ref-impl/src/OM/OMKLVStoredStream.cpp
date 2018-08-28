@@ -37,9 +37,9 @@
 
 #include "OMAssertions.h"
 #include "OMKLVStoredStreamFilter.h"
-#include "OMMXFStorage.h"
+#include "OMMXFStorageBase.h"
 
-OMKLVStoredStream::OMKLVStoredStream(OMMXFStorage* store, OMUInt32 sid)
+OMKLVStoredStream::OMKLVStoredStream(OMMXFStorageBase* store, OMUInt32 sid)
 : _label(nullOMKLVKey),
   _blockSize(0),
   _fileOffset(0),
@@ -67,6 +67,38 @@ void OMKLVStoredStream::read(void* ANAME(data), OMUInt32 ANAME(size)) const
   ASSERT("Unimplemented code not reached", false); // tjb TBS
 }
 
+  // @mfunc Attempt to read the vector of buffers given by <p buffers>
+  //        from this <c OMKLVStoredStream>. This is "read scatter". The
+  //        <p bufferCount> buffers are read in order until all have
+  //        been successfully read or an error is encountered. Once
+  //        an error has been encountered on one buffer no additional
+  //        buffers are read.
+  //        The number of bytes read is returned in <p bytesRead>.
+  //   @parm The vector of buffers into which the bytes are to be read.
+  //   @parm The count of buffers.
+  //   @parm The actual number of bytes that were read.
+void OMKLVStoredStream::read(OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             OMUInt32& bytesRead) const
+{
+  TRACE("OMKLVStoredStream::read");
+  PRECONDITION("Valid store", _store != 0);
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount > 0);
+
+  _store->readStreamAt(_sid, _position, buffers, bufferCount, bytesRead);
+  OMKLVStoredStream* nonConstThis = const_cast<OMKLVStoredStream*>(this);
+  nonConstThis->_position = _position + bytesRead;
+}
+
+void OMKLVStoredStream::probe(OMUInt64 /* position */,
+                              OMUInt32 /* bytesRequired */,
+                              OMUInt32& /* bytesAvailable */) const
+{
+  TRACE("OMKLVStoredStream::probe");
+  ASSERT("Unimplemented code not reached", false);
+}
+
 void OMKLVStoredStream::read(OMByte* data,
                              const OMUInt32 bytes,
                              OMUInt32& bytesRead) const
@@ -79,6 +111,46 @@ void OMKLVStoredStream::read(OMByte* data,
   _store->readStreamAt(_sid, _position, data, bytes, bytesRead);
   OMKLVStoredStream* nonConstThis = const_cast<OMKLVStoredStream*>(this);
   nonConstThis->_position = _position + bytesRead;
+}
+
+  // Asynchronous read - single buffer
+void OMKLVStoredStream::read(OMUInt64 position,
+                             OMByte* buffer,
+                             const OMUInt32 bytes,
+                             void* /* */ completion,
+                             const void* clientArgument)
+{
+  TRACE("OMKLVStoredStream::read");
+  PRECONDITION("Valid store", _store != 0);
+  PRECONDITION("Valid data buffer", buffer != 0);
+  PRECONDITION("Valid size", bytes > 0);
+
+  _store->readStreamAt(_sid,
+                       position,
+                       buffer,
+                       bytes,
+                       completion,
+                       clientArgument);
+}
+
+  // Asynchronous read - multiple buffers
+void OMKLVStoredStream::read(OMUInt64 position,
+                             OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             void* /* */ completion,
+                             const void* clientArgument) const
+{
+  TRACE("OMKLVStoredStream::read");
+  PRECONDITION("Valid store", _store != 0);
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount > 0);
+
+  _store->readStreamAt(_sid,
+                       position,
+                       buffers,
+                       bufferCount,
+                       completion,
+                       clientArgument);
 }
 
 void OMKLVStoredStream::write(void* ANAME(data), OMUInt32 ANAME(size))
@@ -106,6 +178,69 @@ void OMKLVStoredStream::write(const OMByte* data,
                         bytes,
                         bytesWritten);
   _position = _position + bytesWritten;
+}
+
+  // @cmember Attempt to write the vector of buffers given by <p buffers>
+  //          to this <c OMKLVStoredStream>. This is "write gather". The
+  //          <p bufferCount> buffers are written in order until all have
+  //          been successfully written or an error is encountered. Once
+  //          an error has been encountered on one buffer no additional
+  //          buffers are written.
+  //          The number of bytes written is returned in <p bytesWritten>.
+  //   @parm The vector of buffers from which the bytes are to be written.
+  //   @parm The count of buffers.
+  //   @parm The actual number of bytes that were written.
+void OMKLVStoredStream::write(OMIOBufferDescriptor* buffers,
+                              OMUInt32 bufferCount,
+                              OMUInt32& bytesWritten)
+{
+  TRACE("OMKLVStoredStream::write");
+  PRECONDITION("Valid store", _store != 0);
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount > 0);
+
+  _store->writeStreamAt(_sid, _position, buffers, bufferCount, bytesWritten);
+  _position = _position + bytesWritten;
+}
+
+  // Asynchronous write - single buffer
+void OMKLVStoredStream::write(OMUInt64 position,
+                              const OMByte* buffer,
+                              const OMUInt32 bytes,
+                              void* /* */ completion,
+                              const void* clientArgument)
+{
+  TRACE("OMKLVStoredStream::write");
+  PRECONDITION("Valid store", _store != 0);
+  PRECONDITION("Valid data", buffer != 0);
+  PRECONDITION("Valid size", bytes > 0);
+
+  _store->writeStreamAt(_sid,
+                        position,
+                        buffer,
+                        bytes,
+                        completion,
+                        clientArgument);
+}
+
+  // Asynchronous write - multiple buffers
+void OMKLVStoredStream::write(OMUInt64 position,
+                              const OMIOBufferDescriptor* buffers,
+                              OMUInt32 bufferCount,
+                              void* /* */ completion,
+                              const void* clientArgument)
+{
+  TRACE("OMKLVStoredStream::write");
+  PRECONDITION("Valid store", _store != 0);
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount > 0);
+
+  _store->writeStreamAt(_sid,
+                        position,
+                        buffers,
+                        bufferCount,
+                        completion,
+                        clientArgument);
 }
 
 OMUInt64 OMKLVStoredStream::size(void) const
@@ -148,6 +283,41 @@ void OMKLVStoredStream::close(void)
 
   // We don't own _store
   _store = 0;
+}
+
+    // @cmember Create this <c OMKLVStoredStream> in the file.
+    //   @parm The stream label
+    //   @parm The block size (alignment) of this essence element
+    //         (must be > 0).
+    //   @parm The allocation size (in number of blocks) of this
+    //         essence element(must be > 0).
+void OMKLVStoredStream::create(const OMKLVKey& label,
+                               OMUInt32 blockSize,
+                               OMUInt32 allocationSize,
+                               bool alignV)
+{
+  TRACE("OMKLVStoredStream::create");
+
+  PRECONDITION("Valid label", label != nullOMKLVKey);
+  PRECONDITION("Valid block size", blockSize > 0);
+  PRECONDITION("Valid allocation size", allocationSize > 0);
+  PRECONDITION("Stream does not exist", !exists());
+
+  ASSERT("Valid store", _store != 0);
+
+  _store->createStreamAndAddSegment(_sid, label, blockSize, allocationSize, alignV);
+
+  POSTCONDITION("Stream exists", exists());
+}
+
+bool OMKLVStoredStream::exists(void) const
+{
+  TRACE("OMKLVStoredStream::exists");
+
+  ASSERT("Valid store", _store != 0);
+
+  bool result = _store->streamExists(_sid);
+  return result;
 }
 
   // @mfunc Does this <c OMStoredStream> know about essence element keys?
@@ -315,7 +485,7 @@ void OMKLVStoredStream::writeKLVLength(OMStoredStream& stream,
 
   OMByte buffer[sizeof(OMUInt64) + 1]; // Max
 
-  OMMXFStorage::berEncode(buffer, sizeof(buffer), sizeof(OMUInt64), length);
+  OMMXFStorageBase::berEncode(buffer, sizeof(buffer), sizeof(OMUInt64), length);
   OMUInt32 x;
   stream.write(buffer, sizeof(OMUInt64) + 1, x);
 
@@ -325,7 +495,7 @@ void OMKLVStoredStream::writeKLVLength(OMStoredStream& stream,
 OMUInt64 OMKLVStoredStream::reserveKLVLength(OMStoredStream& stream)
 {
   TRACE("OMKLVStoredStream::reserveKLVLength");
-  // Bah ! should reuse code in OMMXFStorage - tjb
+  // Bah ! should reuse code in OMMXFStorageBase - tjb
   OMUInt64 lengthPosition = stream.position();
   OMUInt64 length = 0;
   writeKLVLength(stream, length); // must be fixed up later
@@ -336,7 +506,7 @@ void OMKLVStoredStream::fixupKLVLength(OMStoredStream& stream,
                                        const OMUInt64 lengthPosition)
 {
   TRACE("OMKLVStoredStream::fixupKLVLength");
-  // Bah ! should reuse code in OMMXFStorage - tjb
+  // Bah ! should reuse code in OMMXFStorageBase - tjb
   OMUInt64 endPosition = stream.position();
   ASSERT("Proper position", endPosition >= (lengthPosition + 8 + 1));
   OMUInt64 length = endPosition - (lengthPosition + 8 + 1);

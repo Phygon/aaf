@@ -36,6 +36,7 @@ AAFFile\
 #startm .parent-module 0
 AAFRoot\
 #endm
+#import ./AAFSaveIntermediate.exp
 #c
 AD_HEAD
 AD_IDL(///
@@ -63,7 +64,7 @@ AD_FORWARD_DECLARATION(AAFHeader)
 AD_CLASS_UUID(9346ACD2, 2713, 11d2, 80, 35, 00, 60, 08, 14, 3E, 6F)
 
 AD_DEFAULT_UUID(9346ACD3, 2713, 11d2, 80, 35, 00, 60, 08, 14, 3E, 6F)
-AD_XCLASS_BEGIN(Concrete, Transient)
+AD_COM_EXT_CLASS_BEGIN(public IAAFSaveIntermediate)
 AD_METHOD0(Open,
      Associates this IAAFFile-supporting object with the storage to
   /// which it is to be associated.  It will then be possible to access
@@ -262,4 +263,9 @@ AD_XMETHOD1(GetDictionary,
   /// AAFRESULT_NULL_PARAM
   ///   - ppDictionary is null.)
 
-AD_XCLASS_END(Concrete, Transient)
+#c
+#c AAFSaveIntermediate methods
+#c
+AD_COM_METH(.method-SaveIntermediate)
+
+AD_COM_EXT_CLASS_END(AAFSaveIntermediate)

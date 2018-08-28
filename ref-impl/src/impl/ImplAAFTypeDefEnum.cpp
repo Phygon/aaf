@@ -104,7 +104,7 @@ ImplAAFTypeDefEnum::Initialize (
 								const aafUID_t & id,
 								ImplAAFTypeDef * pType,
 								aafInt64 * pElementValues,
-								aafCharacter_constptr * pElementNames,
+								aafString_t * pElementNames,
 								aafUInt32 numElements,
 								const wchar_t * pTypeName)
 {
@@ -136,7 +136,7 @@ ImplAAFTypeDefEnum::pvtInitialize (
 								   const aafUID_t & id,
 								   const ImplAAFTypeDef * pType,
 								   aafInt64 * pElementValues,
-								   aafCharacter_constptr * pElementNames,
+								   aafString_t * pElementNames,
 								   aafUInt32 numElements,
 								   const wchar_t * pTypeName)
 {
@@ -230,7 +230,7 @@ static void pvtZeroFill (const aafMemPtr_t inVal,
 						   aafMemPtr_t outVal,
 						   aafUInt32   outValSize)
 {
-  aafUInt32 localValue;	// only 4 bytes; see below for why it's OK.
+  aafUInt32 localValue = 0;	// only 4 bytes; see below for why it's OK.
 
   ASSERTU (inVal);
   ASSERTU (outVal);
@@ -723,7 +723,7 @@ ImplAAFTypeDefEnum::GetIntegerValue (
 	// if (AAFRESULT_FAILED(hr)) return hr;
 	localIntSize = NativeSize();
 	
-	aafInt64 retval;
+	aafInt64 retval = 0;
 	
 	ImplAAFDictionarySP pDict;
 	hr = GetDictionary(&pDict);
@@ -1102,7 +1102,7 @@ ImplAAFTypeDef* ImplAAFTypeDefEnum::NonRefCountedBaseType (void) const
 	else
 	{	
 			ImplAAFTypeDef* result;
-			AAFRESULT hr = GetElementType (&result);
+			ARESULT (AAFRESULT hr) GetElementType (&result);
 			ASSERTU (AAFRESULT_SUCCEEDED (hr));
 			ASSERTU (result);
  		  ((ImplAAFTypeDefEnum*)this)->_cachedBaseType = result;
@@ -1323,7 +1323,7 @@ void ImplAAFTypeDefEnum::AttemptBuiltinRegistration (void)
 	if (! _registrationAttempted)
 	{
 		ImplAAFDictionarySP pDict;
-		AAFRESULT hr = GetDictionary(&pDict);
+		ARESULT (AAFRESULT hr) GetDictionary(&pDict);
 		ASSERTU (AAFRESULT_SUCCEEDED (hr));
 		pDict->pvtAttemptBuiltinSizeRegistration (this);
 		_registrationAttempted = kAAFTrue;

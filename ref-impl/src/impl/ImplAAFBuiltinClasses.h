@@ -57,6 +57,8 @@
 #include "ImplAAFUID.h"
 #endif
 
+#include "OMSet.h"
+
 class ImplAAFClassDef;
 class ImplAAFDictionary;
 class ClassDefinition;
@@ -117,6 +119,8 @@ private:
 
   ImplAAFSearchableStack<ImplAAFUID> _createStack;
   ImplAAFSearchableStack<ImplAAFUID> _initStack;
+
+  OMSet<aafUID_t, OMPropertyId> _dynamicPropertyIDs;
 };
 
 #endif // ! __ImplAAFBuiltinClasses_h__

@@ -54,6 +54,7 @@ typedef IAAFSmartPointer<IAAFPropertyDef>           IAAFPropertyDefSP;
 typedef IAAFSmartPointer<IAAFPropertyValue>         IAAFPropertyValueSP;
 typedef IAAFSmartPointer<IAAFTypeDef>               IAAFTypeDefSP;
 typedef IAAFSmartPointer<IAAFTypeDefStream>         IAAFTypeDefStreamSP;
+typedef IAAFSmartPointer<IAAFTypeDefStream2>        IAAFTypeDefStream2SP;
 typedef IAAFSmartPointer<IAAFTypeDefStream3>        IAAFTypeDefStream3SP;
 typedef IAAFSmartPointer<IAAFTypeDefStreamEx>       IAAFTypeDefStreamExSP;
 typedef IAAFSmartPointer<IAAFSourceMob>             IAAFSourceMobSP;
@@ -183,6 +184,10 @@ static const aafUInt32 sTestAlignmentGridSize = 0x300;
   // Open the test file read only and validate the data.
   void CAAFTypeDefStream_read (aafCharacter_constptr pFileName); // throw HRESULT
 
+  // Report temporary encoding-specific implementation deficiencies
+  bool GatherScatterStreamIOSupported(const aafUID_t& fileKind);
+  bool DeferredStreamIOSupported(const aafUID_t& fileKind);
+
 
 extern "C" HRESULT CAAFTypeDefStream_test(
     testMode_t mode,
@@ -206,6 +211,21 @@ extern "C" HRESULT CAAFTypeDefStream_test(
   catch (HRESULT &rhr)
   {
     result = rhr;
+  }
+
+  // Report temporary encoding-specific implementation deficiencies
+  if ( SUCCEEDED(result) )
+  {
+    if(!GatherScatterStreamIOSupported(fileKind))
+    {
+      cout << "Gather/scatter stream IO have not been implemented for this encoding" << endl;
+      result = AAFRESULT_TEST_PARTIAL_SUCCESS;
+    }
+    if(!DeferredStreamIOSupported(fileKind))
+    {
+      cout << "Deferred stream IO is broken for this encoding" << endl;
+      result = AAFRESULT_TEST_PARTIAL_SUCCESS;
+    }
   }
 
   return result;
@@ -327,6 +347,17 @@ static void Test_GetTypeDefStream(
                                        (void **)&pTypeDefStream3));
   CheckResult(pTypeDefStream3->GetPlainStreamData(0,
                                                   ppPlainStreamData));
+}
+
+static void Test_GetTypeDefStream(
+  IAAFPropertyValue *pStreamPropertyValue,
+  IAAFTypeDefStream2 **ppTypeDefStream)
+{
+  IAAFTypeDefSP pTypeDef;
+
+  CheckResult(pStreamPropertyValue->GetType(&pTypeDef));
+  CheckResult(pTypeDef->QueryInterface(IID_IAAFTypeDefStream2,
+                                       (void **)ppTypeDefStream));
 }
 
 static void Test_EssenceStreamWrite(
@@ -565,11 +596,6 @@ static void Test_EssenceStreamRead(
 class TestStreamAccess : public IAAFStreamAccess 
     {
     public:
-	// Defeat gcc warning about private ctor/dtor and no friends
-	// Note that this dummy function cannot itself be called because
-	// it requires a constructed TestStreamAccess object.
-	friend void dummyFriend(TestStreamAccess);
-
         virtual HRESULT STDMETHODCALLTYPE WriteStream( 
             IAAFPropertyValue *propertyValue,
             aafMemPtr_t pUserData);
@@ -579,41 +605,25 @@ class TestStreamAccess : public IAAFStreamAccess
            REFIID iid,
            void **ppIfc);
 
-        static HRESULT Create(IAAFStreamAccess** ppStreamAccess);
+        static HRESULT Create(CAAFBuiltinDefs& defs,
+                              IAAFStreamAccess** ppStreamAccess);
 
     private:
 
-       TestStreamAccess();
+       TestStreamAccess(CAAFBuiltinDefs& defs);
 
        virtual ~TestStreamAccess();
 
        aafUInt32 _referenceCount;
+
+       CAAFBuiltinDefs& _defs;
 
     };
  
 HRESULT STDMETHODCALLTYPE
 TestStreamAccess::WriteStream (IAAFPropertyValue *propertyValue, aafMemPtr_t pUserData)
 {
-	IAAFTypeDefSP			pTypeDef;
-	IAAFTypeDefStream3SP	pTypeDefStreamRaw;
-	IAAFPlainStreamDataSP	pTypeDefStream;
-	IAAFMetaDefinitionSP	pMetaDef;
-	aafCharacter			debugBuf[256];
-
-	CheckResult(propertyValue->GetType(&pTypeDef));
-	CheckResult(pTypeDef->QueryInterface(IID_IAAFMetaDefinition, (void **)&pMetaDef));
-	CheckResult(pMetaDef->GetName(debugBuf, 256));
-
-	CheckResult(pTypeDef->QueryInterface(IID_IAAFTypeDefStream3,
-                                       (void **)&pTypeDefStreamRaw));
-
-	CheckResult(pTypeDefStreamRaw->GetPlainStreamData(0, &pTypeDefStream));
-
-	// Set the byte order of the stream to big endian...
-	CheckResult(pTypeDefStream->SetStoredByteOrder(propertyValue, kAAFByteOrderBig));
-
-    // Write the bytes
-	CheckResult(pTypeDefStream->Write(propertyValue, sizeof(sSmiley), pUserData));
+    Test_EssenceStreamWrite(_defs, propertyValue);
 
     return AAFRESULT_SUCCESS;
 }
@@ -655,12 +665,14 @@ HRESULT STDMETHODCALLTYPE
   }
 }
 
-HRESULT TestStreamAccess::Create(IAAFStreamAccess** ppStreamAccess)
+HRESULT TestStreamAccess::Create(
+    CAAFBuiltinDefs& defs,
+    IAAFStreamAccess** ppStreamAccess)
 {
   if (ppStreamAccess == 0)
     return AAFRESULT_NULL_PARAM;
 
-  IAAFStreamAccess* result = new TestStreamAccess();
+  IAAFStreamAccess* result = new TestStreamAccess(defs);
   if (result == 0)
     return AAFRESULT_NOMEMORY;
 
@@ -669,8 +681,9 @@ HRESULT TestStreamAccess::Create(IAAFStreamAccess** ppStreamAccess)
   return AAFRESULT_SUCCESS;
 }
 
-TestStreamAccess::TestStreamAccess()
-: _referenceCount(0)
+TestStreamAccess::TestStreamAccess(CAAFBuiltinDefs& defs)
+: _referenceCount(0),
+  _defs(defs)
 {
 }
 
@@ -721,10 +734,174 @@ static void Test_EssenceStreamPullWrite(
 	CheckResult(pTypeDef->QueryInterface(IID_IAAFTypeDefStream3,
                                          (void **)&pTypeDefStream3));
 
-	CheckResult(TestStreamAccess::Create(&cb));
+	CheckResult(TestStreamAccess::Create(defs, &cb));
 	CheckResult(pTypeDefStream3->SetCallback(pStreamPropertyValue, cb,
 		reinterpret_cast<aafMemPtr_t>(const_cast<char *>(sSmiley))));
 	cb->Release();
+}
+
+
+static void Test_EssenceStreamWriteGather(
+  CAAFBuiltinDefs & /* defs */,
+  IAAFPropertyValue *pStreamPropertyValue,
+  bool klvStream)
+{
+  IAAFTypeDefStream2SP pTypeDefStream;
+  Test_GetTypeDefStream(pStreamPropertyValue, &pTypeDefStream);
+
+  // An array of I/O buffer descriptors pointing at
+  // sSmiley and sFrowney
+  aafIOBufferDesc_t bufferDescriptors[] = {
+      {(aafMemPtr_t)sSmiley, sizeof(sSmiley)},
+      {(aafMemPtr_t)sFrowney, sizeof(sFrowney)}
+  };
+  const aafUInt32 bufferDescriptorCount =
+      sizeof(bufferDescriptors) / sizeof(bufferDescriptors[0]);
+
+  // Get the current position
+  aafInt64 streamSize = 0, expectedSize = 0, streamPosition = 0, expectedPosition = 0;
+
+  CheckResult(pTypeDefStream->GetSize(pStreamPropertyValue, &streamSize));
+  CheckExpression(0 == streamSize, AAFRESULT_TEST_FAILED);
+  CheckResult(pTypeDefStream->GetPosition(pStreamPropertyValue, &streamPosition));
+  CheckExpression(0 == streamPosition, AAFRESULT_TEST_FAILED);
+
+  // The postioning code has the following assumption:
+  assert(sizeof(sSmiley) == sizeof(sFrowney));
+
+  // If it's a KLV stream, write a KLV key and reserve space for KLV length
+ #ifdef TEST_NEW_STREAM_WRITING
+  aafInt64  klvLengthPosition = 0;
+ #endif
+  if (klvStream)
+  {
+ #ifdef TEST_NEW_STREAM_WRITING
+    CheckResult(WriteKLVKey(pStreamPropertyValue, testMetadataKey));
+    CheckResult(ReserveKLVLength(pStreamPropertyValue,
+                                 &klvLengthPosition));
+ #endif
+  }
+
+  // The current position is where the stream data starts. In case of a
+  // KLV stream it's non-zero.
+  aafInt64  dataStartPosition = 0;
+  CheckResult(pTypeDefStream->GetPosition(pStreamPropertyValue, &dataStartPosition));
+  expectedSize = dataStartPosition;
+  expectedPosition = dataStartPosition;
+
+  aafUInt32 bytesWritten = 0;
+  CheckResult(pTypeDefStream->WriteGather(pStreamPropertyValue,
+                                          bufferDescriptorCount,
+                                          bufferDescriptors,
+                                          &bytesWritten));
+  CheckExpression(sizeof(sSmiley) + sizeof(sFrowney) == bytesWritten, AAFRESULT_TEST_FAILED);
+
+  // Checking for non-zero size and position must be checked 
+  // carefully since the persistent size for structures and 
+  // characters may be smaller then the in memory size. This
+  // is why this test only uses types that have a known
+  // persistent size: aafUInt8, aafUInt16, aafCharacter.
+  expectedSize += (sizeof(sSmiley) + sizeof(sFrowney));
+  expectedPosition += (sizeof(sSmiley) + sizeof(sFrowney));
+  CheckResult(pTypeDefStream->GetSize(pStreamPropertyValue, &streamSize));
+  CheckExpression(expectedSize == streamSize, AAFRESULT_TEST_FAILED);
+  CheckResult(pTypeDefStream->GetPosition(pStreamPropertyValue, &streamPosition));
+  CheckExpression(expectedPosition == streamPosition, AAFRESULT_TEST_FAILED);
+
+
+  // Test non-zero repositioning and overriting...
+  expectedPosition -= sizeof(sFrowney);
+  CheckResult(pTypeDefStream->SetPosition(pStreamPropertyValue, expectedPosition));
+  CheckResult(pTypeDefStream->GetPosition(pStreamPropertyValue, &streamPosition));
+  CheckExpression(expectedPosition == streamPosition, AAFRESULT_TEST_FAILED);
+
+  CheckResult(pTypeDefStream->WriteGather(pStreamPropertyValue,
+                                          bufferDescriptorCount,
+                                          bufferDescriptors,
+                                          &bytesWritten));
+  CheckExpression(sizeof(sSmiley) + sizeof(sFrowney) == bytesWritten, AAFRESULT_TEST_FAILED);
+ 
+  expectedSize = expectedSize - sizeof(sFrowney) + sizeof(sSmiley) + sizeof(sFrowney);
+  expectedPosition += (sizeof(sSmiley) + sizeof(sFrowney));
+  CheckResult(pTypeDefStream->GetSize(pStreamPropertyValue, &streamSize));
+  CheckExpression(expectedSize == streamSize, AAFRESULT_TEST_FAILED);
+  CheckResult(pTypeDefStream->GetPosition(pStreamPropertyValue, &streamPosition));
+  CheckExpression(expectedPosition == streamPosition, AAFRESULT_TEST_FAILED);
+
+
+  // If it's a KLV stream, update the KLV length.
+  if (klvStream)
+  {
+ #ifdef TEST_NEW_STREAM_WRITING
+    CheckResult(pTypeDefStream->SetPosition(pStreamPropertyValue, klvLengthPosition));
+    CheckResult(WriteKLVLength(pStreamPropertyValue, streamSize-dataStartPosition));
+ #endif
+  }
+
+
+  // Restore the position to the begining of the stream.
+  CheckResult(pTypeDefStream->SetPosition(pStreamPropertyValue, 0));
+}
+
+static void Test_EssenceStreamReadScatter(
+  CAAFBuiltinDefs & /* defs */,
+  IAAFPropertyValue *pStreamPropertyValue,
+  bool klvStream)
+{
+  IAAFTypeDefStream2SP pTypeDefStream;
+  Test_GetTypeDefStream(pStreamPropertyValue, &pTypeDefStream);
+
+  // An array of I/O buffer descriptors pointing at
+  // sSmiley and sFrowney
+  aafUInt8  buffer1[ sizeof(sSmiley) ];
+  aafUInt8  buffer2[ sizeof(sSmiley) ];
+  aafUInt8  buffer3[ sizeof(sFrowney) ];
+  aafIOBufferDesc_t bufferDescriptors[] = {
+      {(aafMemPtr_t)buffer1, sizeof(buffer1)},
+      {(aafMemPtr_t)buffer2, sizeof(buffer2)},
+      {(aafMemPtr_t)buffer3, sizeof(buffer3)}
+  };
+  const aafUInt32 bufferDescriptorCount =
+      sizeof(bufferDescriptors) / sizeof(bufferDescriptors[0]);
+
+  // Go to the beginning
+  CheckResult(pTypeDefStream->SetPosition(pStreamPropertyValue, 0));
+
+  // Streams in KLV-encoded files start with a key and BER encoded length.
+  // Skip key and length if present.
+  if (klvStream)
+  {
+#ifdef TEST_NEW_STREAM_WRITING
+    CheckResult(SkipKL(pStreamPropertyValue));
+#else
+    if( IsKLVStream(pStreamPropertyValue) )
+      CheckResult(SkipKL(pStreamPropertyValue));
+#endif
+  }
+
+  // At this point the position may be larger than zero
+  aafInt64 expectedPosition = 0;
+  CheckResult(pTypeDefStream->GetPosition(pStreamPropertyValue, &expectedPosition));
+
+  // Read an array of bytes.
+  aafUInt32 bytesRead = 0;
+  CheckResult(pTypeDefStream->ReadScatter(pStreamPropertyValue,
+                                          bufferDescriptorCount,
+                                          bufferDescriptors,
+                                          &bytesRead));
+  CheckExpression(bytesRead == sizeof(sSmiley)+sizeof(sSmiley)+sizeof(sFrowney),
+                  AAFRESULT_TEST_FAILED);
+  CheckExpression(0 == memcmp(buffer1, sSmiley, sizeof(buffer1)),
+                  AAFRESULT_TEST_FAILED);
+  CheckExpression(0 == memcmp(buffer2, sSmiley, sizeof(buffer2)),
+                  AAFRESULT_TEST_FAILED);
+  CheckExpression(0 == memcmp(buffer3, sFrowney, sizeof(buffer3)),
+                  AAFRESULT_TEST_FAILED);
+
+  expectedPosition += bytesRead;
+  aafInt64 streamPosition = 0;
+  CheckResult(pTypeDefStream->GetPosition(pStreamPropertyValue, &streamPosition));
+  CheckExpression(expectedPosition == streamPosition, AAFRESULT_TEST_FAILED);
 }
 
 static void Test_KLVStreamParametersOnWrite(
@@ -827,6 +1004,8 @@ static void Test_NearKAGBoundaryWrite(
   CAAFBuiltinDefs & defs,
   IAAFPropertyValue *pStreamPropertyValue)
 {
+  AAFRESULT hr = AAFRESULT_SUCCESS;
+
   IAAFPlainStreamDataSP pTypeDefStream;
   Test_GetTypeDefStream(pStreamPropertyValue, &pTypeDefStream);
 
@@ -884,6 +1063,24 @@ static void Test_NearKAGBoundaryRead(
   }
 }
 
+// Report temporary encoding-specific implementation deficiencies
+bool GatherScatterStreamIOSupported(const aafUID_t& fileKind)
+{
+    bool result = true;
+    if(EffectiveTestFileEncoding(fileKind) == kAAFFileKind_AafKlvBinary)
+        result = false;
+    return result;
+}
+
+// Report temporary encoding-specific implementation deficiencies
+bool DeferredStreamIOSupported(const aafUID_t& fileKind)
+{
+    bool result = true;
+    if(isSSFileKind(fileKind))
+        result = false;
+    return result;
+}
+
 // Create the test file.
 void CAAFTypeDefStream_create (
     aafCharacter_constptr pFileName,
@@ -906,6 +1103,13 @@ void CAAFTypeDefStream_create (
 
     // Remove the previous test file is one exists
     ::RemoveTestFile (pFileName);
+
+    // Are we dealing with KLV streams?
+    bool klvStreams = false;
+    if (memcmp(&fileKind, &aafFileKindAafKlvBinary, sizeof(aafUID_t)) == 0)
+    {
+      klvStreams = true;
+    }
 
     // Create the file.
     CheckResult (CreateTestFile( pFileName, fileKind, rawStorageType, productID, &pFile ));
@@ -933,19 +1137,33 @@ void CAAFTypeDefStream_create (
       Test_EssenceStreamRead(defs, pSampleIndexPropertyValue);
     }
 
-    Test_EssenceStreamPullWrite(pFile, defs);
+    // Deferred stream IO is currently broken for Structured Storage encoded files.
+    // (AAFRESULT_TEST_PARTIAL_SUCCESS)
+    if (DeferredStreamIOSupported(fileKind))
+    {
+        Test_EssenceStreamPullWrite(pFile, defs);
+    }
 
-    // Test IAAFTypeDefStream2 methods
-    IAAFEssenceDataSP pEssenceData2;
-    IAAFPropertyValueSP pDataPropertyValue2;
-    IAAFPropertyValueSP pSampleIndexPropertyValue2;
-
-    Test_CreateEssenceData(defs, pHeader, sMobID[3], sMobName[3], &pEssenceData2);
-
-    Test_EssenceStreamPropertyValues(pDictionary,
-                                     pEssenceData2,
-                                     &pDataPropertyValue2,
-                                     &pSampleIndexPropertyValue2);
+    // Gather/scatter stream IO is currently not implemented for KLV encoded files.
+    // (AAFRESULT_TEST_PARTIAL_SUCCESS)
+    if (GatherScatterStreamIOSupported(fileKind))
+    {
+        // Test IAAFTypeDefStream2 methods
+        IAAFEssenceDataSP pEssenceData2;
+        IAAFPropertyValueSP pDataPropertyValue2;
+        IAAFPropertyValueSP pSampleIndexPropertyValue2;
+    
+        Test_CreateEssenceData(defs, pHeader, sMobID[3], sMobName[3], &pEssenceData2);
+    
+        Test_EssenceStreamPropertyValues(pDictionary,
+                                         pEssenceData2,
+                                         &pDataPropertyValue2,
+                                         &pSampleIndexPropertyValue2);
+    
+        // Test the required property
+        Test_EssenceStreamWriteGather(defs, pDataPropertyValue2, klvStreams);
+        Test_EssenceStreamReadScatter(defs, pDataPropertyValue2, klvStreams);
+    }
 
 
     // Test IAAFTypeDefStream3 methods
@@ -1009,10 +1227,16 @@ void CAAFTypeDefStream_read (aafCharacter_constptr pFileName) // throw HRESULT
     IAAFPropertyValueSP pDataPropertyValue;
     IAAFPropertyValueSP pSampleIndexPropertyValue;
 
+    // Are we reading KLV streams?
+    bool klvStream = false;
     aafUID_t  fileKind;
     aafBool isAAFFile = kAAFFalse;
     CheckResult (AAFFileIsAAFFile(pFileName, &fileKind, &isAAFFile));
     CheckExpression(isAAFFile == kAAFTrue, AAFRESULT_TEST_FAILED);
+    if (memcmp(&fileKind, &aafFileKindAafKlvBinary, sizeof(aafUID_t)) == 0)
+    {
+      klvStream = true;
+    }
 
     CheckResult (AAFFileOpenExistingRead(pFileName, 0, &pFile));
     CheckResult (pFile->GetHeader (&pHeader));
@@ -1055,6 +1279,30 @@ void CAAFTypeDefStream_read (aafCharacter_constptr pFileName) // throw HRESULT
     }  
 
 
+    // Test data written using deferred stream IO (IAAFStreamAcccess)
+    IAAFEssenceDataSP pEssenceData1;
+    // sMobID[2] may not be in the file, in the case
+    // the file was created by an older test.
+    if(pHeader->LookupEssenceData(sMobID[2], &pEssenceData1) == AAFRESULT_SUCCESS)
+    {
+      IAAFPropertyValueSP pDataPropertyValue1;
+      IAAFPropertyValueSP pSampleIndexPropertyValue1;
+
+      Test_EssenceStreamPropertyValues(pDictionary,
+                                       pEssenceData1,
+                                       &pDataPropertyValue1,
+                                       &pSampleIndexPropertyValue1);
+
+      Test_EssenceStreamRead(defs, pDataPropertyValue1);
+
+      if(pSampleIndexPropertyValue1)
+      {
+        // Test the optional property
+        Test_EssenceStreamRead(defs, pSampleIndexPropertyValue1);
+      }  
+    }
+
+
     // Test IAAFTypeDefStream2 methods
     IAAFEssenceDataSP pEssenceData2;
 
@@ -1070,6 +1318,7 @@ void CAAFTypeDefStream_read (aafCharacter_constptr pFileName) // throw HRESULT
                                        &pDataPropertyValue2,
                                        &pSampleIndexPropertyValue2);
 
+      Test_EssenceStreamReadScatter(defs, pDataPropertyValue2, klvStream);
     }
 
 

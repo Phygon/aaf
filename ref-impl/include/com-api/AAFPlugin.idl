@@ -55,12 +55,14 @@ import "AAFPluginTypes.idl";
 #endif
 
 interface IAAFClassExtension;
+interface IAAFDictionaryExtension;
 interface IAAFEssenceCodec;
 interface IAAFEssenceCodec2;
 interface IAAFEssenceCodec3;
 interface IAAFEssenceContainer;
 interface IAAFEssenceDataStream;
 interface IAAFEssenceDataStream2;
+interface IAAFEssenceDataStreamEx;
 interface IAAFEssenceStream;
 interface IAAFInterpolator;
 interface IAAFMultiEssenceCodec;
@@ -84,6 +86,9 @@ interface IAAFPlugin;
 /// associated extension class.
 ///
 ///
+
+
+
 [
     object,
     uuid(65C07344-DF36-11d3-8008-00104bc9156d),
@@ -126,6 +131,67 @@ interface IAAFClassExtension : IUnknown
 
 // ************************
 //
+// Interface IAAFDictionaryExtension
+//
+// ************************
+
+
+///
+/// The AAFDictionaryExtension interface describes the calls of a plugin
+/// which registers definitions of extensions in an AAF Dictionary.
+///
+///
+
+
+
+[
+    object,
+    uuid(9a51e9f7-f80e-4ef1-96fd-469cd498271e),
+    helpstring("IAAFDictionaryExtension Interface"),
+    pointer_default(unique)
+]
+interface IAAFDictionaryExtension : IUnknown
+{
+
+
+  //***********************************************************
+  //
+  // RegisterExtensionDefinitions()
+  //
+  /// This method registers the extension definitions
+  /// into the given dictionary.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pDictionary pointer is valid.
+  ///
+  ///   Note that this method should be prepared for the case that the
+  ///   definition it wishes to register has already been registered,
+  ///   this is not an error. 
+  ///
+  ///   The implementation of this method should handle this by simply
+  ///   looking up each definition before attempting to regisister it.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pDictionary arg is NULL.
+  /// 
+  /// @param pDictionary [in] The dictionary in which to register the definitions
+  ///
+  HRESULT RegisterExtensionDefinitions (
+    [in] IAAFDictionary * pDictionary);
+
+}
+
+
+
+// ************************
+//
 // Interface IAAFEssenceCodec
 //
 // ************************
@@ -157,9 +223,6 @@ interface IAAFClassExtension : IUnknown
 ///
 
 
-///
-/// Objects that implement IAAFEssenceCodec also implement the following interfaces:
-///  - IAAFPlugin
 [
     object,
     uuid(3631F7A2-9121-11d2-8088-006008143e6f),
@@ -1055,9 +1118,9 @@ interface IAAFEssenceCodec : IUnknown
 ///   - insufficient system memory is available to perform the
 ///     operation.
 ///
-///
-/// Objects that implement IAAFEssenceCodec2 also implement the following interfaces:
-///  - IAAFPlugin
+
+
+
 [
     object,
     uuid(8888F7A2-9121-11d2-8088-006008143e6f),
@@ -1970,9 +2033,9 @@ interface IAAFEssenceCodec2 : IUnknown
 ///   - insufficient system memory is available to perform the
 ///     operation.
 ///
-///
-/// Objects that implement IAAFEssenceCodec3 also implement the following interfaces:
-///  - IAAFPlugin
+
+
+
 [
     object,
     uuid(F375A58F-EB6A-49C7-90A2-7937329AE0E4),
@@ -3069,6 +3132,9 @@ interface IAAFEssenceContainer : IUnknown
 ///		in AAF files, and essence in a file all by itself (ex. a WAVE file).
 ///
 ///
+
+
+
 [
     object,
     uuid(CDDB6AB1-98DC-11d2-808a-006008143e6f),
@@ -3132,6 +3198,9 @@ interface IAAFEssenceDataStream : IUnknown
 ///		interface is IAAFEssenceDataStream or IAAFEssenceDataStream2.
 ///
 ///
+
+
+
 [
     object,
     uuid(F8C9C2A1-DD6B-4e10-884F-012AF43550BC),
@@ -3272,6 +3341,189 @@ interface IAAFEssenceDataStream2 : IUnknown
   ///
   HRESULT GetEssenceElementKey (
     [out] aafUID_t *  pEssenceElementKey);
+
+}
+
+
+
+
+// ************************
+//
+// Interface IAAFEssenceDataStreamEx
+//
+// ************************
+
+//
+// The IAAFEssenceDataStreamEx interface is an additional interface implemented by objects
+// which stream over AAF files, and were therefore created by the AAFContainerDef for
+// AAF files.  This interface allows the setting of one additional parameter (a pointer
+// to the AAFEssenceData object to stream over) which was not general-purpose enough
+// to be in the IAAFEssenceStream interface.
+//
+// The IAAFEssenceDataStreamEx extends the IAAFEssenceDataStream interface by adding
+// methods to set and get the optional SampleIndex property
+//
+// Objects which support this interface must be created by methods in IAAFContainerDef, since
+// the container definition is what is used to differentiate between the different streams.
+// If the stream needs a reference to data other than a file pointer (ex. the AAFContainer
+// makes a stream which needs a reference to a structureed storage stream) will have another
+// interface to support the additional behaviour.  For an AAF container, the additional interface
+// is IAAFEssenceDataStream.
+//
+// The following has been copied from the IAAFEssenceStream interface:
+//		The IAAFEssenceStream interface is an internal interface used by AAFEssenceAccess and
+//		essence codecs to read the low-level representation of the essence.  There are multiple
+//		classes implementing this interface, each representing a different underlying container
+//		holding the essence data.  The idea of "container" is separate from any formatting such
+//		as WAVE or JPEG.  Examples of containers (and therefore streams), are essence embedded
+//		in AAF files, and essence in a file all by itself (ex. a WAVE file).
+//
+//
+
+
+
+[
+    object,
+    uuid(bc0f561a-7834-408f-b97e-813997a55c5b),
+    helpstring("IAAFEssenceDataStreamEx Interface"),
+    pointer_default(unique)
+]
+interface IAAFEssenceDataStreamEx : IUnknown
+{
+
+
+  //***********************************************************
+  //
+  // Init()
+  //
+  /// Init the stream over a particular EssenceData.
+  /// 
+  /// @param essenceData [in] The EssenceData to stream over
+  ///
+  HRESULT Init (
+    [in] IUnknown * essenceData);
+
+  //***********************************************************
+  //
+  // WriteSampleIndex()
+  //
+  /// Write some number of bytes to the stream exactly and with no formatting or compression.
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  (This is the only code indicating success.)
+	//
+	// AAFRESULT_NULL_PARAM
+	//   - pBuffer or pBytesRead is null.
+	//
+	// AAFRESULT_STREAM_FULL
+	//   - The essence can not be written because of a fault such as a disk full error in the
+	// underlying operating system.
+  /// 
+  /// @param bytes [in] the number of bytes to write
+  /// @param buffer [out, size_is(bytes)] the buffer that contains at least bytes
+  /// @param bytesWritten [out,ref] the number of bytes actually written from the buffer
+  ///
+  HRESULT WriteSampleIndex (
+    [in] aafUInt32  bytes,
+    [out, size_is(bytes)] aafDataBuffer_t  buffer,
+    [out,ref] aafUInt32 *  bytesWritten);
+
+
+  //***********************************************************
+  //
+  // ReadSampleIndex()
+  //
+  /// Read some number of bytes from the stream exactly and with no formatting or compression.
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  (This is the only code indicating success.)
+	//
+	// AAFRESULT_NULL_PARAM
+	//   - pBuffer or pBytesRead is null.
+	//
+	// AAFRESULT_END_OF_ESSENCE
+	//   - Hit either the end-of-file on a raw essence file, or the end of the essence property.
+	//	The pBytesRead parameter correctly reflects the number of bytes actually read.
+  /// 
+  /// @param buflen [in] to a buffer of this size
+  /// @param pBuffer [out, size_is(buflen), length_is(*pBytesRead)] here is the buffer
+  /// @param pBytesRead [out,ref] Return bytes actually read
+  ///
+  HRESULT ReadSampleIndex (
+    [in] aafUInt32  buflen,
+    [out, size_is(buflen), length_is(*pBytesRead)] aafDataBuffer_t  pBuffer,
+    [out,ref] aafUInt32 *  pBytesRead);
+
+  //***********************************************************
+  //
+  // SeekSampleIndex()
+  //
+  /// Seek to the absolute byte offset into the stream.
+  /// 
+  /// @param byteOffset [in] The absolute byte offset into the stream.
+  ///
+  HRESULT SeekSampleIndex (
+    [in] aafPosition_t  byteOffset);
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect\\\, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  \\\(This is the only code indicating success.\\\)
+	//
+	// AAFRESULT_STREAM_BOUNDS
+	//   - The new position would be outside of the bounds of the stream.)
+
+  //***********************************************************
+  //
+  // GetSampleIndexPosition()
+  //
+  /// Returns the position within the stream.
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  (This is the only code indicating success.)
+	//
+	// AAFRESULT_NULL_PARAM
+	//   - pPosition is null.
+  /// 
+  /// @param pPosition [out] The position within the stream.
+  ///
+  HRESULT GetSampleIndexPosition (
+    [out] aafPosition_t *  pPosition);
+
+  //***********************************************************
+  //
+  // GetSampleIndexLength()
+  //
+  /// Returns the length of the stream.
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  (This is the only code indicating success.)
+	//
+	// AAFRESULT_NULL_PARAM
+	//   - pLength is null.
+  /// 
+  /// @param pLength [out] The length of the stream.
+  ///
+  HRESULT GetSampleIndexLength (
+    [out] aafLength_t *  pLength);
 
 }
 
@@ -3536,9 +3788,6 @@ interface IAAFEssenceStream : IUnknown
 ///
 
 
-///
-/// Objects that implement IAAFInterpolator also implement the following interfaces:
-///  - IAAFPlugin
 [
     object,
     uuid(75C6CDF2-0D67-11d3-80A9-006008143e6f),
@@ -3845,9 +4094,6 @@ interface IAAFInterpolator : IUnknown
 ///
 
 
-///
-/// Objects that implement IAAFMultiEssenceCodec also implement the following interfaces:
-///  - IAAFPlugin
 [
     object,
     uuid(7F93992D-DDA3-11d3-8008-00104bc9156d),

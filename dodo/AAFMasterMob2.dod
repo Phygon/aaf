@@ -151,7 +151,7 @@ AD_XMETHOD5(AddMasterSlot,
   ///
   /// AAFRESULT_INVALID_DATADEF
   ///   - The data kind of the source MOB slot to be added to the Master
-  ///     Mob does not match what is specfied in pDataDef.
+  ///     Mob does not match what is specified in pDataDef.
   ///
   /// AAFRESULT_SLOT_NOTFOUND
   ///   - The specified Source Mob slot was not found.

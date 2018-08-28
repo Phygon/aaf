@@ -192,6 +192,28 @@ void OMCachedRawStorage::writeAt(OMUInt64 position,
   }
 }
 
+void OMCachedRawStorage::writeCopyByteAt(OMUInt64 position,
+                                         OMByte theByte,
+                                         OMUInt32 byteCount,
+                                         OMUInt32& bytesWritten)
+{
+  TRACE("OMCachedRawStorage::writeCopyByteAt");
+
+  PRECONDITION("Writable", isWritable());
+  PRECONDITION("Positionable", isPositionable());
+  PRECONDITION("Valid byte count", byteCount > 0);
+
+  setPosition(position);
+  for (OMUInt32 i=0; i<byteCount; i++) {
+    OMUInt32 localBytesWritten = 0;
+    write(&theByte, 1, localBytesWritten);
+    bytesWritten += localBytesWritten;
+    if (localBytesWritten != 1) {
+      break;
+    }
+  }
+}
+
   // @mfunc The current extent of this <c OMCachedRawStorage> in bytes.
   //        The <f extent()> is the allocated size, while the <f size()>
   //        is the valid size.

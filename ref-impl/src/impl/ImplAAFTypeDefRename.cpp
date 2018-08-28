@@ -217,7 +217,7 @@ AAFRESULT STDMETHODCALLTYPE
 ImplAAFTypeDefSP ImplAAFTypeDefRename::BaseType () const
 {
   ImplAAFTypeDefSP result;
-  AAFRESULT hr = GetBaseType (&result);
+  ARESULT (AAFRESULT hr) GetBaseType (&result);
   ASSERTU (AAFRESULT_SUCCEEDED (hr));
   ASSERTU (result);
   return result;

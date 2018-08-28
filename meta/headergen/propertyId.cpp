@@ -83,11 +83,18 @@ static void doFile(const char* moduleName)
     }
   }
   for (i = 0; i < sizeof(properties)/sizeof(properties[0]); i++) {
+    const char* comment;
+    if (properties[i].identifier == 0) {
+      comment = " // dynamic";
+    } else {
+      comment = "";
+    }
     printDefinition("const int",
                     "PID_",
                     properties[i].name,
                     maxNameLength,
                     properties[i].identifier,
+                    comment,
                     cout);
   }
   printEndGuard(moduleName, cout);
@@ -100,5 +107,5 @@ int main(int argc, char** argv)
   validateArgs(argc, argv, moduleName);
   assert(moduleName);
   doFile(moduleName);
-  return 0;
+  return EXIT_SUCCESS;
 }

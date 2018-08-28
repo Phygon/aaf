@@ -150,6 +150,94 @@ void OMDataStreamPropertyFilter::write(const OMByte* buffer,
   _property->setPresent();
 }
 
+  // @mfunc Attempt to read the vector of buffers given by <p buffers>
+  //        from this <c OMDataStreamProperty>. This is "read scatter". The
+  //        <p bufferCount> buffers are read in order until all have
+  //        been successfully read or an error is encountered. Once
+  //        an error has been encountered on one buffer no additional
+  //        buffers are read.
+  //        The number of bytes read is returned in <p bytesRead>.
+  //   @parm The vector of buffers into which the bytes are to be read.
+  //   @parm The count of buffers.
+  //   @parm The actual number of bytes that were read.
+void OMDataStreamPropertyFilter::read(OMIOBufferDescriptor* buffers,
+                                OMUInt32 bufferCount,
+                                OMUInt32& bytesRead) const
+{
+  TRACE("OMDataStreamPropertyFilter::read");
+  streamFilter()->read(buffers, bufferCount, bytesRead);
+}
+
+  // @mfunc Attempt to write the vector of buffers given by <p buffers>
+  //        to this <c OMDataStreamProperty>. This is "write gather". The
+  //        <p bufferCount> buffers are written in order until all have
+  //        been successfully written or an error is encountered. Once
+  //        an error has been encountered on one buffer no additional
+  //        buffers are written.
+  //        The number of bytes written is returned in <p bytesWritten>.
+  //   @parm The vector of buffers from which the bytes are to be written.
+  //   @parm The count of buffers.
+  //   @parm The actual number of bytes that were written.
+void OMDataStreamPropertyFilter::write(const OMIOBufferDescriptor* buffers,
+                                 OMUInt32 bufferCount,
+                                 OMUInt32& bytesWritten)
+{
+  TRACE("OMDataStreamPropertyFilter::write");
+  OMIOBufferDescriptor* b = const_cast<OMIOBufferDescriptor*>(buffers);
+  streamFilter()->write(b, bufferCount, bytesWritten);
+  _property->setPresent();
+}
+
+    // Asynchronous read - single buffer
+void OMDataStreamPropertyFilter::read(OMUInt64 position,
+                                OMByte* buffer,
+                                const OMUInt32 bytes,
+                                void* /* */ completion,
+                                const void* clientArgument)
+{
+  TRACE("OMDataStreamPropertyFilter::read");
+
+  streamFilter()->read(position, buffer, bytes, completion, clientArgument);
+}
+
+    // Asynchronous write - single buffer
+void OMDataStreamPropertyFilter::write(OMUInt64 position,
+                                 const OMByte* buffer,
+                                 const OMUInt32 bytes,
+                                 void* /* */ completion,
+                                 const void* clientArgument)
+{
+  TRACE("OMDataStreamPropertyFilter::write");
+
+  streamFilter()->write(position, buffer, bytes, completion, clientArgument);
+  _property->setPresent();
+}
+
+    // Asynchronous read - multiple buffers
+void OMDataStreamPropertyFilter::read(OMUInt64 position,
+                                OMIOBufferDescriptor* buffers,
+                                OMUInt32 bufferCount,
+                                void* /* */ completion,
+                                const void* clientArgument) const
+{
+  TRACE("OMDataStreamPropertyFilter::read");
+
+  streamFilter()->read(position, buffers, bufferCount, completion, clientArgument);
+}
+
+    // Asynchronous write - multiple buffers
+void OMDataStreamPropertyFilter::write(OMUInt64 position,
+                                 const OMIOBufferDescriptor* buffers,
+                                 OMUInt32 bufferCount,
+                                 void* /* */ completion,
+                                 const void* clientArgument)
+{
+  TRACE("OMDataStreamPropertyFilter::write");
+
+  streamFilter()->write(position, buffers, bufferCount, completion, clientArgument);
+  _property->setPresent();
+}
+
   // @mfunc Attempt to read the number of elements given by
   //        <p elementCount> and described by <p elementType> and
   //        <p externalElementSize> from the data stream into the buffer
@@ -288,6 +376,16 @@ void OMDataStreamPropertyFilter::writeTypedElements(const OMType* elementType,
   delete [] buffer;
   elementsWritten = elementCount;
   _property->setPresent();
+}	
+
+  // @mfunc Synchronize this <c OMDataStreamPropertyFilter> with
+  //        the underlying <c OMDataStreamProperty>.
+  //        Calling this method brings the encoding-specific
+  //        represenation of <c OMStoredStream> into a valid state.
+void OMDataStreamPropertyFilter::synchronize(void) const
+{
+  TRACE("OMFilterStreamAccess::synchronize");
+  streamFilter()->synchronize();
 }
 
 OMStoredStreamFilter* OMDataStreamPropertyFilter::streamFilter()

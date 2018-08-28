@@ -182,6 +182,69 @@ void printReg(const uid& id, ostream& s)
     << "}";
 }
 
+// Convert a GUID to a label
+//{0101010D-0101-0100-060E-2B3402060101} =>
+//06.0E.2B.34.02.53.01.01.0D.01.01.01.01.01.01.00
+// Note 06 -> 53 in octet 6
+void convert(label& lid, const uid& auid)
+{
+  // Bottom half of label <- top half of auid
+  //
+  lid.octet0  = auid.Data4[0];
+  lid.octet1  = auid.Data4[1];
+  lid.octet2  = auid.Data4[2];
+  lid.octet3  = auid.Data4[3];
+  lid.octet4  = auid.Data4[4];
+  lid.octet5  = auid.Data4[5];
+  lid.octet6  = auid.Data4[6];
+  lid.octet7  = auid.Data4[7];
+
+  // Top half of label <- bottom half of auid
+  //
+  lid.octet8  = (aafUInt8)((auid.Data1 & 0xff000000) >> 24);
+  lid.octet9  = (aafUInt8)((auid.Data1 & 0x00ff0000) >> 16);
+  lid.octet10 = (aafUInt8)((auid.Data1 & 0x0000ff00) >>  8);
+  lid.octet11 = (aafUInt8)((auid.Data1 & 0x000000ff));
+
+  lid.octet12 = (aafUInt8)((auid.Data2 & 0xff00) >> 8);
+  lid.octet13 = (aafUInt8)((auid.Data2 & 0x00ff));
+
+  lid.octet14 = (aafUInt8)((auid.Data3 & 0xff00) >> 8);
+  lid.octet15 = (aafUInt8)((auid.Data3 & 0x00ff));
+
+  // If auid is an AAF class AUID, map it to a SMPTE 336M local set key
+  //
+  aafUInt8 classIdPrefix[] = {0x06, 0x0e, 0x2b, 0x34, 0x02, 0x06};
+  if (memcmp(&lid, &classIdPrefix, sizeof(classIdPrefix)) == 0) {
+    lid.octet5  = 0x53;
+  }
+}
+ 
+// print a label like this -
+// 06.0E.2B.34.02.53.01.01.0D.01.01.01.01.01.01.00
+void printLabel(const label& id, ostream& s)
+{
+  s.setf(ios::uppercase);
+  s.flags(ios::right);
+  s << hex << setfill('0')
+    << setw(2) << (int)id.octet0  << "."
+    << setw(2) << (int)id.octet1  << "."
+    << setw(2) << (int)id.octet2  << "."
+    << setw(2) << (int)id.octet3  << "."
+    << setw(2) << (int)id.octet4  << "."
+    << setw(2) << (int)id.octet5  << "."
+    << setw(2) << (int)id.octet6  << "."
+    << setw(2) << (int)id.octet7  << "."
+    << setw(2) << (int)id.octet8  << "."
+    << setw(2) << (int)id.octet9  << "."
+    << setw(2) << (int)id.octet10 << "."
+    << setw(2) << (int)id.octet11 << "."
+    << setw(2) << (int)id.octet12 << "."
+    << setw(2) << (int)id.octet13 << "."
+    << setw(2) << (int)id.octet14 << "."
+    << setw(2) << (int)id.octet15;
+}
+
 void printDefinition(const char* type,
                      const char* prefix,
                      const char* name,
@@ -191,6 +254,11 @@ void printDefinition(const char* type,
 {
   s << "//";
   printReg(identifier, s);
+  s << endl;
+  s << "//";
+  label lab;
+  convert(lab, identifier);
+  printLabel(lab, s);
   s << endl;
   s << type;
   s << " ";
@@ -206,6 +274,7 @@ void printDefinition(const char* type,
                      const char* name,
                      size_t width,
                      int identifier,
+                     const char* comment,
                      ostream& s)
 {
   s << type;
@@ -217,7 +286,7 @@ void printDefinition(const char* type,
   s.fill('0');
   s << "0x" << hex;
   s.setf(ios::uppercase);
-  s << setw(4) << identifier << ";" << endl;
+  s << setw(4) << identifier << ";" << comment << endl;
 }
 
 void printDefinition(const char* type,
@@ -264,6 +333,11 @@ void printMacroInvocation(const char* prefix,
 {
   s << "//";
   printReg(identifier, s);
+  s << endl;
+  s << "//";
+  label lab;
+  convert(lab, identifier);
+  printLabel(lab, s);
   s << endl;
 
   s << macro << "(" << prefix << name << "," << endl;

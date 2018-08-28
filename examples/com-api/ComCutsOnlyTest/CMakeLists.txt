@@ -21,7 +21,7 @@
 # (http://www.amwa.tv/policies).
 #
 # Copyright Notices:
-# The Original Code of this file is Copyright 1998-2009, licensor of the
+# The Original Code of this file is Copyright 1998-2012, licensor of the
 # Advanced Media Workflow Association.  All rights reserved.
 #
 # The Initial Developer of the Original Code of this file and the
@@ -31,33 +31,33 @@
 #
 ###############################################################################
 
-#------------------------------------------------------------------------------
-#
-# Usage: update.sh <new file> <file to update>
-#
-# The script checks if two files are different. If
-# they are, it copies the first file over the second 
-# one and makes it writable to be recognized by some 
-# source control systems as modified.
-# 
-# If files are identical but the first file is newer 
-# then the second one then the script sets the second
-# file's modification date to latest so that 'make' 
-# doesn't try to rebuild it.
-#
-# If none of the above is true, nothing happens.
-#
-#------------------------------------------------------------------------------
+cmake_minimum_required(VERSION 3.0.2)
 
-if [ -f $2 ] && cmp -s $1 $2; then
-    echo $2 did not change;
-    if [ $1 -nt $2 ]; then
-	echo updating timestamp $2
-        touch $2
-    fi
-else
-    echo updating $2
-    cp -f $1 $2
-    chmod +w $2
-fi
+if(NOT DEFINED AAFSDK_ROOT)
+    message(FATAL_ERROR "'AAFSDK_ROOT' must be set. Run a build from the top-level CMakeLists.txt script.")
+endif()
 
+# MSVC: ./AAFWinSDK/<vsXX>/<Win32|x64>/<Debug|Release>/Examples/Com
+# Makefile: ./AAFx86_64LinuxSDK/g++/bin/<debug|>
+set(TARGET_DIR "${AAFSDK_TARGET_DIR}/Examples")
+
+add_executable(ComCutsTestAAF CutsOnlyExample.cpp)
+
+target_link_libraries(ComCutsTestAAF PRIVATE
+    AAFIID
+    AAFLIB
+)
+
+set_target_properties(ComCutsTestAAF PROPERTIES
+    VERSION ${AAFSDK_VERSION_STRING}
+)
+
+set_target_properties(ComCutsTestAAF PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${TARGET_DIR}
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${TARGET_DIR}
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${TARGET_DIR}
+)
+
+add_dependencies(ComCutsTestAAF
+    MakeSDK
+)

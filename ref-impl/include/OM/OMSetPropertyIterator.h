@@ -98,7 +98,7 @@ public:
 
     // @cmember The number of <p Element>s in the associated
     //          <c OMSetProperty>.
-  virtual size_t count(void) const;
+  virtual OMUInt32 count(void) const;
 
     // @cmember Advance this <c OMSetPropertyIterator> to the next
     //          <p Element>, if any.

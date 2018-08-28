@@ -92,7 +92,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	aafUID_t*			pDef;
 	aafUInt32			numDefs;
-	HRESULT				hr = E_FAIL;
+	HRESULT				hr = AAFRESULT_SUCCESS;
 
 	if ((!pFetched && count != 1) || (pFetched && count == 1))
 		return E_INVALIDARG;

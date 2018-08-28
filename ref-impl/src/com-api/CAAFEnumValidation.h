@@ -45,6 +45,7 @@ extern "C" {
 #endif
 
 bool Is_AAFDataDefinitionMatch_t_Valid(AAFDataDefinitionMatch_t param);
+bool Is_aafAVCContentScanningType_t_Valid(aafAVCContentScanningType_t param);
 bool Is_aafAlphaTransparency_t_Valid(aafAlphaTransparency_t param);
 bool Is_aafAppendOption_t_Valid(aafAppendOption_t param);
 bool Is_aafAttributeKind_t_Valid(aafAttributeKind_t param);
@@ -84,6 +85,7 @@ bool Is_aafIncMedia_t_Valid(aafIncMedia_t param);
 bool Is_aafIndexType_t_Valid(aafIndexType_t param);
 bool Is_aafInterpKind_t_Valid(aafInterpKind_t param);
 bool Is_aafJPEGcomponent_t_Valid(aafJPEGcomponent_t param);
+bool Is_aafMPEG4VisualCodedContentType_t_Valid(aafMPEG4VisualCodedContentType_t param);
 bool Is_aafMediaOpenMode_t_Valid(aafMediaOpenMode_t param);
 bool Is_aafMobKind_t_Valid(aafMobKind_t param);
 bool Is_aafOperationChoice_t_Valid(aafOperationChoice_t param);

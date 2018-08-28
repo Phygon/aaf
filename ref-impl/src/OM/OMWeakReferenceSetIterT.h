@@ -161,7 +161,7 @@ bool OMWeakReferenceSetIterator<Key, ReferencedObject>::valid(void) const
   //   @rdesc The number of <p ReferencedObject>s
   //   @this const
 template <typename Key, typename ReferencedObject>
-size_t OMWeakReferenceSetIterator<Key, ReferencedObject>::count(void) const
+OMUInt32 OMWeakReferenceSetIterator<Key, ReferencedObject>::count(void) const
 {
   return _iterator.count();
 }

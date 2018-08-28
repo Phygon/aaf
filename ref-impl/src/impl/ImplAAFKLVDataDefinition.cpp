@@ -92,7 +92,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFKLVDataDefinition::AddParentProperty (
-      ImplAAFPropertyDef * pParentProperty )
+      ImplAAFPropertyDef * /* pParentProperty */ )
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -100,7 +100,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFKLVDataDefinition::GetParentProperties (
-      ImplEnumAAFPropertyDefs ** ppEnum )
+      ImplEnumAAFPropertyDefs ** /* ppEnum */ )
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }
@@ -108,7 +108,7 @@ ImplAAFKLVDataDefinition::GetParentProperties (
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFKLVDataDefinition::CountParentProperties (
-      aafUInt32* pNumProperties )
+      aafUInt32* /* pNumProperties */ )
 {
   return AAFRESULT_NOT_IMPLEMENTED;
 }

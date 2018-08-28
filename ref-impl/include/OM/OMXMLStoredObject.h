@@ -112,11 +112,37 @@ public:
     //            make sense for all derived instances of <c OMStoredObject>.
     virtual OMStoredObject* create(const wchar_t* name);
 
-    // @cmember Open an exsiting <c OMXMLStoredObject>, named <p name>,
+    // @cmember Create a new <c OMXMLStoredObject>, contained by this
+    //          <c OMXMLStoredObject>. New <c OMXMLStoredObject> is a stored
+    //          representatin of an <c OMStorable> referenced by
+    //          <p containingProperty>.
+  virtual OMStoredObject* create(const OMProperty* containingProperty);
+
+    // @cmember Create a new <c OMXMLStoredObject>, contained by this
+    //          <c OMXMLStoredObject>. New <c OMStoredObject> is a stored
+    //          representatin of an <c OMStorable> referenced by
+    //          an element <p localKey> of <p containingProperty>.
+  virtual OMStoredObject* create(const OMProperty* containingProperty,
+                                 OMUInt32 localKey);
+
+    // @cmember Open an existing <c OMXMLStoredObject>, named <p name>,
     //          contained by this <c OMXMLStoredObject>.
     //   @devnote The name argument to this member function doesn't
     //            make sense for all derived instances of <c OMStoredObject>.
     virtual OMStoredObject* open(const wchar_t* name);
+
+    // @cmember Open an existing <c OMXMLStoredObject>, contained by this
+    //          <c OMXMLStoredObject>. <c OMXMLStoredObject> is a stored
+    //          representatin of an <c OMStorable> referenced by
+    //          <p containingProperty>.
+  virtual OMStoredObject* open(const OMProperty* containingProperty);
+
+    // @cmember Open an existing <c OMXMLStoredObject>, contained by this
+    //          <c OMXMLStoredObject>. <c OMXMLStoredObject> is a stored
+    //          representatin of an <c OMStorable> referenced by
+    //          an element <p localKey> of <p containingProperty>.
+  virtual OMStoredObject* open(const OMProperty* containingProperty,
+                               OMUInt32 localKey);
 
     // @cmember Close this <c OMXMLStoredObject>.
     virtual void close(void);

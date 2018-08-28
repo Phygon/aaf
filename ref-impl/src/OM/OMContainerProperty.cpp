@@ -78,12 +78,14 @@ void OMContainerProperty::setLocalKey(OMUInt32 newLocalKey)
   // @mfunc Compute the name of an element in this <c OMContainer>
   //        given the element's <p localKey>.
   //   @parm The element's local key.
+  //
+  // Obsolete?
 wchar_t* OMContainerProperty::elementName(OMUInt32 localKey)
 {
   TRACE("OMContainerProperty::elementName");
 
-  wchar_t* name = OMStoredObject::elementName(_name, propertyId(), localKey);
-  return name;
+  wchar_t* result = OMStoredObject::elementName(name(), propertyId(), localKey);
+  return result;
 }
 
   // @mfunc Obtain the next available local key.
@@ -91,15 +93,4 @@ wchar_t* OMContainerProperty::elementName(OMUInt32 localKey)
 OMUInt32 OMContainerProperty::nextLocalKey(void)
 {
   return _localKey++;
-}
-
-const wchar_t* OMContainerProperty::storedName(void) const
-{
-  TRACE("OMContainerProperty::storedName");
-
-  if (_storedName == 0) {
-    OMContainerProperty* p = const_cast<OMContainerProperty*>(this);
-    p->_storedName = OMStoredObject::collectionName(_name, propertyId());
-  }
-  return _storedName;
 }

@@ -1,3 +1,6 @@
+#ifndef __AAFEssenceFormats_h__
+#define __AAFEssenceFormats_h__
+
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -110,3 +113,5 @@ const aafUID_t kAAFNumThreads = { 0xfd5a645e, 0x7bfe, 0x47cd, { 0x8f, 0xfb, 0x39
 // the enumerated type is BufferLayout_t (presently declared in framebuffer.h, should be from autogen)
 // BufferLayout_t supercedes aafColorSpace_e (declared in AAFTypes.h, used in CAAFCDCICodec.cpp et al)
 const aafUID_t kAAFBufferLayout = { 0x3c93eb8a, 0xe61, 0x434c, { 0xa1, 0xa8, 0x63, 0xf0, 0x98, 0x3e, 0x5b, 0x4b } };
+
+#endif

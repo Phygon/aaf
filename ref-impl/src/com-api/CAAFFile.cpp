@@ -75,7 +75,6 @@ CAAFFile::~CAAFFile ()
 {
 }
 
-
 HRESULT STDMETHODCALLTYPE
     CAAFFile::Open ()
 {
@@ -269,8 +268,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppHeader->ReleaseReference(); // We are through with this pointer.
+          internalppHeader = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppHeader should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppHeader == 0);
+
   return hr;
 }
 
@@ -496,9 +506,33 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppDictionary->ReleaseReference(); // We are through with this pointer.
+          internalppDictionary = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppDictionary should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppDictionary == 0);
+
   return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFFile::SaveIntermediate ()
+{
+  ImplAAFFile * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFFile*> (pO);
+  assert (ptr);
+  return ptr->SaveIntermediate();
 }
 
 
@@ -525,6 +559,13 @@ HRESULT CAAFFile::InternalQueryInterface
         return S_OK;
     }
 
+    if (EQUAL_UID(riid,IID_IAAFSaveIntermediate)) 
+    { 
+        *ppvObj = (IAAFSaveIntermediate *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
+
     // Always delegate back to base implementation.
     return CAAFRoot::InternalQueryInterface(riid, ppvObj);
 }
@@ -533,4 +574,3 @@ HRESULT CAAFFile::InternalQueryInterface
 // Define the contrete object support implementation.
 // 
 AAF_DEFINE_FACTORY(AAFFile)
-

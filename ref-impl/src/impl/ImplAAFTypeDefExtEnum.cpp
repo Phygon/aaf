@@ -54,6 +54,8 @@
 #include "AAFTypeDefUIDs.h"
 #endif
 
+#include "ImplAAFPropValData.h"
+
 #include "AAFUtils.h"
 
 #include "OMTypeVisitor.h"
@@ -238,19 +240,31 @@ ImplAAFTypeDefExtEnum::CreateValueFromName (
 	//else FOUND
 	
 	
-	//Now allocate a New PV based on the local INT size ....
+	ImplAAFPropValDataSP pvd;
+	pvd = (ImplAAFPropValData*) CreateImpl (CLSID_AAFPropValData);
+	if (!pvd)
+		return AAFRESULT_NOMEMORY;
+
+	// Both CreateImpl() and ImplAAFSmartPointer increment reference count.
+	// Manually release one of the references.
+	pvd->ReleaseReference();
 	
-	ImplAAFTypeDef* ptd;
-	ImplAAFTypeDefRecord* ptdAuid;
+	AAFRESULT hr;
+	hr = pvd->Initialize (this);
+	if (AAFRESULT_FAILED (hr))
+		return hr;
 	
-	ptd = NonRefCountedBaseType ();
-	ASSERTU (ptd);
+	aafMemPtr_t pBits = 0;
+	hr = pvd->AllocateBits (sizeof(aafUID_t), &pBits);
+	if (AAFRESULT_FAILED(hr))
+		return hr;
+	ASSERTU (pBits);
 	
-	ptdAuid = dynamic_cast<ImplAAFTypeDefRecord*> ((ImplAAFTypeDef*) ptd);
-	ASSERTU (ptdAuid);
+	// Simply copy struct bits into property value.
+	memcpy (pBits, &the_value, sizeof(aafUID_t));
 	
-	HRESULT hr = ptdAuid->CreateValueFromStruct ((aafMemPtr_t) &the_value, sizeof (aafUID_t),
-		ppPropVal);
+	*ppPropVal = pvd;
+	(*ppPropVal)->AcquireReference ();
 	
 	return hr;
 }
@@ -492,6 +506,51 @@ ImplAAFTypeDefExtEnum::AppendElement (
 	hr = CountElements(&origNumElems);
 	if (AAFRESULT_FAILED(hr))
 		return hr;
+
+	// Check for duplicates
+	try 
+	{
+		aafInt32 foundDuplicateValue = -1, foundDuplicateName = -1;
+
+		for (aafUInt32 i = 0; i < origNumElems; ++i) 
+		{
+			aafUID_t existing_value;
+			_ElementValues.getValueAt(&existing_value, i);
+			
+			if (memcmp(&existing_value, &value, sizeof(value)) == 0) 
+			{
+				foundDuplicateValue = i;
+				break;
+			}
+		}
+
+		const OMUInt16 ELEMENT_NAME_LEGHT_MAX = OMPROPERTYSIZE_MAX/sizeof(aafCharacter);
+		for (aafUInt32 i = 0; i < origNumElems; ++i)
+		{
+			aafCharacter existing_name[ELEMENT_NAME_LEGHT_MAX];
+			GetElementName(i, existing_name, OMPROPERTYSIZE_MAX);
+			if (wcscmp(existing_name, pName) == 0)
+			{
+				foundDuplicateName = i;
+				break;
+			}
+		}
+
+		if (foundDuplicateValue != -1 && foundDuplicateName == foundDuplicateValue) 
+		{
+			// Both value and name already present - assume success
+			return AAFRESULT_SUCCESS;
+		} 
+		else if (foundDuplicateValue != foundDuplicateName)
+		{
+			// Trying to add not same pair of name/value; fail
+			return AAFRESULT_INVALID_PARAM;
+		}
+	}
+	catch (AAFRESULT &rCaught)
+	{
+		return rCaught;
+	}
 	
 	aafWChar * namesBuf = 0;
 	aafUID_t * valsBuf = 0;
@@ -1017,7 +1076,81 @@ bool ImplAAFTypeDefExtEnum::IsStringable () const
 { return true; }
 
 
+AAFRESULT ImplAAFTypeDefExtEnum::MergeTo( ImplAAFDictionary* pDestDictionary )
+{
+	ASSERTU( pDestDictionary );
 
+	AAFRESULT hr = AAFRESULT_SUCCESS;
+
+	aafUID_t typeID = {0};
+	GetAUID( &typeID );
+
+	ImplAAFTypeDef* pDstTypeDef = 0;
+	if( AAFRESULT_FAILED( pDestDictionary->LookupTypeDef( typeID, &pDstTypeDef ) ) )
+	{
+		hr = ImplAAFTypeDef::MergeTo(pDestDictionary);
+	}
+	else
+	{
+		ImplAAFTypeDefExtEnum* pDestTypeDefExtEnum = 
+			dynamic_cast<ImplAAFTypeDefExtEnum*>(pDstTypeDef);
+		ASSERTU( pDestTypeDefExtEnum );
+		
+		OMUInt32 count = elementCount();
+		for (OMUInt32 index = 0; index < count; index++)
+		{
+			const wchar_t* name = elementName(index);
+			const OMUniqueObjectIdentification id = elementValue(index);
+			const aafUID_t& auid = *reinterpret_cast<const aafUID_t*>(&id); // Ugly cast !!!
+
+			bool append = true;
+
+			// Built-in names changed from v1.0 -> v1.1 to remove kAAF prefix.
+			// For elements with same IDs ignore the prefix when comparing their names.
+			const wchar_t* namePtr = name;
+			if (wcsncmp(namePtr, L"kAAF", 4) == 0) namePtr += 4;
+
+			OMUInt32 dstCount = pDestTypeDefExtEnum->elementCount();
+			for (OMUInt32 dstIndex = 0; dstIndex < dstCount; dstIndex++)
+			{
+				const wchar_t* dstName = pDestTypeDefExtEnum->elementName(dstIndex);
+				const OMUniqueObjectIdentification dstId = pDestTypeDefExtEnum->elementValue(dstIndex);
+				const aafUID_t& dstAuid = *reinterpret_cast<const aafUID_t*>(&dstId); // Ugly cast !!!
+				
+				const wchar_t* dstNamePtr = dstName;
+				if (wcsncmp(dstNamePtr, L"kAAF", 4) == 0) dstNamePtr += 4;
+
+				bool isNameEqual = (wcscmp(name, dstName) == 0);
+				bool isNameWithoutKAAFEqual = (wcscmp(namePtr, dstNamePtr) == 0);
+				bool isAuidEqual = EqualAUID (&auid, &dstAuid);
+				
+				if ((isNameEqual || isNameWithoutKAAFEqual) && isAuidEqual)
+				{
+					// Just skip appending if the same element is exist.
+					append = false;
+					break;
+				}
+				else if( isNameEqual && !isAuidEqual)
+				{
+					// Element is unique only if names and AUIDs are both equal or are both not equal.
+					hr = AAFRESULT_INCONSISTENCY;
+					append = false;
+					break;
+				}
+			}
+
+			if (append)
+				hr = pDestTypeDefExtEnum->AppendElement(auid, name);
+
+			if (AAFRESULT_FAILED(hr))
+				break;
+		}
+	}
+
+	pDstTypeDef->ReleaseReference();
+
+	return hr;
+}
 
 
 

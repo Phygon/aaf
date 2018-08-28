@@ -36,9 +36,8 @@
 #ifndef OMLISTITERATOR_H
 #define OMLISTITERATOR_H
 
+#include "OMDataTypes.h"
 #include "OMContainerIterator.h"
-
-#include <stddef.h>
 
 template <typename Element>
 class OMList;
@@ -94,7 +93,7 @@ public:
 
     // @cmember The number of <p Elements>s in the associated
     //          <c OMList>.
-  virtual size_t count(void) const;
+  virtual OMUInt32 count(void) const;
 
     // @cmember Advance this <c OMListIterator> to the next <p Element>,
     //          if any.

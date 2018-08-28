@@ -1,0 +1,893 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFAVCSubDescriptor\
+#endm
+#c
+#startm .parent-module 0
+AAFSubDescriptor\
+#endm
+#c
+#c #import ./AAFSubDescriptor.exp
+AD_HEAD
+AD_IDL(///
+/// The IAAFAVCSubDescriptor interface is implemented by objects which
+/// describe H.264/MPEG-4 AVC video essence.
+///
+/// In addition to the specific error results listed for each method\,
+/// all methods in this interface may also return one of the following
+/// values:
+/// 
+/// AAFRESULT_NOMEMORY
+///   - insufficient system memory is available to perform the
+///     operation.
+///)
+AD_CLASS_UUID(70B8009A, DCCE, 499B, B0, 8A, 3F, A3, 87, 30, 4E, 5D)
+
+AD_DEFAULT_UUID(BA7E9988, 39E4, 4D99, 81, 35, 76, CB, E7, 2A, 29, 25)
+AD_XCLASS_BEGIN(Concrete, StoredObject)
+AD_METHOD0(Initialize,
+		   Initializes a newly allocated\, IAAFAVCSubDescriptor-supporting
+  /// object. This method must be called after allocation\, and before
+  /// any other method can be called.
+  ///
+  /// Succeeds if:
+  /// - Initialize\(\) has not yet been called on this object.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect\, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_ALREADY_INITIALIZED
+  ///   - Initialize\(\) has already been called on this object.)
+
+
+AD_XMETHOD1(SetDecodingDelay,
+            [in],
+                objPass,
+                aafUInt8,
+                decodingDelay,
+            The delay required for decoded pictures in number of access units.,
+
+     Set the delay required for decoded pictures in number of access units.
+  /// The value is given by the presentation time of the first presented
+  /// picture in a GOP minus the decoding time of the first decoded picture
+  /// in the GOP.
+  /// The value shall be set to zero if there are no B Pictures in the essence
+  /// stream.
+  /// The value shall be set to FFh if the delay is unknown.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCDecodingDelay property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetDecodingDelay,
+            [out],
+                objPass,
+                aafUInt8 *,
+                pDecodingDelay,
+            The delay required for decoded pictures in number of access units.,
+
+     Get the delay required for decoded pictures in number of access units.
+  /// The value is the presentation time of the first presented picture in
+  /// a GOP minus the decoding time of the first decoded picture in the GOP.
+  /// The value is zero if there are no B Pictures in the essence stream.
+  /// The value is FFh if the delay is unknown.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pDecodingDelay pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pDecodingDelay.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pDecodingDelay arg is NULL.)
+
+
+
+AD_XMETHOD1(SetConstantBPictureFlag,
+            [in],
+                objPass,
+                aafBoolean_t,
+                constantBPictureFlag,
+            True if the number of the consecutive B Pictures is always constant; false if it is not constant or is unknown.,
+
+     Set the flag specifying if the number of the consecutive B Pictures
+  /// is always constant.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCConstantBPictureFlag property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetConstantBPictureFlag,
+            [out],
+                objPass,
+                aafBoolean_t *,
+                pConstantBPictureFlag,
+            True if the number of the consecutive B Pictures is always constant; false if it is not constant or is unknown.,
+
+     Get the flag specifying if the number of the consecutive B Pictures
+  /// is always constant.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pConstantBPictureFlag pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pConstantBPictureFlag.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pConstantBPictureFlag arg is NULL.)
+
+
+
+AD_XMETHOD1(SetCodedContentKind,
+            [in],
+                objPass,
+                aafAVCContentScanningType_t,
+                codedContentKind,
+            coded content kind.,
+
+     Set coded content kind.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCCodedContentKind property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetCodedContentKind,
+            [out],
+                objPass,
+                aafAVCContentScanningType_t *,
+                pCodedContentKind,
+            coded content kind.,
+
+     Get coded content kind.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pCodedContentKind pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pCodedContentKind.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pCodedContentKind arg is NULL.)
+
+
+
+AD_XMETHOD1(SetClosedGOPIndicator,
+            [in],
+                objPass,
+                aafBoolean_t,
+                closedGOPIndicator,
+            True if all GOPs are started with an IDR Picture; false otherwise or if the information is not available.,
+
+     Set the closed GOP indicator.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCClosedGOPIndicator property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetClosedGOPIndicator,
+            [out],
+                objPass,
+                aafBoolean_t *,
+                pClosedGOPIndicator,
+            True if all GOPs are started with an IDR Picture; false otherwise or if the information is not available.,
+
+     Set the closed GOP indicator.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pClosedGOPIndicator pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pClosedGOPIndicator.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pClosedGOPIndicator arg is NULL.)
+
+
+
+AD_XMETHOD1(SetIdenticalGOPIndicator,
+            [in],
+                objPass,
+                aafBoolean_t,
+                identicalGOPIndicator,
+            True if every GOP in has the same number of pictures and the same types of pictures in the same order; false otherwise or if the information is not available.,
+
+     Set identical GOP indicator.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCIdenticalGOPIndicator property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetIdenticalGOPIndicator,
+            [out],
+                objPass,
+                aafBoolean_t *,
+                pIdenticalGOPIndicator,
+            True if every GOP in has the same number of pictures and the same types of pictures in the same order; false otherwise or if the information is not available.,
+
+     Get identical GOP indicator.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pIdenticalGOPIndicator pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pIdenticalGOPIndicator.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pIdenticalGOPIndicator arg is NULL.)
+
+
+
+AD_XMETHOD1(SetMaximumGOPSize,
+            [in],
+                objPass,
+                aafUInt16,
+                maximumGOPSize,
+            maximum GOP size.,
+
+     Set the maximum occurring spacing between I Pictures.
+  /// A value of 0 or the absence of this property indicates either there
+  /// is no limit to the maximum GOP or the maximum GOP is unknown.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCMaximumGOPSize property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetMaximumGOPSize,
+            [out],
+                objPass,
+                aafUInt16 *,
+                pMaximumGOPSize,
+            maximum GOP size.,
+
+     Get the maximum occurring spacing between I Pictures.
+  /// A value of 0 or the absence of this property indicates either there
+  /// is no limit to the maximum GOP or the maximum GOP is unknown.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pMaximumGOPSize pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pMaximumGOPSize.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pMaximumGOPSize arg is NULL.)
+
+
+
+AD_XMETHOD1(SetMaximumBPictureCount,
+            [in],
+                objPass,
+                aafUInt16,
+                maximumBPictureCount,
+            maximum B Picture count.,
+
+     Set the maximum number of B Pictures between P or I Pictures.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCMaximumBPictureCount property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetMaximumBPictureCount,
+            [out],
+                objPass,
+                aafUInt16 *,
+                pMaximumBPictureCount,
+            maximum B Picture count.,
+
+     Get the maximum number of B Pictures between P or I Pictures.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pMaximumBPictureCount pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pMaximumBPictureCount.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pMaximumBPictureCount arg is NULL.)
+
+
+
+AD_XMETHOD1(SetMaximumBitRate,
+            [in],
+                objPass,
+                aafUInt32,
+                maximumBitRate,
+            maximum bit rate.,
+
+     Set the maximum bit rate of the AVC stream in bit/s is given by
+  /// bit_rate_scale and bit_rate_value_minus1 in the HRD parameters
+  /// in the Sequence Parameter Set. The equivalent value is assigned
+  /// for this property of the stream even if the stream does not
+  /// include the HRD parameters.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCMaximumBitRate property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetMaximumBitRate,
+            [out],
+                objPass,
+                aafUInt32 *,
+                pMaximumBitRate,
+            maximum bit rate.,
+
+     Get the maximum bit rate of the AVC stream in bit/s.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pMaximumBitRate pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pMaximumBitRate.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pMaximumBitRate arg is NULL.)
+
+
+
+AD_XMETHOD1(SetAverageBitRate,
+            [in],
+                objPass,
+                aafUInt32,
+                averageBitRate,
+            Average bit rate.,
+
+     Set the average bitrate of the AVC stream in bit/s over the entire
+  /// AVC bitstream.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCAverageBitRate property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetAverageBitRate,
+            [out],
+                objPass,
+                aafUInt32 *,
+                pAverageBitRate,
+            Average bit rate.,
+
+     Get the average bitrate of the AVC stream in bit/s over the entire
+  /// AVC bitstream.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pAverageBitRate pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pAverageBitRate.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pAverageBitRate arg is NULL.)
+
+
+
+AD_XMETHOD1(SetProfile,
+            [in],
+                objPass,
+                aafUInt8,
+                profile,
+            AVC video profile.,
+
+     Set the AVC video profile.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCProfile property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetProfile,
+            [out],
+                objPass,
+                aafUInt8 *,
+                pProfile,
+            AVC video profile.,
+
+     Get the AVC video profile.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pProfile pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pProfile.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pProfile arg is NULL.)
+
+
+
+AD_XMETHOD1(SetProfileConstraint,
+            [in],
+                objPass,
+                aafUInt8,
+                profileConstraint,
+            AVC video profile constraint flags.,
+
+     Set the AVC video profile constraint flags.
+  /// The value of bit [7..2] is taken from constraint_set0_flag through
+  /// constraint_set5_flag in the sequence parameter set. The value of
+  /// bit [1..0] shall be set to zero.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCProfileConstraint property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetProfileConstraint,
+            [out],
+                objPass,
+                aafUInt8 *,
+                pProfileConstraint,
+            AVC video profile constraint flags.,
+
+     Get the AVC video profile constraint flags.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pProfileConstraint pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pProfileConstraint.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pProfileConstraint arg is NULL.)
+
+
+
+AD_XMETHOD1(SetLevel,
+            [in],
+                objPass,
+                aafUInt8,
+                level,
+            AVC level.,
+
+     Set the AVC level.
+  /// The value is taken from level_idc in the sequence parameter set.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCLevel property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetLevel,
+            [out],
+                objPass,
+                aafUInt8 *,
+                pLevel,
+            AVC level.,
+
+     Get the AVC level.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pLevel pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pLevel.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pLevel arg is NULL.)
+
+
+
+AD_XMETHOD1(SetMaximumRefFrames,
+            [in],
+                objPass,
+                aafUInt8,
+                maximumRefFrames,
+            maximum number of reference frames.,
+
+     Set the maximum number of reference frames.
+  /// The value is the maximum value of max_num_ref_frames within all
+  /// sequence parameter sets.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCMaximumRefFrames property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetMaximumRefFrames,
+            [out],
+                objPass,
+                aafUInt8 *,
+                pMaximumRefFrames,
+            maximum number of reference frames.,
+
+     Get the maximum number of reference frames.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pMaximumRefFrames pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pMaximumRefFrames.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pMaximumRefFrames arg is NULL.)
+
+
+
+AD_XMETHOD1(SetSequenceParameterSetFlag,
+            [in],
+                objPass,
+                aafUInt8,
+                sequenceParameterSetFlag,
+            sequence parameter set flag.,
+
+     Set the flag specifying location and the constancy of sequence
+  /// parameter sets.
+  /// For the meaning of values of the flag see SMPTE ST 381-3:2013\, Table 7.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCSequenceParameterSetFlag property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetSequenceParameterSetFlag,
+            [out],
+                objPass,
+                aafUInt8 *,
+                pSequenceParameterSetFlag,
+            sequence parameter set flag.,
+
+     Get the flag specifying location and the constancy of sequence
+  /// parameter sets.
+  /// For the meaning of values of the flag see SMPTE ST 381-3:2013\, Table 7.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pSequenceParameterSetFlag pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pSequenceParameterSetFlag.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pSequenceParameterSetFlag arg is NULL.)
+
+
+
+AD_XMETHOD1(SetPictureParameterSetFlag,
+            [in],
+                objPass,
+                aafUInt8,
+                pictureParameterSetFlag,
+            picture parameter set flag.,
+
+     Set the flag specifying the location and the constancy of picture
+  /// parameter sets.
+  /// For the meaning of values of the flag see SMPTE ST 381-3:2013\, Table 8.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the AVCPictureParameterSetFlag property will not be
+  /// changed.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.)
+
+
+AD_XMETHOD1(GetPictureParameterSetFlag,
+            [out],
+                objPass,
+                aafUInt8 *,
+                pPictureParameterSetFlag,
+            picture parameter set flag.,
+
+     Get the flag specifying the location and the constancy of picture
+  /// parameter sets.
+  /// For the meaning of values of the flag see SMPTE ST 381-3:2013\, Table 8.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pPictureParameterSetFlag pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pPictureParameterSetFlag.
+  /// 
+  /// This method will return the following codes:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NOT_INITIALIZED
+  ///   - the object is not initialized.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pPictureParameterSetFlag arg is NULL.)
+
+
+AD_XCLASS_END(Concrete, StoredObject)

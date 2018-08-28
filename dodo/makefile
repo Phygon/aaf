@@ -31,7 +31,7 @@
 #
 ###############################################################################
 
-UPDATE = ../update.ksh
+UPDATE = ../update.sh
 
 all : dodo-app macros/base.mac targets.mk depend.mk targets
 

@@ -77,7 +77,7 @@ public:
 
     // @cmember The number of elements in the associated
     //          reference container.
-  virtual size_t count(void) const = 0;
+  virtual OMUInt32 count(void) const = 0;
 
     // @cmember Advance this <c OMDataContainerIterator> to the next
     //          element, if any.

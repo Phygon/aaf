@@ -73,6 +73,7 @@
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFDictionary.h"
 #include "ImplEnumAAFParameters.h"
+#include "ImplAAFMob.h"
 
 #include "OMAssertions.h"
 #include <string.h>
@@ -577,12 +578,19 @@ AAFRESULT STDMETHODCALLTYPE
 
 	XPROTECT()
 	{
-		_inputSegments.getValueAt(obj, index);
-		if (obj)
-			obj->AcquireReference();
+		if ( index >= _inputSegments.count() )
+		{
+			RAISE ( AAFRESULT_BADINDEX );
+		}
 		else
-			RAISE(AAFRESULT_NO_MORE_OBJECTS); // AAFRESULT_BADINDEX ???
-		*ppInputSegment = obj;
+		{
+			_inputSegments.getValueAt(obj, index);
+			if (obj)
+				obj->AcquireReference();
+			else
+				RAISE(AAFRESULT_NO_MORE_OBJECTS); // AAFRESULT_BADINDEX ???
+			*ppInputSegment = obj;
+		}
 	}
 	XEXCEPT
 	XEND
@@ -608,6 +616,135 @@ AAFRESULT STDMETHODCALLTYPE
 		pSeg->ReleaseReference();
 
 	return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT ImplAAFOperationGroup::GetMinimumBounds(aafPosition_t rootPos, aafLength_t rootLen,
+												  ImplAAFMob *mob, ImplAAFMobSlot *track,
+												  aafMediaCriteria_t *mediaCrit,
+												  aafPosition_t currentObjPos,
+												  aafOperationChoice_t *effectChoice,
+												  ImplAAFComponent	*prevObject,
+												  ImplAAFComponent *nextObject,
+												  ImplAAFScopeStack *scopeStack,
+												  aafPosition_t *diffPos, aafLength_t *minLength,
+												  ImplAAFOperationGroup **effeObject, aafInt32	*nestDepth,
+												  ImplAAFComponent **foundObj, aafBool *foundTransition)
+{
+	aafUInt32			count = 0;
+	ImplAAFSegment		*seg = NULL;
+	ImplAAFComponent	*tmpFound = NULL;
+	aafLength_t			tmpMinLen = 0;
+
+	XPROTECT()
+	{
+		CHECK(CountSourceSegments (&count));
+		if (count > 0)
+		{
+			// TODO: The effect input segment to traverse should be chosen based on
+			// the value of effectChoice. For now we always follow the first segment.
+			CHECK(GetInputSegmentAt (0, &seg));
+
+			// TODO:
+			// The existing implementations of GetMinimumBounds() in ImplAAFComponent,
+			// ImplAAFSelector, and ImplAAFEssenceGroup call MobFindLeaf() to traverse
+			// the sub-component. But all MobFindLeaf() does is call sub-component's
+			// GetMinimumBounds(). It seems that it would be more appropriare to call
+			// GetMinimumBounds() directly, right here. This would also allow to remove
+			// a dependency on ImplAAFMob.h.
+			CHECK(mob->MobFindLeaf(track, mediaCrit, effectChoice,
+								seg, rootPos, rootLen,
+								prevObject, nextObject, 
+								scopeStack, 
+								currentObjPos, &tmpFound, &tmpMinLen, foundTransition,
+								effeObject, nestDepth, diffPos));
+		}
+
+		if (tmpFound)
+		{
+			*foundObj = tmpFound;
+			if (rootLen != AAF_UNKNOWN_LENGTH && tmpMinLen != AAF_UNKNOWN_LENGTH)
+			{
+				if (tmpMinLen < rootLen)
+					*minLength = tmpMinLen;
+				else
+					*minLength = rootLen;
+			}
+			else
+			{
+				// One if the legths is unknown (-1)
+				if (tmpMinLen != AAF_UNKNOWN_LENGTH)
+				{
+					XASSERT(rootLen == AAF_UNKNOWN_LENGTH, AAFRESULT_INTERNAL_ERROR);
+					*minLength = tmpMinLen;
+				}
+				else
+				{
+					XASSERT(tmpMinLen == AAF_UNKNOWN_LENGTH, AAFRESULT_INTERNAL_ERROR);
+					*minLength = rootLen;
+				}
+			}
+		}
+		else
+		{
+			RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
+		}
+	}
+	XEXCEPT
+	{
+	}
+	XEND;
+
+	if( seg != NULL )
+		seg->ReleaseReference();
+	
+	return(AAFRESULT_SUCCESS);
+}
+
+AAFRESULT ImplAAFOperationGroup::FindSubSegment(
+			aafPosition_t offset,
+			aafMediaCriteria_t *mediaCrit,
+			aafPosition_t *sequPosPtr,
+			ImplAAFSegment **subseg,
+			aafBool *found)
+{
+	aafUInt32			count = 0;
+	ImplAAFSegment		*inputSegment = NULL;
+
+	XPROTECT()
+	  {
+		CHECK(CountSourceSegments (&count));
+		if (count > 0)
+		{
+			// TODO: The effect input segment to traverse should be chosen based on
+			// the value of effectChoice. For now we always follow the first segment.
+			CHECK(GetInputSegmentAt (0, &inputSegment));
+
+			CHECK(inputSegment->FindSubSegment(offset, mediaCrit, sequPosPtr, subseg, found));
+		}
+		else
+		{
+			*found = kAAFFalse;
+			*subseg = NULL;
+			*sequPosPtr = 0;
+		}
+	  }
+	XEXCEPT
+	  {
+		if(inputSegment)
+		  {
+		    inputSegment->ReleaseReference();
+		    inputSegment = NULL;
+		  }
+	  }
+	XEND
+
+	if(inputSegment)
+	  {
+		inputSegment->ReleaseReference();
+		inputSegment = NULL;
+	  }
+
+	return(AAFRESULT_SUCCESS);
 }
 
 AAFRESULT ImplAAFOperationGroup::ChangeContainedReferences(aafMobID_constref from,
@@ -638,6 +775,41 @@ AAFRESULT ImplAAFOperationGroup::ChangeContainedReferences(aafMobID_constref fro
 	return AAFRESULT_SUCCESS;
 }
 
+//sdaigle: simple implementation built to work with audio gains and EQ.
+// It should work with all single input efects.
+// However, special handling is needed for timewarp effects.
+//
+//akharkev: It doesn't look like TraverseToClip() is supposed to be
+// called on components that can have more than one source reference
+// (OperationGroup, Sequence, etc.) because the call does not take
+// any parameters that can help chose a particular reference.
+// For now I am leaving this method here but with introduction of
+// GetMinimumBounds() it probably won't be called anymore. Instread
+// GetMinimumBounds() should traverse down to a component with single
+// source reference, which then can be traversed to a clip.
+AAFRESULT ImplAAFOperationGroup::TraverseToClip(aafLength_t length, ImplAAFSourceClip **sclp,
+ 	ImplAAFPulldown ** pulldownObj,
+ 	aafInt32 * pulldownPhase,
+ 	aafLength_t *sclpLen,
+ 	aafBool * isMask)
+{
+	ImplAAFSegment		*seg = NULL;
+	
+	XPROTECT()
+	{
+		CHECK(GetInputSegmentAt (0, &seg ));
+		CHECK(seg->TraverseToClip(length, sclp, pulldownObj, pulldownPhase, sclpLen, isMask));
+	}
+	XEXCEPT
+	{
+		if(seg != NULL)
+		  seg->ReleaseReference();
+		seg = 0;
+	}
+	XEND;
+
+	return AAFRESULT_SUCCESS;
+}
 
 void ImplAAFOperationGroup::Accept(AAFComponentVisitor& visitor)
 {
@@ -648,10 +820,19 @@ void ImplAAFOperationGroup::Accept(AAFComponentVisitor& visitor)
 		ImplAAFSegment* pSegment = 0;
 		GetInputSegmentAt(i, &pSegment);
 
-       	        pSegment->Accept(visitor);
+		pSegment->Accept(visitor);
 
 		pSegment->ReleaseReference();
 		pSegment = NULL;
+	}
+
+	ImplAAFSourceReference* pRender = NULL;
+	GetRender(&pRender);
+	if (pRender)
+	{
+		pRender->Accept(visitor);
+		pRender->ReleaseReference();
+		pRender = NULL;
 	}
 
 	// TODO

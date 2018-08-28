@@ -78,7 +78,6 @@ CAAFEssenceDescriptor::~CAAFEssenceDescriptor ()
 {
 }
 
-
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceDescriptor::CountLocators (aafUInt32 *  pResult)
 {
@@ -425,8 +424,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppLocator->ReleaseReference(); // We are through with this pointer.
+          internalppLocator = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppLocator should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppLocator == 0);
+
   return hr;
 }
 
@@ -555,10 +565,522 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEnum->ReleaseReference(); // We are through with this pointer.
+          internalppEnum = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppEnum should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEnum == 0);
+
   return hr;
 }
+
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceDescriptor::CountSubDescriptors (aafUInt32 *  pResult)
+{
+  HRESULT hr;
+
+  ImplAAFEssenceDescriptor * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceDescriptor*> (pO);
+  assert (ptr);
+
+
+  try
+    {
+      hr = ptr->CountSubDescriptors (pResult);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+
+  return hr;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceDescriptor::AppendSubDescriptor (IAAFSubDescriptor * pSubDescriptors)
+{
+  HRESULT hr;
+
+  ImplAAFEssenceDescriptor * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceDescriptor*> (pO);
+  assert (ptr);
+
+  //
+  // set up for pSubDescriptors
+  //
+  ImplAAFSubDescriptor * internalpSubDescriptors = NULL;
+  if (pSubDescriptors)
+    {
+      HRESULT hStat;
+      IAAFRoot * iObj;
+      ImplAAFRoot *arg;
+      hStat = pSubDescriptors->QueryInterface (IID_IAAFRoot, (void **)&iObj);
+      assert (SUCCEEDED (hStat));
+      assert (iObj);
+      hStat = iObj->GetImplRep((void **)&arg);
+      assert (SUCCEEDED (hStat));
+      iObj->Release(); // we are through with this interface pointer.
+      internalpSubDescriptors = static_cast<ImplAAFSubDescriptor*>(arg);
+      assert (internalpSubDescriptors);
+    }
+
+  try
+    {
+      hr = ptr->AppendSubDescriptor (internalpSubDescriptors);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+  //
+  // no cleanup necessary for pSubDescriptors
+  //
+
+  return hr;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceDescriptor::PrependSubDescriptor (IAAFSubDescriptor * pSubDescriptor)
+{
+  HRESULT hr;
+
+  ImplAAFEssenceDescriptor * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceDescriptor*> (pO);
+  assert (ptr);
+
+  //
+  // set up for pSubDescriptor
+  //
+  ImplAAFSubDescriptor * internalpSubDescriptor = NULL;
+  if (pSubDescriptor)
+    {
+      HRESULT hStat;
+      IAAFRoot * iObj;
+      ImplAAFRoot *arg;
+      hStat = pSubDescriptor->QueryInterface (IID_IAAFRoot, (void **)&iObj);
+      assert (SUCCEEDED (hStat));
+      assert (iObj);
+      hStat = iObj->GetImplRep((void **)&arg);
+      assert (SUCCEEDED (hStat));
+      iObj->Release(); // we are through with this interface pointer.
+      internalpSubDescriptor = static_cast<ImplAAFSubDescriptor*>(arg);
+      assert (internalpSubDescriptor);
+    }
+
+  try
+    {
+      hr = ptr->PrependSubDescriptor (internalpSubDescriptor);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+  //
+  // no cleanup necessary for pSubDescriptor
+  //
+
+  return hr;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceDescriptor::InsertSubDescriptorAt (aafUInt32  index,
+        IAAFSubDescriptor * pSubDescriptor)
+{
+  HRESULT hr;
+
+  ImplAAFEssenceDescriptor * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceDescriptor*> (pO);
+  assert (ptr);
+
+
+  //
+  // set up for pSubDescriptor
+  //
+  ImplAAFSubDescriptor * internalpSubDescriptor = NULL;
+  if (pSubDescriptor)
+    {
+      HRESULT hStat;
+      IAAFRoot * iObj;
+      ImplAAFRoot *arg;
+      hStat = pSubDescriptor->QueryInterface (IID_IAAFRoot, (void **)&iObj);
+      assert (SUCCEEDED (hStat));
+      assert (iObj);
+      hStat = iObj->GetImplRep((void **)&arg);
+      assert (SUCCEEDED (hStat));
+      iObj->Release(); // we are through with this interface pointer.
+      internalpSubDescriptor = static_cast<ImplAAFSubDescriptor*>(arg);
+      assert (internalpSubDescriptor);
+    }
+
+  try
+    {
+      hr = ptr->InsertSubDescriptorAt (index,
+    internalpSubDescriptor);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+
+  //
+  // no cleanup necessary for pSubDescriptor
+  //
+
+  return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceDescriptor::GetSubDescriptorAt (aafUInt32  index,
+        IAAFSubDescriptor ** ppSubDescriptor)
+{
+  HRESULT hr;
+
+  ImplAAFEssenceDescriptor * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceDescriptor*> (pO);
+  assert (ptr);
+
+
+  //
+  // set up for ppSubDescriptor
+  //
+  ImplAAFSubDescriptor * internalppSubDescriptor = NULL;
+  ImplAAFSubDescriptor ** pinternalppSubDescriptor = NULL;
+  if (ppSubDescriptor)
+    {
+      pinternalppSubDescriptor = &internalppSubDescriptor;
+    }
+
+  try
+    {
+      hr = ptr->GetSubDescriptorAt (index,
+    pinternalppSubDescriptor);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+
+  //
+  // cleanup for ppSubDescriptor
+  //
+  if (SUCCEEDED(hr))
+    {
+      IUnknown *pUnknown;
+      HRESULT hStat;
+
+      if (internalppSubDescriptor)
+        {
+          pUnknown = static_cast<IUnknown *> (internalppSubDescriptor->GetContainer());
+          hStat = pUnknown->QueryInterface(IID_IAAFSubDescriptor, (void **)ppSubDescriptor);
+          assert (SUCCEEDED (hStat));
+          //pUnknown->Release();
+          internalppSubDescriptor->ReleaseReference(); // We are through with this pointer.
+          internalppSubDescriptor = 0;
+        }
+    }
+
+  // If the call to the Impl method above fails, internalppSubDescriptor should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppSubDescriptor == 0);
+
+
+  return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceDescriptor::RemoveSubDescriptorAt (aafUInt32  index)
+{
+  HRESULT hr;
+
+  ImplAAFEssenceDescriptor * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceDescriptor*> (pO);
+  assert (ptr);
+
+
+  try
+    {
+      hr = ptr->RemoveSubDescriptorAt (index);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+
+  return hr;
+}
+
+HRESULT STDMETHODCALLTYPE
+    CAAFEssenceDescriptor::GetSubDescriptors (IEnumAAFSubDescriptors ** ppEnum)
+{
+  HRESULT hr;
+
+  ImplAAFEssenceDescriptor * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFEssenceDescriptor*> (pO);
+  assert (ptr);
+
+  //
+  // set up for ppEnum
+  //
+  ImplEnumAAFSubDescriptors * internalppEnum = NULL;
+  ImplEnumAAFSubDescriptors ** pinternalppEnum = NULL;
+  if (ppEnum)
+    {
+      pinternalppEnum = &internalppEnum;
+    }
+
+  try
+    {
+      hr = ptr->GetSubDescriptors (pinternalppEnum);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+  //
+  // cleanup for ppEnum
+  //
+  if (SUCCEEDED(hr))
+    {
+      IUnknown *pUnknown;
+      HRESULT hStat;
+
+      if (internalppEnum)
+        {
+          pUnknown = static_cast<IUnknown *> (internalppEnum->GetContainer());
+          hStat = pUnknown->QueryInterface(IID_IEnumAAFSubDescriptors, (void **)ppEnum);
+          assert (SUCCEEDED (hStat));
+          //pUnknown->Release();
+          internalppEnum->ReleaseReference(); // We are through with this pointer.
+          internalppEnum = 0;
+        }
+    }
+
+  // If the call to the Impl method above fails, internalppEnum should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEnum == 0);
+
+
+  return hr;
+}
+
+
 
 //
 // 
@@ -583,6 +1105,13 @@ HRESULT CAAFEssenceDescriptor::InternalQueryInterface
         return S_OK;
     }
 
+    if (EQUAL_UID(riid,IID_IAAFEssenceDescriptor2)) 
+    { 
+        *ppvObj = (IAAFEssenceDescriptor2 *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
+
     // Always delegate back to base implementation.
     return CAAFObject::InternalQueryInterface(riid, ppvObj);
 }
@@ -591,4 +1120,3 @@ HRESULT CAAFEssenceDescriptor::InternalQueryInterface
 // Define the contrete object support implementation.
 // 
 AAF_DEFINE_FACTORY(AAFEssenceDescriptor)
-

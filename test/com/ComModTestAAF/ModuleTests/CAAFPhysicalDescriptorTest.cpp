@@ -1,4 +1,3 @@
-
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -39,6 +38,7 @@
 #include <stdlib.h>
 using namespace std;
 
+#include "AAFWideString.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"

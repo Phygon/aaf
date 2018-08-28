@@ -43,7 +43,8 @@ using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
-#include <wchar.h>
+
+#include "AAFWideString.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -397,7 +398,7 @@ static HRESULT CreateAAFFile(
 		assert (pMob);
 		checkResult (pHeader->AddMob (pMob));
 		
-		checkResult(verifyContents (pHeader, pDict, kAAFTrue));  //True => minimal testing
+		checkResult(verifyContents (pHeader, pDict, kAAFFalse));  //True => minimal testing, False => full testing
 		
 	}
 	catch (HRESULT & rResult)

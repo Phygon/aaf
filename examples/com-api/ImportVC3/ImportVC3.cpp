@@ -295,7 +295,7 @@ static HRESULT OpenAAFFile(aafWChar * pFileName, bool comp_enable, const char * 
 								MobSlotID, sampleRate.numerator, sampleRate.denominator,
 								maxSampleSize, storedRect.xSize, storedRect.ySize);
 			
-					printf("\n\t\tFrameLayout=%s \n\t\tCountSamples=%"AAFFMT64"d\n", frameLayoutStr, sampleCount);
+					printf("\n\t\tFrameLayout=%s \n\t\tCountSamples=%" AAFFMT64 "d\n", frameLayoutStr, sampleCount);
 
 					// Read samples until no more are available
 					aafUInt32	samplesRead, actualBytesRead, total_samples = 0;

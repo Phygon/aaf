@@ -53,6 +53,7 @@
 #include "CAAFDefObject.h"
 #endif
 
+
 //
 // Forward declaration
 //
@@ -62,7 +63,8 @@ class ImplAAFDataDef;
 class CAAFDataDef
   : public IAAFDataDef,
     public IAAFDataDef2,
-	public IAAFDataDef3,
+    public IAAFDataDef3,
+    public IAAFDataDef4,
     public CAAFDefObject
 {
 protected:
@@ -239,6 +241,21 @@ public:
    (
     // @parm [retval,out] aafBoolean_t * | bIsAuxiliaryKind | pointer to the return value
     aafBoolean_t *  bIsAuxiliaryKind
+  );
+
+
+  //***********************************************************
+  // METHOD NAME: IsDataKind()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFDataDef4 | IsDataKind |
+  // Sets return value to TRUE if DataDef is data essence.
+  // @end
+  // 
+  STDMETHOD (IsDataKind)
+   (
+    // @parm [retval,out] aafBoolean_t * | bIsDataKind | pointer to the return value
+    aafBoolean_t *  bIsDataKind
   );
 
 

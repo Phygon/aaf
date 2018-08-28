@@ -82,6 +82,54 @@ void OMXMLStoredStream::read(OMByte* data,
   nonConstThis->_position = _position + bytesRead;
 }
 
+  // @mfunc Attempt to read the vector of buffers given by <p buffers>
+  //        from this <c OMXMLStoredStream>. This is "read scatter". The
+  //        <p bufferCount> buffers are read in order until all have
+  //        been successfully read or an error is encountered. Once
+  //        an error has been encountered on one buffer no additional
+  //        buffers are read.
+  //        The number of bytes read is returned in <p bytesRead>.
+  //   @parm The vector of buffers into which the bytes are to be read.
+  //   @parm The count of buffers.
+  //   @parm The actual number of bytes that were read.
+void OMXMLStoredStream::read(OMIOBufferDescriptor* /* buffers */,
+                             OMUInt32 /* bufferCount */,
+                             OMUInt32& /* bytesRead */) const
+{
+  TRACE("OMXMLStoredStream::read");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // Asynchronous read - single buffer
+void OMXMLStoredStream::read(OMUInt64 /* position */,
+                             OMByte* /* buffer */,
+                             const OMUInt32 /* bytes */,
+                             void* /* */ /* completion */,
+                             const void* /* clientArgument */)
+{
+  TRACE("OMXMLStoredStream::read");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // Asynchronous read - multiple buffers
+void OMXMLStoredStream::read(OMUInt64 /* position */,
+                             OMIOBufferDescriptor* /* buffers */,
+                             OMUInt32 /* bufferCount */,
+                             void* /* */ /* completion */,
+                             const void* /* clientArgument */) const
+{
+  TRACE("OMXMLStoredStream::read");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMXMLStoredStream::probe(OMUInt64 /* position */,
+                              OMUInt32 /* bytesRequired */,
+                              OMUInt32& /* bytesAvailable */) const
+{
+  TRACE("OMXMLStoredStream::probe");
+  ASSERT("Unimplemented code not reached", false);
+}
+
 void OMXMLStoredStream::write(void* data, OMUInt32 size)
 {
   TRACE("OMXMLStoredStream::write");
@@ -106,6 +154,46 @@ void OMXMLStoredStream::write(const OMByte* data,
 
   _store->writeAt(_position, data, bytes, bytesWritten);
   _position = _position + bytesWritten;
+}
+
+  // @cmember Attempt to write the vector of buffers given by <p buffers>
+  //          to this <c OMXMLStoredStream>. This is "write gather". The
+  //          <p bufferCount> buffers are written in order until all have
+  //          been successfully written or an error is encountered. Once
+  //          an error has been encountered on one buffer no additional
+  //          buffers are written.
+  //          The number of bytes written is returned in <p bytesWritten>.
+  //   @parm The vector of buffers from which the bytes are to be written.
+  //   @parm The count of buffers.
+  //   @parm The actual number of bytes that were written.
+void OMXMLStoredStream::write(OMIOBufferDescriptor* /* buffers */,
+                              OMUInt32 /* bufferCount */,
+                              OMUInt32& /* bytesWritten */)
+{
+  TRACE("OMXMLStoredStream::write");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // Asynchronous write - single buffer
+void OMXMLStoredStream::write(OMUInt64 /* position */,
+                              const OMByte* /* buffer */,
+                              const OMUInt32 /* bytes */,
+                              void* /* */ /* completion */,
+                              const void* /* clientArgument */)
+{
+  TRACE("OMXMLStoredStream::write");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+  // Asynchronous write - multiple buffers
+void OMXMLStoredStream::write(OMUInt64 /* position */,
+                              const OMIOBufferDescriptor* /* buffers */,
+                              OMUInt32 /* bufferCount */,
+                              void* /* */ /* completion */,
+                              const void* /* clientArgument */)
+{
+  TRACE("OMXMLStoredStream::write");
+  ASSERT("Unimplemented code not reached", false);
 }
 
 OMUInt64 OMXMLStoredStream::size(void) const

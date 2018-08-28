@@ -36,8 +36,8 @@
 #include <iostream>
 using namespace std;
 #include <stdio.h>
-#include <wchar.h>
 
+#include "AAFWideString.h"
 #include "AAF.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
@@ -132,7 +132,7 @@ private:
 	IAAFOperationGroup *_pOperationGroup;
 };
 
-// Before performing any testing, we create an operation group, so we can perform 
+// Before performing any testing, we create an operation group, so we can perform
 // our test by enumerating over its parameters.
 void CEnumAAFParametersTest::CreateOperationGroup(IAAFDictionary *pDictionary)
 {

@@ -45,11 +45,14 @@
 ImplAAFFindSourceInfo::ImplAAFFindSourceInfo ()
 {
 	_mob = NULL;
-	_cpnt = NULL;
+	_slotID = 0;
+	_hasChannelIDs = false;
+	_channelID = 0;
+	_position = 0;
 	_editRate.numerator = 0;
 	_editRate.denominator = 1;
-	_position = 0;
 	_length = 0;
+	_cpnt = NULL;
 	_operationGroup = NULL;
 }
 
@@ -75,8 +78,13 @@ ImplAAFFindSourceInfo::~ImplAAFFindSourceInfo ()
 
 
 AAFRESULT STDMETHODCALLTYPE
-ImplAAFFindSourceInfo::Init(ImplAAFMob *mob, aafSlotID_t slotID, aafPosition_t position,
-							aafRational_t editRate, aafLength_t length,
+ImplAAFFindSourceInfo::Init(ImplAAFMob *mob,
+							aafSlotID_t slotID,
+							bool hasChannelIDs,
+							aafUInt32 channelID,
+							aafPosition_t position,
+							aafRational_t editRate,
+							aafLength_t length,
 							ImplAAFComponent *cpnt)
 {
 	if (_mob)
@@ -88,6 +96,8 @@ ImplAAFFindSourceInfo::Init(ImplAAFMob *mob, aafSlotID_t slotID, aafPosition_t p
 	if (mob)
 		mob->AcquireReference();
 	_slotID = slotID;
+	_hasChannelIDs = hasChannelIDs;
+	_channelID = channelID;
 	_position = position;
 	_editRate = editRate;
 	_length = length;
@@ -105,7 +115,7 @@ ImplAAFFindSourceInfo::Init(ImplAAFMob *mob, aafSlotID_t slotID, aafPosition_t p
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFFindSourceInfo::AddPulldown(ImplAAFPulldown * /*pdwn*/)
 {
-	return AAFRESULT_NOT_IN_CURRENT_VERSION;
+	return AAFRESULT_SUCCESS;
 }
 
 //AAFRESULT STDMETHODCALLTYPE
@@ -188,6 +198,25 @@ AAFRESULT STDMETHODCALLTYPE
 		{
 			memset(&pSourceRef->sourceID, 0, sizeof(pSourceRef->sourceID));
 		}
+	}
+	XEXCEPT
+	XEND;
+
+	return AAFRESULT_SUCCESS;
+}
+
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFFindSourceInfo::GetMultichannelSourceReference(aafSourceRef_t *pSourceRef, aafBoolean_t* pHasChannelIDs, aafUInt32 *pChannelID)
+{
+	if (pSourceRef == NULL || pHasChannelIDs == NULL || pChannelID == NULL )
+		return AAFRESULT_NULL_PARAM;
+
+	XPROTECT()
+	{
+		CHECK(GetSourceReference(pSourceRef));
+
+		*pHasChannelIDs = _hasChannelIDs;
+		*pChannelID = _channelID;
 	}
 	XEXCEPT
 	XEND;

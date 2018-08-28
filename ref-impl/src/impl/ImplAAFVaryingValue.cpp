@@ -326,7 +326,7 @@ AAFRESULT STDMETHODCALLTYPE
 	IAAFInterpolator			*iInterp = NULL;
 	IAAFParameter				*iParm = NULL;
 	IUnknown					*iUnk = NULL;
-	ImplAAFTypeDef				*intDef;
+	ImplAAFTypeDef				*intDef = NULL;
 	IAAFTypeDef					*iTypeDef = NULL;
 	XPROTECT()
 	{

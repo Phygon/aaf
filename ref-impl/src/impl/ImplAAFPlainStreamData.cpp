@@ -143,6 +143,108 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT STDMETHODCALLTYPE
+   ImplAAFPlainStreamData::ReadScatter (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUInt32  bufCount,
+      aafIOBufferDesc_t *  pBufs,
+      aafUInt32 *  pBytesRead)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  return pStreamPropertyValue->ReadScatterFiltered(bufCount, pBufs, pBytesRead);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPlainStreamData::WriteGather (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUInt32  bufCount,
+      aafIOBufferDesc_constptr  pBufs,
+      aafUInt32 *  pBytesWritten)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  return pStreamPropertyValue->WriteGatherFiltered(bufCount, pBufs, pBytesWritten);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPlainStreamData::ReadAsyncAt (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUInt64  position,
+      aafUInt32  dataSize,
+      aafMemPtr_t  pData,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  return pStreamPropertyValue->ReadAsyncFilteredAt(position,
+                                                   dataSize,
+                                                   pData,
+                                                   pCompletion,
+                                                   pClientArg);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPlainStreamData::WriteAsyncAt (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUInt64  position,
+      aafUInt32  dataSize,
+      aafMemConstPtr_t  pData,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  return pStreamPropertyValue->WriteAsyncFilteredAt(position,
+                                                    dataSize,
+                                                    pData,
+                                                    pCompletion,
+                                                    pClientArg);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPlainStreamData::ReadScatterAsyncAt (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUInt64  position,
+      aafUInt32  bufCount,
+      aafIOBufferDesc_t *  pBufs,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  return pStreamPropertyValue->ReadScatterAsyncFilteredAt(position,
+                                                          bufCount,
+                                                          pBufs,
+                                                          pCompletion,
+                                                          pClientArg);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFPlainStreamData::WriteGatherAsyncAt (
+      ImplAAFPropertyValue * pPropertyValue,
+      aafUInt64  position,
+      aafUInt32  bufCount,
+      aafIOBufferDesc_constptr  pBufs,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  PROPERTYVALUE_TO_STREAMPROPERTYVALUE(pPropertyValue, pStreamPropertyValue);
+  
+  return pStreamPropertyValue->WriteGatherAsyncFilteredAt(position,
+                                                          bufCount,
+                                                          pBufs,
+                                                          pCompletion,
+                                                          pClientArg);
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
     ImplAAFPlainStreamData::HasStoredByteOrder (
       ImplAAFPropertyValue * pPropertyValue,
       aafBoolean_t *  pHasByteOrder)

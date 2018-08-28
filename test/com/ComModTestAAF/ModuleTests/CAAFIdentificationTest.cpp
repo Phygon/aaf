@@ -40,7 +40,8 @@
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
+
+#include "AAFWideString.h"
 #include <time.h>
 #include <string.h>
 
@@ -117,11 +118,14 @@ static void GetDateTime(aafTimeStamp_t *ts)
 #define MOB_NAME_SIZE 16
 
 #define COMPANY_NAME		L"AAF Developers Desk"
-#define PRODUCT_NAME		L"AAFDictionary Test"
+#define PRODUCT_NAME		L"AAFIdentification Test"
 #define TEST_VERSION		L"TEST VERSION"
 
-#if defined( OS_WINDOWS )
+#if defined( OS_WINDOWS ) && defined( CPU_INTEL )
 # define PLATFORM_NAME L"Win32"
+
+#elif defined( OS_WINDOWS ) && defined( CPU_X64 )
+# define PLATFORM_NAME L"Win64"
 
 #elif defined( OS_IRIX )
 # define PLATFORM_NAME L"IRIX"

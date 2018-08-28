@@ -104,15 +104,6 @@ interface IAAFRoot : IUnknown
 ///
 
 
-///
-/// Objects that implement IAAFHTMLClip also implement the following interfaces:
-///  - IAAFTextClip
-///  - IAAFSourceReference
-///  - IAAFSourceReference2
-///  - IAAFSegment
-///  - IAAFComponent
-///  - IAAFComponent2
-///  - IAAFObject
 [
     object,
     uuid(e684d784-b935-11d2-bf9d-00104bc9156d),
@@ -349,12 +340,9 @@ interface IAAFHTMLClip : IUnknown
 /// describes an HTML essence data object, which contains text
 /// formatted according to the HTML standard.
 ///
-///
-/// Objects that implement IAAFHTMLDescriptor also implement the following interfaces:
-///  - IAAFFileDescriptor
-///  - IAAFFileDescriptor2
-///  - IAAFEssenceDescriptor
-///  - IAAFObject
+
+
+
 [
     object,
     uuid(e684d770-b935-11d2-bf9d-00104bc9156d),
@@ -374,6 +362,9 @@ interface IAAFHTMLDescriptor : IUnknown
 // Interface IAAFMetaDictionary
 //
 // ************************
+
+
+
 [
     object,
     uuid(e1085eeb-0cc3-11d4-8014-00104bc9156d),
@@ -397,9 +388,6 @@ interface IAAFMetaDictionary : IUnknown
 /// published interface.
 
 
-///
-/// Objects that implement IAAFPropValData also implement the following interfaces:
-///  - IAAFPropertyValue
 [
     object,
     uuid(106bb6e2-f0c1-11d2-842c-00600832acb8),
@@ -423,9 +411,6 @@ interface IAAFPropValData : IUnknown
 /// published interface.
 
 
-///
-/// Objects that implement IAAFStreamPropertyValue also implement the following interfaces:
-///  - IAAFPropertyValue
 [
     object,
     uuid(F06bb6e2-f0c1-11d2-842c-00600832acb8),
@@ -449,9 +434,6 @@ interface IAAFStreamPropertyValue : IUnknown
 /// published interface.
 
 
-///
-/// Objects that implement IAAFStrongRefArrayValue also implement the following interfaces:
-///  - IAAFPropertyValue
 [
     object,
     uuid(f2973a82-6895-11d4-a812-8f71e157e3f3),
@@ -475,9 +457,6 @@ interface IAAFStrongRefArrayValue : IUnknown
 /// published interface.
 
 
-///
-/// Objects that implement IAAFStrongRefSetValue also implement the following interfaces:
-///  - IAAFPropertyValue
 [
     object,
     uuid(84537782-6897-11d4-a812-8f71e157e3f3),
@@ -501,9 +480,6 @@ interface IAAFStrongRefSetValue : IUnknown
 /// published interface.
 
 
-///
-/// Objects that implement IAAFStrongRefValue also implement the following interfaces:
-///  - IAAFPropertyValue
 [
     object,
     uuid(4142d582-6892-11d4-a812-8f71e157e3f3),
@@ -527,14 +503,9 @@ interface IAAFStrongRefValue : IUnknown
 /// A TextClip is an abstract class of SourceReference. Implementations
 /// of TextClip reference a Mob Slot containing text essence data.
 ///
-///
-/// Objects that implement IAAFTextClip also implement the following interfaces:
-///  - IAAFSourceReference
-///  - IAAFSourceReference2
-///  - IAAFSegment
-///  - IAAFComponent
-///  - IAAFComponent2
-///  - IAAFObject
+
+
+
 [
     object,
     uuid(e684d786-b935-11d2-bf9d-00104bc9156d),
@@ -559,9 +530,6 @@ interface IAAFTextClip : IUnknown
 /// published interface.
 
 
-///
-/// Objects that implement IAAFWeakRefArrayValue also implement the following interfaces:
-///  - IAAFPropertyValue
 [
     object,
     uuid(02fbe502-6897-11d4-a812-8f71e157e3e3),
@@ -585,9 +553,6 @@ interface IAAFWeakRefArrayValue : IUnknown
 /// published interface.
 
 
-///
-/// Objects that implement IAAFWeakRefSetValue also implement the following interfaces:
-///  - IAAFPropertyValue
 [
     object,
     uuid(b1078f02-6897-11d4-a812-8f71e157e3e3),
@@ -611,9 +576,6 @@ interface IAAFWeakRefSetValue : IUnknown
 /// published interface.
 
 
-///
-/// Objects that implement IAAFWeakRefValue also implement the following interfaces:
-///  - IAAFPropertyValue
 [
     object,
     uuid(32a8ee02-6893-11d4-a812-8f71e157e3e3),
@@ -632,9 +594,9 @@ interface IAAFWeakRefValue : IUnknown
 // Interface IEnumAAFStorablePropVals
 //
 // ************************
-///
-/// Objects that implement IEnumAAFStorablePropVals also implement the following interfaces:
-///  - IEnumAAFPropertyValues
+
+
+
 [
     object,
     uuid(5096c202-831b-11d4-a812-8a70df17ed53),

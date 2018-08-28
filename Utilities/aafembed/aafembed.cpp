@@ -55,13 +55,9 @@ using namespace std;
 #endif
 #endif
 
-#ifdef _MSC_VER
 extern "C" {
 #include "avilib.h"
 }
-#else
-#include "avilib.h"
-#endif
 
 #define aaf_assert(b, msg) \
 	if (!(b)) {fprintf(stderr, "ASSERT: %s\n\n", msg); exit(1);}
@@ -295,7 +291,7 @@ static HRESULT addEssenceDataForAVI(
 				return E_FAIL;
 			totalBytes += bytesWritten;
 		}
-		printf("  total bytes written=%"AAFFMT64"d\n", totalBytes);
+		printf("  total bytes written=%" AAFFMT64 "d\n", totalBytes);
 	}
 	else		// isSound
 	{

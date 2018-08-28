@@ -52,6 +52,7 @@ using namespace std;
 
 #include "AAFTypes.h"
 #include "AAFCodecDefs.h"
+#include "AAFContainerDefs.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -316,6 +317,7 @@ void Omf2Aaf::AAFFileOpen( char* pFileName)
 		rc = pHeader->AppendIdentification(pIdent);
 	}
 	pAAF->RegisterAAFProperties(pDictionary);
+	pAAF->RegisterAAFCodecs(pDictionary);
 	gpGlobals->pLogger->Log(kLogInfo, "AAF File: %s Created succesfully\n", pFileName);
 	pAAF->SetDictionary(pDictionary);
 
@@ -2161,7 +2163,7 @@ void Omf2Aaf::ConvertOMFCDCIDescriptorLocator(omfObject_t mediaDescriptor,
 						   zeroPos, kSwabIfNeeded, OMInt32Array,
 						   sizeof(aafInt32), &videoLineMap[0]) != OM_ERR_NONE)
 		videoLineMap[0] = 0;
-	omfsCvtInt32toPosition(sizeof(aafInt32), fourPos);
+	((fourPos) = (sizeof(aafInt32)));
 	if (OMReadProp(OMFFileHdl, mediaDescriptor, OMDIDDVideoLineMap, 
 						   fourPos, kSwabIfNeeded, OMInt32Array,
 						   sizeof(aafInt32), &videoLineMap[1]) != OM_ERR_NONE)
@@ -2238,6 +2240,8 @@ void Omf2Aaf::ConvertOMFSourceMob(omfObject_t obj,
 	IAAFAIFCDescriptor*		pAifcDesc = NULL;
 	IAAFCDCIDescriptor*		pCDCIDesc = NULL;
 	IAAFObject*				pElement = NULL;
+	IAAFCodecDef*			pCodecDef = NULL;
+	IAAFContainerDef*		pContainerDef = NULL;
 	
 	aafLength_t				length = 0;
 	aafRational_t			sampleRate;
@@ -2384,6 +2388,8 @@ void Omf2Aaf::ConvertOMFSourceMob(omfObject_t obj,
 				pWAVEDesc->Release();
 				pWAVEDesc = NULL;
 			}
+
+			rc = pDictionary->LookupCodecDef( kAAFCodecWAVE, &pCodecDef );
 		}
 		else if ( omfsIsTypeOf(OMFFileHdl, mediaDescriptor, OMClassAIFD, &testErr) )
 		{
@@ -2431,6 +2437,8 @@ void Omf2Aaf::ConvertOMFSourceMob(omfObject_t obj,
 				pAifcDesc->Release();
 				pAifcDesc = NULL;
 			}
+
+			rc = pDictionary->LookupCodecDef( kAAFCODEC_AIFC, &pCodecDef );
 		}
 		else if ( omfsIsTypeOf(OMFFileHdl, mediaDescriptor, OMClassCDCI, &testErr) )
 		{
@@ -2445,6 +2453,8 @@ void Omf2Aaf::ConvertOMFSourceMob(omfObject_t obj,
 				pCDCIDesc->Release();
 				pCDCIDesc = NULL;
 			}
+
+			rc = pDictionary->LookupCodecDef( kAAFCodecCDCI, &pCodecDef );
 		}
 		else
 		{
@@ -2472,6 +2482,8 @@ void Omf2Aaf::ConvertOMFSourceMob(omfObject_t obj,
 				pWAVEDesc->Release();
 				pWAVEDesc = NULL;
 			}
+
+			rc = pDictionary->LookupCodecDef( kAAFCodecWAVE, &pCodecDef );
 		}
 		// Retrieve and set generic File Descriptor properties.
 		rc = pEssenceDesc->QueryInterface(IID_IAAFFileDescriptor, (void **) &pFileDesc);
@@ -2484,7 +2496,26 @@ void Omf2Aaf::ConvertOMFSourceMob(omfObject_t obj,
 		
 		OMFError = omfsReadLength(OMFFileHdl, mediaDescriptor, OMMDFLLength, (omfLength_t *)&length);
 		rc = pFileDesc->SetLength(length);
-		
+
+		// Codec definition
+		if( pCodecDef )
+		{
+			rc = pFileDesc->SetCodecDef( pCodecDef );
+			pCodecDef->Release();
+			pCodecDef = NULL;
+		}
+
+		// Container format
+		rc = pDictionary->LookupContainerDef( ContainerAAF, &pContainerDef );
+		if( pContainerDef )
+		{
+			rc = pFileDesc->SetContainerFormat( pContainerDef );
+			pContainerDef->Release();
+			pContainerDef = NULL;
+		}
+
+
+
 		pFileDesc->Release();
 		pFileDesc = NULL;
 	}
@@ -2642,7 +2673,7 @@ void Omf2Aaf::ConvertOMFConstValue(omfSegObj_t segment,
 	IAAFTypeDef*		pTypeDef = NULL;
 
 	OMFError = omfiDataValueGetSize(OMFFileHdl, segment, &cvValueSize);
-	omfsTruncInt64toUInt32(cvValueSize, &valueSize);
+	valueSize = static_cast<aafUInt32>(cvValueSize);
 	if (valueSize > 0)
 	{
 		pcvBuffer = new char[valueSize];
@@ -2739,7 +2770,7 @@ void Omf2Aaf::ConvertOMFVaryingValue(omfSegObj_t segment,
 				CreateInstance(IID_IAAFControlPoint,
 				(IUnknown **)&pControlPoint);
 			OMFError = omfiDataValueGetSize(OMFFileHdl, control, &cpValueSize);
-			omfsTruncInt64toUInt32(cpValueSize, &valueSize);
+			valueSize = static_cast<aafUInt32>(cpValueSize);
 			pCPBuffer = new char[valueSize];
 			OMFError = omfiControlPtGetInfo(OMFFileHdl, control, &time, &editHint, &cpDatakind, 
 				valueSize, (long *)&bytesRead, pCPBuffer);
@@ -3441,7 +3472,7 @@ void Omf2Aaf::ConvertOMFEffects(omfEffObj_t	effect,
 			AutoRelease< IAAFParameterDef > pparamdef( pParameterDef );
 			rc = pEffectDef->AddParameterDef(pParameterDef);
 		
-			OMFError = omfiEffectGetNumSlots(OMFFileHdl, effect, &numSlots);;
+			OMFError = omfiEffectGetNumSlots(OMFFileHdl, effect, &numSlots);
 			if (numSlots > 0)
 			{
 				omfiIteratorAlloc(OMFFileHdl, &OMFIterator);

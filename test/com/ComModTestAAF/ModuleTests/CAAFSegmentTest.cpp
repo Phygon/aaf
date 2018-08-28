@@ -50,7 +50,7 @@ static const aafWChar *slotName = L"SLOT1";
 //static aafInt32 fadeOutLen = 2000;
 //static aafFadeType_t fadeInType = kAAFFadeLinearAmp;
 //static aafFadeType_t fadeOutType = kAAFFadeLinearPower;
-//static aafSourceRef_t sourceRef; 
+//static aafSourceRef_t sourceRef;
 
 
 static const	aafMobID_t	TEST_MobID = 
@@ -319,25 +319,3 @@ extern "C" HRESULT CAAFSegment_test(
 
 	return hr;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

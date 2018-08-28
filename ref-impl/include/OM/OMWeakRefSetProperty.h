@@ -236,18 +236,17 @@ public:
 
   virtual const wchar_t* targetName(void) const;
 
-  virtual bool isResolved(
-                     const OMUniqueObjectIdentification& identification) const;
+  virtual bool isResolved(const Key& identification) const;
 
-  virtual bool isResolvable(
-                     const OMUniqueObjectIdentification& identification) const;
+  virtual bool isResolvable(const Key& identification) const;
 
   // Copying.
 
   virtual void shallowCopyTo(OMProperty* destination) const;
 
   virtual void deepCopyTo(OMProperty* destination,
-                          void* clientContext) const;
+                          void* clientContext,
+                          bool deferStreamData) const;
 
 private:
 

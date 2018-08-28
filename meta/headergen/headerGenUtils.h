@@ -62,6 +62,16 @@ void print(const uid& id, ostream& s);
 //{0101010D-0101-0100-060E-2B3402060101}
 void printReg(const uid& id, ostream& s);
 
+// Convert a GUID to a label
+//{0101010D-0101-0100-060E-2B3402060101} =>
+//06.0E.2B.34.02.53.01.01.0D.01.01.01.01.01.01.00
+// Note 06 -> 53 in octet 5
+void convert(label& lid, const uid& auid);
+ 
+// print a label like this -
+// 06.0E.2B.34.02.53.01.01.0D.01.01.01.01.01.01.00
+void printLabel(const label& id, ostream& s);
+
 void printDefinition(const char* type,
                      const char* prefix,
                      const char* name,
@@ -74,6 +84,7 @@ void printDefinition(const char* type,
                      const char* name,
                      size_t width,
                      int identifier,
+                     const char* comment,
                      ostream& s);
 
 void printDefinition(const char* type,

@@ -84,7 +84,7 @@ AAFRESULT STDMETHODCALLTYPE
 		ImplAAFDictionarySP pDict;
 		CHECK(GetDictionary (&pDict));
 		CHECK(SetNewProps(length,
-						  pDict->GetBuiltinDefs()->ddTimecode()));
+						  pDict->GetBuiltinDefs()->ddkAAFTimecode()));
 		_start = timecode->startFrame;
 		if (timecode->drop == kAAFTcDrop)
 		{

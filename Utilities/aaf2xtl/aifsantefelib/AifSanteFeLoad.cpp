@@ -46,7 +46,6 @@
 #include <AxIterator.h>
 
 #include <AAFExtEnum.h>
-#include <AAFSDKBuild.h>
 #include <AAFResult.h>
 
 #include <assert.h>

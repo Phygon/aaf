@@ -151,6 +151,8 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (!ppValue)
 	return AAFRESULT_NULL_PARAM;
+  if (!isInitialized())
+	  return AAFRESULT_NOT_INITIALIZED;
 
   ASSERTU (_pPropVal);
   *ppValue = _pPropVal;
@@ -176,7 +178,7 @@ AAFRESULT
 }
 
 
-    
+
 // non-public unique identification
 const OMPropertyId& ImplAAFProperty::identification(void) const
 {

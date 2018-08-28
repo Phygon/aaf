@@ -101,7 +101,7 @@ public:
 
     // @cmember The number of <p ReferencedObject>s in the associated
     //          <c OMReferenceVector>.
-  virtual size_t count(void) const;
+  virtual OMUInt32 count(void) const;
 
     // @cmember Advance this <c OMReferenceVectorIterator> to the
     //          next <p ReferencedObject>, if any.
@@ -165,7 +165,7 @@ public:
     //          associated <c OMReferenceVector> at the position
     //          currently designated by this
     //          <c OMReferenceVectorIterator>.
-  virtual size_t index(void) const;
+  virtual OMUInt32 index(void) const;
 
 protected:
 

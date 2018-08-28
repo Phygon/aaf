@@ -1,4 +1,3 @@
-
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -41,7 +40,7 @@
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
+#include "AAFWideString.h"
 #include <string.h>
 
 #include "AAFStoredObjectIDs.h"

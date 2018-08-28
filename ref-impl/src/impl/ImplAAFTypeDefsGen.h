@@ -36,7 +36,7 @@
 
 
 #include "AAFTypes.h"
-
+#include "AAFUtils.h"
 
 // Get guids for types we'll use
 #define TYPE_GUID_NAME(type) kAAFTypeID_##type
@@ -44,12 +44,35 @@
 #include "AAFPropertyDefs.h"
 
 //
+// Pass 0:  Do stuff for characters.
+//
+#define AAF_TYPE_TABLE_BEGIN()  \
+struct TypeCharacter            \
+{                               \
+  const wchar_t * typeName;     \
+  aafUID_t  typeID;             \
+  int       isValid;            \
+};                              \
+                                \
+static TypeCharacter s_AAFAllTypeCharacters [] = {
+
+#define AAF_TYPE_DEFINITION_CHARACTER(name, id) {L"aaf" L###name, id, 1},
+
+#if defined(_MSC_VER) && (_MSC_VER <= 1200)
+#define AAF_TYPE_TABLE_END()  0 };
+#else
+#define AAF_TYPE_TABLE_END()  {0, kNullUID, 0} };
+#endif
+
+#include "AAFMetaDictionary.h"
+
+//
 // Pass 1:  Do stuff for integers.
 //
 #define AAF_TYPE_TABLE_BEGIN()  \
 struct TypeInteger              \
 {                               \
-  const wchar_t * typeName;           \
+  const wchar_t * typeName;     \
   aafUID_t  typeID;             \
   aafUInt8  size;               \
   aafBool   isSigned;           \
@@ -60,8 +83,7 @@ static TypeInteger s_AAFAllTypeIntegers [] = {
 
 #define AAF_TYPE_DEFINITION_INTEGER(name, id, size, signed) {L"aaf" L###name, id, size, kAAF##signed, 1},
 
-#define AAF_TYPE_TABLE_END() \
-  {0,{0,0,0,{0,0,0,0,0,0,0,0}},0,0,0}};
+#define AAF_TYPE_TABLE_END()  {0, kNullUID, 0, kAAFFalse, 0} };
 
 #include "AAFMetaDictionary.h"
 
@@ -77,7 +99,7 @@ static TypeInteger s_AAFAllTypeIntegers [] = {
                                            \
 struct TypeEnumerationMember               \
 {                                          \
-  const wchar_t *        memberName;             \
+  const wchar_t *        memberName;       \
   aafInt64         memberValue;            \
 };                                         \
                                            \
@@ -176,7 +198,7 @@ static TypeEnumeration * s_AAFAllTypeEnumerations [] = {
 struct TypeRecordMember             \
 {                                   \
   const aafUID_t *   pMemberTypeId; \
-  const wchar_t *          memberName;    \
+  const wchar_t *    memberName;    \
   aafUInt32          memberOffset;  \
   eAAFTypeCategory_t typeCat;       \
 };                                  \
@@ -184,7 +206,7 @@ struct TypeRecordMember             \
 struct TypeRecord                   \
 {                                   \
   aafUID_t   typeID;                \
-  const wchar_t *  typeName;              \
+  const wchar_t *  typeName;        \
   aafUInt32  size;                  \
   TypeRecordMember ** members;      \
 };
@@ -280,7 +302,8 @@ static TypeVaryingArray s_AAFAllTypeVaryingArrays [] = {
   {L"aaf" L###name, id, &type, 1},
 
 #define AAF_TYPE_TABLE_END()  \
-  {0,{0,0,0,{0,0,0,0,0,0,0,0}},0,0}};
+  {0, kNullUID, 0, 0} };
+
 
 #include "AAFMetaDictionary.h"
 
@@ -305,7 +328,8 @@ static TypeFixedArray s_AAFAllTypeFixedArrays [] = {
   {L"aaf" L###name, id, &type, count, 1},
 
 #define AAF_TYPE_TABLE_END()  \
-  {0,{0,0,0,{0,0,0,0,0,0,0,0}},0,0,0}};
+  {0, kNullUID, 0, 0, 0}};
+
 
 #include "AAFMetaDictionary.h"
 
@@ -329,7 +353,7 @@ static TypeRename s_AAFAllTypeRenames [] = {
   {L"aaf" L###name, id, (aafUID_t *)& AAF_TYPE(type), 1},
 
 #define AAF_TYPE_TABLE_END()  \
-  {0,{0,0,0,{0,0,0,0,0,0,0,0}},0,0}};
+  {0, kNullUID, 0, 0}};
 
 #include "AAFMetaDictionary.h"
 
@@ -353,7 +377,7 @@ static TypeString s_AAFAllTypeStrings [] = {
   {L"aaf" L###name, id, (aafUID_t *)& AAF_TYPE(type), 1},
 
 #define AAF_TYPE_TABLE_END()  \
-  {0,{0,0,0,{0,0,0,0,0,0,0,0}},0,0}};
+  {0, kNullUID, 0, 0}};
 
 #include "AAFMetaDictionary.h"
 
@@ -379,7 +403,7 @@ static TypeStrongRef s_AAFAllTypeStrongRefs [] = {
   {name, id, (aafUID_t *)& type, 1},
 
 #define AAF_TYPE_TABLE_END()  \
-  {0,{0,0,0,{0,0,0,0,0,0,0,0}},0,0}};
+  {0, kNullUID, 0, 0}};
 
 #include "AAFMetaDictionary.h"
 
@@ -404,7 +428,7 @@ static TypeStrongRefSet s_AAFAllTypeStrongRefSets [] = {
   {name, id, (aafUID_t *)& type, 1},
 
 #define AAF_TYPE_TABLE_END()  \
-  {0,{0,0,0,{0,0,0,0,0,0,0,0}},0,0}};
+  {0, kNullUID, 0, 0}};
 
 #include "AAFMetaDictionary.h"
 
@@ -429,7 +453,7 @@ static TypeStrongRefVector s_AAFAllTypeStrongRefVectors [] = {
   {name, id, (aafUID_t *)& type, 1},
 
 #define AAF_TYPE_TABLE_END()  \
-  {0,{0,0,0,{0,0,0,0,0,0,0,0}},0,0}};
+  {0, kNullUID, 0, 0}};
 
 #include "AAFMetaDictionary.h"
 
@@ -490,7 +514,8 @@ static TypeWeakRef s_AAFAllTypeWeakRefs [] = {
   {MY_TYPE_NAME(name), id, (aafUID_t *)& type, 1, sizeof(MY_ARRAY_NAME(name))/sizeof(TypeWeakRefMember), MY_ARRAY_NAME(name)},
 
 #define AAF_TYPE_TABLE_END()  \
-  {0,{0,0,0,{0,0,0,0,0,0,0,0}},0,0,0,0}};
+  {0, kNullUID, 0, 0, 0, 0}};
+
 
 #include "AAFMetaDictionary.h"
 #undef MY_ARRAY_NAME
@@ -516,7 +541,7 @@ static TypeWeakRefSet s_AAFAllTypeWeakRefSets [] = {
   {name, id, (aafUID_t *)& type, 1},
 
 #define AAF_TYPE_TABLE_END()  \
-  {0,{0,0,0,{0,0,0,0,0,0,0,0}},0,0}};
+  {0, kNullUID, 0, 0}};
 
 #include "AAFMetaDictionary.h"
 
@@ -541,7 +566,7 @@ static TypeWeakRefVector s_AAFAllTypeWeakRefVectors [] = {
   {name, id, (aafUID_t *)& type, 1},
 
 #define AAF_TYPE_TABLE_END()  \
-  {0,{0,0,0,{0,0,0,0,0,0,0,0}},0,0}};
+  {0, kNullUID, 0, 0}};
 
 #include "AAFMetaDictionary.h"
 
@@ -558,7 +583,7 @@ static TypeWeakRefVector s_AAFAllTypeWeakRefVectors [] = {
                                            \
 struct TypeExtEnumerationMember            \
 {                                          \
-  const wchar_t *        memberName;             \
+  const wchar_t *  memberName;             \
   aafUID_t         memberValue;            \
 };                                         \
                                            \
@@ -688,7 +713,7 @@ static TypeSet s_AAFAllTypeSets [] = {
   {L###name, id, (aafUID_t *)& type, 1},
 
 #define AAF_TYPE_TABLE_END()  \
-  {0,{0,0,0,{0,0,0,0,0,0,0,0}},0,0}};
+  {0, kNullUID, 0, 0}};
 
 #include "AAFMetaDictionary.h"
 

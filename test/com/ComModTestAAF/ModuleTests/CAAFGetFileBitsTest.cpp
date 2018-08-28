@@ -93,6 +93,9 @@ static HRESULT GetFileBitsTest (
     aafUID_constref fileKind,
     aafProductIdentification_constref productID)
 {
+  // Determine the file encoding to be used.
+  aafUID_t effectiveFileKind = EffectiveTestFileEncoding( fileKind );
+
   // Create a memory raw storage and a file on it, to be opened for
   // writing.  We'll use this to get the GetFileBits to be tested.
   IAAFRawStorageSP pWriteStg;
@@ -104,7 +107,7 @@ static HRESULT GetFileBitsTest (
 	(AAFCreateAAFFileOnRawStorage (pWriteStg,
 								   kAAFFileExistence_new,
 								   kAAFFileAccess_modify,
-								   &kAAFFileKind_Aaf4KBinary,
+								   &effectiveFileKind,
 								   0,
 								   &productID,
 								   &pWriteFile));

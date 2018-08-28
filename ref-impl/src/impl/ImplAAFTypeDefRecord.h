@@ -76,7 +76,7 @@ public:
 
          // @parm [in, size_is(numMembers)] array of member names to
 		 // be represented in this enumerated  type
-         const aafCharacter* *  pMemberNames,
+         aafString_t *  pMemberNames,
 
          // @parm [in] number of members in pMemberInfo array
          aafUInt32  numMembers,

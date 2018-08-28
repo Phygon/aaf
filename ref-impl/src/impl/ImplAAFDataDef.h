@@ -162,6 +162,14 @@ public:
         // @parm [retval,out] pointer to the return value
         (aafBool *  bIsDescriptiveMetadataKind);
 
+  //****************
+  // IsDataKind()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    IsDataKind
+        // @parm [retval,out] pointer to the return value
+        (aafBool *  bIsDataKind);
+
 
 private:
 

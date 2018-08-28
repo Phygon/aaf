@@ -36,7 +36,6 @@
 #define OMENUMERATEDTYPE_H
 
 #include "OMType.h"
-#include "OMVector.h"
 
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMEnumeratedType
 class OMEnumeratedType : public OMType {

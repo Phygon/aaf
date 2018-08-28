@@ -44,6 +44,8 @@
 
 #include "ImplAAFObjectCreation.h"
 
+#include "AAFUtils.h"
+
 #include "OMAssertions.h"
 #include <string.h>
 
@@ -81,7 +83,7 @@ AAFRESULT STDMETHODCALLTYPE
 aafBool ImplAAFTypeDef::IsFixedSize (void) const
 {
   // Should be implemented in derived class.
-  ASSERTU (0);
+  check(AAFRESULT_ABSTRACT_CLASS);
   return kAAFFalse; // not reached!
 }
 
@@ -89,7 +91,7 @@ aafBool ImplAAFTypeDef::IsFixedSize (void) const
 OMUInt32 ImplAAFTypeDef::PropValSize (void) const
 {
   // Should be implemented in derived class.
-  ASSERTU (0);
+  check(AAFRESULT_ABSTRACT_CLASS);
   return 0; // not reached!
 }
 
@@ -97,7 +99,7 @@ OMUInt32 ImplAAFTypeDef::PropValSize (void) const
 aafBool ImplAAFTypeDef::IsRegistered (void) const
 {
   // Should be implemented in derived class.
-  ASSERTU (0);
+  check(AAFRESULT_ABSTRACT_CLASS);
   return kAAFFalse; // not reached!
 }
 
@@ -110,7 +112,7 @@ void ImplAAFTypeDef::AttemptBuiltinRegistration (void)
 OMUInt32 ImplAAFTypeDef::NativeSize (void) const
 {
   // Should be implemented in derived class.
-  ASSERTU (0);
+  check(AAFRESULT_ABSTRACT_CLASS);
   return 0; // not reached!
 }
 
@@ -188,7 +190,7 @@ OMProperty * ImplAAFTypeDef::pvtCreateOMProperty
    const wchar_t * /*name*/) const
 {
   // Should be implemented in derived class.
-  ASSERTU (0);
+  check(AAFRESULT_ABSTRACT_CLASS);
   return 0; // not reached!
 }
 
@@ -324,19 +326,34 @@ AAFRESULT STDMETHODCALLTYPE
 // These all should be pure virtual, but if we allow client extension
 // of behavior, clients may have to instantiate these.
 bool ImplAAFTypeDef::IsAggregatable () const
-{ ASSERTU (0); return false; }
+{
+  check(AAFRESULT_ABSTRACT_CLASS);
+  return false;
+}
 
 bool ImplAAFTypeDef::IsStreamable () const
-{ ASSERTU (0); return false; }
+{
+  check(AAFRESULT_ABSTRACT_CLASS);
+  return false;
+}
 
 bool ImplAAFTypeDef::IsFixedArrayable () const
-{ ASSERTU (0); return false; }
+{
+  check(AAFRESULT_ABSTRACT_CLASS);
+  return false;
+}
 
 bool ImplAAFTypeDef::IsVariableArrayable () const
-{ ASSERTU (0); return false; }
+{
+  check(AAFRESULT_ABSTRACT_CLASS);
+  return false;
+}
 
 bool ImplAAFTypeDef::IsStringable () const
-{ ASSERTU (0); return false; }
+{
+  check(AAFRESULT_ABSTRACT_CLASS);
+  return false;
+}
 
 
 
@@ -397,89 +414,4 @@ bool ImplAAFTypeDef::isPredefined(void) const
 {
   // to prevent ambiguity
   return ImplAAFMetaDefinition::isPredefined();
-}
-
-bool ImplAAFTypeDef::isFixedSize(void) const
-{
-  bool result = false;
-  if (IsFixedSize() == kAAFTrue) {
-    result = true;
-  }
-  return result;
-}
-
-void ImplAAFTypeDef::reorder(OMByte* externalBytes,
-								   OMUInt32 externalBytesSize) const
-{
-	// should be pure virtual, but if we allow client extension
-	// of behavior, clients may have to instantiate this
-	ASSERTU (0);
-	return;
-}
-
-
-OMUInt32 ImplAAFTypeDef::externalSize(const OMByte* /*internalBytes*/,
-											OMUInt32 /*internalBytesSize*/) const
-{
-	// should be pure virtual, but if we allow client extension
-	// of behavior, clients may have to instantiate this
-	ASSERTU (0);
-	return false;
-}
-
-
-OMUInt32 ImplAAFTypeDef::externalSize(void) const
-{
-	// should be pure virtual, but if we allow client extension
-	// of behavior, clients may have to instantiate this
-	ASSERTU (0);
-	return false;
-}
-
-
-void ImplAAFTypeDef::externalize(const OMByte* internalBytes,
-									   OMUInt32 internalBytesSize,
-									   OMByte* externalBytes,
-									   OMUInt32 externalBytesSize,
-									   OMByteOrder byteOrder) const
-{
-	// should be pure virtual, but if we allow client extension
-	// of behavior, clients may have to instantiate this
-	ASSERTU (0);
-}
-
-
-OMUInt32 ImplAAFTypeDef::internalSize(void) const
-{
-	// should be pure virtual, but if we allow client extension
-	// of behavior, clients may have to instantiate this
-	ASSERTU (0);
-	return false;
-}
-
-OMUInt32 ImplAAFTypeDef::internalSize(const OMByte* /*externalBytes*/,
-											OMUInt32 /*externalBytesSize*/) const
-{
-	// should be pure virtual, but if we allow client extension
-	// of behavior, clients may have to instantiate this
-	ASSERTU (0);
-	return false;
-}
-
-void ImplAAFTypeDef::internalize(const OMByte* externalBytes,
-									   OMUInt32 externalBytesSize,
-									   OMByte* internalBytes,
-									   OMUInt32 internalBytesSize,
-									   OMByteOrder byteOrder) const
-{
-	// should be pure virtual, but if we allow client extension
-	// of behavior, clients may have to instantiate this
-	ASSERTU (0);
-}
-
-void ImplAAFTypeDef::accept(OMTypeVisitor& visitor) const
-{
-	// should be pure virtual, but if we allow client extension
-	// of behavior, clients may have to instantiate this
-	ASSERTU (0);
 }

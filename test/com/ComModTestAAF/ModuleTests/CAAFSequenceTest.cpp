@@ -45,6 +45,7 @@ using namespace std;
 #include "ModuleTest.h"
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
+#include "AAFSmartPointer.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -78,9 +79,9 @@ inline void checkExpression(bool expression, HRESULT r=AAFRESULT_TEST_FAILED)
 
 const aafUID_t kTestEffectID = { 0xD15E7611, 0xFE40, 0x11d2, { 0x80, 0xA5, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F } };
 
-void InstantiateComponent(CAAFBuiltinDefs *defs, 
-						 aafLength_t length, 
-						 IAAFComponent*& pComponent)
+void InstantiateFiller(CAAFBuiltinDefs *defs, 
+					   aafLength_t length, 
+					   IAAFComponent*& pComponent)
 {
 	checkResult(defs->cdFiller()->CreateInstance(IID_IAAFComponent, 
 		(IUnknown **)&pComponent));
@@ -88,11 +89,34 @@ void InstantiateComponent(CAAFBuiltinDefs *defs,
 	checkResult(pComponent->SetLength(length)); 
 }
 
+void InstantiateComponent(CAAFBuiltinDefs *defs, 
+						 aafLength_t length, 
+						 IAAFComponent*& pComponent)
+{
+	InstantiateFiller(defs, length, pComponent);
+}
+
 void InstantiateComponentWithoutLength(CAAFBuiltinDefs *defs, IAAFComponent*& pComponent)
 {
 	checkResult(defs->cdFiller()->CreateInstance(IID_IAAFComponent, 
 		(IUnknown **)&pComponent));
 	checkResult(pComponent->SetDataDef(defs->ddkAAFSound()));
+}
+
+void InstantiateNonFillerComponent(CAAFBuiltinDefs *defs, 
+								   aafLength_t length, 
+								   IAAFComponent*& pComponent)
+{
+	IAAFSourceClip* pSourceClip = NULL;
+
+	checkResult(defs->cdSourceClip()->CreateInstance(IID_IAAFSourceClip, 
+		(IUnknown **)&pSourceClip));
+	aafSourceRef_t nullSrcRef;
+	memset(&nullSrcRef, 0, sizeof(nullSrcRef));
+	checkResult(pSourceClip->Initialize(defs->ddkAAFSound(), length, nullSrcRef));
+	checkResult(pSourceClip->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+	pSourceClip->Release();
+	pSourceClip = NULL;
 }
 
 void InstantiateEvent(CAAFBuiltinDefs *defs,
@@ -105,6 +129,26 @@ void InstantiateEvent(CAAFBuiltinDefs *defs,
 		CreateInstance(IID_IAAFEvent, 
 			(IUnknown **)&pEvent));
 	checkResult(pEvent->SetPosition(position));
+	checkResult(pEvent->SetComment(L"A comment"));
+	checkResult(pEvent->QueryInterface(IID_IAAFComponent, (void **)&pEventASpComp));
+	checkResult(pEventASpComp->SetDataDef(defs->ddkAAFSound()));
+
+	pEvent->Release();
+	pEvent = NULL;
+}
+
+// Create Event without Position or Length
+void InstantiateEvent(CAAFBuiltinDefs *defs,
+					  IAAFComponent*& pEventASpComp)
+{
+	IAAFEvent *pEvent = NULL;
+
+	checkResult(defs->cdCommentMarker()->
+		CreateInstance(IID_IAAFEvent, 
+			(IUnknown **)&pEvent));
+	// AAF specification and AAF Toolkit define Position as required
+	// property of Event. It has to be set to something.
+	checkResult(pEvent->SetPosition(0));
 	checkResult(pEvent->SetComment(L"A comment"));
 	checkResult(pEvent->QueryInterface(IID_IAAFComponent, (void **)&pEventASpComp));
 	checkResult(pEventASpComp->SetDataDef(defs->ddkAAFSound()));
@@ -126,6 +170,17 @@ void InstantiateEventWithLength(CAAFBuiltinDefs *defs,
 	pEvent = NULL;
 }
 
+void InstantiateEventWithLength(CAAFBuiltinDefs *defs,
+								aafLength_t length,
+								IAAFComponent*& pEventASpComp)
+{
+	IAAFEvent *pEvent = NULL;
+	InstantiateEvent(defs, pEventASpComp);
+	checkResult(pEventASpComp->QueryInterface(IID_IAAFEvent, (void **)&pEvent));
+	checkResult(pEventASpComp->SetLength(length));
+	pEvent->Release();
+	pEvent = NULL;
+}
 
 void TestComponentLength(IAAFComponent *pCompLengthCheck,
 						 aafLength_t expectedLength)
@@ -139,7 +194,7 @@ void InstantiateTransition(CAAFBuiltinDefs *defs,
 						   aafLength_t transitionLength,
 						   IAAFOperationDef* pOperationDef,
 						   IAAFComponent*& pComponent)
-  {  
+{
 	IAAFOperationGroup  *pOperationGroup = 0;
 	IAAFTransition* pTransition = 0;
 	aafPosition_t cutPoint = 0;
@@ -196,7 +251,7 @@ HRESULT TestDefinitions(CAAFBuiltinDefs *defs)
 	  return hr;
 }
 
- 		
+
 HRESULT TestComponents(CAAFBuiltinDefs *defs, 
 					   IAAFDictionary*  pDictionary, 
 					   IAAFMob* pMob)
@@ -210,28 +265,45 @@ HRESULT TestComponents(CAAFBuiltinDefs *defs,
 	aafUID_t	   effectID = kTestEffectID;
 	IAAFSegment*	pSegment = NULL;
 	IAAFTimelineMobSlot*	pMobSlot = NULL;
-	  
-	  // Add mob slot w/ sequence
+
+	// Add mob slot w/ sequence
  	  checkResult(defs->cdSequence()->
 				  CreateInstance(IID_IAAFSequence, 
 								 (IUnknown **)&pSequence));		
-	  checkResult(pSequence->Initialize(defs->ddkAAFSound()));
+	  checkResult(pSequence->Initialize(defs->ddkAAFSound())); 
 
 	  //Get Component interface to test sequence lenght:
 	  checkResult(pSequence->QueryInterface(IID_IAAFComponent, (void **)&pCompLengthCheck));
 
-	  
+
+	  // Set up for transitions testing.
+	  // Actual transition testing is further down below.
+	  // Here we test behavior specific to empty sequences.
+	  aafLength_t					transitionLength=1;
+	  IAAFOperationDef*			pOperationDef = NULL;
+
+	  // Create the effect and parameter definitions
+	  checkResult(defs->cdOperationDef()->
+					CreateInstance(IID_IAAFOperationDef, 
+								   (IUnknown **)&pOperationDef));
+	  checkResult(pOperationDef->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
+	  checkResult(pDictionary->RegisterOperationDef(pOperationDef));
+	  checkResult(pOperationDef->SetDataDef (defs->ddkAAFSound()));
+	  checkResult(pOperationDef->SetNumberInputs (0));
+
+	  //Create a transition 
+	  InstantiateTransition(defs, transitionLength, pOperationDef, pComponent);
+	  //Adding the transition to an empty sequence should fail
+	  checkExpression(AAFRESULT_LEADING_TRAN == pSequence->InsertComponentAt(0,pComponent), AAFRESULT_TEST_FAILED);
+	  pComponent->Release();
+	  pComponent = NULL;
+
+
 	  aafLength_t testLength[4];
 	  aafLength_t len;
 	  IAAFComponent *pEventASpComp = NULL;
 	  aafPosition_t position;
 	  
-	  InstantiateComponentWithoutLength(defs, pComponent);
-	  //Inserting a component without length should fail:
-	  checkExpression(AAFRESULT_PROP_NOT_PRESENT==pSequence->AppendComponent(pComponent), AAFRESULT_TEST_FAILED);
-	  pComponent->Release();
-	  pComponent = NULL;
-
 	  int i = 0;
 	  // Append two components onto sequence
 	  for(i = 0; i < 2; i++)
@@ -243,7 +315,7 @@ HRESULT TestComponents(CAAFBuiltinDefs *defs,
 		  }
 		  else
 		  {
-		    checkResult(pSequence->AppendComponent(pComponent));
+			  checkResult(pSequence->AppendComponent(pComponent));
 		  }
 		  if(i > 0)
 		  {
@@ -259,7 +331,7 @@ HRESULT TestComponents(CAAFBuiltinDefs *defs,
 	  }
 		checkResult(pSequence->CountComponents (&numComponents));
 		checkExpression(2 == numComponents, AAFRESULT_TEST_FAILED);
-		checkResult(pSequence->RemoveComponentAt(1));
+		checkResult(pSequence->RemoveComponentAt(1)); 
 		checkResult(pSequence->CountComponents (&numComponents));
 		checkExpression(1 == numComponents, AAFRESULT_TEST_FAILED);
 		len = 0;//Component at index 1 had length 13, after removing it, the sequence length should be 12.
@@ -276,7 +348,7 @@ HRESULT TestComponents(CAAFBuiltinDefs *defs,
 		TestComponentLength(pCompLengthCheck, (COMPONENT_TEST_LENGTH+2+COMPONENT_TEST_LENGTH));
 
 		
-		// Now insert a component in the middle
+		// Now insert a component in the middle 
 		InstantiateComponent(defs, COMPONENT_TEST_LENGTH+1, pComponent);//22+11 = 33 
 		checkResult(pSequence->InsertComponentAt(1,pComponent));
 		pComponent->Release();
@@ -287,31 +359,8 @@ HRESULT TestComponents(CAAFBuiltinDefs *defs,
 		checkResult(pSequence->CountComponents (&numComponents));
 		checkExpression(3 == numComponents, AAFRESULT_TEST_FAILED);
 
-		//Inserting an event in a non event sequence should fail
-		position = 0;
-		InstantiateEventWithLength(defs, COMPONENT_TEST_LENGTH, position, pEventASpComp);
-		//Insert event should fail 
-		checkExpression(AAFRESULT_EVENT_SEMANTICS==pSequence->AppendComponent(pEventASpComp), AAFRESULT_TEST_FAILED);
-		pEventASpComp->Release();
-		pEventASpComp = NULL;
-
 
 		/////////////////////Trannsition testing/////////////////////////////
-		aafLength_t					transitionLength=1;
-		IAAFOperationDef*			pOperationDef = NULL;
-
-		// Create the effect and parameter definitions
-		checkResult(defs->cdOperationDef()->
-					CreateInstance(IID_IAAFOperationDef, 
-								   (IUnknown **)&pOperationDef));
-    
-
-		checkResult(pOperationDef->Initialize (effectID, TEST_EFFECT_NAME, TEST_EFFECT_DESC));
-		checkResult(pDictionary->RegisterOperationDef(pOperationDef));
-
-		checkResult(pOperationDef->SetDataDef (defs->ddkAAFSound()));
-		
-		checkResult(pOperationDef->SetNumberInputs (0));
 
 		//Create a transition 
 		InstantiateTransition(defs, transitionLength, pOperationDef, pComponent);
@@ -331,6 +380,8 @@ HRESULT TestComponents(CAAFBuiltinDefs *defs,
 		InstantiateTransition(defs, transitionLength, pOperationDef, pComponent);
 		// now append the second transition and it should fail due to adjecent transitions
 		checkExpression(AAFRESULT_ADJACENT_TRAN == pSequence->AppendComponent(pComponent), AAFRESULT_TEST_FAILED);
+		// now try inserting the second transition before the first and it should fail due to adjecent transitions
+		checkExpression(AAFRESULT_ADJACENT_TRAN == pSequence->InsertComponentAt(numComponents-1, pComponent), AAFRESULT_TEST_FAILED);
 		// Component count should now still be 4
 		checkResult(pSequence->CountComponents (&numComponents));
 		checkExpression(4 == numComponents, AAFRESULT_TEST_FAILED);
@@ -360,11 +411,11 @@ HRESULT TestComponents(CAAFBuiltinDefs *defs,
 												L"AAF Test Sequence",
 												0,
 												&pMobSlot));
-		
+
 		pSegment->Release();
     pSegment = NULL;
 
-    pMobSlot->Release();
+	pMobSlot->Release();
     pMobSlot = NULL;
 
 
@@ -443,7 +494,7 @@ HRESULT TestEvents(CAAFBuiltinDefs *defs)
 			else
 			{
 				testLength[i]=(position+COMPONENT_TEST_LENGTH+i)-10;
-  }
+			}
 			// Add the event to the sequence.
 			if(i<1)
 			{
@@ -456,11 +507,11 @@ HRESULT TestEvents(CAAFBuiltinDefs *defs)
 			TestComponentLength(pEventLengthCheck, testLength[i]);
 
 			if(pEventASpComp)
-  {
+			{
 				pEventASpComp->Release();
 				pEventASpComp = NULL;
 			}
-  }
+		}
 		//Remove the middle event, the sequence length should not be affected:
 		checkResult(pEventsSequence->RemoveComponentAt(1));
 		TestComponentLength(pEventLengthCheck, 14);
@@ -540,17 +591,1098 @@ HRESULT TestEvents(CAAFBuiltinDefs *defs)
 		pEventASpComp = NULL;
 		TestComponentLength(pEventLengthCheck,10*COMPONENT_TEST_LENGTH);
 
-		//Inserting a component in an events sequence should fail.
+		//In general case inserting a component in an events sequence should succeeed:
+		// - Events can be mixed with other components in a sequence referenced from a static mob slot.
+		// - Events can be mixed with fillers in a sequence referenced from a timeline mob slot.
+		//Since this sequence is not yet referenced by any mob the implementation cannot apply any
+		//constraints specific to mob slot type.
 		InstantiateComponent(defs, COMPONENT_TEST_LENGTH, pComponent);
-		checkExpression(AAFRESULT_EVENT_SEMANTICS == pEventsSequence->AppendComponent(pComponent), AAFRESULT_TEST_FAILED);
-    pComponent->Release();
+		checkResult(pEventsSequence->AppendComponent(pComponent));
+		pComponent->Release();
 		pComponent = NULL;
+
+		// Insert Event after non-Event
+		position = 70;
+		InstantiateEventWithLength(defs, (2*COMPONENT_TEST_LENGTH), position, pEventASpComp);
+		checkResult(pEventsSequence->AppendComponent(pEventASpComp));
+		pEventASpComp->Release();
+		pEventASpComp = NULL;
+
+		// Insert non-Event (Filler) after Event
+		IAAFComponent*	pFiller = NULL;
+		InstantiateFiller(defs, 123, pFiller);
+		checkResult(pEventsSequence->AppendComponent(pFiller));
+		pFiller->Release();
+		pFiller = NULL;
 
 		if(pEventsSequence)
 			pEventsSequence->Release();
 
 		if(pEventLengthCheck)
 			pEventLengthCheck->Release();
+
+	return hr;
+}
+
+HRESULT TestTimelineMobSlotNonEventSemantics(CAAFBuiltinDefs* defs,
+											 IAAFMob* pMob)
+{
+	HRESULT			hr = S_OK;
+
+	IAAFSequence*	pSequence = NULL;
+	IAAFComponent*	pFiller = NULL;
+	IAAFComponent*	pComponent = NULL;
+	IAAFComponent*	pEvent = NULL;
+	IAAFSegment*	pSegment = NULL;
+	IAAFTimelineMobSlot*	pMobSlot = NULL;
+	aafUInt32	expectedComponentCount = 0;
+
+	checkResult(defs->cdSequence()->
+				CreateInstance(IID_IAAFSequence,
+								(IUnknown**)&pSequence));		
+	checkResult(pSequence->Initialize(defs->ddkAAFSound()));
+	checkResult(pSequence->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
+
+	const aafRational_t editRate = {0, 1};
+	const aafSlotID_t slotID = 1;
+	checkResult(pMob->AppendNewTimelineSlot(editRate,
+											pSegment,
+											slotID,
+											L"AAF Test Sequence",
+											0,
+											&pMobSlot));
+
+	/* TODO: Test adding non-Filler to Sequences of only Fillers:
+
+	InstantiateFiller(defs, 123, pFiller);
+	checkResult(pSequence->AppendComponent(pFiller));
+	pFiller->Release();
+	pFiller = NULL;
+
+	InstantiateNonFillerComponent(defs, 123, pComponent);
+	checkResult(pSequence->AppendComponent(pComponent));
+	pComponent->Release();
+	pComponent = NULL;
+	*/
+
+	// Sequence with a single non-Filler (SourceClip)
+	InstantiateNonFillerComponent(defs, 123, pComponent);
+	checkResult(pSequence->AppendComponent(pComponent));
+	expectedComponentCount++;
+	pComponent->Release();
+	pComponent = NULL;
+
+	// Cannot add Event to a Sequence in TimelineMobSlot that contains
+	// components that are not Events or Fillers
+	InstantiateEvent(defs, pEvent);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->PrependComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(0, pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(1, pEvent), AAFRESULT_TEST_FAILED);
+	pEvent->Release();
+	pEvent = NULL;
+
+	// Sequence of Filler, non-Filler (SourceClip) and Filler.
+	InstantiateFiller(defs, 123, pFiller);
+	checkResult(pSequence->PrependComponent(pFiller));
+	expectedComponentCount++;
+	pFiller->Release();
+	pFiller = NULL;
+	InstantiateFiller(defs, 123, pFiller);
+	checkResult(pSequence->AppendComponent(pFiller));
+	expectedComponentCount++;
+	pFiller->Release();
+	pFiller = NULL;
+
+	// Cannot add Event to a Sequence in TimelineMobSlot that contains
+	// components that are not Events or Fillers
+	InstantiateEvent(defs, pEvent);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->PrependComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(0, pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(1, pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(2, pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(3, pEvent), AAFRESULT_TEST_FAILED);
+
+	aafUInt32 componentCount = 0;
+	checkResult(pSequence->CountComponents(&componentCount));
+	checkExpression(expectedComponentCount == componentCount, AAFRESULT_TEST_FAILED);
+
+	if (pSequence)
+	{
+		pSequence->Release();
+		pSequence = NULL;
+	}
+	if (pFiller)
+	{
+		pFiller->Release();
+		pFiller = NULL;
+	}
+	if (pComponent)
+	{
+		pComponent->Release();
+		pComponent = NULL;
+	}
+	if (pEvent)
+	{
+		pEvent->Release();
+		pEvent = NULL;
+	}
+	if (pSegment)
+	{
+		pSegment->Release();
+		pSegment = NULL;
+	}
+	if (pMobSlot)
+	{
+		pMobSlot->Release();
+		pMobSlot = NULL;
+	}
+
+	return hr;
+}
+
+HRESULT TestTimelineMobSlotInvalidSemantics(CAAFBuiltinDefs* defs,
+											IAAFSequence*	pSequence)
+{
+	HRESULT			hr = S_OK;
+
+	IAAFComponent*	pEvent = NULL;
+	IAAFComponent*	pComponent = NULL;
+
+	// Cannot add Event without Length to a Sequence in TimelineMobSlot
+	InstantiateEvent(defs, pEvent);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->PrependComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->InsertComponentAt(0, pEvent), AAFRESULT_TEST_FAILED);
+	pEvent->Release();
+	pEvent = NULL;
+
+	// Cannot add Event with Position to a Sequence in TimelineMobSlot
+	InstantiateEventWithLength(defs, 123, 19, pEvent);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->PrependComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(0, pEvent), AAFRESULT_TEST_FAILED);
+	pEvent->Release();
+	pEvent = NULL;
+
+	// Cannot add non-Event without Length to a Sequence in TimelineMobSlot
+	InstantiateComponentWithoutLength(defs, pComponent);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->AppendComponent(pComponent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->PrependComponent(pComponent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->InsertComponentAt(0, pComponent), AAFRESULT_TEST_FAILED);
+	pComponent->Release();
+	pComponent = NULL;
+
+	if (pEvent)
+	{
+		pEvent->Release();
+		pEvent = NULL;
+	}
+	if (pComponent)
+	{
+		pComponent->Release();
+		pComponent = NULL;
+	}
+
+	return hr;
+}
+
+HRESULT TestTimelineMobSlotWithEventsInvalidSemantics(CAAFBuiltinDefs* defs,
+													  IAAFSequence*	pSequence)
+{
+	HRESULT			hr = S_OK;
+
+	IAAFComponent*	pComponent = NULL;
+
+	// Cannot add component that is not Filler or Event to a Sequence in
+	// TimelineMobSlot that contains Events.
+	InstantiateNonFillerComponent(defs, 123, pComponent);
+	checkExpression(AAFRESULT_OBJECT_SEMANTIC == pSequence->AppendComponent(pComponent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_OBJECT_SEMANTIC == pSequence->PrependComponent(pComponent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_OBJECT_SEMANTIC == pSequence->InsertComponentAt(0, pComponent), AAFRESULT_TEST_FAILED);
+	pComponent->Release();
+	pComponent = NULL;
+
+	if (pComponent)
+	{
+		pComponent->Release();
+		pComponent = NULL;
+	}
+
+	return hr;
+}
+
+HRESULT TestTimelineMobSlotEventSemantics(CAAFBuiltinDefs* defs,
+										  IAAFMob* pMob)
+{
+	HRESULT			hr = S_OK;
+
+	aafUInt32	expectedComponentCount = 0;
+
+	//-----------------------------------------------------
+	// Empty Sequence attached to TimelineMobSlot
+	//-----------------------------------------------------
+	IAAFSmartPointer<IAAFSequence> pSequence;
+	IAAFSmartPointer<IAAFSegment> pSegmentSequence;
+	IAAFSmartPointer<IAAFComponent> pComponentSequence;
+	checkResult(defs->cdSequence()->CreateInstance(IID_IAAFSequence, (IUnknown**)&pSequence));
+	checkResult(pSequence->Initialize(defs->ddkAAFSound()));
+	checkResult(pSequence->QueryInterface(IID_IAAFSegment, (void **)&pSegmentSequence));
+	checkResult(pSequence->QueryInterface(IID_IAAFComponent, (void **)&pComponentSequence));
+
+	const aafRational_t editRate = {0, 1};
+	const aafSlotID_t slotID = 1;
+	IAAFSmartPointer<IAAFTimelineMobSlot> pMobSlot;
+	checkResult(pMob->AppendNewTimelineSlot(editRate,
+											pSegmentSequence,
+											slotID,
+											L"AAF Test Sequence",
+											0,
+											&pMobSlot));
+
+
+	// Test invalid semantics with empty Sequence
+	TestTimelineMobSlotInvalidSemantics(defs, pSequence);
+
+	//-----------------------------------------------------
+	// Sequence with a single Event
+	//-----------------------------------------------------
+	IAAFSmartPointer<IAAFComponent> pEvent;
+	InstantiateEventWithLength(defs, 123, *&pEvent);
+	checkResult(pSequence->AppendComponent(pEvent));
+	expectedComponentCount++;
+
+	// Test invalid semantics with only Events
+	TestTimelineMobSlotInvalidSemantics(defs, pSequence);
+	TestTimelineMobSlotWithEventsInvalidSemantics(defs, pSequence);
+
+	//-----------------------------------------------------
+	// Sequence of Filler, Event and Filler.
+	//-----------------------------------------------------
+	// Can add Fillers to a Sequence with Events
+	IAAFSmartPointer<IAAFComponent> pFiller;
+	InstantiateFiller(defs, 123, *&pFiller);
+	checkResult(pSequence->PrependComponent(pFiller));
+	expectedComponentCount++;
+	InstantiateFiller(defs, 123, *&pFiller);
+	checkResult(pSequence->AppendComponent(pFiller));
+	expectedComponentCount++;
+
+	// Test invalid semantics with Events and Fillers
+	TestTimelineMobSlotInvalidSemantics(defs, pSequence);
+	TestTimelineMobSlotWithEventsInvalidSemantics(defs, pSequence);
+
+	//-----------------------------------------------------
+	// Sequence of Event, Filler, Event, Event, Filler and
+	// Event.
+	//-----------------------------------------------------
+	// Can add Events to a Sequence with Events and Fillers
+	InstantiateEventWithLength(defs, 123, *&pEvent);
+	checkResult(pSequence->InsertComponentAt(expectedComponentCount-1, pEvent));
+	expectedComponentCount++;
+	InstantiateEventWithLength(defs, 123, *&pEvent);
+	checkResult(pSequence->AppendComponent(pEvent));
+	expectedComponentCount++;
+	InstantiateEventWithLength(defs, 123, *&pEvent);
+	checkResult(pSequence->PrependComponent(pEvent));
+	expectedComponentCount++;
+
+	// Test invalid semantics with Events and Fillers
+	TestTimelineMobSlotInvalidSemantics(defs, pSequence);
+	TestTimelineMobSlotWithEventsInvalidSemantics(defs, pSequence);
+
+	aafUInt32 componentCount = 0;
+	checkResult(pSequence->CountComponents(&componentCount));
+	checkExpression(expectedComponentCount == componentCount, AAFRESULT_TEST_FAILED);
+
+	return hr;
+}
+
+HRESULT TestStaticMobSlotInvalidSemantics(CAAFBuiltinDefs* defs,
+										  IAAFSequence*	pSequence)
+{
+	HRESULT			hr = S_OK;
+
+	IAAFComponent*	pEvent = NULL;
+	IAAFComponent*	pComponent = NULL;
+
+	// Cannot add Event with Length to a Sequence in StaticMobSlot
+	InstantiateEventWithLength(defs, 123, pEvent);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->PrependComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->InsertComponentAt(0, pEvent), AAFRESULT_TEST_FAILED);
+	pEvent->Release();
+	pEvent = NULL;
+
+	// Cannot add Event with unknown length (-1) to a Sequence in StaticMobSlot
+	InstantiateEventWithLength(defs, AAF_UNKNOWN_LENGTH, pEvent);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->PrependComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->InsertComponentAt(0, pEvent), AAFRESULT_TEST_FAILED);
+	pEvent->Release();
+	pEvent = NULL;
+
+	// Cannot add Event with Position to a Sequence in StaticMobSlot
+	InstantiateEvent(defs, 19, pEvent);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->PrependComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(0, pEvent), AAFRESULT_TEST_FAILED);
+	pEvent->Release();
+	pEvent = NULL;
+
+	// Cannot add Event with Length and Position to a Sequence in StaticMobSlot
+	InstantiateEventWithLength(defs, 123, 19, pEvent);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->PrependComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(0, pEvent), AAFRESULT_TEST_FAILED);
+	pEvent->Release();
+	pEvent = NULL;
+
+	// Cannot add non-Event with Length to a Sequence in StaticMobSlot
+	InstantiateComponent(defs, 123, pComponent);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->AppendComponent(pComponent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->PrependComponent(pComponent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->InsertComponentAt(0, pComponent), AAFRESULT_TEST_FAILED);
+	pComponent->Release();
+	pComponent = NULL;
+
+	// Cannot add non-Event with unknown length (-1) to a Sequence in StaticMobSlot
+	InstantiateComponent(defs, AAF_UNKNOWN_LENGTH, pComponent);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->AppendComponent(pComponent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->PrependComponent(pComponent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_BAD_LENGTH == pSequence->InsertComponentAt(0, pComponent), AAFRESULT_TEST_FAILED);
+	pComponent->Release();
+	pComponent = NULL;
+
+	if (pComponent)
+	{
+		pComponent->Release();
+		pComponent = NULL;
+	}
+	if (pEvent)
+	{
+		pEvent->Release();
+		pEvent = NULL;
+	}
+
+	return hr;
+}
+
+HRESULT TestTimelineMobSlotEventSemanticsUnkLen(CAAFBuiltinDefs* defs, IAAFMob* pMob)
+{
+	HRESULT hr = S_OK;
+
+	IAAFSmartPointer<IAAFComponent> pFiller;
+	IAAFSmartPointer<IAAFComponent> pEvent;
+
+	aafUInt32 componentCount = 0;
+	aafUInt32 expectedComponentCount = 0;
+	aafLength_t sequenceLength = 0;
+
+	// Sequence
+	IAAFSmartPointer<IAAFSequence> pSequence;
+	IAAFSmartPointer<IAAFSegment> pSegmentSequence;
+	IAAFSmartPointer<IAAFComponent> pComponentSequence;
+	checkResult(defs->cdSequence()->CreateInstance(IID_IAAFSequence, (IUnknown**)&pSequence));
+	checkResult(pSequence->Initialize(defs->ddkAAFSound()));
+	checkResult(pSequence->QueryInterface(IID_IAAFSegment, (void **)&pSegmentSequence));
+	checkResult(pSequence->QueryInterface(IID_IAAFComponent, (void **)&pComponentSequence));
+
+	// TimelineMobSlot
+	const aafSlotID_t slotID = 1;
+	const aafRational_t editRate = { 0, 1 };
+	IAAFSmartPointer<IAAFTimelineMobSlot> pMobSlot;
+	checkResult(pMob->AppendNewTimelineSlot(editRate,
+		pSegmentSequence,
+		slotID,
+		L"AAF Test Sequence",
+		0,
+		&pMobSlot));
+
+	// append Filler
+	InstantiateFiller(defs, 43, *&pFiller);
+	checkResult(pSequence->AppendComponent(pFiller));
+	expectedComponentCount++;
+
+	// append Event
+	InstantiateEventWithLength(defs, 57, *&pEvent);
+	checkResult(pSequence->AppendComponent(pEvent));
+	expectedComponentCount++;
+
+	// append Filler with unknown length
+	InstantiateFiller(defs, AAF_UNKNOWN_LENGTH, *&pFiller);
+	// Sequence Components other than the last Component shall not have a Length property set to AAF_UNKNOWN_LENGTH.
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->PrependComponent(pFiller), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->InsertComponentAt(0, pFiller), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->InsertComponentAt(1, pFiller), AAFRESULT_TEST_FAILED);
+	// the last Component of a Sequence may have a Length property set to AAF_UNKNOWN_LENGTH.
+	checkResult(pSequence->AppendComponent(pFiller));
+	expectedComponentCount++;
+
+	// a Sequence that contains a Component with Length of -1 shall have a Length property set to -1
+	checkResult(pSequence->CountComponents(&componentCount));
+	checkExpression(componentCount == expectedComponentCount, AAFRESULT_TEST_FAILED);
+	checkResult(pComponentSequence->GetLength(&sequenceLength));
+	checkExpression(sequenceLength == AAF_UNKNOWN_LENGTH, AAFRESULT_TEST_FAILED);
+
+	// cannot append another component with unknown length
+	InstantiateEventWithLength(defs, AAF_UNKNOWN_LENGTH, *&pEvent);
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+
+	// cannot append any component after Componet with unknown length
+	InstantiateEventWithLength(defs, 77, *&pEvent);
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+
+	// insert Component into Sequence with unknown length
+	InstantiateEventWithLength(defs, 33, *&pEvent);
+	checkResult(pSequence->InsertComponentAt(2, pEvent));
+	expectedComponentCount++;
+
+	// remove Component with length
+	checkResult(pSequence->RemoveComponentAt(2));
+	expectedComponentCount--;
+
+	// but Sequence still has an unknown length
+	checkResult(pSequence->CountComponents(&componentCount));
+	checkExpression(componentCount == expectedComponentCount, AAFRESULT_TEST_FAILED);
+	checkResult(pComponentSequence->GetLength(&sequenceLength));
+	checkExpression(sequenceLength == AAF_UNKNOWN_LENGTH, AAFRESULT_TEST_FAILED);
+
+	// a Sequence that doesn't contains Components with Length of -1 shall not have a Length property set to -1
+	checkResult(pSequence->RemoveComponentAt(expectedComponentCount - 1));
+	expectedComponentCount--;
+	checkResult(pSequence->CountComponents(&componentCount));
+	checkExpression(componentCount == expectedComponentCount, AAFRESULT_TEST_FAILED);
+	checkResult(pComponentSequence->GetLength(&sequenceLength));
+	checkExpression(sequenceLength == 100, AAFRESULT_TEST_FAILED);
+
+	return hr;
+}
+
+HRESULT TestTimelineMobSlotNonEventSemanticsUnkLen(CAAFBuiltinDefs* defs,	IAAFMob* pMob)
+{
+	HRESULT	hr = S_OK;
+
+	IAAFSmartPointer<IAAFComponent> pFiller;
+	IAAFSmartPointer<IAAFComponent> pSourceClip;
+	
+	aafUInt32 componentCount = 0;
+	aafUInt32 expectedComponentCount = 0;
+	aafLength_t sequenceLength = 0;
+
+	// Sequence
+	IAAFSmartPointer<IAAFSequence> pSequence;
+	IAAFSmartPointer<IAAFSegment> pSegmentSequence;
+	IAAFSmartPointer<IAAFComponent> pComponentSequence;
+	checkResult(defs->cdSequence()->CreateInstance(IID_IAAFSequence, (IUnknown**)&pSequence));
+	checkResult(pSequence->Initialize(defs->ddkAAFSound()));
+	checkResult(pSequence->QueryInterface(IID_IAAFSegment, (void **)&pSegmentSequence));
+	checkResult(pSequence->QueryInterface(IID_IAAFComponent, (void **)&pComponentSequence));
+
+	// TimelineMobSlot
+	const aafSlotID_t slotID = 1;
+	const aafRational_t editRate = { 0, 1 };
+	IAAFSmartPointer<IAAFTimelineMobSlot> pMobSlot;
+	checkResult(pMob->AppendNewTimelineSlot(editRate, pSegmentSequence,	slotID,	L"AAF Test Sequence", 0, &pMobSlot));
+
+	// append Filler
+	InstantiateFiller(defs, 43, *&pFiller);
+	checkResult(pSequence->AppendComponent(pFiller));
+	expectedComponentCount++;
+
+	// append SourceClip
+	InstantiateNonFillerComponent(defs, 57, *&pSourceClip);
+	checkResult(pSequence->AppendComponent(pSourceClip));
+	expectedComponentCount++;
+
+	// append Filler with unknown length
+	InstantiateFiller(defs, AAF_UNKNOWN_LENGTH, *&pFiller);
+	// Sequence Components other than the last Component shall not have a Length property set to AAF_UNKNOWN_LENGTH.
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->PrependComponent(pFiller), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->InsertComponentAt(0, pFiller), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->InsertComponentAt(1, pFiller), AAFRESULT_TEST_FAILED);
+	// the last Component of a Sequence may have a Length property set to AAF_UNKNOWN_LENGTH.
+	checkResult(pSequence->AppendComponent(pFiller));
+	expectedComponentCount++;
+
+	// a Sequence that contains a Component with Length of -1 shall have a Length property set to -1
+	checkResult(pSequence->CountComponents(&componentCount));
+	checkExpression(componentCount == expectedComponentCount, AAFRESULT_TEST_FAILED);
+	checkResult(pComponentSequence->GetLength(&sequenceLength));
+	checkExpression(sequenceLength == AAF_UNKNOWN_LENGTH, AAFRESULT_TEST_FAILED);
+
+	// cannot append another component with unknown length
+	InstantiateNonFillerComponent(defs, AAF_UNKNOWN_LENGTH, *&pSourceClip);
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->AppendComponent(pSourceClip), AAFRESULT_TEST_FAILED);
+
+	// cannot append any component after Componet with unknown length
+	InstantiateNonFillerComponent(defs, 77, *&pSourceClip);
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->AppendComponent(pSourceClip), AAFRESULT_TEST_FAILED);
+
+	// insert Component into Sequence with unknown length
+	InstantiateNonFillerComponent(defs, 33, *&pSourceClip);
+	checkResult(pSequence->InsertComponentAt(2, pSourceClip));
+	expectedComponentCount++;
+
+	// remove Component with length
+	checkResult(pSequence->RemoveComponentAt(2));
+	expectedComponentCount--;
+
+	// but Sequence still has an unknown length
+	checkResult(pSequence->CountComponents(&componentCount));
+	checkExpression(componentCount == expectedComponentCount, AAFRESULT_TEST_FAILED);
+	checkResult(pComponentSequence->GetLength(&sequenceLength));
+	checkExpression(sequenceLength == AAF_UNKNOWN_LENGTH, AAFRESULT_TEST_FAILED);
+
+	// a Sequence that doesn't contains Components with Length of -1 shall not have a Length property set to -1
+	checkResult(pSequence->RemoveComponentAt(expectedComponentCount - 1));
+	expectedComponentCount--;
+	checkResult(pSequence->CountComponents(&componentCount));
+	checkExpression(componentCount == expectedComponentCount, AAFRESULT_TEST_FAILED);
+	checkResult(pComponentSequence->GetLength(&sequenceLength));
+	checkExpression(sequenceLength == 100, AAFRESULT_TEST_FAILED);
+
+	return hr;
+}
+
+HRESULT TestStaticMobSlotSemantics(CAAFBuiltinDefs* defs,
+									  IAAFMob* pMob)
+{
+	HRESULT			hr = S_OK;
+
+	IAAFSequence*	pSequence = NULL;
+	IAAFComponent*	pComponent = NULL;
+	IAAFComponent*	pEvent = NULL;
+	IAAFSegment*	pSegment = NULL;
+	IAAFMobSlot*	pMobSlot = NULL;
+	aafUInt32	expectedComponentCount = 0;
+
+	//-----------------------------------------------------
+	// Empty Sequence attached to StaticMobSlot
+	//-----------------------------------------------------
+	checkResult(defs->cdSequence()->
+				CreateInstance(IID_IAAFSequence,
+								(IUnknown**)&pSequence));		
+	checkResult(pSequence->Initialize(defs->ddkAAFSound()));
+	checkResult(pSequence->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
+
+	checkResult(defs->cdStaticMobSlot()->
+				CreateInstance(IID_IAAFMobSlot,
+								(IUnknown**)&pMobSlot));		
+	checkResult(pMobSlot->SetSlotID(1));
+	checkResult(pMobSlot->SetSegment(pSegment));
+
+	checkResult(pMob->AppendSlot(pMobSlot));
+
+	// Test invalid semantics with the empty Seqeunce
+	TestStaticMobSlotInvalidSemantics(defs, pSequence);
+
+	InstantiateEvent(defs, pEvent);
+	checkResult(pSequence->AppendComponent(pEvent));
+	expectedComponentCount++;
+	pEvent->Release();
+	pEvent = NULL;
+
+	InstantiateEvent(defs, pEvent);
+	checkResult(pSequence->PrependComponent(pEvent));
+	expectedComponentCount++;
+	pEvent->Release();
+	pEvent = NULL;
+
+	InstantiateEvent(defs, pEvent);
+	checkResult(pSequence->InsertComponentAt(1, pEvent));
+	expectedComponentCount++;
+	pEvent->Release();
+	pEvent = NULL;
+
+	InstantiateComponentWithoutLength(defs, pComponent);
+	checkResult(pSequence->AppendComponent(pComponent));
+	expectedComponentCount++;
+	pComponent->Release();
+	pComponent = NULL;
+
+	InstantiateComponentWithoutLength(defs, pComponent);
+	checkResult(pSequence->PrependComponent(pComponent));
+	expectedComponentCount++;
+	pComponent->Release();
+	pComponent = NULL;
+
+	InstantiateComponentWithoutLength(defs, pComponent);
+	checkResult(pSequence->InsertComponentAt(1, pComponent));
+	expectedComponentCount++;
+	pComponent->Release();
+	pComponent = NULL;
+
+	// Test invalid semantics with the non-empty Seqeunce
+	TestStaticMobSlotInvalidSemantics(defs, pSequence);
+
+	aafUInt32 componentCount = 0;
+	checkResult(pSequence->CountComponents(&componentCount));
+	checkExpression(expectedComponentCount == componentCount, AAFRESULT_TEST_FAILED);
+
+	if (pSequence)
+	{
+		pSequence->Release();
+		pSequence = NULL;
+	}
+	if (pComponent)
+	{
+		pComponent->Release();
+		pComponent = NULL;
+	}
+	if (pEvent)
+	{
+		pEvent->Release();
+		pEvent = NULL;
+	}
+	if (pSegment)
+	{
+		pSegment->Release();
+		pSegment = NULL;
+	}
+	if (pMobSlot)
+	{
+		pMobSlot->Release();
+		pMobSlot = NULL;
+	}
+
+	return hr;
+}
+
+HRESULT TestStaticMobSlotLengths(CAAFBuiltinDefs* defs,
+								 IAAFMob* pMob)
+{
+	HRESULT			hr = S_OK;
+
+	IAAFSequence*	pSequence = NULL;
+	IAAFComponent*	pComponent = NULL;
+	IAAFComponent*	pEvent = NULL;
+	IAAFSegment*	pSegment = NULL;
+	IAAFMobSlot*	pMobSlot = NULL;
+
+	//-----------------------------------------------------
+	// Create empty Sequence attached to StaticMobSlot
+	//-----------------------------------------------------
+	checkResult(defs->cdSequence()->
+				CreateInstance(IID_IAAFSequence,
+								(IUnknown**)&pSequence));		
+	checkResult(pSequence->Initialize(defs->ddkAAFSound()));
+	checkResult(pSequence->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
+
+	checkResult(defs->cdStaticMobSlot()->
+				CreateInstance(IID_IAAFMobSlot,
+								(IUnknown**)&pMobSlot));		
+	checkResult(pMobSlot->SetSlotID(1));
+	checkResult(pMobSlot->SetSegment(pSegment));
+
+	checkResult(pMob->AppendSlot(pMobSlot));
+
+	//-----------------------------------------------------
+	// Add Events and non-Events without length to
+	// the Sequence.
+	//-----------------------------------------------------
+	InstantiateEvent(defs, pEvent);
+	checkResult(pSequence->AppendComponent(pEvent));
+	pEvent->Release();
+	pEvent = NULL;
+
+	InstantiateEvent(defs, pEvent);
+	checkResult(pSequence->PrependComponent(pEvent));
+	pEvent->Release();
+	pEvent = NULL;
+
+	InstantiateEvent(defs, pEvent);
+	checkResult(pSequence->InsertComponentAt(1, pEvent));
+	pEvent->Release();
+	pEvent = NULL;
+
+	InstantiateComponentWithoutLength(defs, pComponent);
+	checkResult(pSequence->AppendComponent(pComponent));
+	pComponent->Release();
+	pComponent = NULL;
+
+	InstantiateComponentWithoutLength(defs, pComponent);
+	checkResult(pSequence->PrependComponent(pComponent));
+	pComponent->Release();
+	pComponent = NULL;
+
+	InstantiateComponentWithoutLength(defs, pComponent);
+	checkResult(pSequence->InsertComponentAt(1, pComponent));
+	pComponent->Release();
+	pComponent = NULL;
+
+	// Sequence with components without Length
+	checkResult(pSequence->QueryInterface(IID_IAAFComponent, (void**)&pComponent));
+	aafLength_t length = 0;
+	checkExpression(AAFRESULT_PROP_NOT_PRESENT == pComponent->GetLength(&length), AAFRESULT_TEST_FAILED);
+	pComponent->Release();
+	pComponent = NULL;
+
+	if (pSequence)
+	{
+		pSequence->Release();
+		pSequence = NULL;
+	}
+	if (pComponent)
+	{
+		pComponent->Release();
+		pComponent = NULL;
+	}
+	if (pEvent)
+	{
+		pEvent->Release();
+		pEvent = NULL;
+	}
+	if (pSegment)
+	{
+		pSegment->Release();
+		pSegment = NULL;
+	}
+	if (pMobSlot)
+	{
+		pMobSlot->Release();
+		pMobSlot = NULL;
+	}
+
+	return hr;
+}
+
+HRESULT TestEventMobSlotInvalidSemantics(CAAFBuiltinDefs* defs,
+										 IAAFSequence* pSequence,
+										 aafPosition_t existingPosition)
+{
+	// The following tests assume that pSequence is attached to
+	// an EventMobSlot.
+
+	IAAFComponent*	pComponent = NULL;
+	IAAFComponent*	pEvent = NULL;
+
+	//-----------------------------------------------------
+	// Sequence with Event at 'existingPosition'
+	//-----------------------------------------------------
+
+	// Cannot add non-Event (with Length) to a Sequence in EventMobSlot
+	InstantiateComponent(defs, 123, pComponent);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->AppendComponent(pComponent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->PrependComponent(pComponent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(0, pComponent), AAFRESULT_TEST_FAILED);
+	pComponent->Release();
+	pComponent = NULL;
+
+	// Cannot add non-Event (without Length) to a Sequence in EventMobSlot
+	InstantiateComponentWithoutLength(defs, pComponent);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->AppendComponent(pComponent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->PrependComponent(pComponent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(0, pComponent), AAFRESULT_TEST_FAILED);
+	pComponent->Release();
+	pComponent = NULL;
+
+	// Note that adding Event without position cannot be tested because
+	// Event's Position property is required in AAF Toolkit, and therefore
+	// is always present.
+	//
+	// [ ... ]
+
+	// Cannot add Event (without Length) after Event with larger position.
+	InstantiateEvent(defs, existingPosition-10, pEvent);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(1, pEvent), AAFRESULT_TEST_FAILED);
+	pEvent->Release();
+	pEvent = NULL;
+
+	// Cannot add Event (without Length) before Event with smaller position.
+	InstantiateEvent(defs, existingPosition+10, pEvent);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->PrependComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(0, pEvent), AAFRESULT_TEST_FAILED);
+	pEvent->Release();
+	pEvent = NULL;
+
+	// Cannot add Event (with Length) after Event with larger position.
+	InstantiateEventWithLength(defs, 123, existingPosition-10, pEvent);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(1, pEvent), AAFRESULT_TEST_FAILED);
+	pEvent->Release();
+	pEvent = NULL;
+
+	// Cannot add Event (with Length) before Event with smaller position.
+	InstantiateEventWithLength(defs, 123, existingPosition+10, pEvent);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->PrependComponent(pEvent), AAFRESULT_TEST_FAILED);
+	checkExpression(AAFRESULT_EVENT_SEMANTICS == pSequence->InsertComponentAt(0, pEvent), AAFRESULT_TEST_FAILED);
+	pEvent->Release();
+	pEvent = NULL;
+
+	if (pComponent)
+	{
+		pComponent->Release();
+		pComponent = NULL;
+	}
+	if (pEvent)
+	{
+		pEvent->Release();
+		pEvent = NULL;
+	}
+
+	return S_OK;
+}
+
+HRESULT TestEventMobSlotSemantics(CAAFBuiltinDefs* defs,
+									  IAAFMob* pMob)
+{
+	HRESULT			hr = S_OK;
+
+	IAAFSequence*	pSequence = NULL;
+	IAAFComponent*	pFiller = NULL;
+	IAAFComponent*	pComponent = NULL;
+	IAAFComponent*	pEvent = NULL;
+	IAAFSegment*	pSegment = NULL;
+	IAAFMobSlot*	pMobSlot = NULL;
+
+	//-----------------------------------------------------
+	// Create empty(*) Sequence attached to EventMobSlot
+	//-----------------------------------------------------
+	checkResult(defs->cdSequence()->
+				CreateInstance(IID_IAAFSequence,
+								(IUnknown**)&pSequence));		
+	checkResult(pSequence->Initialize(defs->ddkAAFSound()));
+	checkResult(pSequence->QueryInterface (IID_IAAFSegment, (void **)&pSegment));
+
+	checkResult(defs->cdEventMobSlot()->
+				CreateInstance(IID_IAAFMobSlot,
+								(IUnknown**)&pMobSlot));		
+	checkResult(pMobSlot->SetSlotID(1));
+
+	// (*) Actually, the sequence is not empty.
+	// EventMobSlot's SetSegment() has a bizzare requirement for
+	// an input Sequence to be non-empty. This is a whim of the API
+	// which is not supported by the data model.
+	const aafPosition_t position = 100;
+	InstantiateEvent(defs, position, pEvent);
+	checkResult(pSequence->AppendComponent(pEvent));
+	pEvent->Release();
+	pEvent = NULL;
+
+	checkResult(pMobSlot->SetSegment(pSegment));
+	checkResult(pMob->AppendSlot(pMobSlot));
+
+	//-----------------------------------------------------
+	// Test adding invalid components to sequence with one
+	// Event at 'position'
+	//-----------------------------------------------------
+	TestEventMobSlotInvalidSemantics(defs, pSequence, position);
+
+	//-----------------------------------------------------
+	// Add Events with unique Positions to Sequence with
+	// one Event: [0]: 100
+	//-----------------------------------------------------
+
+	// [0]: 100, [1]: 120 
+	//            ^
+	InstantiateEvent(defs, position+10+10, pEvent);
+	checkResult(pSequence->AppendComponent(pEvent));
+	pEvent->Release();
+	pEvent = NULL;
+
+	// [0]: 100, [1]: 110, [2]: 120 
+	//            ^
+	InstantiateEvent(defs, position+10, pEvent);
+	checkResult(pSequence->InsertComponentAt(1, pEvent));
+	pEvent->Release();
+	pEvent = NULL;
+
+	// [0]: 80, [1]: 100, [2]: 110, [3]: 120 
+	//  ^
+	InstantiateEvent(defs, position-10-10, pEvent);
+	checkResult(pSequence->PrependComponent(pEvent));
+	pEvent->Release();
+	pEvent = NULL;
+
+	// [0]: 80, [1]: 90, [2]: 100, [3]: 110, [4]: 120 
+	//           ^
+	InstantiateEvent(defs, position-10, pEvent);
+	checkResult(pSequence->InsertComponentAt(1, pEvent));
+	pEvent->Release();
+	pEvent = NULL;
+
+	//-----------------------------------------------------
+	// Add Events with duplicate Positions to Sequence with
+	// Events:
+	// [0]: 80, [1]: 90, [2]: 100, [3]: 110, [4]: 120
+	//-----------------------------------------------------
+
+	// [0]: 80, [1]: 90, [2]: 100, [3]: 110, [4]: 120, [5]: 120
+	//                                                  ^
+	InstantiateEvent(defs, position+10+10, pEvent);
+	checkResult(pSequence->AppendComponent(pEvent));
+	pEvent->Release();
+	pEvent = NULL;
+
+	// [0]: 80, [1]: 90, [2]: 100, [3]: 100, [4]: 110, [5]: 120, [6]: 120
+	//                    ^
+	InstantiateEvent(defs, position, pEvent);
+	checkResult(pSequence->InsertComponentAt(2, pEvent));
+	pEvent->Release();
+	pEvent = NULL;
+
+	// [0]: 80, [1]: 80, [2]: 90, [3]: 100, [4]: 100, [5]: 110, [6]: 120, [7]: 120
+	//  ^
+	InstantiateEvent(defs, position-10-10, pEvent);
+	checkResult(pSequence->PrependComponent(pEvent));
+	pEvent->Release();
+	pEvent = NULL;
+
+	//-----------------------------------------------------
+	// Validate Sequence Events and their Positions
+	//-----------------------------------------------------
+	const aafPosition_t expectedPositions[] = {80, 80, 90, 100, 100, 110, 120, 120};
+	const size_t expectedCount = sizeof(expectedPositions) / sizeof(expectedPositions[0]);
+	for (size_t i=0; i<expectedCount; i++)
+	{
+		IAAFComponent* pComponent = NULL;
+		checkResult(pSequence->GetComponentAt(i, &pComponent));
+		IAAFEvent* pEvent = NULL;
+		checkResult(pComponent->QueryInterface(IID_IAAFEvent, (void**)&pEvent));
+		aafPosition_t position = 0;
+		checkResult(pEvent->GetPosition(&position));
+		checkExpression(expectedPositions[i] == position, AAFRESULT_TEST_FAILED);
+		pComponent->Release();
+		pEvent->Release();
+	}
+
+	aafUInt32 componentCount = 0;
+	checkResult(pSequence->CountComponents(&componentCount));
+	checkExpression(expectedCount == componentCount, AAFRESULT_TEST_FAILED);
+
+	//-----------------------------------------------------
+	// Test adding invalid components to sequence with one
+	// Event at 'position'
+	//-----------------------------------------------------
+	TestEventMobSlotInvalidSemantics(defs, pSequence, position);
+
+	if (pSequence)
+	{
+		pSequence->Release();
+		pSequence = NULL;
+	}
+	if (pFiller)
+	{
+		pFiller->Release();
+		pFiller = NULL;
+	}
+	if (pComponent)
+	{
+		pComponent->Release();
+		pComponent = NULL;
+	}
+	if (pEvent)
+	{
+		pEvent->Release();
+		pEvent = NULL;
+	}
+	if (pSegment)
+	{
+		pSegment->Release();
+		pSegment = NULL;
+	}
+	if (pMobSlot)
+	{
+		pMobSlot->Release();
+		pMobSlot = NULL;
+	}
+
+	return hr;
+}
+
+HRESULT TestEventMobSlotSemanticsUnkLen(CAAFBuiltinDefs* defs, IAAFMob* pMob)
+{
+	HRESULT			hr = S_OK;
+
+	IAAFSmartPointer<IAAFComponent> pEvent;
+
+	aafLength_t seqLength = 0;
+
+	//-----------------------------------------------------
+	// Create empty(*) Sequence attached to EventMobSlot
+	//-----------------------------------------------------
+	IAAFSmartPointer<IAAFSequence> pSequence;
+	IAAFSmartPointer<IAAFSegment> pSegmentSequence;
+	IAAFSmartPointer<IAAFComponent> pComponentSequence;
+	checkResult(defs->cdSequence()->CreateInstance(IID_IAAFSequence, (IUnknown**)&pSequence));
+	checkResult(pSequence->Initialize(defs->ddkAAFSound()));
+	checkResult(pSequence->QueryInterface(IID_IAAFSegment, (void **)&pSegmentSequence));
+	checkResult(pSequence->QueryInterface(IID_IAAFComponent, (void **)&pComponentSequence));
+
+	IAAFSmartPointer<IAAFMobSlot> pMobSlot;
+	checkResult(defs->cdEventMobSlot()->CreateInstance(IID_IAAFMobSlot, (IUnknown**)&pMobSlot));
+	checkResult(pMobSlot->SetSlotID(1));
+
+	// (*) Actually, the sequence is not empty.
+	// EventMobSlot's SetSegment() has a bizzare requirement for
+	// an input Sequence to be non-empty. This is a whim of the API
+	// which is not supported by the data model.
+	InstantiateEvent(defs, 100, *&pEvent);
+	checkResult(pSequence->AppendComponent(pEvent));
+
+	checkResult(pMobSlot->SetSegment(pSegmentSequence));
+	checkResult(pMob->AppendSlot(pMobSlot));
+
+	InstantiateEvent(defs, 120, *&pEvent);
+	checkResult(pSequence->AppendComponent(pEvent));
+
+	// pSequence: [(pos:100; len:null), (pos:120; len:null)], len:null
+
+	// expect no length is set
+	checkExpression(AAFRESULT_PROP_NOT_PRESENT == pComponentSequence->GetLength(&seqLength), AAFRESULT_TEST_FAILED);
+
+	// append Component with unknown length (-1)
+	// Sequence Components other than the last Component shall not have a Length property set to AAF_UNKNOWN_LENGTH.
+	InstantiateEventWithLength(defs, AAF_UNKNOWN_LENGTH, 10, *&pEvent);
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->PrependComponent(pEvent), AAFRESULT_TEST_FAILED);
+	// the last Component of a Sequence may have a Length property set to AAF_UNKNOWN_LENGTH.
+	InstantiateEventWithLength(defs, AAF_UNKNOWN_LENGTH, 180, *&pEvent);
+	checkResult(pSequence->AppendComponent(pEvent));
+
+	// pSequence: [(pos:100, len:null), (pos:120, len:null), (pos:180, len:-1)], len:-1
+
+	// a Sequence that contains a Component with Length of -1 shall have a Length property set to -1
+	checkResult(pComponentSequence->GetLength(&seqLength));
+	checkExpression(seqLength == AAF_UNKNOWN_LENGTH, AAFRESULT_TEST_FAILED);
+
+	// cannot append another component with unknown length
+	InstantiateEventWithLength(defs, AAF_UNKNOWN_LENGTH, 200, *&pEvent);
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+
+	// cannot append any component after Componet with unknown length
+	InstantiateEvent(defs, 200, *&pEvent);
+	checkExpression(AAFRESULT_INVALID_PARAM == pSequence->AppendComponent(pEvent), AAFRESULT_TEST_FAILED);
+
+	// insert Component into Sequence of unknown length
+	InstantiateEventWithLength(defs, 60, 140, *&pEvent);
+	checkResult(pSequence->InsertComponentAt(2, pEvent));
+
+	// pSequence: [(pos:100, len:null), (pos:120, len:null), (pos:140, len:60), (pos:180, len:-1)], len:-1
+
+	// but Sequence still has an unknown length
+	checkResult(pComponentSequence->GetLength(&seqLength));
+	checkExpression(seqLength == AAF_UNKNOWN_LENGTH, AAFRESULT_TEST_FAILED);
+
+	// remove Component with length
+	checkResult(pSequence->RemoveComponentAt(2));
+
+	// pSequence: [(pos:100, len:null), (pos:120, len:null), (pos:180, len:-1)], len:-1
+
+	// but Sequence still has an unknown length
+	checkResult(pComponentSequence->GetLength(&seqLength));
+	checkExpression(seqLength == AAF_UNKNOWN_LENGTH, AAFRESULT_TEST_FAILED);
+
+	// remove the last Component of unknown length
+	checkResult(pSequence->RemoveComponentAt(2));
+
+	// pSequence: [(pos:100, len:null), (pos:120, len:null)], len:null
+
+	// a Sequence that doesn't contains Components with Length of -1 shall not have a Length property set to -1
+	checkResult(pComponentSequence->GetLength(&seqLength));
+	checkExpression(AAFRESULT_PROP_NOT_PRESENT != seqLength, AAFRESULT_TEST_FAILED);
 
 	return hr;
 }
@@ -563,8 +1695,9 @@ static HRESULT CreateAAFFile(
 {
 	IAAFFile*		pFile = NULL;
 	IAAFHeader*		pHeader = NULL;
-  IAAFDictionary*  pDictionary = NULL;
+	IAAFDictionary*  pDictionary = NULL;
 	IAAFMob*		pMob = NULL;
+	IAAFMob*		pTransientMob = NULL;
 
 	HRESULT			hr = S_OK;
 	
@@ -601,6 +1734,17 @@ static HRESULT CreateAAFFile(
 		// Add the master mob to the file and cleanup
 		pHeader->AddMob(pMob);
 
+	  checkResult(defs.cdSourceMob()->
+				  CreateInstance(IID_IAAFMob, 
+								 (IUnknown **)&pTransientMob));
+	  TestTimelineMobSlotNonEventSemantics(&defs, pTransientMob);
+	  TestTimelineMobSlotNonEventSemanticsUnkLen(&defs, pTransientMob);
+	  TestTimelineMobSlotEventSemantics(&defs, pTransientMob);
+	  TestTimelineMobSlotEventSemanticsUnkLen(&defs, pTransientMob);
+	  TestStaticMobSlotSemantics(&defs, pTransientMob);
+	  TestStaticMobSlotLengths(&defs, pTransientMob);
+	  TestEventMobSlotSemantics(&defs, pTransientMob);
+	  TestEventMobSlotSemanticsUnkLen(&defs, pTransientMob);
   }
   catch (HRESULT& rResult)
   {
@@ -610,6 +1754,9 @@ static HRESULT CreateAAFFile(
 
 	if (pMob)
     pMob->Release();
+
+	if (pTransientMob)
+		pTransientMob->Release();
 
 	if (pDictionary)
     pDictionary->Release();
@@ -623,7 +1770,7 @@ static HRESULT CreateAAFFile(
 		pFile->Close();
 		pFile->Release();
 	}
-
+ 
 	return hr;
 }
 
@@ -730,16 +1877,16 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 				}
 
 				pCompIter->Release();
-        pCompIter = NULL;
+				pCompIter = NULL;
 
-        pSequence->Release();
-        pSequence = NULL;
+				pSequence->Release();
+				pSequence = NULL;
 
-				pSegment->Release();
-        pSegment = NULL;
+						pSegment->Release();
+				pSegment = NULL;
 
-        pSlot->Release();
-        pSlot = NULL;
+				pSlot->Release();
+				pSlot = NULL;
 			}
 
 			pSlotIter->Release();
@@ -769,11 +1916,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		pCompIter = 0;
 	  }
 
-	if (pSequence)
-	  {
-		pSequence->Release();
-		pSequence = 0;
-	  }
+	
 
 	if (pSegment)
 	  {

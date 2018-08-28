@@ -45,23 +45,20 @@
 #include "OMPropertyDefinition.h"
 #include "OMDataStreamProperty.h"
 #include "OMDataStreamPropertyFilter.h"
+#include "OMDataStreamAccess.h"
 #include "OMUtilities.h"
 
 #include "OMAssertions.h"
 #include <string.h>
 
-
 ImplAAFStreamPropertyValue::ImplAAFStreamPropertyValue () :
-  _streamProperty(NULL),
-  _streamPropertyFilter(NULL)
+  _streamProperty(NULL)
 {
 }
 
 
 ImplAAFStreamPropertyValue::~ImplAAFStreamPropertyValue ()
 {
-  delete _streamPropertyFilter;
-  _streamPropertyFilter = 0;
 }
  
 
@@ -69,6 +66,7 @@ void ImplAAFStreamPropertyValue::setStreamAccess(OMDataStreamAccess* access)
 {
 	 _streamProperty->setStreamAccess(access);
 }
+
 
 
 
@@ -232,6 +230,174 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+AAFRESULT STDMETHODCALLTYPE
+   ImplAAFStreamPropertyValue::ReadScatter (
+      aafUInt32  bufCount,
+      aafIOBufferDesc_t *  pBufs,
+      aafUInt32 *  pBytesRead)
+{
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (NULL == pBufs || NULL == pBytesRead)
+    return AAFRESULT_NULL_PARAM;
+
+  // Cannot read from an optional property unless it is present.
+  if (_streamProperty->isOptional() && !_streamProperty->isPresent())
+    return AAFRESULT_PROP_NOT_PRESENT;
+    
+  // Read the bytes from the data stream.
+  OMIOBufferDescriptor* ioVector = reinterpret_cast<OMIOBufferDescriptor*>(pBufs);
+  _streamProperty->read(ioVector, bufCount, *pBytesRead);
+
+  if (*pBytesRead == 0)
+  {
+    if (ioVectorByteCount(ioVector, bufCount) > 0)
+    {
+      return AAFRESULT_END_OF_DATA;
+    }
+  }
+  
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFStreamPropertyValue::WriteGather (
+      aafUInt32  bufCount,
+      aafIOBufferDesc_constptr  pBufs,
+      aafUInt32 *  pBytesWritten)
+{
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (NULL == pBufs)
+    return AAFRESULT_NULL_PARAM;
+    
+  // Write the bytes from the data stream.
+  const OMIOBufferDescriptor* ioVector =
+      reinterpret_cast<const OMIOBufferDescriptor*>(pBufs);
+  _streamProperty->write(ioVector, bufCount, *pBytesWritten);
+  
+  if (*pBytesWritten == 0)
+  {
+    if (ioVectorByteCount(ioVector, bufCount) > 0)
+    {
+      return AAFRESULT_END_OF_DATA;
+    }
+  }
+  
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFStreamPropertyValue::ReadAsyncAt (
+      aafUInt64  position,
+      aafUInt32  dataSize,
+      aafMemPtr_t  pData,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (pData == NULL)
+    return AAFRESULT_NULL_PARAM;
+
+  // Cannot read from an optional property unless it is present.
+  if (_streamProperty->isOptional() && !_streamProperty->isPresent())
+    return AAFRESULT_PROP_NOT_PRESENT;
+
+  _streamProperty->read(position,
+                        pData,
+                        dataSize,
+                        pCompletion,
+                        pClientArg);
+
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFStreamPropertyValue::WriteAsyncAt (
+      aafUInt64  position,
+      aafUInt32  dataSize,
+      aafMemConstPtr_t  pData,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (pData == NULL)
+    return AAFRESULT_NULL_PARAM;
+
+  _streamProperty->write(position,
+                         pData,
+                         dataSize,
+                         pCompletion,
+                         pClientArg);
+
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFStreamPropertyValue::ReadScatterAsyncAt (
+      aafUInt64  position,
+      aafUInt32  bufCount,
+      aafIOBufferDesc_t *  pBufs,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (pBufs == NULL)
+    return AAFRESULT_NULL_PARAM;
+
+  // Cannot read from an optional property unless it is present.
+  if (_streamProperty->isOptional() && !_streamProperty->isPresent())
+    return AAFRESULT_PROP_NOT_PRESENT;
+    
+  // Read the bytes from the data stream.
+  OMIOBufferDescriptor* ioVector = reinterpret_cast<OMIOBufferDescriptor*>(pBufs);
+  _streamProperty->read(position,
+                        ioVector,
+                        bufCount,
+                        pCompletion,
+                        pClientArg);
+
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFStreamPropertyValue::WriteGatherAsyncAt (
+      aafUInt64  position,
+      aafUInt32  bufCount,
+      aafIOBufferDesc_constptr  pBufs,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (NULL == pBufs)
+    return AAFRESULT_NULL_PARAM;
+    
+  // Write the bytes from the data stream.
+  const OMIOBufferDescriptor* ioVector =
+      reinterpret_cast<const OMIOBufferDescriptor*>(pBufs);
+  _streamProperty->write(position,
+                         ioVector,
+                         bufCount,
+                         pCompletion,
+                         pClientArg);
+
+
+  return AAFRESULT_SUCCESS;
+}
+
+
 
 
 
@@ -346,7 +512,23 @@ AAFRESULT STDMETHODCALLTYPE
   // Cannot read from an optional property unless it is present.
   if (_streamProperty->isOptional() && !_streamProperty->isPresent())
     return AAFRESULT_PROP_NOT_PRESENT;
-  
+
+  // Do not try to read more elements than there are in the
+  // stream - update elementCount if necessary.
+  OMUInt64 elementsLeft = 0;
+  if( _streamProperty->position() < _streamProperty->size() )
+  {
+      const OMUInt64 bytesLeft = _streamProperty->size() -
+                                 _streamProperty->position();
+      elementsLeft = bytesLeft / externalElementSize;
+  }
+
+  if (elementsLeft == 0)
+      return AAFRESULT_END_OF_DATA;
+
+  if (elementsLeft < elementCount)
+      elementCount = (OMUInt32)elementsLeft;
+
   // Read the elements from the data stream.
   OMUInt32 elementsRead;
   _streamProperty->readTypedElements(pElementType->type(),
@@ -469,7 +651,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (NULL == pSize)
     return AAFRESULT_NULL_PARAM;    
   
-  *pSize = (aafInt64)(_streamPropertyFilter->size());
+  *pSize = (aafInt64)(_streamProperty->filter()->size());
   return AAFRESULT_SUCCESS;
 }
 
@@ -486,11 +668,11 @@ AAFRESULT STDMETHODCALLTYPE
   // *** Structured Storage PATCH! *** transdel:2000-JUN-20
   // Save the old position so that we can detect whether
   // or not the stream is being truncated.
-  OMUInt64 position = _streamPropertyFilter->position();
+  OMUInt64 position = _streamProperty->filter()->position();
 
 
   // Set the new size of the data stream.
-  _streamPropertyFilter->setSize((OMUInt64)newSize); // What happens if this call fails?
+  _streamProperty->filter()->setSize((OMUInt64)newSize); // What happens if this call fails?
 
 
   // *** Structured Storage PATCH! *** transdel:2000-JUN-20
@@ -500,7 +682,7 @@ AAFRESULT STDMETHODCALLTYPE
   // "stale bytes" in the stream after the next write
   // operation.
   if (position > (OMUInt64)newSize)
-    _streamPropertyFilter->setPosition((OMUInt64)newSize); // What happens if this call fails?
+    _streamProperty->filter()->setPosition((OMUInt64)newSize); // What happens if this call fails?
     
   return AAFRESULT_SUCCESS;
 }
@@ -515,7 +697,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (NULL == pPosition)
     return AAFRESULT_NULL_PARAM;
     
-  *pPosition = (aafInt64)_streamPropertyFilter->position();
+  *pPosition = (aafInt64)_streamProperty->filter()->position();
     
   return AAFRESULT_SUCCESS;
 }
@@ -531,7 +713,7 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_INVALID_PARAM;
   
   // Set the new size of the data stream.
-  _streamPropertyFilter->setPosition((OMUInt64)newPosition); // What happens if this call fails?
+  _streamProperty->filter()->setPosition((OMUInt64)newPosition); // What happens if this call fails?
     
   return AAFRESULT_SUCCESS;
 }
@@ -556,7 +738,7 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_PROP_NOT_PRESENT;
     
   // Read the bytes from the data stream.
-  _streamPropertyFilter->read(pData, dataSize, *bytesRead);
+  _streamProperty->filter()->read(pData, dataSize, *bytesRead);
   
   if (0 < dataSize && 0 == *bytesRead)
     return AAFRESULT_END_OF_DATA;
@@ -580,7 +762,7 @@ AAFRESULT STDMETHODCALLTYPE
   OMUInt32 bytesWritten = 0;
   if (0 < dataSize)
   {
-    _streamPropertyFilter->write(pData, dataSize, bytesWritten);
+    _streamProperty->filter()->write(pData, dataSize, bytesWritten);
   }
   
   if (0 < dataSize && 0 == bytesWritten)
@@ -603,19 +785,188 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_NULL_PARAM;    
 
   // Set the position to the size of the stream.
-  _streamPropertyFilter->setPosition(_streamPropertyFilter->size());
+  _streamProperty->filter()->setPosition(_streamProperty->filter()->size());
        
   // Write the bytes from the data stream.
   OMUInt32 bytesWritten = 0;
   if (0 < dataSize)
   {
-    _streamPropertyFilter->write(pData, dataSize, bytesWritten);
+    _streamProperty->filter()->write(pData, dataSize, bytesWritten);
   }
   
   if (0 < dataSize && 0 == bytesWritten)
     return AAFRESULT_END_OF_DATA;
   
   ASSERTU(dataSize == bytesWritten);  
+  return AAFRESULT_SUCCESS;
+}
+
+
+
+AAFRESULT STDMETHODCALLTYPE
+   ImplAAFStreamPropertyValue::ReadScatterFiltered (
+      aafUInt32  bufCount,
+      aafIOBufferDesc_t *  pBufs,
+      aafUInt32 *  pBytesRead)
+{
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (NULL == pBufs || NULL == pBytesRead)
+    return AAFRESULT_NULL_PARAM;
+
+  // Cannot read from an optional property unless it is present.
+  if (_streamProperty->isOptional() && !_streamProperty->isPresent())
+    return AAFRESULT_PROP_NOT_PRESENT;
+    
+  // Read the bytes from the data stream.
+  OMIOBufferDescriptor* ioVector = reinterpret_cast<OMIOBufferDescriptor*>(pBufs);
+  _streamProperty->filter()->read(ioVector, bufCount, *pBytesRead);
+
+  if (*pBytesRead == 0)
+  {
+    if (ioVectorByteCount(ioVector, bufCount) > 0)
+    {
+      return AAFRESULT_END_OF_DATA;
+    }
+  }
+  
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFStreamPropertyValue::WriteGatherFiltered (
+      aafUInt32  bufCount,
+      aafIOBufferDesc_constptr  pBufs,
+      aafUInt32 *  pBytesWritten)
+{
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (NULL == pBufs)
+    return AAFRESULT_NULL_PARAM;
+    
+  // Write the bytes from the data stream.
+  const OMIOBufferDescriptor* ioVector =
+      reinterpret_cast<const OMIOBufferDescriptor*>(pBufs);
+  _streamProperty->filter()->write(ioVector, bufCount, *pBytesWritten);
+  
+  if (*pBytesWritten == 0)
+  {
+    if (ioVectorByteCount(ioVector, bufCount) > 0)
+    {
+      return AAFRESULT_END_OF_DATA;
+    }
+  }
+  
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFStreamPropertyValue::ReadAsyncFilteredAt (
+      aafUInt64  position,
+      aafUInt32  dataSize,
+      aafMemPtr_t  pData,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (pData == NULL)
+    return AAFRESULT_NULL_PARAM;
+
+  // Cannot read from an optional property unless it is present.
+  if (_streamProperty->isOptional() && !_streamProperty->isPresent())
+    return AAFRESULT_PROP_NOT_PRESENT;
+
+  _streamProperty->filter()->read(position,
+                              pData,
+                              dataSize,
+                              pCompletion,
+                              pClientArg);
+
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFStreamPropertyValue::WriteAsyncFilteredAt (
+      aafUInt64  position,
+      aafUInt32  dataSize,
+      aafMemConstPtr_t  pData,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (pData == NULL)
+    return AAFRESULT_NULL_PARAM;
+
+  _streamProperty->filter()->write(position,
+                               pData,
+                               dataSize,
+                               pCompletion,
+                               pClientArg);
+
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFStreamPropertyValue::ReadScatterAsyncFilteredAt (
+      aafUInt64  position,
+      aafUInt32  bufCount,
+      aafIOBufferDesc_t *  pBufs,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (pBufs == NULL)
+    return AAFRESULT_NULL_PARAM;
+
+  // Cannot read from an optional property unless it is present.
+  if (_streamProperty->isOptional() && !_streamProperty->isPresent())
+    return AAFRESULT_PROP_NOT_PRESENT;
+    
+  // Read the bytes from the data stream.
+  OMIOBufferDescriptor* ioVector = reinterpret_cast<OMIOBufferDescriptor*>(pBufs);
+  _streamProperty->filter()->read(position,
+                              ioVector,
+                              bufCount,
+                              pCompletion,
+                              pClientArg);
+
+
+  return AAFRESULT_SUCCESS;
+}
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFStreamPropertyValue::WriteGatherAsyncFilteredAt (
+      aafUInt64  position,
+      aafUInt32  bufCount,
+      aafIOBufferDesc_constptr  pBufs,
+      IAAFIOCompletion *  pCompletion,
+      aafMemConstPtr_t  pClientArg)
+{
+  if (!isInitialized())
+    return AAFRESULT_NOT_INITIALIZED;
+  if (NULL == pBufs)
+    return AAFRESULT_NULL_PARAM;
+    
+  // Write the bytes from the data stream.
+  const OMIOBufferDescriptor* ioVector =
+      reinterpret_cast<const OMIOBufferDescriptor*>(pBufs);
+  _streamProperty->filter()->write(position,
+                               ioVector,
+                               bufCount,
+                               pCompletion,
+                               pClientArg);
+
+
   return AAFRESULT_SUCCESS;
 }
 
@@ -647,11 +998,11 @@ AAFRESULT STDMETHODCALLTYPE
     return AAFRESULT_INVALID_PARAM;
   
   // Set the position to the size of the stream.
-  _streamPropertyFilter->setPosition(_streamPropertyFilter->size());
+  _streamProperty->filter()->setPosition(_streamProperty->filter()->size());
    
   // Write the elements to the data stream.
   OMUInt32 elementsWritten;
-  _streamPropertyFilter->writeTypedElements(pElementType->type(),
+  _streamProperty->filter()->writeTypedElements(pElementType->type(),
                                     internalElementSize,
                                     pData,
                                     elementCount,
@@ -698,7 +1049,7 @@ AAFRESULT STDMETHODCALLTYPE
   
   // Write the elements to the data stream.
   OMUInt32 elementsWritten;
-  _streamPropertyFilter->writeTypedElements(pElementType->type(),
+  _streamProperty->filter()->writeTypedElements(pElementType->type(),
                                     internalElementSize,
                                     pData,
                                     elementCount,
@@ -756,7 +1107,7 @@ AAFRESULT STDMETHODCALLTYPE
   
   // Read the elements from the data stream.
   OMUInt32 elementsRead;
-  _streamPropertyFilter->readTypedElements(pElementType->type(),
+  _streamProperty->filter()->readTypedElements(pElementType->type(),
                                    externalElementSize,
                                    pData,
                                    elementCount,
@@ -791,7 +1142,7 @@ AAFRESULT ImplAAFStreamPropertyValue::Initialize (
   ASSERTU (property->definition());
   if (NULL == property->definition())
     return AAFRESULT_INVALID_PARAM;
-  const OMType *type = property->definition()->type();
+  ARESULT (const OMType *type) property->definition()->type();
   ASSERTU (type);
   
   // The given property must be an OM stream property.  
@@ -818,7 +1169,6 @@ AAFRESULT ImplAAFStreamPropertyValue::Initialize (
   if (AAFRESULT_SUCCEEDED(result))
   {
     _streamProperty = streamProperty;
-    _streamPropertyFilter = streamProperty->createFilter();
    
     // This instance is now fully initialized.
     setInitialized();

@@ -103,7 +103,7 @@ public:
 
     // @cmember The number of <p ReferencedObject>s in the associated
     //          <c OMWeakReferenceSetProperty>.
-  virtual size_t count(void) const;
+  virtual OMUInt32 count(void) const;
 
     // @cmember Advance this <c OMWeakReferenceSetIterator> to the next
     //          <p ReferencedObject>, if any.

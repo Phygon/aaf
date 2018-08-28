@@ -77,11 +77,17 @@ using namespace std;
 #define kStoredF2OffsetTestVal			-1
 #define kActiveFormatDescriptorTestVal	3
 #define kSignalStandardTestVal			kAAFSignalStandard_ITU1358
+#define kSignalStandardTestValCase2		kAAFSignalStandard_SMPTE428_1
 
 static const 	aafMobID_t	TEST_MobID =
 {{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
 0x13, 0x00, 0x00, 0x00,
 {0x4b8a7f32, 0x03fe, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
+
+static const 	aafMobID_t	TEST_MobIDCase2 =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x4b8a7f32, 0x03fe, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7d}}};
 
 static const aafUID_t kGammaTestVal =
 {0x04010101, 0x0101, 0x0000, { 0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01}};
@@ -118,10 +124,15 @@ static HRESULT CreateAAFFile(
 	IAAFHeader*		pHeader = NULL;
 	IAAFDictionary*	pDictionary = NULL;
 	IAAFSourceMob*	pSourceMob = NULL;
+	IAAFSourceMob*	pSourceMobCase2 = NULL;
 	IAAFMob*	pMob = NULL;
+	IAAFMob*	pMobCase2 = NULL;
 	IAAFDigitalImageDescriptor*	pDIDesc = NULL;
+	IAAFDigitalImageDescriptor*	pDIDescCase2 = NULL;
 	IAAFDigitalImageDescriptor2*	pDIDesc2 = NULL;
+	IAAFDigitalImageDescriptor2*	pDIDesc2Case2 = NULL;
 	IAAFEssenceDescriptor*	pEssDesc = NULL;
+	IAAFEssenceDescriptor*	pEssDescCase2 = NULL;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
 
@@ -144,6 +155,7 @@ static HRESULT CreateAAFFile(
     checkResult(defs.cdSourceMob()->
 				CreateInstance(IID_IAAFSourceMob, 
 							   (IUnknown **)&pSourceMob));
+
     checkResult(pSourceMob->QueryInterface(IID_IAAFMob, (void **)&pMob));
 
     checkResult(pMob->SetMobID(TEST_MobID));
@@ -201,6 +213,42 @@ static HRESULT CreateAAFFile(
 
     // Add the MOB to the file
     checkResult(pHeader->AddMob(pMob));
+
+	// Case 2
+
+	// Create a source mob
+    checkResult(defs.cdSourceMob()->
+				CreateInstance(IID_IAAFSourceMob, 
+							   (IUnknown **)&pSourceMobCase2));
+
+    checkResult(pSourceMobCase2->QueryInterface(IID_IAAFMob, (void **)&pMobCase2));
+
+    checkResult(pMobCase2->SetMobID(TEST_MobIDCase2));
+    checkResult(pMobCase2->SetName(L"DigitalImageDescriptorTest Case2"));
+
+	// Create a concrete subclass of DigitialImageDescriptor.
+	checkResult(defs.cdRGBADescriptor()->
+		CreateInstance(IID_IAAFDigitalImageDescriptor, 
+		(IUnknown **)&pDIDescCase2));		
+
+	// Add all DigitalImage properties
+	// Required Properties
+	checkResult(pDIDescCase2->SetStoredView(kStoredHeightTestVal, kStoredWidthTestVal));
+	checkResult(pDIDescCase2->SetFrameLayout(kFrameLayoutTestVal));
+	checkResult(pDIDescCase2->SetVideoLineMap(kVideoLineMapMaxElement, VideoLineMap));
+
+	// Optional Properties accessed using IAAFDigitalImageDescriptor2
+	checkResult(pDIDescCase2->QueryInterface (IID_IAAFDigitalImageDescriptor2, (void **)&pDIDesc2Case2));
+
+	checkResult(pDIDesc2Case2->SetSignalStandard(kSignalStandardTestValCase2));
+
+	// Save the initialized descriptor with the source mob.
+	checkResult(pDIDescCase2->QueryInterface(IID_IAAFEssenceDescriptor, (void **)&pEssDescCase2));
+	checkResult(pSourceMobCase2->SetEssenceDescriptor(pEssDescCase2));
+
+	// Add the MOB to the file
+	checkResult(pHeader->AddMob(pMobCase2));
+
   }
   catch (HRESULT& rResult)
   {
@@ -211,17 +259,32 @@ static HRESULT CreateAAFFile(
   if (pEssDesc)
     pEssDesc->Release();
 
+  if (pEssDescCase2)
+	  pEssDescCase2->Release();
+
   if (pDIDesc2)
     pDIDesc2->Release();
+
+  if (pDIDesc2Case2)
+	  pDIDesc2Case2->Release();
 
   if (pDIDesc)
     pDIDesc->Release();
 
+  if (pDIDescCase2)
+	  pDIDescCase2->Release();
+
   if (pMob)
     pMob->Release();
 
+  if (pMobCase2)
+	  pMobCase2->Release();
+
   if (pSourceMob)
     pSourceMob->Release();
+
+  if (pSourceMobCase2)
+	  pSourceMobCase2->Release();
 
 	if (pDictionary)
     pDictionary->Release();
@@ -245,10 +308,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 	IAAFHeader*		pHeader = NULL;
 	IEnumAAFMobs*	pMobIter = NULL;
 	IAAFMob*	pMob = NULL;
+	IAAFMob*	pMobCase2 = NULL;
 	IAAFSourceMob*	pSourceMob = NULL;
+	IAAFSourceMob*	pSourceMobCase2 = NULL;
 	IAAFEssenceDescriptor*	pEssDesc = NULL;
+	IAAFEssenceDescriptor*	pEssDescCase2 = NULL;
 	IAAFDigitalImageDescriptor*	pDIDesc = NULL;
 	IAAFDigitalImageDescriptor2*	pDIDesc2 = NULL;
+	IAAFDigitalImageDescriptor2*	pDIDesc2Case2 = NULL;
 	aafNumSlots_t	numMobs = 0;
 	HRESULT			hr = AAFRESULT_SUCCESS;
 
@@ -263,11 +330,30 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
 
     // Make sure there is one a single mob in the file.
 	  checkResult(pHeader->CountMobs(kAAFAllMob, &numMobs));
-	  checkExpression(1 == numMobs, AAFRESULT_TEST_FAILED);
+	  checkExpression(2 == numMobs, AAFRESULT_TEST_FAILED);
 
     // Loop to the first mob.
 	  checkResult(pHeader->GetMobs(NULL, &pMobIter));
-	  checkResult(pMobIter->NextOne(&pMob));
+	  for (int mobNum=0; mobNum < numMobs; ++mobNum)
+	  {
+		  IAAFMob*	pMobTmp = NULL;
+		  checkResult(pMobIter->NextOne(&pMobTmp));
+
+		  aafMobID_t mobID;
+		  checkResult(pMobTmp->GetMobID(&mobID));
+		  if (memcmp(&mobID, &TEST_MobID, sizeof(aafMobID_t)) == 0)
+		  {
+			  pMob = pMobTmp;
+		  }
+		  else if (memcmp(&mobID, &TEST_MobIDCase2, sizeof(aafMobID_t)) == 0)
+		  {
+			  pMobCase2 = pMobTmp;
+		  }
+		  else
+		  {
+			  checkExpression(false, AAFRESULT_TEST_FAILED);
+		  }
+	  }
 
 	  checkResult(pMob->QueryInterface(IID_IAAFSourceMob, (void **)&pSourceMob));
 
@@ -387,6 +473,18 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     checkResult(pDIDesc2->GetSignalStandard(&signalStandard));
 		checkExpression(signalStandard == kSignalStandardTestVal, AAFRESULT_TEST_FAILED);
 
+
+	// Case 2
+	  checkResult(pMobCase2->QueryInterface(IID_IAAFSourceMob, (void **)&pSourceMobCase2));
+
+    // Back into testing mode
+	  checkResult(pSourceMobCase2->GetEssenceDescriptor(&pEssDescCase2));
+
+	  // Optional Properties accessed using IAAFDigitalImageDescriptor2
+	  checkResult(pEssDescCase2->QueryInterface (IID_IAAFDigitalImageDescriptor2, (void **)&pDIDesc2Case2));
+
+	  checkResult(pDIDesc2Case2->GetSignalStandard(&signalStandard));
+	  checkExpression(signalStandard == kSignalStandardTestValCase2, AAFRESULT_TEST_FAILED);
   }
   catch (HRESULT& rResult)
   {
@@ -397,8 +495,14 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   if (pEssDesc)
     pEssDesc->Release();
 
+  if (pEssDescCase2)
+	  pEssDescCase2->Release();
+
   if (pDIDesc2)
     pDIDesc2->Release();
+
+  if (pDIDesc2Case2)
+	  pDIDesc2Case2->Release();
 
   if (pDIDesc)
     pDIDesc->Release();
@@ -406,11 +510,17 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
   if (pMob)
     pMob->Release();
 
+  if (pMobCase2)
+	  pMobCase2->Release();
+
   if (pMobIter)
     pMobIter->Release();
 
   if (pSourceMob)
     pSourceMob->Release();
+
+  if (pSourceMobCase2)
+	  pSourceMobCase2->Release();
 
 	if (pHeader)
     pHeader->Release();

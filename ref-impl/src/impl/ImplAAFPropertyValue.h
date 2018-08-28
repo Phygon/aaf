@@ -1,5 +1,9 @@
+//@doc
+//@class    AAFPropertyValue | Implementation class for AAFPropertyValue
 #ifndef __ImplAAFPropertyValue_h__
 #define __ImplAAFPropertyValue_h__
+
+
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$

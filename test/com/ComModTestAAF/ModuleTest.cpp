@@ -353,19 +353,6 @@ AAFRESULT RemoveTestFile( const aafCharacter* p_file_name )
 }
 
 
-
-#if defined( OS_MACOS )
-#define TEST_PLATFORM_NAME		L"MacOS"
-#elif defined( OS_WINDOWS )
-#define TEST_PLATFORM_NAME		L"Win32"
-#elif defined( OS_UNIX )
-#define TEST_PLATFORM_NAME		L"Unix"
-#else
-#define TEST_PLATFORM_NAME		L"Unknown"
-#endif
-
-
-
 aafProductIdentification_t MakeProductID()
 {
     static aafProductVersion_t  product_version;
@@ -377,10 +364,10 @@ aafProductIdentification_t MakeProductID()
     product_version.type = kAAFVersionUnknown;
 
 
-    static aafCharacter    company_name[] = L"AAF Developers Desk";
-    static aafCharacter    product_name[] = L"ComModTestAAF";
-    static aafCharacter    product_version_string[] = L"1.0.0.0";
-    static aafCharacter    platform[] = TEST_PLATFORM_NAME;
+    static aafCharacter*    company_name = L"AAF Developers Desk";
+    static aafCharacter*    product_name = L"ComModTestAAF";
+    static aafCharacter*    product_version_string = L"1.0.0.0";
+    static aafCharacter*    platform = PLATFORM_NAME;
     aafProductIdentification_t  product_identification;
  
     product_identification.companyName = company_name;
@@ -754,6 +741,520 @@ aafUID_t EffectiveTestFileEncoding( const aafUID_t& encoding )
     return effective_encoding;
 }
 
+bool isSSFileKind(const aafUID_t& fileKind)
+{
+	bool result=false;
+	if (equalUID(fileKind, testFileKindDefault)
+		|| equalUID(fileKind, kAAFFileKind_Aaf512Binary)
+		|| equalUID(fileKind, kAAFFileKind_AafM512Binary)
+		|| equalUID(fileKind, kAAFFileKind_AafS512Binary)
+		|| equalUID(fileKind, kAAFFileKind_AafG512Binary)
+		|| equalUID(fileKind, kAAFFileKind_Aaf4KBinary)
+		|| equalUID(fileKind, kAAFFileKind_AafM4KBinary)
+		|| equalUID(fileKind, kAAFFileKind_AafS4KBinary)
+		|| equalUID(fileKind, kAAFFileKind_AafG4KBinary))
+	{
+		result=true;
+	}
+	return result;
+}
+
+//-----------------------------------------------------------------------------
+//
+//  ReadBERLength()
+//
+//  Read and decode a BER-encode length from the specified stream property..
+//
+//  Returns:
+//      AAFRESULT_SUCCESS           - succeeded.
+//      AAFRESULT_END_OF_DATA
+//
+//-----------------------------------------------------------------------------
+static AAFRESULT ReadBERLength(
+    IAAFPropertyValue* p_property_value,
+    IAAFTypeDefStream2* p_property_type,
+    aafUInt64* p_length,
+    aafUInt32* p_bytes_read )
+{
+    assert( p_property_value );
+    assert( p_property_type );
+    assert( p_length );
+    assert( p_bytes_read );
+
+
+    AAFRESULT  ar = AAFRESULT_SUCCESS;
+    aafUInt64  result = 0;
+
+
+    aafUInt8 byte;
+    aafUInt32  bytes_read = 0;
+    ar = p_property_type->Read( p_property_value,
+                                1,
+                                (aafMemPtr_t)&byte,
+                                &bytes_read );
+    (*p_bytes_read) += bytes_read;
+
+    if( ar == AAFRESULT_SUCCESS )
+    {
+        if( byte == 0x80 )
+        {
+            // unknown length
+            result = 0;
+        }
+        else if( (byte & 0x80) != 0x80 )
+        {
+            // short form
+            result = byte;
+        }
+        else
+        {
+            int  count = byte & 0x7f;
+            for( int i=0; i<count; i++ )
+            {
+                bytes_read = 0;
+                ar = p_property_type->Read( p_property_value,
+                                            1,
+                                            (aafMemPtr_t)&byte,
+                                            &bytes_read );
+                (*p_bytes_read) += bytes_read;
+
+                if( ar != AAFRESULT_SUCCESS )
+                {
+                    break;
+                }
+
+                result = result << 8;
+                result = result + byte;
+            }
+
+
+        }
+    }
+
+
+    if( ar == AAFRESULT_SUCCESS )
+    {
+        *p_length = result;
+    }
+
+
+    return ar;
+}
+
+
+
+static AAFRESULT StreamPropertyType(
+    IAAFPropertyValue* p_property_value,
+    IAAFTypeDefStream2** p_property_type )
+
+{
+    assert( p_property_value );
+    assert( p_property_type );
+
+
+    IAAFTypeDef*  p_type_def = 0;
+    p_property_value->GetType( &p_type_def );
+    assert( p_type_def );
+
+
+    AAFRESULT  ar = p_type_def->QueryInterface( IID_IAAFTypeDefStream2,
+                                                (void **)p_property_type );
+
+    ReleaseCOMObject( p_type_def );
+
+
+    return ar;
+}
+
+
+
+static void berEncode(aafUInt8* berValueBuffer,
+                      const aafUInt32 berValueSize,
+                      const aafUInt64 value)
+{
+  assert(berValueBuffer != 0);
+  assert(berValueSize <= sizeof(aafUInt64));
+  assert(berValueSize > 0);
+
+  aafUInt8* p = berValueBuffer;
+  aafUInt8 b = 0x80 | (aafUInt8)berValueSize;
+  *p++ = b;
+  size_t skip = sizeof(aafUInt64) - berValueSize;
+  size_t i;
+  aafUInt64 v = value;
+  for (i = 0; i < skip; i++) {
+    v = v << 8;
+  }
+  const aafUInt64 mask = ((aafUInt64)0xff << 56);
+  for (i = i; i < sizeof(aafUInt64); i++) {
+    b = (aafUInt8)((v & mask) >> 56);
+    *p++ = b;
+    v = v << 8;
+  }
+}
+
+
+
+//-----------------------------------------------------------------------------
+// Write a KLV key to the stream.
+//-----------------------------------------------------------------------------
+AAFRESULT WriteKLVKey(
+    IAAFPropertyValue* p_property_value,
+    const testKLVKey_t& key )
+{
+    // Check inputs
+    if( p_property_value == 0 )
+    {
+        return AAFRESULT_NULL_PARAM;
+    }
+
+
+    IAAFTypeDefStream2*  p_property_type = 0;
+    AAFRESULT  ar = StreamPropertyType( p_property_value,
+                                        &p_property_type );
+
+    if( ar == AAFRESULT_SUCCESS )
+    {
+        ar = p_property_type->Write( p_property_value,
+                                     sizeof(key),
+                                     (aafMemPtr_t)&key );
+    }
+
+
+    ReleaseCOMObject( p_property_type );
+
+
+    return ar;
+}
+
+
+
+AAFRESULT WriteKLVLength(
+    IAAFPropertyValue* p_property_value,
+    aafUInt64 length )
+{
+    if( p_property_value == 0 )
+    {
+        return AAFRESULT_NULL_PARAM;
+    }
+
+
+    IAAFTypeDefStream2*  p_property_type = 0;
+    AAFRESULT  ar = StreamPropertyType( p_property_value,
+                                        &p_property_type );
+
+    if( ar == AAFRESULT_SUCCESS )
+    {
+        const size_t ber_length_size = sizeof(aafUInt64) + 1;
+        aafUInt8  ber_length[ ber_length_size ];
+        memset( ber_length, 0, ber_length_size );
+        berEncode( ber_length, sizeof(length), length );
+
+
+        ar = p_property_type->Write( p_property_value,
+                                     ber_length_size,
+                                     (aafMemPtr_t)ber_length );
+    }
+
+
+    ReleaseCOMObject( p_property_type );
+
+
+    return ar;
+}
+
+
+
+AAFRESULT WriteKLVLength(
+    IAAFPropertyValue* p_property_value,
+    aafInt64 length_position,
+    aafUInt64 length )
+{
+    if( p_property_value == 0 )
+    {
+        return AAFRESULT_NULL_PARAM;
+    }
+
+
+    IAAFTypeDefStream2*  p_property_type = 0;
+    AAFRESULT  ar = StreamPropertyType( p_property_value,
+                                        &p_property_type );
+
+    if( ar == AAFRESULT_SUCCESS )
+    {
+        ar = p_property_type->SetPosition( p_property_value,
+                                           length_position );
+        if( ar == AAFRESULT_SUCCESS )
+        {
+            ar = WriteKLVLength( p_property_value,
+                                 length );
+        }
+    }
+
+
+    ReleaseCOMObject( p_property_type );
+
+
+    return ar;
+}
+
+
+
+AAFRESULT ReserveKLVLength(
+    IAAFPropertyValue* p_property_value,
+    aafInt64* p_length_position )
+{
+    // Check inputs
+    if( p_property_value == 0 )
+    {
+        return AAFRESULT_NULL_PARAM;
+    }
+    if( p_length_position == 0 )
+    {
+        return AAFRESULT_NULL_PARAM;
+    }
+
+
+    IAAFTypeDefStream2*  p_property_type = 0;
+    AAFRESULT  ar = StreamPropertyType( p_property_value,
+                                        &p_property_type );
+
+    aafInt64  length_position = 0;
+    if( ar == AAFRESULT_SUCCESS )
+    {
+        ar = p_property_type->GetPosition( p_property_value,
+                                           &length_position );
+    }
+
+
+    if( ar == AAFRESULT_SUCCESS )
+    {
+        ar = WriteKLVLength( p_property_value, 0 );
+    }
+
+
+    if( ar == AAFRESULT_SUCCESS )
+    {
+        *p_length_position = length_position;
+    }
+
+
+    ReleaseCOMObject( p_property_type );
+
+
+    return ar;
+}
+
+
+
+AAFRESULT FixupKLVLength(
+    IAAFPropertyValue* p_property_value,
+    aafInt64 length_position )
+{
+    // Check inputs
+    if( p_property_value == 0 )
+    {
+        return AAFRESULT_NULL_PARAM;
+    }
+
+
+    IAAFTypeDefStream2*  p_property_type = 0;
+    AAFRESULT  ar = StreamPropertyType( p_property_value,
+                                        &p_property_type );
+
+    // The current position
+    aafInt64  current_position = 0;
+    if( ar == AAFRESULT_SUCCESS )
+    {
+        ar = p_property_type->GetPosition( p_property_value,
+                                           &current_position );
+    }
+
+
+    const aafInt64  value_offset = length_position + sizeof(aafUInt64) + 1;
+    if( value_offset > current_position )
+    {
+        ar = AAFRESULT_INVALID_PARAM;
+    }
+    else
+    {
+        // Calculate the KLV length.
+        const aafUInt64  length = current_position - value_offset;
+
+
+        // Move to the reserved length
+        if( ar == AAFRESULT_SUCCESS )
+        {
+            ar = p_property_type->SetPosition( p_property_value,
+                                               length_position );
+        }
+
+
+        if( ar == AAFRESULT_SUCCESS )
+        {
+            ar = WriteKLVLength( p_property_value, length );
+        }
+    }
+
+
+    // Restore the current position
+    if( ar == AAFRESULT_SUCCESS )
+    {
+        ar = p_property_type->SetPosition( p_property_value,
+                                           current_position );
+    }
+    else
+    {
+        p_property_type->SetPosition( p_property_value,
+                                      current_position );
+    }
+
+
+    ReleaseCOMObject( p_property_type );
+
+
+    return ar;
+}
+
+
+
+// Return 'true' if the key is recognized as a valid
+// essence, index, or meta-data stream label.
+// The key is a 16 byte array.
+bool IsValidStreamLabel(
+    const testKLVKey_t& key )
+{
+    bool result = false;
+    // Only check the prefix of the label as the last 4
+    // bytes may change.
+    if( memcmp( &key, &testMetadataKey, sizeof(testKLVKey_t) - 4 ) == 0 )
+    {
+        result = true;
+    }
+    else
+    {
+        result = false;
+    }
+
+    return result;
+}
+
+
+
+bool IsKLVStream(
+    IAAFPropertyValue* p_property_value )
+{
+    bool  is_klv_stream = false;
+    AAFRESULT  ar = AAFRESULT_SUCCESS;
+
+
+    IAAFTypeDefStream2*  p_typedef_stream = 0;
+    ar = StreamPropertyType( p_property_value, &p_typedef_stream );
+    if( ar == AAFRESULT_SUCCESS )
+    {
+        aafInt64  streamSize = 0;
+        ar = p_typedef_stream->GetSize( p_property_value,
+                                        &streamSize );
+        assert( ar == AAFRESULT_SUCCESS );
+
+        if( streamSize > sizeof(testKLVKey_t) )
+        {
+            // Remember the current position
+            aafInt64  startPosition = 0;
+            ar = p_typedef_stream->GetPosition( p_property_value,
+                                                &startPosition );
+            assert( ar == AAFRESULT_SUCCESS );
+
+
+            // Read at the beginning of the stream
+            ar = p_typedef_stream->SetPosition( p_property_value, 0 );
+            if( ar == AAFRESULT_SUCCESS )
+            {
+                testKLVKey_t key;
+
+                // Read the key
+                aafUInt32  bytes_read = 0;
+                ar = p_typedef_stream->Read( p_property_value,
+                                             sizeof(key),
+                                             (aafMemPtr_t)&key,
+                                             &bytes_read );
+                if( ar == AAFRESULT_SUCCESS  &&
+                    IsValidStreamLabel( key ) )
+                {
+                    // Read the length
+                    aafUInt64  length = 0;
+                    bytes_read = 0;
+                    ar = ReadBERLength( p_property_value,
+                                        p_typedef_stream,
+                                        &length,
+                                        &bytes_read );
+                    if( ar == AAFRESULT_SUCCESS )
+                    {
+                        is_klv_stream = true;
+                    }
+                }
+            }
+
+
+            // Restore the current position
+            ar = p_typedef_stream->SetPosition( p_property_value,
+                                                startPosition );
+            assert( ar == AAFRESULT_SUCCESS );
+        }
+
+
+        p_typedef_stream->Release();
+        p_typedef_stream = 0;
+    }
+
+
+    return is_klv_stream;
+}
+
+
+
+AAFRESULT SkipKL(
+    IAAFPropertyValue* p_property_value )
+{
+    assert( IsKLVStream( p_property_value ) );
+
+
+    AAFRESULT  ar = AAFRESULT_SUCCESS;
+
+
+    IAAFTypeDefStream2*  p_typedef_stream = 0;
+    ar = StreamPropertyType( p_property_value, &p_typedef_stream );
+    if( ar == AAFRESULT_SUCCESS )
+    {
+        // Current position
+        aafInt64  startPosition = 0;
+        ar = p_typedef_stream->GetPosition( p_property_value,
+                                            &startPosition );
+        assert( ar == AAFRESULT_SUCCESS );
+
+
+        // Skip the key
+        ar = p_typedef_stream->SetPosition( p_property_value,
+                                            startPosition + 16 );
+        if( ar == AAFRESULT_SUCCESS )
+        {
+            // Read to skip the length
+            aafUInt64  length = 0;
+            aafUInt32  bytes_read = 0;
+            ar = ReadBERLength( p_property_value,
+                                p_typedef_stream,
+                                &length,
+                                &bytes_read );
+        }
+
+        p_typedef_stream->Release();
+        p_typedef_stream = 0;
+    }
+
+
+    return ar;
+}
+
 
 
 AAFRESULT GetPropertyValue(
@@ -873,6 +1374,24 @@ bool operator !=( const aafUID_t uid1, const aafUID_t uid2 )
 
 
 
+bool operator ==( const aafMobID_t& mobID1, const aafMobID_t& mobID2 )
+{
+    return (memcmp(&mobID1.SMPTELabel, &mobID2.SMPTELabel, 12) == 0 &&
+            mobID1.instanceHigh == mobID2.instanceHigh &&
+            mobID1.instanceMid == mobID2.instanceMid &&
+            mobID1.instanceLow == mobID2.instanceLow &&
+            mobID1.material == mobID2.material);
+}
+
+
+
+bool operator !=( const aafMobID_t& mobID1, const aafMobID_t& mobID2 )
+{
+    return (! operator==( mobID1, mobID2 ) );
+}
+
+
+
 bool operator ==( const aafRational_t& a, const aafRational_t& b )
 {
     bool  are_equal = true;
@@ -920,5 +1439,55 @@ bool operator !=( const aafTimeStamp_t& a, const aafTimeStamp_t& b )
 {
     return (! operator==( a, b ) );
 }
+
+
+
+bool operator ==( const aafSourceRef_t& a, const aafSourceRef_t& b )
+{
+    return (a.sourceID == b.sourceID &&
+            a.sourceSlotID == b.sourceSlotID &&
+            a.startTime == b.startTime);
+}
+
+
+
+bool operator !=( const aafSourceRef_t& a, const aafSourceRef_t& b )
+{
+    return (! operator==( a, b ) );
+}
+
+
+
+bool operator ==( const aafTimecode_t& a, const aafTimecode_t& b )
+{
+	return (a.drop == b.drop &&
+			a.fps == b.fps &&
+			a.startFrame == b.startFrame);
+}
+
+
+
+bool operator !=( const aafTimecode_t& a, const aafTimecode_t& b )
+{
+    return (! operator==( a, b ) );
+}
+
+
+
+bool operator ==( const aafEdgecode_t& a, const aafEdgecode_t& b )
+{
+	return (a.codeFormat == b.codeFormat &&
+			a.filmKind == b.filmKind &&
+			memcmp(a.header, b.header, kAAFEtHeaderSize) == 0 &&
+			a.startFrame == b.startFrame);
+}
+
+
+
+bool operator !=( const aafEdgecode_t& a, const aafEdgecode_t& b )
+{
+    return (! operator==( a, b ) );
+}
+
 
 

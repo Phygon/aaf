@@ -169,7 +169,8 @@ public:
   virtual void shallowCopyTo(OMProperty* destination) const;
 
   virtual void deepCopyTo(OMProperty* destination,
-                          void* clientContext) const;
+                          void* clientContext,
+                          bool deferStreamData) const;
 
 protected:
   // @access Protected members.

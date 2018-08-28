@@ -39,8 +39,8 @@ using namespace std;
 #include <assert.h>
 #include <memory.h>
 #include <stdlib.h>
-#include <wchar.h>
 
+#include "AAFWideString.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
@@ -142,8 +142,8 @@ extern "C" HRESULT CAAFCommentMarker_test(
 	
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IEnumAAFCommentMarker methods have not been tested:" << endl;       
-//		cout << "     GetAnnotation" << endl; 
+//		cout << "The following IEnumAAFCommentMarker methods have not been tested:" << endl;
+//		cout << "     GetAnnotation" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 
@@ -156,8 +156,8 @@ const aafPosition_t CommentMarkerTest::_position = 0;
 const wchar_t *CommentMarkerTest::_eventComment = L"Event::Comment:This is a test event";
 const aafMobID_t CommentMarkerTest::_compositionMobID = 
 	{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
-0x13, 0x00, 0x00, 0x00,
-{0x3e2db3b8, 0x0a61, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
+	0x13, 0x00, 0x00, 0x00,
+	{0x3e2db3b8, 0x0a61, 0x11d4, {0x8e, 0x3d, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x7c}}};
 
 
 CommentMarkerTest::CommentMarkerTest() :

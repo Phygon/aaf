@@ -55,6 +55,7 @@ class ImplAAFDataDef;
 class ImplAAFParameter;
 class ImplAAFSegment;
 class ImplAAFSourceReference;
+class ImplAAFSourceClip;
 
 template <class T> 
 class ImplAAFEnumerator;
@@ -280,8 +281,32 @@ public:
 
 public:
 
+	 virtual AAFRESULT GetMinimumBounds(aafPosition_t rootPos, aafLength_t rootLen,
+										ImplAAFMob *mob, ImplAAFMobSlot *track,
+										aafMediaCriteria_t *mediaCrit,
+										aafPosition_t currentObjPos,
+										aafOperationChoice_t *effectChoice,
+										ImplAAFComponent	*prevObject,
+										ImplAAFComponent *nextObject,
+										ImplAAFScopeStack *scopeStack,
+										aafPosition_t *diffPos, aafLength_t *minLength,
+										ImplAAFOperationGroup **groupObject, aafInt32	*nestDepth,
+										ImplAAFComponent **found, aafBool *foundTransition);
+
+	virtual AAFRESULT FindSubSegment( aafPosition_t offset,
+									  aafMediaCriteria_t *mediaCrit,
+									  aafPosition_t *sequPosPtr,
+									  ImplAAFSegment **subseg,
+									  aafBool *found);
+
 	 virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
 												aafMobID_constref to);
+	 virtual AAFRESULT TraverseToClip( aafLength_t length,
+									   ImplAAFSourceClip **sclp,
+									   ImplAAFPulldown **pulldownObj,
+									   aafInt32 *pulldownPhase,
+									   aafLength_t *sclpLen,
+									   aafBool *isMask);
 	 // Visit this component and its sub-components
 	 // with the specified visitor.
 	 virtual void Accept(AAFComponentVisitor& visitor);

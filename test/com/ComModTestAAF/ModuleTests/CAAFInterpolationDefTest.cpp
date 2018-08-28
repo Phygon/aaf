@@ -1,4 +1,3 @@
-
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -146,7 +145,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 
 	try
 	{
-	  // Open the AAF file
+		// Open the AAF file
 		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = true;
 

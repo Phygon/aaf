@@ -43,8 +43,8 @@ using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <wchar.h>
 
+#include "AAFWideString.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
@@ -372,8 +372,8 @@ extern "C" HRESULT CAAFOperationDef_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IAAFOperationDef methods have not been implemented:" << endl; 
-//		cout << "     GetDegradeToOperations" << endl; 
+//		cout << "The following IAAFOperationDef methods have not been implemented:" << endl;
+//		cout << "     GetDegradeToOperations" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

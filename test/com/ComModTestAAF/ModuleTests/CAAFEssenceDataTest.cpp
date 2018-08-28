@@ -452,7 +452,6 @@ void EssenceDataTest::createEssenceData(IAAFSourceMob *pSourceMob)
   checkExpression(AAFRESULT_FAILED(hr) || key == _essenceElementKey,
                   AAFRESULT_TEST_FAILED);
 
-
   writeEssenceData(_pEssenceData, (aafDataBuffer_t)_smiley, sizeof(_smiley));
   writeEssenceData(_pEssenceData, (aafDataBuffer_t)_frowney, sizeof(_frowney));
 

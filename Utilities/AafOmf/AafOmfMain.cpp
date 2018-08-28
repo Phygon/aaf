@@ -35,9 +35,9 @@
 
 #ifndef COMPILE_AS_DLL
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <string>
+#include <cstdlib>
 #include <ctype.h>
 #include <iostream>
 using namespace std;

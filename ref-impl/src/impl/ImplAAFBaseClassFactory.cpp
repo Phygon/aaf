@@ -83,6 +83,7 @@
 #define CLSID_AAFTypeDefinitionStrongObjectReference CLSID_AAFTypeDefStrongObjRef
 #define CLSID_AAFTypeDefinitionVariableArray CLSID_AAFTypeDefVariableArray
 #define CLSID_AAFTypeDefinitionWeakObjectReference CLSID_AAFTypeDefWeakObjRef
+#define CLSID_AAFTypeDefinitionGenericCharacter CLSID_AAFTypeDefGenericCharacter
 #define CLSID_AAFCodecDefinition CLSID_AAFCodecDef
 #define CLSID_AAFContainerDefinition CLSID_AAFContainerDef
 #define CLSID_AAFPluginDefinition CLSID_AAFPluginDef
@@ -91,6 +92,11 @@
 //
 // Include the AAF macro invocations.
 #include "AAFMetaDictionary.h"
+
+// The following classes temporarily masquerade as their respective ancestors:
+aafClassID_t CLSID_AAFVBIDataDescriptor = CLSID_AAFDataEssenceDescriptor;
+aafClassID_t CLSID_AAFANCDataDescriptor = CLSID_AAFDataEssenceDescriptor;
+aafClassID_t CLSID_AAFContainerConstraintsSubDescriptor = CLSID_AAFSubDescriptor;
 
 
 

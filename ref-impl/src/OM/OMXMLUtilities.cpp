@@ -846,15 +846,15 @@ integerToString(const OMByte* value, OMUInt8 size, bool isSigned, wchar_t* str, 
             {
                 if (hex)
                 {
-                    std_swprintf(str, 19, L"0x%"OMWFMT64 L"x", *((OMUInt64*)value));
+                    std_swprintf(str, 19, L"0x%" OMWFMT64 L"x", *((OMUInt64*)value));
                 }
                 else if (isSigned)
                 {
-                    std_swprintf(str, 22, L"%"OMWFMT64 L"d", *((OMInt64*)value));
+                    std_swprintf(str, 22, L"%" OMWFMT64 L"d", *((OMInt64*)value));
                 }
                 else
                 {
-                    std_swprintf(str, 21, L"%"OMWFMT64 L"u", *((OMUInt64*)value));
+                    std_swprintf(str, 21, L"%" OMWFMT64 L"u", *((OMUInt64*)value));
                 }
             }
             break;        
@@ -1111,11 +1111,11 @@ integerFromString(OMByteArray& bytes, const wchar_t* str, OMUInt8 size, bool isS
                 OMInt64 value;
                 if (hex)
                 {
-                    result = swscanf(strPtr, L"%"OMWFMT64 L"x", &value);
+                    result = swscanf(strPtr, L"%" OMWFMT64 L"x", &value);
                 }
                 else
                 {
-                    result = swscanf(strPtr, L"%"OMWFMT64 L"d", &value);
+                    result = swscanf(strPtr, L"%" OMWFMT64 L"d", &value);
                 }
                 bytes.append(reinterpret_cast<OMByte*>(&value), size);
             }
@@ -1124,11 +1124,11 @@ integerFromString(OMByteArray& bytes, const wchar_t* str, OMUInt8 size, bool isS
                 OMUInt64 value;
                 if (hex)
                 {
-                    result = swscanf(strPtr, L"%"OMWFMT64 L"x", &value);
+                    result = swscanf(strPtr, L"%" OMWFMT64 L"x", &value);
                 }
                 else
                 {
-                    result = swscanf(strPtr, L"%"OMWFMT64 L"u", &value);
+                    result = swscanf(strPtr, L"%" OMWFMT64 L"u", &value);
                 }
                 bytes.append(reinterpret_cast<OMByte*>(&value), size);
             }
@@ -1448,11 +1448,11 @@ int64FromString(const wchar_t* str, OMInt64& value)
     int result = 0;
     if (wcsncmp(str, L"0x", 2) == 0)
     {
-        result = swscanf(str, L"0x%"OMWFMT64 L"x", &tmp);
+        result = swscanf(str, L"0x%" OMWFMT64 L"x", &tmp);
     }
     else
     {
-        result = swscanf(str, L"%"OMWFMT64 L"d", &tmp);
+        result = swscanf(str, L"%" OMWFMT64 L"d", &tmp);
     }
     if (result != 1)
     {
@@ -1512,7 +1512,7 @@ characterRequiresEscaping(OMUInt32 code)
     TRACE("::characterRequiresEscaping(OMUInt32)");
 
     // characters not accepted in XML version 1.0
-    if ((code >= 0x0000 && code <= 0x0009) ||
+    if ((/*code >= 0x0000 -- unsigned is always >=0*/ code <= 0x0009) ||
         (code >= 0x000B && code <= 0x000C) ||
         (code >= 0x000E && code <= 0x001F) ||
         (code >= 0xD800 && code <= 0xDFFF) || // invalid Unicode character - used for UTF-16 surrogates
@@ -1616,8 +1616,8 @@ escapeString(const wchar_t* str)
             strPtr += codeLen;
         }
     }
-    const wchar_t* nullTerm = L'\0';
-    buffer.append(reinterpret_cast<OMByte*>(&nullTerm), sizeof(wchar_t));
+    const wchar_t nullTerm = L'\0';
+    buffer.append(reinterpret_cast<const OMByte*>(&nullTerm), sizeof(wchar_t));
     wchar_t* result = new wchar_t[buffer.size() / sizeof(wchar_t)];
     memcpy(result, buffer.bytes(), buffer.size());
     return result;    

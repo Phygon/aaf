@@ -43,8 +43,8 @@ using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
-#include <wchar.h>
 
+#include "AAFWideString.h"
 #include "CAAFBuiltinDefs.h"
 
 typedef IAAFSmartPointer<IAAFClassDef>				IAAFClassDefSP;
@@ -497,7 +497,7 @@ static HRESULT CreateAAFFile(
 		//////////////////// done /!!!!!!!!!!!!!!!!!!!!!!
 		
 		//Verify results right away (during this creation process) ....
-		checkResult(verifyContents (pHeader, pDict, kAAFTrue));  //True => minimal testing 
+		checkResult(verifyContents (pHeader, pDict, kAAFFalse));  //True => minimal testing, False => full testing 
 		
 	}
 	catch (HRESULT & rResult)

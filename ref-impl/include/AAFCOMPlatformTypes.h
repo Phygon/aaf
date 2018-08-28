@@ -49,6 +49,9 @@
 
 #elif defined( OS_UNIX )
 
+// If this types are not wanted, add this to the project files
+#if !defined(AAF_OMIT_WINDOWS_DATA_TYPES_DEFINITIONS)
+
   // Note! Much of the stuff in this section copied from
   // ss-impl/.../ref.hxx
 
@@ -56,8 +59,8 @@
   // defined BYTE et al, but due to nested includes we had to defined
   // them in terms of primitives...
 
-  typedef int SCODE;
-  typedef int HRESULT;
+  typedef aafInt32 SCODE;
+  typedef aafInt32 HRESULT;
 
 #ifndef BOOL 
   typedef int BOOL;
@@ -65,7 +68,7 @@
   typedef unsigned char BYTE;
   typedef BYTE * LPBYTE;
   typedef unsigned short WORD;
-  typedef unsigned int DWORD;
+  typedef aafUInt32 DWORD;
   typedef DWORD ULONG;
   typedef void *LPVOID;
   typedef char *LPSTR;
@@ -203,6 +206,8 @@ const GUID IID_IUnknown = {0x0,0x0,0x0,{0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0}};
 
   // stolen from winreg.h (from vc++6.0)
 #define HKEY_CLASSES_ROOT           (( HKEY ) 0x80000000 )
+
+#endif  // AAF_OMIT_WINDOWS_DATA_TYPES_DEFINITIONS
 
 #else
 #error Unknown operating system

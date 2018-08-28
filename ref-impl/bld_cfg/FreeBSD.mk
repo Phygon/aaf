@@ -54,8 +54,16 @@ CFLAGS = -Wall -Werror
 ARFLAGS = -c -q
 OBJFILE = -o $*.${OBJ}
 EXEFILE = -o unittest.${EXE}
+
 CP = cp
+ECHO = echo
+CAT = cat
+CHMOD = chmod
+MV = mv
+SH = sh
+TOUCH = touch
 PERL = perl
+
 MAKE_SUFFIX = .gmake
 
 UNICODE = 1

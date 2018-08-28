@@ -56,7 +56,8 @@ NOTE: Requires a Bourne shell to run the scripts
    Ensure that PATH and LD_LIBRARY_PATH variables are set correctly on U*nix
    so that the executables InfoDumper, eli2aaf, and libcom-api.so are
    found correctly.  For MS Windows, PATH must be set correctly for the
-   executables and AAFCOAPI.dll.
+   executables and AAFCOAPI.dll.  For MacOS X/Darwin, DYLD_LIBRARY_PATH must be set correctly
+   so that libcom-api.dylib can be found.
 
    sh <datadir>/runaaftest.sh [options]
 

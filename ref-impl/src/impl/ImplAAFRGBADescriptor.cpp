@@ -181,6 +181,9 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pPalette == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
+	if (!_palette.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	if (_palette.size() < numberBytes)
 	  return AAFRESULT_SMALLBUF;
 
@@ -197,6 +200,9 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	if(pNumberBytes == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if (!_palette.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
 
 	*pNumberBytes = _palette.size();
 
@@ -232,6 +238,9 @@ AAFRESULT STDMETHODCALLTYPE
 	aafUInt32			n, result;
 	RGBComponentArray	local;
 
+	if (!_paletteLayout.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
+
 	local = _paletteLayout;
 	for( n = 0, result = 0; n < MAX_NUM_RGBA_COMPS; n++)
 	{
@@ -255,6 +264,9 @@ AAFRESULT STDMETHODCALLTYPE
 
 	if(PaletteLayoutArray == NULL)
 		return(AAFRESULT_NULL_PARAM);
+
+	if (!_paletteLayout.isPresent())
+		return AAFRESULT_PROP_NOT_PRESENT;
 
 	if (_paletteLayout.size() < numberElements)
 	  return AAFRESULT_SMALLBUF;

@@ -129,6 +129,8 @@ typedef aafCharacter * aafString_t;
 /*** Types for all components***/
 typedef aafInt64   		aafLength_t;
 
+const aafLength_t AAF_UNKNOWN_LENGTH = -1;
+
 /*** Types for mob slots***/
 typedef aafInt64  		aafPosition_t;
 typedef aafInt64		aafFrameOffset_t;
@@ -369,7 +371,8 @@ typedef enum _aafSignalStandard_e
 	kAAFSignalStandard_SMPTE347M = 3,
 	kAAFSignalStandard_SMPTE274M = 4,
 	kAAFSignalStandard_SMPTE296M = 5,
-	kAAFSignalStandard_SMPTE349M = 6
+	kAAFSignalStandard_SMPTE349M = 6,
+	kAAFSignalStandard_SMPTE428_1 = 7
 } aafSignalStandard_e;
 	
 typedef aafInt32 aafScanningDirection_t;
@@ -393,7 +396,7 @@ typedef enum _aafContentScanningType_e
 	kAAFContentScanning_Interlace = 2,
 	kAAFContentScanning_Mixed = 3
 } aafContentScanningType_e;
-	
+
 typedef aafInt32 aafTitleAlignmentType_t;
 typedef enum _aafTitleAlignmentType_e
 {
@@ -401,7 +404,27 @@ typedef enum _aafTitleAlignmentType_e
 	kAAFTitleAlignment_Center = 1,
 	kAAFTitleAlignment_Right = 2
 } aafTitleAlignmentType_e;
-	
+
+typedef aafInt32 aafAVCContentScanningType_t;
+typedef enum _aafAVCContentScanningType_e
+{
+	kAAFAVCContentScanning_NotKnown = 0,
+	kAAFAVCContentScanning_ProgressiveFramePicture = 1,
+	kAAFAVCContentScanning_InterlaceFieldPicture = 2,
+	kAAFAVCContentScanning_InterlaceFramePicture = 3,
+	kAAFAVCContentScanning_Interlace_FrameFieldPicture = 4
+
+} aafAVCContentScanningType_e;
+
+typedef aafInt32 aafMPEG4VisualCodedContentType_t;
+typedef enum _aafMPEG4VisualCodedContentType_e
+{
+	kAAFMPEG4VisualCodedContent_Unknown = 0,
+	kAAFMPEG4VisualCodedContent_Progressive = 1,
+	kAAFMPEG4VisualCodedContent_Interlaced = 2,
+	kAAFMPEG4VisualCodedContent_Mixed = 3
+} aafMPEG4VisualCodedContentType_e;
+
 typedef aafInt32 aafColorSiting_t;
 typedef enum _aafColorSiting_e
 {
@@ -410,6 +433,8 @@ typedef enum _aafColorSiting_e
 	kAAFThreeTap = 2,
 	kAAFQuincunx = 3, 
 	kAAFRec601 = 4, 
+	kAAFLineAlternating = 5,
+	kAAFVerticalMidpoint = 6,
 	kAAFUnknownSiting = 255
 } aafColorSiting_e;
 	
@@ -615,7 +640,26 @@ typedef enum _aafRGBAComponentKind_e
 	kAAFCompGreen = 0x47,
 	kAAFCompPalette = 0x50,
 	kAAFCompRed = 0x52,
-	kAAFCompNull = 0x0
+	kAAFCompNull = 0x0,
+	kAAFCompRedLSBs = 0x72,
+	kAAFCompGreenLSBs = 0x67,
+	kAAFCompBlueLSBs = 0x62,
+	kAAFCompAlphaLSBs = 0x61,
+	kAAFCompColorDifferenceU = 0x55,
+	kAAFCompColorDifferenceV = 0x56,
+	kAAFCompComposite = 0x57,
+	kAAFCompNonCoSitedLuma = 0x58,
+	kAAFCompLuma = 0x59,
+	kAAFCompDepth = 0x5A,
+	kAAFCompColorDifferenceULSBs = 0x75,
+	kAAFCompColorDifferenceVLSBs = 0x76,
+	kAAFCompCompositeLSBs = 0x77,
+	kAAFCompNonCoSitedLumaLSBs = 0x78,
+	kAAFCompLumaLSBs = 0x79,
+	kAAFCompDepthLSBs = 0x7A,
+	kAAFCompColorX = 0xD8,
+	kAAFCompColorY = 0xD9,
+	kAAFCompColorZ = 0xDA
 } aafRGBAComponentKind_e;
 
 typedef struct _aafRGBAComponent_t
@@ -710,7 +754,6 @@ typedef struct _aafProductIdentification_t
     aafProductVersion_t *      productVersion;  // optional
 } aafProductIdentification_t;
 
-extern const aafProductVersion_t AAFReferenceImplementationVersion;
 
 
 
@@ -854,6 +897,13 @@ typedef struct _aafDefaultFade_t
 	aafRational_t	fadeEditUnit;
 	aafBoolean_t	valid;		/* Are the above fields valid? */
 } aafDefaultFade_t;	
+
+/* Buffer descriptor */
+typedef struct _aafIOBufferDesc_t
+{
+  aafMemPtr_t       buf;     /* pointer to the buffer */
+  aafUInt32         bufSize; /* the size of the buffer */
+} aafIOBufferDesc_t;
 
 /************************************************************
  *
@@ -1157,6 +1207,7 @@ typedef aafTimecodeSourceType_t aafTCSource_t;
     typedef aafUID_t *                   aafUID_constref;
     typedef aafMobID_t *                 aafMobID_constref;
     typedef aafVersionType_t *           aafVersionType_constref;
+    typedef aafIOBufferDesc_t *          aafIOBufferDesc_constref;
   #else
     /* MIDL 1.1 definitions */
 	typedef aafArgIDType_t               aafArgIDType_constref;
@@ -1178,6 +1229,7 @@ typedef aafTimecodeSourceType_t aafTCSource_t;
     typedef aafUID_t                     aafUID_constref;
     typedef aafMobID_t                   aafMobID_constref;
     typedef aafVersionType_t             aafVersionType_constref;
+    typedef aafIOBufferDesc_t            aafIOBufferDesc_constref;
   #endif
 
   typedef unsigned char *                aafMemConstPtr_t;
@@ -1186,9 +1238,11 @@ typedef aafTimecodeSourceType_t aafTCSource_t;
   typedef aafOperationChoice_t *         aafOperationChoice_constptr;
   typedef aafProductVersion_t *          aafProductVersion_constptr;
   typedef aafProductIdentification_t *   aafProductIdentification_constptr;
+  typedef aafRGBAComponent_t *           aafRGBAComponent_constptr;
   typedef aafSearchCrit_t *              aafSearchCrit_constptr;
   typedef aafUID_t *                     aafUID_constptr;
   typedef aafMobID_t *                   aafMobID_constptr;
+  typedef aafIOBufferDesc_t *            aafIOBufferDesc_constptr;
 
 #endif // 0
 
@@ -1212,6 +1266,7 @@ typedef aafTimecodeSourceType_t aafTCSource_t;
 #define aafUID_constref              const aafUID_t &
 #define aafMobID_constref            const aafMobID_t &
 #define aafVersionType_constref      const aafVersionType_t &
+#define aafIOBufferDesc_constref     const aafIOBufferDesc_t &
 #else // !__cplusplus
 #define aafArgIDType_constref         const aafArgIDType_t * const
 #define aafEdgecodeHeader_constref    const aafEdgecodeHeader_t * const
@@ -1232,6 +1287,7 @@ typedef aafTimecodeSourceType_t aafTCSource_t;
 #define aafUID_constref               const aafUID_t * const
 #define aafMobID_constref             const aafMobID_t * const
 #define aafVersionType_constref       const aafVersionType_t * const
+#define aafIOBufferDesc_constref      const aafIOBufferDesc_t * const
 #endif // !__cplusplus
 
 #define aafMemConstPtr_t              const unsigned char *
@@ -1240,9 +1296,11 @@ typedef aafTimecodeSourceType_t aafTCSource_t;
 #define aafOperationChoice_constptr   const aafOperationChoice_t *
 #define aafProductVersion_constptr    const aafProductVersion_t *
 #define aafProductIdentification_constptr const aafProductIdentification_t *
+#define aafRGBAComponent_constptr     const aafRGBAComponent_t *
 #define aafSearchCrit_constptr        const aafSearchCrit_t *
 #define aafUID_constptr               const aafUID_t *
 #define aafMobID_constptr             const aafMobID_t *
+#define aafIOBufferDesc_constptr      const aafIOBufferDesc_t *
 
 
 #endif // #ifndef __AAFTypes_h__

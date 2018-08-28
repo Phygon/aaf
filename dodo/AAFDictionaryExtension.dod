@@ -1,0 +1,85 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFDictionaryExtension\
+#endm
+#c
+#startm .parent-module 0
+AAFRoot\
+#endm
+#c
+AD_HEAD
+
+
+AD_IDL(///
+/// The AAFDictionaryExtension interface describes the calls of a plugin
+/// which registers definitions of extensions in an AAF Dictionary.
+///
+///)
+
+AD_CLASS_UUID(74c77116, c727, 4fb4, b7, fb, e9, 47, 47, 7d, 21, f6)
+
+AD_DEFAULT_UUID(9a51e9f7, f80e, 4ef1, 96, fd, 46, 9c, d4, 98, 27, 1e)
+AD_XCLASS_BEGIN(Abstract, Transient)
+
+AD_XMETHOD1(RegisterExtensionDefinitions,
+			[in],
+			objIn,
+			AAFDictionary,
+			pDictionary,
+			The dictionary in which to register the definitions,
+
+			This method registers the extension definitions
+  /// into the given dictionary.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - the pDictionary pointer is valid.
+  ///
+  ///   Note that this method should be prepared for the case that the
+  ///   definition it wishes to register has already been registered\,
+  ///   this is not an error. 
+  ///
+  ///   The implementation of this method should handle this by simply
+  ///   looking up each definition before attempting to regisister it.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect\, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - pDictionary arg is NULL.)
+
+AD_XCLASS_END(Abstract, Transient)

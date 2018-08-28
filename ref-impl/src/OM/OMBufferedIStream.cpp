@@ -200,10 +200,13 @@ void OMBufferedIStream::read(OMByte* bytes,
   PRECONDITION("Valid data buffer", bytes != 0);
   PRECONDITION("Valid size", byteCount > 0);
 
+  // HACK ALERT - Accomodate any variety of int and long incompatibility
+  ULONG tempLong=static_cast<ULONG>(bytesRead);
 #if defined(OM_DEBUG)
   HRESULT status = 
 #endif
-  _stream->Read(bytes, byteCount, &bytesRead);
+  _stream->Read(bytes, byteCount, &tempLong);
+  bytesRead=static_cast<OMUInt32>(tempLong);
   ASSERT("IStream::Read() succeeded", SUCCEEDED(status));
   ASSERT("Successful read", bytesRead == byteCount);
 }
@@ -217,10 +220,13 @@ void OMBufferedIStream::write(const OMByte* bytes,
   PRECONDITION("Valid data", bytes != 0);
   PRECONDITION("Valid size", byteCount > 0);
 
+  // HACK ALERT for GCC/Linux - Accomodate any variety of int and long incompatibility
+  ULONG tempLong=static_cast<ULONG>(bytesWritten);
 #if defined(OM_DEBUG)
   HRESULT status = 
 #endif
-  _stream->Write(bytes, byteCount, &bytesWritten);
+  _stream->Write(bytes, byteCount, &tempLong);
+  bytesWritten=static_cast<OMUInt32>(tempLong);
   ASSERT("IStream::Write() succeeded", SUCCEEDED(status));
   ASSERT("Successful write", bytesWritten == byteCount);
 }

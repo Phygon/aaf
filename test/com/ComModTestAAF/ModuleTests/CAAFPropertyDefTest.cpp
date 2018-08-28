@@ -43,7 +43,7 @@ using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
-#include <wchar.h>
+#include "AAFWideString.h"
 #include <string.h>
 
 #include "CAAFBuiltinDefs.h"
@@ -69,10 +69,10 @@ static const aafUID_t propDef_id =
 static const aafUID_t TEST_UID = kAAFTypeID_UInt8;
 
 //Initialize our Non-Implemented flags to False ...
-//static aafBoolean_t	 bSetDefaultValue_NI = kAAFFalse;       
-//static aafBoolean_t  bSetIsSearchable_NI = kAAFFalse;       
-//static aafBoolean_t  bGetDefaultValue_NI = kAAFFalse;       
-//static aafBoolean_t  bGetIsSearchable_NI = kAAFFalse;       
+//static aafBoolean_t	 bSetDefaultValue_NI = kAAFFalse;
+//static aafBoolean_t  bSetIsSearchable_NI = kAAFFalse;
+//static aafBoolean_t  bGetDefaultValue_NI = kAAFFalse;
+//static aafBoolean_t  bGetIsSearchable_NI = kAAFFalse;
 
 
 // convenient error handlers.

@@ -455,8 +455,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppComponent->ReleaseReference(); // We are through with this pointer.
+          internalppComponent = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppComponent should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppComponent == 0);
+
   return hr;
 }
 
@@ -637,8 +648,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEnum->ReleaseReference(); // We are through with this pointer.
+          internalppEnum = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppEnum should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEnum == 0);
+
   return hr;
 }
 

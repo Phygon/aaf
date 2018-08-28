@@ -1201,15 +1201,15 @@ AAFDotInstanceMapper::GetIntValue( AxTypeDefInt &axTypeDefInt, AxPropertyValue a
         case 8:
             if (axTypeDefInt.IsSigned()) {
                 if (displayHex) {
-                    strSize = sprintf(buffer, "0x%"AAFFMT64"x", value);
+                    strSize = sprintf(buffer, "0x%" AAFFMT64 "x", value);
                 } else {
-                    strSize = sprintf(buffer, "%"AAFFMT64"d", value);
+                    strSize = sprintf(buffer, "%" AAFFMT64 "d", value);
                 }
             } else {
                 if (displayHex) {
-                    strSize = sprintf(buffer, "0x%"AAFFMT64"x", (aafUInt64)value);
+                    strSize = sprintf(buffer, "0x%" AAFFMT64 "x", (aafUInt64)value);
                 } else {
-                    strSize = sprintf(buffer, "%"AAFFMT64"u", (aafUInt64)value);
+                    strSize = sprintf(buffer, "%" AAFFMT64 "u", (aafUInt64)value);
                 }
             }
             break;

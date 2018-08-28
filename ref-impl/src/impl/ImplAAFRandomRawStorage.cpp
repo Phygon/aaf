@@ -184,3 +184,36 @@ AAFRESULT STDMETHODCALLTYPE
 
   return AAFRESULT_SUCCESS;
 }
+
+
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFRandomRawStorage::WriteCopyByteAt (
+      aafUInt64  position,
+	  aafUInt8   theByte,
+	  aafUInt32  byteCount,
+	  aafUInt32 *  pNumWritten)
+{
+  if (!GetOMStorage())
+	return AAFRESULT_NOT_INITIALIZED;
+
+  if (! pNumWritten)
+	return AAFRESULT_NULL_PARAM;
+
+  if (! GetOMStorage()->isWritable())
+	return AAFRESULT_NOT_WRITEABLE;
+
+  // Creation if ImplAAFRandomRawStorages in ImplAAFModule.cpp
+  // guarantees that this storage is positionable.
+  ASSERTU (GetOMStorage()->isPositionable ());
+
+  if (GetOMStorage()->extent() < (position + byteCount))
+	{
+	  GetOMStorage()->extend (position + byteCount);
+	  if (GetOMStorage()->extent() < (position + byteCount))
+		return AAFRESULT_SMALLBUF;
+	}
+
+  GetOMStorage()->writeCopyByteAt(position, theByte, byteCount, *pNumWritten);
+
+  return AAFRESULT_SUCCESS;
+}

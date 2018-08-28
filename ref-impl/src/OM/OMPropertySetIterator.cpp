@@ -131,7 +131,7 @@ bool OMPropertySetIterator::valid(void) const
   //        <c OMPropertySet>.
   //   @rdesc The number of <c OMProperty>s
   //   @this const
-size_t OMPropertySetIterator::count(void) const
+OMUInt32 OMPropertySetIterator::count(void) const
 {
   TRACE("OMPropertySetIterator::count");
 

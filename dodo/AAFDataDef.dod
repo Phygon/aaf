@@ -39,6 +39,7 @@ AAFDefObject\
 #endm
 #import ./AAFDataDef2.exp
 #import ./AAFDataDef3.exp
+#import ./AAFDataDef4.exp
 AD_HEAD
 AD_IDL(///
 /// IAAFDataDef is DEPRECATED\,  Please use IAAFDataDef2.
@@ -47,7 +48,7 @@ AD_IDL(///
 AD_CLASS_UUID(dfbd652A, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
 
 AD_DEFAULT_UUID(dfbd6529, 1d81, 11d2, bf, 96, 00, 60, 97, 11, 62, 12)
-AD_COM_EXT2_CLASS_BEGIN(public IAAFDataDef2,public IAAFDataDef3)
+AD_COM_EXT3_CLASS_BEGIN(public IAAFDataDef2,public IAAFDataDef3,public IAAFDataDef4)
 AD_XMETHOD3(Initialize,
 		   [in\, ref],
 		   objPass,
@@ -171,4 +172,9 @@ AD_COM_METH(.method-IsTimecodeKind)
 AD_COM_METH(.method-IsDescriptiveMetadataKind)
 AD_COM_METH(.method-IsAuxiliaryKind)
 
-AD_COM_EXT2_CLASS_END(AAFDataDef2, AAFDataDef3)
+#c
+#c DataDef4 methods
+#c
+AD_COM_METH(.method-IsDataKind)
+
+AD_COM_EXT3_CLASS_END(AAFDataDef2, AAFDataDef3, AAFDataDef4)

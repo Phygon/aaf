@@ -401,9 +401,9 @@ extern "C" HRESULT CAAFPulldown_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following AAFPulldown tests have not been implemented:" << endl; 
-//		cout << "     GetPhaseFrame" << endl; 
-//		cout << "     SetPhaseFrame" << endl; 
+//		cout << "The following AAFPulldown tests have not been implemented:" << endl;
+//		cout << "     GetPhaseFrame" << endl;
+//		cout << "     SetPhaseFrame" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 	return hr;

@@ -35,7 +35,8 @@
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
+
+#include "AAFWideString.h"
 #include <string.h>
 #include "AAF.h"
 #include "AAFResult.h"

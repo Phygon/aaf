@@ -43,9 +43,11 @@
 #include "ImplAAFObjectCreation.h"
 #include "ImplEnumAAFMobSlots.h"
 #include "ImplAAFEssenceAccess.h"
+#include "ImplAAFSequence.h"
 #include "OMAssertions.h"
 #include "AAFResult.h"
 #include "AAFUtils.h"
+#include "ImplAAFStaticMobSlot.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -133,6 +135,7 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFStaticMobSlot* pStaticMobSlot = NULL;
 	aafUID_t	segDataDef;
 	ImplAAFSegment*	pSegment = NULL;
+	ImplAAFSequence*	pSequence = NULL;
 	ImplAAFSourceClip*	pSrcClip = NULL;
 	aafSourceRef_t		ref;
 	aafPosition_t		zeroPos;
@@ -235,19 +238,30 @@ AAFRESULT STDMETHODCALLTYPE
 			CHECK(GetDictionary(&pDictionary));
 			CHECK(pDictionary->GetBuiltinDefs()->cdSourceClip()->
 				CreateInstance((ImplAAFObject**) &pSrcClip));
+			CHECK(pSrcClip->Initialize(pDataDef, slotLength, ref));
+
+			// For MXF it is mandatory that we use a sequence here.
+			// For AAF it is optional.
+
+			CHECK(pDictionary->GetBuiltinDefs()->cdSequence()->
+				CreateInstance((ImplAAFObject **) &pSequence));
+			CHECK(pSequence->Initialize(pDataDef));
+			CHECK(pSequence->AppendComponent(pSrcClip));
+
+			CHECK(AppendNewTimelineSlot(editRate, pSequence, masterSlotID, pSlotName, 
+										zeroPos,&pNewTimelineSlot));
 
 			pDictionary->ReleaseReference();
 			pDictionary = NULL;
-
-			CHECK(pSrcClip->Initialize(pDataDef, slotLength, ref));
-			CHECK(AppendNewTimelineSlot(editRate,pSrcClip, masterSlotID, pSlotName, 
-										zeroPos,&pNewTimelineSlot));
 
 			pNewTimelineSlot->ReleaseReference();
 			pNewTimelineSlot = NULL;
 
 			pSrcClip->ReleaseReference();
 			pSrcClip = NULL;
+
+			pSequence->ReleaseReference();
+			pSequence = NULL;
 		}
 	}
 	XEXCEPT
@@ -262,6 +276,8 @@ AAFRESULT STDMETHODCALLTYPE
 			pMobSlot->ReleaseReference();
 		if(pSrcClip != NULL)
 			pSrcClip->ReleaseReference();
+		if(pSequence != NULL)
+			pSequence->ReleaseReference();
 		if(pDictionary != NULL)
 			pDictionary->ReleaseReference();
 	}
@@ -754,15 +770,17 @@ AAFRESULT STDMETHODCALLTYPE
 			if(pGroup != NULL)
 			{
 				hr = pGroup->GetChoiceAt (index, ppSegment);
-				pGroup->ReleaseReference();
-				pGroup = NULL;
 				pSegment->ReleaseReference();
 				pSegment = NULL;
 			}
 			else if(index == 0)
 				*ppSegment = pSegment;
 			else
+			{
+				pSegment->ReleaseReference();
+				pSegment = NULL;
 				return(AAFRESULT_INCONSISTANCY);
+			}
 		}
 		pSlot->ReleaseReference();
 		pSlot = NULL;
@@ -845,8 +863,6 @@ AAFRESULT STDMETHODCALLTYPE
 			if(pGroup != NULL)
 			{
 				hr = pGroup->GetCriteriaSegment (pCriteria, ppSourceClip);
-				pGroup->ReleaseReference();
-				pGroup = NULL;
 				pSegment->ReleaseReference();
 				pSegment = NULL;
 			}
@@ -881,8 +897,63 @@ AAFRESULT STDMETHODCALLTYPE
 									aafOperationChoice_t*	pOperationChoice,
 									ImplAAFFindSourceInfo**	ppSourceInfo)
 {
-	return(InternalSearchSource(slotID, offset, mobKind, pMediaCrit, pOperationChoice,
+	return(InternalSearchSource(slotID, kDistinguishedChannelID, offset, mobKind, pMediaCrit, pOperationChoice, kRoundFloor,
 										   ppSourceInfo));
+}
+
+AAFRESULT STDMETHODCALLTYPE
+	ImplAAFMasterMob::SearchMultichannelSource (aafSlotID_t				slotID,
+												aafUInt32				channelID,
+												aafPosition_t			offset,
+												aafMobKind_t			mobKind,
+												aafMediaCriteria_t*		pMediaCrit,
+												aafOperationChoice_t*	pOperationChoice,
+												ImplAAFFindSourceInfo**	ppSourceInfo)
+{
+	if (channelID == 0)
+		return AAFRESULT_INVALID_PARAM;
+
+	return(InternalSearchSource(slotID, channelID, offset, mobKind, pMediaCrit, pOperationChoice, kRoundFloor,
+		ppSourceInfo));
+}
+
+//***********************************************************
+//
+// SearchSourceAdvanced()
+//
+// AAFRESULT_SUCCESS
+//   - succeeded.  (This is the only code indicating success.)
+//
+// AAFRESULT_NULL_PARAM
+//   - ppSourceClip arg is NULL.
+//
+// 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFMasterMob::SearchSourceAdvanced (aafSlotID_t				slotID,
+									aafPosition_t			offset,
+									aafMobKind_t			mobKind,
+									aafMediaCriteria_t*		pMediaCrit,
+									aafOperationChoice_t*	pOperationChoice,
+									ImplAAFFindSourceInfo**	ppSourceInfo)
+{
+	return(InternalSearchSource(slotID, kDistinguishedChannelID, offset, mobKind, pMediaCrit, pOperationChoice, kRoundAuto,
+										   ppSourceInfo));
+}
+
+AAFRESULT STDMETHODCALLTYPE
+	ImplAAFMasterMob::SearchMultichannelSourceAdvanced (aafSlotID_t				slotID,
+														aafUInt32				channelID,
+														aafPosition_t			offset,
+														aafMobKind_t			mobKind,
+														aafMediaCriteria_t*		pMediaCrit,
+														aafOperationChoice_t*	pOperationChoice,
+														ImplAAFFindSourceInfo**	ppSourceInfo)
+{
+	if (channelID == 0)
+		return AAFRESULT_INVALID_PARAM;
+
+	return(InternalSearchSource(slotID, channelID, offset, mobKind, pMediaCrit, pOperationChoice, kRoundAuto,
+		ppSourceInfo));
 }
 
 //***********************************************************
@@ -1042,9 +1113,11 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 			} else {
 				CHECK(fileSeq->CountComponents(&numComponents));
 				endPos = 0;
-				if (numComponents >= 1) {
-					for (aafUInt32 i = 0 ; i < numComponents ; i++) {
-						CHECK(fileSeq->GetComponentAt(i, (ImplAAFComponent**)&fileClip));
+				for (aafUInt32 i = 0 ; i < numComponents ; i++) {
+					ImplAAFComponent* pComponent = 0;
+					CHECK(fileSeq->GetComponentAt(i, &pComponent));
+					fileClip = dynamic_cast<ImplAAFSourceClip*>(pComponent);
+					if (fileClip != 0) {
 						CHECK(fileClip->ResolveRef( &fileMob));
 						CHECK(fileMob->CountSlots(&fileNumSlots));
 						if (fileNumSlots >= 1) 
@@ -1070,9 +1143,13 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 						}
 						CHECK(((ImplAAFSegment*)fileClip)->SetLength(tmpPos));
 						endPos += tmpPos;
-						fileClip->ReleaseReference();
-						fileClip = NULL;
+
+					} else {
+						CHECK(pComponent->GetLength(&tmpPos));
+						endPos += tmpPos;
 					}
+					pComponent->ReleaseReference();
+					pComponent = NULL;
 				}
 				slot->ReleaseReference();
 				slot = NULL; 

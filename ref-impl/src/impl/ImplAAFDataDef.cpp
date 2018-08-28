@@ -194,6 +194,14 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFDataDef::IsDataKind (
+      aafBool *bIsDataKind)
+{
+	return(IsDataDefOf(GetDict()->GetBuiltinDefs()->ddkAAFData(), bIsDataKind));
+}
+
+
 AAFRESULT ImplAAFDataDef::IsDataDefEquivalentOf (
       ImplAAFDataDef * pDataDef,
       aafBool *bIsDataDefEquivalentOf)
@@ -338,7 +346,7 @@ ImplAAFDictionary * ImplAAFDataDef::GetDict()
 {
   if (! _pCachedDict)
 	{
-	  AAFRESULT hr = GetDictionary (&_pCachedDict);
+	  ARESULT (AAFRESULT hr) GetDictionary (&_pCachedDict);
 	  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 	  // _pCachedDict is *NOT* reference counted here, so release the
 	  // newly-added reference.

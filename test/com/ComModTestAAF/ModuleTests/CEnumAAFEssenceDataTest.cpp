@@ -48,6 +48,7 @@ using namespace std;
 #include "AAFResult.h"
 #include "ModuleTest.h"
 #include "AAFDefUIDs.h"
+#include "AAFWideString.h"
 
 #include "CAAFBuiltinDefs.h"
 

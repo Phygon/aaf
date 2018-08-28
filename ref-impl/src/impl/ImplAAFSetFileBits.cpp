@@ -38,7 +38,6 @@
 #include "OMAssertions.h"
 #include <string.h>
 
-
 ImplAAFSetFileBits::ImplAAFSetFileBits ()
   : _rep (0)
 {}
@@ -92,11 +91,6 @@ AAFRESULT STDMETHODCALLTYPE
 {
   if (! _rep)
 	return AAFRESULT_NOT_INITIALIZED;
-
-  // BobT Hack!  Some implementations may not understand 64-bit
-  // integer sizes, so we'll only allow 32-bit sizes...
-  if (size > ((aafUInt32) ~0))
-	return AAFRESULT_DATA_SIZE;
 
   _rep->extend (size);
   aafUInt64 s = _rep->extent ();

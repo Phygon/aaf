@@ -168,6 +168,7 @@ public:
 
   // Override from AAFSegement	
   virtual AAFRESULT FindSubSegment( aafPosition_t offset,
+									  aafMediaCriteria_t *mediaCrit,
 									  aafPosition_t *sequPosPtr,
 									  ImplAAFSegment **subseg,
 									  aafBool *found);
@@ -176,13 +177,26 @@ public:
 
   // Interfaces visible inside the toolkit, but not exposed through the API
   AAFRESULT GetNthComponent(aafUInt32 index, ImplAAFComponent **ppComponent);
+
+	virtual AAFRESULT GetMinimumBounds(aafPosition_t rootPos, aafLength_t rootLen,
+										ImplAAFMob *mob, ImplAAFMobSlot *track,
+										aafMediaCriteria_t *mediaCrit,
+										aafPosition_t currentObjPos,
+										aafOperationChoice_t *effectChoice,
+										ImplAAFComponent	*prevObject,
+										ImplAAFComponent *nextObject,
+										ImplAAFScopeStack *scopeStack,
+										aafPosition_t *diffPos, aafLength_t *minLength,
+										ImplAAFOperationGroup **groupObject, aafInt32	*nestDepth,
+										ImplAAFComponent **found, aafBool *foundTransition);
+
 	virtual AAFRESULT ChangeContainedReferences(aafMobID_constref from,
 												aafMobID_constref to);
   AAFRESULT
     SetNthComponent (aafUInt32 index, ImplAAFComponent* pComponent);
 
 	virtual AAFRESULT TraverseToClip( aafLength_t length,
-									  ImplAAFSegment **sclp,
+									  ImplAAFSourceClip **sclp,
 									  ImplAAFPulldown **pulldownObj,
 									  aafInt32 *pulldownPhase,
 									  aafLength_t *sclpLen,
@@ -194,40 +208,57 @@ public:
 	
 private:
 
-   // Sequences have two distinct forms: i) a sequence exclusively composed of events,
-   // ii) a sequence of non-event components.  The policy that must be
-   // enforced in regards to
+   // Sequences have two distinct forms:
+   //   i) a sequence exclusively composed of events,
+   //   ii) a sequence of non-event components.
+   // The policy that must be enforced in regards to
    // valid component types, ordering, position, and length are different.
    // The component type dependent processing, performed in AppendComponent,
-   // is implemented by these polymorphic routines.  It is the responsibilty of
+   // is implemented by these polymorphic routines. It is the responsibilty of
    // AppendComponent to attempt the ImplAAFEvent and special case the
    // calls to these routines should the cast succeed.
 
-   AAFRESULT CheckFirstComponentSematics( ImplAAFComponent* pComponent );
-
    AAFRESULT CheckTypeSemantics( ImplAAFEvent* pEvent );
    AAFRESULT CheckPositionSemantics( ImplAAFEvent* pEvent, aafUInt32 index );
-   AAFRESULT CheckLengthSemantics( ImplAAFEvent* pEvent );
+   AAFRESULT CheckEventSlotLengthSemantics( ImplAAFEvent* pEvent, aafUInt32 index );
 
    AAFRESULT CheckTypeSemantics( ImplAAFComponent* pComponent, aafUInt32 index );
    AAFRESULT CheckPositionSemantics( ImplAAFComponent* pComponent );
-   AAFRESULT CheckLengthSemantics( ImplAAFComponent* pComponent );
+   AAFRESULT CheckLengthSemantics( ImplAAFComponent* pComponent, aafUInt32 index );
+
+   AAFRESULT CheckTimelineSlotTypeSemantics( ImplAAFEvent* pEvent );
+   AAFRESULT CheckTimelineSlotPositionSemantics( ImplAAFEvent* pEvent, aafUInt32 index );
+   AAFRESULT CheckTimelineSlotLengthSemantics( ImplAAFEvent* pEvent, aafUInt32 index );
+
+   AAFRESULT CheckTimelineSlotTypeSemantics( ImplAAFComponent* pComponent, aafUInt32 index );
+
+   AAFRESULT CheckStaticSlotPositionSemantics( ImplAAFEvent* pEvent, aafUInt32 index );
+
+   AAFRESULT CheckStaticSlotLengthSemantics( ImplAAFComponent* pComponent );
+
+   AAFRESULT CheckEventSlotTypeSemantics( ImplAAFComponent* pComponent, aafUInt32 index );
+
+   // Update the length of a Sequence for O(n) time
+   AAFRESULT UpdateSequenceLength();
 
    // These routines will update the length of an event, or !event, component.
-   // The caller must resolve the type.  Both will work correctly if pComponent
+   // The caller must resolve the type. Both will work correctly if pComponent
    // or pEvent is the first component.
-   AAFRESULT UpdateSequenceLength( ImplAAFComponent* pComponent );
-   AAFRESULT UpdateSequenceLength( ImplAAFEvent* pEvent, aafUInt32 index);
-   AAFRESULT UpdateSequenceLengthOnRemove( ImplAAFEvent* pEvent, aafUInt32 index);
-   AAFRESULT UpdateSequenceLengthOnRemove( ImplAAFComponent* pComponent);
-
-   aafLength_t FindEventSequenceEnd();
-   AAFRESULT getEventEnd(ImplAAFEvent*, aafLength_t &end);//pos+len
+   AAFRESULT UpdateSequenceLengthOnInsert( ImplAAFComponent* pComponent );
+   AAFRESULT UpdateSequenceLengthOnInsert( ImplAAFEvent* pEvent, aafUInt32 index);
 
    ImplAAFComponent* GetLastComponent();
    ImplAAFComponent* GetFirstComponent();
    AAFRESULT GetLastEvent( ImplAAFEvent*& );
    AAFRESULT GetFirstEvent( ImplAAFEvent*& );
+
+   ImplAAFEvent* FindLastEvent() const;
+   ImplAAFEvent* FindNextEvent(aafUInt32 index) const;
+   ImplAAFEvent* FindPreviousEvent(aafUInt32 index) const;
+
+   bool ContainsEvents() const;
+   bool ContainsNonFillers() const;
+   bool ContainsNonEvents() const;
 
    // Call this when the length property is known to be optional.  It will
    // set refLenght to zero and return success if the property is not present.
@@ -235,7 +266,6 @@ private:
 
 private:
 	OMStrongReferenceVectorProperty<ImplAAFComponent> _components;
-
 };
 
 #endif // ! __ImplAAFSequence_h__

@@ -221,6 +221,10 @@ public:
 
 public:
   // Overrides from ImplAAFTypeDef
+  virtual aafBool IsFixedSize () const;
+  virtual OMUInt32 PropValSize () const;
+  virtual aafBool IsRegistered () const;
+  virtual OMUInt32 NativeSize () const;
   virtual bool IsAggregatable () const;
   virtual bool IsStreamable () const;
   virtual bool IsFixedArrayable () const;

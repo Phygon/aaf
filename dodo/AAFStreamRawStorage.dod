@@ -1,0 +1,243 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFStreamRawStorage\
+#endm
+#startm .parent-module 0
+AAFRandomRawStorage\
+#endm
+#c
+AD_HEAD
+AD_IDL(///
+/// This interface is used by the toolkit to access stream data on
+/// storage in which AAF files are read and written. Its methods are
+/// called when I\/O operation are performed on AAF stream properties.
+///
+/// Clients who want to separate stream I\/O from meta\-data I\/O
+/// should implement this interface.
+AD_STD_COMMENT_IFC_HEADER)
+AD_CLASS_UUID(9F990C06, 2ABF, 49D1, 97, CC, 5E, 20, 01, B2, AE, E5)
+
+AD_DEFAULT_UUID(9F990C07, 2ABF, 49D1, 97, CC, 5E, 20, 01, B2, AE, E5)
+AD_XCLASS_BEGIN(Concrete, Transient)
+AD_XMETHOD4(StreamReadAt,
+			[in],
+			objPass,
+			aafUInt64,
+			position,
+			position in this storage from which data is read,
+
+			[out\, size_is\(bufSize\)\, length_is\(*pNumRead\)],
+			objPass,
+			aafMemPtr_t,
+			buf,
+			Buffer into which data is read,
+
+			[in],
+			objPass,
+			aafUInt32,
+			bufSize,
+			Size of buf in bytes,
+
+			[out],
+			objPass,
+			aafUInt32 *,
+			pNumRead,
+			Number of bytes read,
+
+     Attempts to read bufSize stream bytes from this storage.  Places the
+  /// data into buf\, and puts the actual number of bytes read into
+  /// *pNumRead.  If the end of the storage is encountered before
+  /// bufSize bytes can be read\, the value written into *pNumRead may
+  /// be smaller than bufSize.
+  ///
+  /// This call will advance the current position by *pNumRead bytes.
+  ///
+  /// Succeeds if:
+  /// - The pNumRead pointer is valid.
+  /// - This storage is open for read or read/write.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(buf or pNumRead\)
+  ///
+  /// AAFRESULT_NOT_READABLE
+  ///   - This storage is not open for read or read/write.)
+
+
+AD_XMETHOD4(StreamWriteAt,
+			[in],
+			objPass,
+			aafUInt64,
+			position,
+			position in this storage into which data is written,
+
+			[in\, size_is\(bufSize\)],
+			objPass,
+			aafMemConstPtr_t,
+			buf,
+			Buffer from which data is written,
+
+			[in],
+			objPass,
+			aafUInt32,
+			bufSize,
+			Number of bytes,
+
+			[out],
+			objPass,
+			aafUInt32 *,
+			pNumWritten,
+			Number of bytes written,
+
+     Writes bufsize stream bytes into this storage.  Obtains the data
+  /// from buf.
+  ///
+  /// This call may fail if the capacity of this storage cannot be
+  /// extended sufficiently to complete the request.  The client can
+  /// call SetSize\(\) to attempt to reserve capacity for the storage;
+  /// if the SetSize\(\) call succeeds\, subsequent Write\(\) calls
+  /// within requested that capacity are guaranteed to succeed.
+  ///
+  /// This call will advance the current position by bufSize bytes.
+  ///
+  /// Succeeds if:
+  /// - The pNumWritten pointer is valid.
+  /// - This storage is open for write or read/write.
+  /// - Sufficient capacity exists in this storage to perform the
+  ///   write.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pNumWritten\)
+  ///
+  /// AAFRESULT_NOT_WRITEABLE
+  ///   - This storage is not open for write or read/write.
+  ///
+  /// AAFRESULT_OFFSET_SIZE
+  ///   - It is not possible to extend the allocated size of this
+  ///     storage.)
+
+
+AD_XMETHOD4(StreamReadScatterAt,
+			[in],
+			objPass,
+			aafUInt64,
+			position,
+			position in this storage from which data is read,
+
+			[out\, size_is\(bufCount\)],
+			objPass,
+			aafIOBufferDesc_t *,
+			pBufs,
+			Buffers into which data is read,
+
+			[in],
+			objPass,
+			aafUInt32,
+			bufCount,
+			Number of buffers,
+
+			[out],
+			objPass,
+			aafUInt32 *,
+			pNumRead,
+			Number of bytes read,
+
+     Attempts to read bufsize stream bytes from this storage.  Places the
+  /// data into buf\, and puts the actual number of bytes read into
+  /// *pNumRead.  If the end of the storage is encountered before
+  /// bufSize bytes can be read\, the value written into *pNumRead may
+  /// be smaller than bufSize.
+  ///
+  /// This call will advance the current position by *pNumRead bytes.
+  ///
+  /// Succeeds if:
+  /// - The pNumRead pointer is valid.
+  /// - This storage is open for read or read/write.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(buf or pNumRead\)
+  ///
+  /// AAFRESULT_NOT_READABLE
+  ///   - This storage is not open for read or read/write.)
+
+
+AD_XMETHOD4(StreamWriteGatherAt,
+			[in],
+			objPass,
+			aafUInt64,
+			position,
+			position in this storage into which data is written,
+
+			[out\, size_is\(bufCount\)],
+			objPass,
+			aafIOBufferDesc_constptr,
+			pBufs,
+			Buffers from which data is written,
+
+			[in],
+			objPass,
+			aafUInt32,
+			bufCount,
+			Number of buffers,
+
+			[out],
+			objPass,
+			aafUInt32 *,
+			pNumWritten,
+			Number of bytes written,
+
+     Writes bufsize stream bytes into this storage.  Obtains the data
+  /// from buf.
+  ///
+  /// This call may fail if the capacity of this storage cannot be
+  /// extended sufficiently to complete the request.  The client can
+  /// call SetSize\(\) to attempt to reserve capacity for the storage;
+  /// if the SetSize\(\) call succeeds\, subsequent Write\(\) calls
+  /// within requested that capacity are guaranteed to succeed.
+  ///
+  /// This call will advance the current position by bufSize bytes.
+  ///
+  /// Succeeds if:
+  /// - The pNumWritten pointer is valid.
+  /// - This storage is open for write or read/write.
+  /// - Sufficient capacity exists in this storage to perform the
+  ///   write.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pNumWritten\)
+  ///
+  /// AAFRESULT_NOT_WRITEABLE
+  ///   - This storage is not open for write or read/write.
+  ///
+  /// AAFRESULT_OFFSET_SIZE
+  ///   - It is not possible to extend the allocated size of this
+  ///     storage.)
+
+
+AD_XCLASS_END(Concrete, Transient)

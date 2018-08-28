@@ -48,8 +48,8 @@ using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
-#include <wchar.h>
 
+#include "AAFWideString.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
@@ -254,7 +254,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	IEnumAAFCodecDefs *pEnumPluggable = NULL;
 	IAAFCodecDef *pCodecDef = NULL;
 	IAAFDefObject *pDefObj = NULL;
-	IEnumAAFPluginDefs *pEnumDesc;
+	IEnumAAFPluginDefs *pEnumDesc = NULL;
 	IAAFPluginDef *pPlugin = NULL;
 	IAAFNetworkLocator	*pNetLoc = NULL;
 	IAAFLocator			*pLocator = NULL;
@@ -431,11 +431,11 @@ extern "C" HRESULT CEnumAAFPluginLocators_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IEnumAAFPluginLocators methods have not been implemented:" << endl;       
-//		cout << "     Next" << endl; 
-//		cout << "     Skip" << endl; 
-//		cout << "     Reset" << endl; 
-//		cout << "     Clone" << endl; 
+//		cout << "The following IEnumAAFPluginLocators methods have not been implemented:" << endl;
+//		cout << "     Next" << endl;
+//		cout << "     Skip" << endl;
+//		cout << "     Reset" << endl;
+//		cout << "     Clone" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

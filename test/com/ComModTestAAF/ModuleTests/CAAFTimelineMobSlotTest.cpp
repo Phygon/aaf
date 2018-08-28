@@ -34,15 +34,13 @@
 //
 //=---------------------------------------------------------------------=
 
-#include "AAF.h"
-
 #include <iostream>
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
 
-
+#include "AAF.h"
+#include "AAFWideString.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
@@ -446,9 +444,9 @@ extern "C" HRESULT CAAFTimelineMobSlot_test(
 	// When all of the functionality of this class is tested, we can return success
 //!!!	if(hr == AAFRESULT_SUCCESS)
 //	{
-//		cout << "The following IAAFTimelineMobSlot methods have not been tested:" << endl; 
-//		cout << "     SetEditRate" << endl; 
-//		cout << "     SetOrigin" << endl; 
+//		cout << "The following IAAFTimelineMobSlot methods have not been tested:" << endl;
+//		cout << "     SetEditRate" << endl;
+//		cout << "     SetOrigin" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

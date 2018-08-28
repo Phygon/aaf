@@ -3,18 +3,18 @@
 /* this ALWAYS GENERATED file contains the definitions for the interfaces */
 
 
-/* File created by MIDL compiler version 6.00.0361 */
+/* File created by MIDL compiler version 8.00.0603 */
 /* at TIMESTAMP REMOVED
  */
 /* Compiler settings for ../ref-impl/include/com-api/AAFTypes.idl:
-    Oicf, W1, Zp8, env=Win32 (32b run)
+    Oicf, W1, Zp8, env=Win64 (32b run), target_arch=AMD64 8.00.0603 
     protocol : dce , ms_ext, c_ext, robust
     error checks: allocation ref bounds_check enum stub_data 
     VC __declspec() decoration level: 
          __declspec(uuid()), __declspec(selectany), __declspec(novtable)
          DECLSPEC_UUID(), MIDL_INTERFACE()
 */
-//@@MIDL_FILE_HEADING(  )
+/* @@MIDL_FILE_HEADING(  ) */
 
 #pragma warning( disable: 4049 )  /* more than 64k source lines */
 
@@ -48,10 +48,8 @@
 extern "C"{
 #endif 
 
-void * __RPC_USER MIDL_user_allocate(size_t);
-void __RPC_USER MIDL_user_free( void * ); 
 
-/* interface __MIDL_itf_AAFTypes_0000 */
+/* interface __MIDL_itf_AAFTypes_0000_0000 */
 /* [local] */ 
 
 //=---------------------------------------------------------------------=
@@ -79,7 +77,7 @@ void __RPC_USER MIDL_user_free( void * );
 // (http://www.amwa.tv/policies).
 //
 // Copyright Notices:
-// The Original Code of this file is Copyright 1998-2009, licensor of the
+// The Original Code of this file is Copyright 1998-2012, licensor of the
 // Advanced Media Workflow Association.  All rights reserved.
 //
 // The Initial Developer of the Original Code of this file and the
@@ -90,14 +88,14 @@ void __RPC_USER MIDL_user_free( void * );
 //=---------------------------------------------------------------------=
 
 
-extern RPC_IF_HANDLE __MIDL_itf_AAFTypes_0000_v0_0_c_ifspec;
-extern RPC_IF_HANDLE __MIDL_itf_AAFTypes_0000_v0_0_s_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_AAFTypes_0000_0000_v0_0_c_ifspec;
+extern RPC_IF_HANDLE __MIDL_itf_AAFTypes_0000_0000_v0_0_s_ifspec;
 
 #ifndef __IAAFTypes_INTERFACE_DEFINED__
 #define __IAAFTypes_INTERFACE_DEFINED__
 
 /* interface IAAFTypes */
-/* [auto_handle][unique][uuid] */ 
+/* [unique][uuid] */ 
 
 /*
  * Basic types that don't depend on other types.
@@ -142,8 +140,9 @@ typedef aafInt32 aafBoolean_t;
 
 typedef 
 enum _aafBoolean_e
-    {	kAAFFalse	= 0,
-	kAAFTrue	= 1
+    {
+        kAAFFalse	= 0,
+        kAAFTrue	= 1
     } 	aafBoolean_e;
 
 #ifndef MAX_NUM_RGBA_COMPS
@@ -153,7 +152,8 @@ typedef aafInt32 aafMAX_NUM_RGBA_COMPS;
 
 typedef 
 enum _aafMAX_NUM_RGBA_COMPS_e
-    {	MAX_NUM_RGBA_COMPS	= 8
+    {
+        MAX_NUM_RGBA_COMPS	= 8
     } 	aafMAX_NUM_RGBA_COMPS_e;
 
 #endif
@@ -175,6 +175,8 @@ typedef aafCharacter * aafString_t;
  *************************************************************/
 /*** Types for all components***/
 typedef aafInt64 aafLength_t;
+
+#define	AAF_UNKNOWN_LENGTH	( -1 )
 
 /*** Types for mob slots***/
 typedef aafInt64 aafPosition_t;
@@ -223,78 +225,87 @@ typedef aafInt32 aafFileRev_t;
 
 typedef 
 enum _aafFileRev_e
-    {	kAAFRev1	= 0,
-	kAAFRev2	= 1
+    {
+        kAAFRev1	= 0,
+        kAAFRev2	= 1
     } 	aafFileRev_e;
 
 typedef aafInt32 aafMediaOpenMode_t;
 
 typedef 
 enum _aafMediaOpenMode_e
-    {	kAAFMediaOpenReadOnly	= 0,
-	kAAFMediaOpenAppend	= 1
+    {
+        kAAFMediaOpenReadOnly	= 0,
+        kAAFMediaOpenAppend	= 1
     } 	aafMediaOpenMode_e;
 
 typedef aafInt32 aafFieldDom_t;
 
 typedef 
 enum _aafFieldDom_e
-    {	kAAFDominantField1	= 0,
-	kAAFDominantField2	= 1,
-	kAAFNoDominant	= 2
+    {
+        kAAFDominantField1	= 0,
+        kAAFDominantField2	= 1,
+        kAAFNoDominant	= 2
     } 	aafFieldDom_e;
 
 typedef aafInt32 aafFieldTop_t;
 
 typedef 
 enum _aafFieldTop_e
-    {	kAAFTopField1	= 0,
-	kAAFTopField2	= 1,
-	kAAFTopFieldNone	= 2
+    {
+        kAAFTopField1	= 0,
+        kAAFTopField2	= 1,
+        kAAFTopFieldNone	= 2
     } 	aafFieldTop_e;
 
 typedef aafInt32 aafAlphaTransparency_t;
 
 typedef 
 enum _aafAlphaTransparency_e
-    {	kAAFMinValueTransparent	= 0,
-	kAAFMaxValueTransparent	= 1
+    {
+        kAAFMinValueTransparent	= 0,
+        kAAFMaxValueTransparent	= 1
     } 	aafAlphaTransparency_e;
 
 typedef aafInt32 aafFieldNumber_t;
 
 typedef 
 enum _aafFieldNumber_e
-    {	kAAFUnspecifiedField	= 0,
-	kAAFFieldOne	= 1,
-	kAAFFieldTwo	= 2
+    {
+        kAAFUnspecifiedField	= 0,
+        kAAFFieldOne	= 1,
+        kAAFFieldTwo	= 2
     } 	aafFieldNumber_e;
 
 typedef aafInt32 aafPixelFormat_t;
 
 typedef 
 enum _aafPixelFormat_e
-    {	kAAFPixNone	= 0,
-	kAAFPixRGBA	= 1,
-	kAAFPixYUV	= 2
+    {
+        kAAFPixNone	= 0,
+        kAAFPixRGBA	= 1,
+        kAAFPixYUV	= 2
     } 	aafPixelFormat_e;
 
 typedef aafInt32 aafFileExistence_t;
 
 typedef 
 enum _aafFileExistence_e
-    {	kAAFFileExistence_new	= 1,
-	kAAFFileExistence_existing	= 2
+    {
+        kAAFFileExistence_new	= 1,
+        kAAFFileExistence_existing	= 2
     } 	aafFileExistence_e;
 
 typedef aafInt32 aafFileAccess_t;
 
 typedef 
 enum _aafFileAccess_e
-    {	kAAFFileAccess_none	= 0,
-	kAAFFileAccess_read	= 1 << 0,
-	kAAFFileAccess_write	= 1 << 1,
-	kAAFFileAccess_modify	= kAAFFileAccess_read | kAAFFileAccess_write
+    {
+        kAAFFileAccess_none	= 0,
+        kAAFFileAccess_read	= ( 1 << 0 ) ,
+        kAAFFileAccess_write	= ( 1 << 1 ) ,
+        kAAFFileAccess_modify	= ( kAAFFileAccess_read | kAAFFileAccess_write ) 
     } 	aafFileAccess_e;
 
 typedef aafInt32 aafJPEGcomponent_t;
@@ -302,10 +313,11 @@ typedef aafInt32 aafJPEGcomponent_t;
 #if 0
 typedef 
 enum _aafJPEGcomponent_e
-    {	kAAFJcLuminance	= 0,
-	kAAFJcChrominance	= 1,
-	kAAFJcLuminanceFP16	= 2,
-	kAAFJcChrominanceFP16	= 3
+    {
+        kAAFJcLuminance	= 0,
+        kAAFJcChrominance	= 1,
+        kAAFJcLuminanceFP16	= 2,
+        kAAFJcChrominanceFP16	= 3
     } 	aafJPEGcomponent_e;
 
 #endif
@@ -322,222 +334,268 @@ typedef aafInt32 aafCompressEnable_t;
 
 typedef 
 enum _aafCompressEnable_e
-    {	kAAFCompressionEnable	= 0,
-	kAAFCompressionDisable	= 1
+    {
+        kAAFCompressionEnable	= 0,
+        kAAFCompressionDisable	= 1
     } 	aafCompressEnable_e;
 
 typedef aafInt32 aafFileFormat_t;
 
 typedef 
 enum _aafFileFormat_e
-    {	kAAFEssence	= 0,
-	kAAFForeignMedia	= 1
+    {
+        kAAFEssence	= 0,
+        kAAFForeignMedia	= 1
     } 	aafFileFormat_e;
 
 typedef aafInt32 aafDropType_t;
 
 typedef 
 enum _aafDropType_e
-    {	kAAFTcNonDrop	= 0,
-	kAAFTcDrop	= 1
+    {
+        kAAFTcNonDrop	= 0,
+        kAAFTcDrop	= 1
     } 	aafDropType_e;
 
 typedef aafInt32 aafFrameLayout_t;
 
 typedef 
 enum _aafFrameLayout_e
-    {	kAAFFullFrame	= 0,
-	kAAFSeparateFields	= 1,
-	kAAFOneField	= 2,
-	kAAFMixedFields	= 3,
-	kAAFSegmentedFrame	= 4
+    {
+        kAAFFullFrame	= 0,
+        kAAFSeparateFields	= 1,
+        kAAFOneField	= 2,
+        kAAFMixedFields	= 3,
+        kAAFSegmentedFrame	= 4
     } 	aafFrameLayout_e;
 
 typedef aafInt32 aafElectroSpatialFormulation_t;
 
 typedef 
 enum _aafElectroSpatialFormulation_e
-    {	kAAFElectroSpatialFormulation_Default	= 0,
-	kAAFElectroSpatialFormulation_TwoChannelMode	= 1,
-	kAAFElectroSpatialFormulation_SingleChannelMode	= 2,
-	kAAFElectroSpatialFormulation_PrimarySecondaryMode	= 3,
-	kAAFElectroSpatialFormulation_StereophonicMode	= 4,
-	kAAFElectroSpatialFormulation_SingleChannelDoubleSamplingFrequencyMode	= 7,
-	kAAFElectroSpatialFormulation_StereoLeftChannelDoubleSamplingFrequencyMode	= 8,
-	kAAFElectroSpatialFormulation_StereoRightChannelDoubleSamplingFrequencyMode	= 9,
-	kAAFElectroSpatialFormulation_MultiChannelMode	= 15
+    {
+        kAAFElectroSpatialFormulation_Default	= 0,
+        kAAFElectroSpatialFormulation_TwoChannelMode	= 1,
+        kAAFElectroSpatialFormulation_SingleChannelMode	= 2,
+        kAAFElectroSpatialFormulation_PrimarySecondaryMode	= 3,
+        kAAFElectroSpatialFormulation_StereophonicMode	= 4,
+        kAAFElectroSpatialFormulation_SingleChannelDoubleSamplingFrequencyMode	= 7,
+        kAAFElectroSpatialFormulation_StereoLeftChannelDoubleSamplingFrequencyMode	= 8,
+        kAAFElectroSpatialFormulation_StereoRightChannelDoubleSamplingFrequencyMode	= 9,
+        kAAFElectroSpatialFormulation_MultiChannelMode	= 15
     } 	aafElectroSpatialFormulation_e;
 
 typedef aafInt32 aafEmphasisType_t;
 
 typedef 
 enum _aafEmphasisType_e
-    {	kAAFEmphasis_Unknown	= 0,
-	kAAFEmphasis_Reserved0	= 1,
-	kAAFEmphasis_Reserved1	= 2,
-	kAAFEmphasis_Reserved2	= 3,
-	kAAFEmphasis_None	= 4,
-	kAAFEmphasis_Reserved3	= 5,
-	kAAFEmphasis_15and50	= 6,
-	kAAFEmphasis_ITU	= 7
+    {
+        kAAFEmphasis_Unknown	= 0,
+        kAAFEmphasis_Reserved0	= 1,
+        kAAFEmphasis_Reserved1	= 2,
+        kAAFEmphasis_Reserved2	= 3,
+        kAAFEmphasis_None	= 4,
+        kAAFEmphasis_Reserved3	= 5,
+        kAAFEmphasis_15and50	= 6,
+        kAAFEmphasis_ITU	= 7
     } 	aafEmphasisType_e;
 
 typedef aafInt32 aafAuxBitsModeType_t;
 
 typedef 
 enum _aafAuxBitsModeType_e
-    {	kAAFAuxBitsMode_NotDefined	= 0,
-	kAAFAuxBitsMode_MainAudioSampleData	= 1,
-	kAAFAuxBitsMode_SingleCoordinationSignal	= 2,
-	kAAFAuxBitsMode_UserDefined	= 3,
-	kAAFAuxBitsMode_Reserved0	= 4,
-	kAAFAuxBitsMode_Reserved1	= 5,
-	kAAFAuxBitsMode_Reserved2	= 6,
-	kAAFAuxBitsMode_Reserved3	= 7
+    {
+        kAAFAuxBitsMode_NotDefined	= 0,
+        kAAFAuxBitsMode_MainAudioSampleData	= 1,
+        kAAFAuxBitsMode_SingleCoordinationSignal	= 2,
+        kAAFAuxBitsMode_UserDefined	= 3,
+        kAAFAuxBitsMode_Reserved0	= 4,
+        kAAFAuxBitsMode_Reserved1	= 5,
+        kAAFAuxBitsMode_Reserved2	= 6,
+        kAAFAuxBitsMode_Reserved3	= 7
     } 	aafAuxBitsModeType_e;
 
 typedef aafInt32 aafChannelStatusModeType_t;
 
 typedef 
 enum _aafChannelStatusModeType_e
-    {	kAAFChannelStatusMode_None	= 0,
-	kAAFChannelStatusMode_Minimum	= 1,
-	kAAFChannelStatusMode_Standard	= 2,
-	kAAFChannelStatusMode_Fixed	= 3,
-	kAAFChannelStatusMode_Stream	= 4,
-	kAAFChannelStatusMode_Essence	= 5
+    {
+        kAAFChannelStatusMode_None	= 0,
+        kAAFChannelStatusMode_Minimum	= 1,
+        kAAFChannelStatusMode_Standard	= 2,
+        kAAFChannelStatusMode_Fixed	= 3,
+        kAAFChannelStatusMode_Stream	= 4,
+        kAAFChannelStatusMode_Essence	= 5
     } 	aafChannelStatusModeType_e;
 
 typedef aafInt32 aafUserDataModeType_t;
 
 typedef 
 enum _aafUserDataModeType_e
-    {	kAAFUserDataMode_NotDefined	= 0,
-	kAAFUserDataMode_192BitBlockStructure	= 1,
-	kAAFUserDataMode_AES18	= 2,
-	kAAFUserDataMode_UserDefined	= 3,
-	kAAFUserDataMode_IEC	= 4,
-	kAAFUserDataMode_Metadata	= 5,
-	kAAFUserDataMode_Reserved0	= 6,
-	kAAFUserDataMode_Reserved1	= 7,
-	kAAFUserDataMode_Reserved2	= 8,
-	kAAFUserDataMode_Reserved3	= 9,
-	kAAFUserDataMode_Reserved4	= 10,
-	kAAFUserDataMode_Reserved5	= 11,
-	kAAFUserDataMode_Reserved6	= 12,
-	kAAFUserDataMode_Reserved7	= 13,
-	kAAFUserDataMode_Reserved8	= 14,
-	kAAFUserDataMode_Reserved9	= 15
+    {
+        kAAFUserDataMode_NotDefined	= 0,
+        kAAFUserDataMode_192BitBlockStructure	= 1,
+        kAAFUserDataMode_AES18	= 2,
+        kAAFUserDataMode_UserDefined	= 3,
+        kAAFUserDataMode_IEC	= 4,
+        kAAFUserDataMode_Metadata	= 5,
+        kAAFUserDataMode_Reserved0	= 6,
+        kAAFUserDataMode_Reserved1	= 7,
+        kAAFUserDataMode_Reserved2	= 8,
+        kAAFUserDataMode_Reserved3	= 9,
+        kAAFUserDataMode_Reserved4	= 10,
+        kAAFUserDataMode_Reserved5	= 11,
+        kAAFUserDataMode_Reserved6	= 12,
+        kAAFUserDataMode_Reserved7	= 13,
+        kAAFUserDataMode_Reserved8	= 14,
+        kAAFUserDataMode_Reserved9	= 15
     } 	aafUserDataModeType_e;
 
 typedef aafInt32 aafSignalStandard_t;
 
 typedef 
 enum _aafSignalStandard_e
-    {	kAAFSignalStandard_None	= 0,
-	kAAFSignalStandard_ITU601	= 1,
-	kAAFSignalStandard_ITU1358	= 2,
-	kAAFSignalStandard_SMPTE347M	= 3,
-	kAAFSignalStandard_SMPTE274M	= 4,
-	kAAFSignalStandard_SMPTE296M	= 5,
-	kAAFSignalStandard_SMPTE349M	= 6
+    {
+        kAAFSignalStandard_None	= 0,
+        kAAFSignalStandard_ITU601	= 1,
+        kAAFSignalStandard_ITU1358	= 2,
+        kAAFSignalStandard_SMPTE347M	= 3,
+        kAAFSignalStandard_SMPTE274M	= 4,
+        kAAFSignalStandard_SMPTE296M	= 5,
+        kAAFSignalStandard_SMPTE349M	= 6,
+        kAAFSignalStandard_SMPTE428_1	= 7
     } 	aafSignalStandard_e;
 
 typedef aafInt32 aafScanningDirection_t;
 
 typedef 
 enum _aafScanningDirection_e
-    {	kAAFScanningDirection_LeftToRightTopToBottom	= 0,
-	kAAFScanningDirection_RightToLeftTopToBottom	= 1,
-	kAAFScanningDirection_LeftToRightBottomToTop	= 2,
-	kAAFScanningDirection_RightToLeftBottomToTop	= 3,
-	kAAFScanningDirection_TopToBottomLeftToRight	= 4,
-	kAAFScanningDirection_TopToBottomRightToLeft	= 5,
-	kAAFScanningDirection_BottomToTopLeftToRight	= 6,
-	kAAFScanningDirection_BottomToTopRightToLeft	= 7
+    {
+        kAAFScanningDirection_LeftToRightTopToBottom	= 0,
+        kAAFScanningDirection_RightToLeftTopToBottom	= 1,
+        kAAFScanningDirection_LeftToRightBottomToTop	= 2,
+        kAAFScanningDirection_RightToLeftBottomToTop	= 3,
+        kAAFScanningDirection_TopToBottomLeftToRight	= 4,
+        kAAFScanningDirection_TopToBottomRightToLeft	= 5,
+        kAAFScanningDirection_BottomToTopLeftToRight	= 6,
+        kAAFScanningDirection_BottomToTopRightToLeft	= 7
     } 	aafScanningDirection_e;
 
 typedef aafInt32 aafContentScanningType_t;
 
 typedef 
 enum _aafContentScanningType_e
-    {	kAAFContentScanning_NotKnown	= 0,
-	kAAFContentScanning_Progressive	= 1,
-	kAAFContentScanning_Interlace	= 2,
-	kAAFContentScanning_Mixed	= 3
+    {
+        kAAFContentScanning_NotKnown	= 0,
+        kAAFContentScanning_Progressive	= 1,
+        kAAFContentScanning_Interlace	= 2,
+        kAAFContentScanning_Mixed	= 3
     } 	aafContentScanningType_e;
 
 typedef aafInt32 aafTitleAlignmentType_t;
 
 typedef 
 enum _aafTitleAlignmentType_e
-    {	kAAFTitleAlignment_Left	= 0,
-	kAAFTitleAlignment_Center	= 1,
-	kAAFTitleAlignment_Right	= 2
+    {
+        kAAFTitleAlignment_Left	= 0,
+        kAAFTitleAlignment_Center	= 1,
+        kAAFTitleAlignment_Right	= 2
     } 	aafTitleAlignmentType_e;
+
+typedef aafInt32 aafAVCContentScanningType_t;
+
+typedef 
+enum _aafAVCContentScanningType_e
+    {
+        kAAFAVCContentScanning_NotKnown	= 0,
+        kAAFAVCContentScanning_ProgressiveFramePicture	= 1,
+        kAAFAVCContentScanning_InterlaceFieldPicture	= 2,
+        kAAFAVCContentScanning_InterlaceFramePicture	= 3,
+        kAAFAVCContentScanning_Interlace_FrameFieldPicture	= 4
+    } 	aafAVCContentScanningType_e;
+
+typedef aafInt32 aafMPEG4VisualCodedContentType_t;
+
+typedef 
+enum _aafMPEG4VisualCodedContentType_e
+    {
+        kAAFMPEG4VisualCodedContent_Unknown	= 0,
+        kAAFMPEG4VisualCodedContent_Progressive	= 1,
+        kAAFMPEG4VisualCodedContent_Interlaced	= 2,
+        kAAFMPEG4VisualCodedContent_Mixed	= 3
+    } 	aafMPEG4VisualCodedContentType_e;
 
 typedef aafInt32 aafColorSiting_t;
 
 typedef 
 enum _aafColorSiting_e
-    {	kAAFCoSiting	= 0,
-	kAAFAveraging	= 1,
-	kAAFThreeTap	= 2,
-	kAAFQuincunx	= 3,
-	kAAFRec601	= 4,
-	kAAFUnknownSiting	= 255
+    {
+        kAAFCoSiting	= 0,
+        kAAFAveraging	= 1,
+        kAAFThreeTap	= 2,
+        kAAFQuincunx	= 3,
+        kAAFRec601	= 4,
+        kAAFLineAlternating	= 5,
+        kAAFVerticalMidpoint	= 6,
+        kAAFUnknownSiting	= 255
     } 	aafColorSiting_e;
 
 typedef aafInt32 aafPropertyOpt_t;
 
 typedef 
 enum _aafPropertyOpt_e
-    {	kAAFPropRequired	= 0,
-	kAAFPropOptional	= 1
+    {
+        kAAFPropRequired	= 0,
+        kAAFPropOptional	= 1
     } 	aafPropertyOpt_e;
 
 typedef aafInt32 AAFDataDefinitionMatch_t;
 
 typedef 
 enum _AAFDataDefinitionMatch_e
-    {	kAAFExactMatch	= 0,
-	kAAFConvertTo	= 1,
-	kAAFConvertFrom	= 2
+    {
+        kAAFExactMatch	= 0,
+        kAAFConvertTo	= 1,
+        kAAFConvertFrom	= 2
     } 	AAFDataDefinitionMatch_e;
 
 typedef aafInt32 aafAppendOption_t;
 
 typedef 
 enum _aafAppendOption_e
-    {	kAAFAppend	= 0,
-	kAAFForceOverwrite	= 1
+    {
+        kAAFAppend	= 0,
+        kAAFForceOverwrite	= 1
     } 	aafAppendOption_e;
 
 typedef aafInt32 aafReferenceType_t;
 
 typedef 
 enum _aafReferenceType_e
-    {	kAAFRefLimitMinimum	= 0,
-	kAAFRefLimitMaximum	= 1,
-	kAAFRefMinimum	= 2,
-	kAAFRefMaximum	= 3,
-	kAAFRefEnumvalue	= 4
+    {
+        kAAFRefLimitMinimum	= 0,
+        kAAFRefLimitMaximum	= 1,
+        kAAFRefMinimum	= 2,
+        kAAFRefMaximum	= 3,
+        kAAFRefEnumvalue	= 4
     } 	aafReferenceType_e;
 
 typedef aafInt32 aafSwapNeeded_t;
 
 typedef 
 enum _aafSwapNeeded_e
-    {	kAAFSwapIfNeeded	= 0,
-	kAAFNeverSwap	= 1
+    {
+        kAAFSwapIfNeeded	= 0,
+        kAAFNeverSwap	= 1
     } 	aafSwapNeeded_e;
 
 typedef aafInt32 aafTimecodeSourceType_t;
 
 typedef 
 enum _aafTimecodeSourceType_e
-    {	kAAFTimecodeLTC	= 0,
-	kAAFTimecodeVITC	= 1
+    {
+        kAAFTimecodeLTC	= 0,
+        kAAFTimecodeVITC	= 1
     } 	aafTimecodeSourceType_e;
 
 /************************************************************
@@ -549,48 +607,52 @@ typedef aafInt32 aafMobKind_t;
 
 typedef 
 enum _aafMobKind_e
-    {	kAAFCompMob	= 0,
-	kAAFMasterMob	= 1,
-	kAAFFileMob	= 2,
-	kAAFTapeMob	= 3,
-	kAAFFilmMob	= 4,
-	kAAFPrimaryMob	= 5,
-	kAAFAllMob	= 6,
-	kAAFPhysicalMob	= 7
+    {
+        kAAFCompMob	= 0,
+        kAAFMasterMob	= 1,
+        kAAFFileMob	= 2,
+        kAAFTapeMob	= 3,
+        kAAFFilmMob	= 4,
+        kAAFPrimaryMob	= 5,
+        kAAFAllMob	= 6,
+        kAAFPhysicalMob	= 7
     } 	aafMobKind_e;
 
 typedef aafInt32 aafOperationChoice_t;
 
 typedef 
 enum _aafOperationChoice_e
-    {	kAAFFindNull	= 0,
-	kAAFFindIncoming	= 1,
-	kAAFFindOutgoing	= 2,
-	kAAFFindRender	= 3,
-	kAAFFindOperationSrc1	= 4,
-	kAAFFindOperationSrc2	= 5,
-	kAAFFindOperationSrc3	= 6,
-	kAAFFindOperationSrc4	= 7,
-	kAAFFindOperationSrc5	= 8,
-	kAAFFindOperationSrc6	= 9,
-	kAAFFindOperationSrc7	= 10,
-	kAAFFindOperationSrc8	= 11
+    {
+        kAAFFindNull	= 0,
+        kAAFFindIncoming	= 1,
+        kAAFFindOutgoing	= 2,
+        kAAFFindRender	= 3,
+        kAAFFindOperationSrc1	= 4,
+        kAAFFindOperationSrc2	= 5,
+        kAAFFindOperationSrc3	= 6,
+        kAAFFindOperationSrc4	= 7,
+        kAAFFindOperationSrc5	= 8,
+        kAAFFindOperationSrc6	= 9,
+        kAAFFindOperationSrc7	= 10,
+        kAAFFindOperationSrc8	= 11
     } 	aafOperationChoice_e;
 
 typedef aafInt32 aafDepend_t;
 
 typedef 
 enum _aafDepend_e
-    {	kAAFNoFollowDepend	= 0,
-	kAAFFollowDepend	= 1
+    {
+        kAAFNoFollowDepend	= 0,
+        kAAFFollowDepend	= 1
     } 	aafDepend_e;
 
 typedef aafInt32 aafIncMedia_t;
 
 typedef 
 enum _aafIncMedia_e
-    {	kAAFNoIncludeMedia	= 0,
-	kAAFIncludeMedia	= 1
+    {
+        kAAFNoIncludeMedia	= 0,
+        kAAFIncludeMedia	= 1
     } 	aafIncMedia_e;
 
 /* aafIndexType_t: describes the types of HEAD indices */
@@ -598,10 +660,11 @@ typedef aafInt32 aafIndexType_t;
 
 typedef 
 enum _aafIndexType_e
-    {	kAAFCompMobIndex	= 0,
-	kAAFSourceMobIndex	= 1,
-	kAAFMediaIndex	= 2,
-	kAAFPrimaryMobIndex	= 3
+    {
+        kAAFCompMobIndex	= 0,
+        kAAFSourceMobIndex	= 1,
+        kAAFMediaIndex	= 2,
+        kAAFPrimaryMobIndex	= 3
     } 	aafIndexType_e;
 
 /* aafFadeType_t: describes values for SCLP fadein and fadeout types  */
@@ -609,78 +672,85 @@ typedef aafInt32 aafFadeType_t;
 
 typedef 
 enum _aafFadeType_e
-    {	kAAFFadeNone	= 0,
-	kAAFFadeLinearAmp	= 1,
-	kAAFFadeLinearPower	= 2
+    {
+        kAAFFadeNone	= 0,
+        kAAFFadeLinearAmp	= 1,
+        kAAFFadeLinearPower	= 2
     } 	aafFadeType_e;
 
 typedef aafInt32 aafAudioSampleType_t;
 
 typedef 
 enum _aafAudioSampleType_e
-    {	kAAFOffsetBinary	= 0,
-	kAAFSignedMagnitude	= 1
+    {
+        kAAFOffsetBinary	= 0,
+        kAAFSignedMagnitude	= 1
     } 	aafAudioSampleType_e;
 
 typedef aafInt32 aafTapeCaseType_t;
 
 typedef 
 enum _aafTapeCaseType_e
-    {	kAAFTapeCaseNull	= 0,
-	kAAFThreeFourthInchVideoTape	= 1,
-	kAAFVHSVideoTape	= 2,
-	kAAF8mmVideoTape	= 3,
-	kAAFBetacamVideoTape	= 4,
-	kAAFCompactCassette	= 5,
-	kAAFDATCartridge	= 6,
-	kAAFNagraAudioTape	= 7
+    {
+        kAAFTapeCaseNull	= 0,
+        kAAFThreeFourthInchVideoTape	= 1,
+        kAAFVHSVideoTape	= 2,
+        kAAF8mmVideoTape	= 3,
+        kAAFBetacamVideoTape	= 4,
+        kAAFCompactCassette	= 5,
+        kAAFDATCartridge	= 6,
+        kAAFNagraAudioTape	= 7
     } 	aafTapeCaseType_e;
 
 typedef aafInt32 aafVideoSignalType_t;
 
 typedef 
 enum _aafVideoSignalType_e
-    {	kAAFVideoSignalNull	= 0,
-	kAAFNTSCSignal	= 1,
-	kAAFPALSignal	= 2,
-	kAAFSECAMSignal	= 3
+    {
+        kAAFVideoSignalNull	= 0,
+        kAAFNTSCSignal	= 1,
+        kAAFPALSignal	= 2,
+        kAAFSECAMSignal	= 3
     } 	aafVideoSignalType_e;
 
 typedef aafInt32 aafTapeFormatType_t;
 
 typedef 
 enum _aafTapeFormatType_e
-    {	kAAFTapeFormatNull	= 0,
-	kAAFBetacamFormat	= 1,
-	kAAFBetacamSPFormat	= 2,
-	kAAFVHSFormat	= 3,
-	kAAFSVHSFormat	= 4,
-	kAAF8mmFormat	= 5,
-	kAAFHi8Format	= 6
+    {
+        kAAFTapeFormatNull	= 0,
+        kAAFBetacamFormat	= 1,
+        kAAFBetacamSPFormat	= 2,
+        kAAFVHSFormat	= 3,
+        kAAFSVHSFormat	= 4,
+        kAAF8mmFormat	= 5,
+        kAAFHi8Format	= 6
     } 	aafTapeFormatType_e;
 
 typedef aafInt32 aafAttributeKind_t;
 
 typedef 
 enum _aafAttributeKind_e
-    {	kAAFNullAttribute	= 0,
-	kAAFIntegerAttribute	= 1,
-	kAAFStringAttribute	= 2,
-	kAAFObjectAttribute	= 3
+    {
+        kAAFNullAttribute	= 0,
+        kAAFIntegerAttribute	= 1,
+        kAAFStringAttribute	= 2,
+        kAAFObjectAttribute	= 3
     } 	aafAttributeKind_e;
 
 typedef aafInt32 aafPulldownKind_t;
 
 typedef 
 enum _aafPulldownKind_e
-    {	kAAFTwoThreePD	= 0,
-	kAAFPALPD	= 1,
-	kAAFOneToOneNTSC	= 2,
-	kAAFOneToOnePAL	= 3,
-	kAAFVideoTapNTSC	= 4,
-	kAAFOneToOneHDSixty	= 5,
-	kAAFTwentyFourToSixtyPD	= 6,
-	kAAFTwoToOnePD	= 7
+    {
+        kAAFTwoThreePD	= 0,
+        kAAFPALPD	= 1,
+        kAAFOneToOneNTSC	= 2,
+        kAAFOneToOnePAL	= 3,
+        kAAFVideoTapNTSC	= 4,
+        kAAFOneToOneHDSixty	= 5,
+        kAAFTwentyFourToSixtyPD	= 6,
+        kAAFTwoToOnePD	= 7
     } 	aafPulldownKind_e;
 
 typedef aafInt32 aafPhaseFrame_t;
@@ -689,8 +759,9 @@ typedef aafInt32 aafPulldownDir_t;
 
 typedef 
 enum _aafPulldownDir_e
-    {	kAAFTapeToFilmSpeed	= 0,
-	kAAFFilmToTapeSpeed	= 1
+    {
+        kAAFTapeToFilmSpeed	= 0,
+        kAAFFilmToTapeSpeed	= 1
     } 	aafPulldownDir_e;
 
 typedef struct _aafMobComment_t
@@ -703,14 +774,34 @@ typedef aafInt32 aafRGBAComponentKind_t;
 
 typedef 
 enum _aafRGBAComponentKind_e
-    {	kAAFCompNone	= 0x30,
-	kAAFCompAlpha	= 0x41,
-	kAAFCompBlue	= 0x42,
-	kAAFCompFill	= 0x46,
-	kAAFCompGreen	= 0x47,
-	kAAFCompPalette	= 0x50,
-	kAAFCompRed	= 0x52,
-	kAAFCompNull	= 0
+    {
+        kAAFCompNone	= 0x30,
+        kAAFCompAlpha	= 0x41,
+        kAAFCompBlue	= 0x42,
+        kAAFCompFill	= 0x46,
+        kAAFCompGreen	= 0x47,
+        kAAFCompPalette	= 0x50,
+        kAAFCompRed	= 0x52,
+        kAAFCompNull	= 0,
+        kAAFCompRedLSBs	= 0x72,
+        kAAFCompGreenLSBs	= 0x67,
+        kAAFCompBlueLSBs	= 0x62,
+        kAAFCompAlphaLSBs	= 0x61,
+        kAAFCompColorDifferenceU	= 0x55,
+        kAAFCompColorDifferenceV	= 0x56,
+        kAAFCompComposite	= 0x57,
+        kAAFCompNonCoSitedLuma	= 0x58,
+        kAAFCompLuma	= 0x59,
+        kAAFCompDepth	= 0x5a,
+        kAAFCompColorDifferenceULSBs	= 0x75,
+        kAAFCompColorDifferenceVLSBs	= 0x76,
+        kAAFCompCompositeLSBs	= 0x77,
+        kAAFCompNonCoSitedLumaLSBs	= 0x78,
+        kAAFCompLumaLSBs	= 0x79,
+        kAAFCompDepthLSBs	= 0x7a,
+        kAAFCompColorX	= 0xd8,
+        kAAFCompColorY	= 0xd9,
+        kAAFCompColorZ	= 0xda
     } 	aafRGBAComponentKind_e;
 
 typedef struct _aafRGBAComponent_t
@@ -728,31 +819,34 @@ typedef aafInt32 aafInterpKind_t;
 
 typedef 
 enum _aafInterpKind_e
-    {	kAAFConstInterp	= 1,
-	kAAFLinearInterp	= 2
+    {
+        kAAFConstInterp	= 1,
+        kAAFLinearInterp	= 2
     } 	aafInterpKind_e;
 
 typedef aafInt32 aafEditHint_t;
 
 typedef 
 enum _aafEditHint_e
-    {	kAAFNoEditHint	= 0,
-	kAAFProportional	= 1,
-	kAAFRelativeLeft	= 2,
-	kAAFRelativeRight	= 3,
-	kAAFRelativeFixed	= 4
+    {
+        kAAFNoEditHint	= 0,
+        kAAFProportional	= 1,
+        kAAFRelativeLeft	= 2,
+        kAAFRelativeRight	= 3,
+        kAAFRelativeFixed	= 4
     } 	aafEditHint_e;
 
 typedef aafInt32 aafProductReleaseType_t;
 
 typedef 
 enum _aafProductReleaseType_e
-    {	kAAFVersionUnknown	= 0,
-	kAAFVersionReleased	= 1,
-	kAAFVersionDebug	= 2,
-	kAAFVersionPatched	= 3,
-	kAAFVersionBeta	= 4,
-	kAAFVersionPrivateBuild	= 5
+    {
+        kAAFVersionUnknown	= 0,
+        kAAFVersionReleased	= 1,
+        kAAFVersionDebug	= 2,
+        kAAFVersionPatched	= 3,
+        kAAFVersionBeta	= 4,
+        kAAFVersionPrivateBuild	= 5
     } 	aafProductReleaseType_e;
 
 /************************************************************
@@ -803,7 +897,6 @@ typedef struct _aafProductIdentification_t
     aafProductVersion_t *productVersion;
     } 	aafProductIdentification_t;
 
-extern const aafProductVersion_t AAFReferenceImplementationVersion;
 typedef struct _aafDateStruct_t
     {
     aafInt16 year;
@@ -867,50 +960,54 @@ typedef aafInt32 aafEdgeType_t;
 
 typedef 
 enum _aafEdgeType_e
-    {	kAAFEtNull	= 0,
-	kAAFEtKeycode	= 1,
-	kAAFEtEdgenum4	= 2,
-	kAAFEtEdgenum5	= 3,
-	kAAFEtHeaderSize	= 8
+    {
+        kAAFEtNull	= 0,
+        kAAFEtKeycode	= 1,
+        kAAFEtEdgenum4	= 2,
+        kAAFEtEdgenum5	= 3,
+        kAAFEtHeaderSize	= 8
     } 	aafEdgeType_e;
 
 typedef aafInt32 aafFilmType_t;
 
 typedef 
 enum _aafFilmType_e
-    {	kAAFFtNull	= 0,
-	kAAFFt35MM	= 1,
-	kAAFFt16MM	= 2,
-	kAAFFt8MM	= 3,
-	kAAFFt65MM	= 4
+    {
+        kAAFFtNull	= 0,
+        kAAFFt35MM	= 1,
+        kAAFFt16MM	= 2,
+        kAAFFt8MM	= 3,
+        kAAFFt65MM	= 4
     } 	aafFilmType_e;
 
 typedef aafInt32 aafDirectionCode_t;
 
 typedef 
 enum _aafDirectionCode_e
-    {	kAAFDirCodeRight	= 0,
-	kAAFDirCodeUpperRight	= 1,
-	kAAFDirCodeUp	= 2,
-	kAAFDirCodeUpperLeft	= 3,
-	kAAFDirCodeLeft	= 4,
-	kAAFDirCodeLowerLeft	= 5,
-	kAAFDirCodeDown	= 6,
-	kAAFDirCodeLowerRight	= 7
+    {
+        kAAFDirCodeRight	= 0,
+        kAAFDirCodeUpperRight	= 1,
+        kAAFDirCodeUp	= 2,
+        kAAFDirCodeUpperLeft	= 3,
+        kAAFDirCodeLeft	= 4,
+        kAAFDirCodeLowerLeft	= 5,
+        kAAFDirCodeDown	= 6,
+        kAAFDirCodeLowerRight	= 7
     } 	aafDirectionCode_e;
 
 typedef aafInt32 aafColorSpace_t;
 
 typedef 
 enum _aafColorSpace_e
-    {	kAAFColorSpaceRGB	= 0,
-	kAAFColorSpaceYUV	= 1,
-	kAAFColorSpaceYIQ	= 2,
-	kAAFColorSpaceHSI	= 3,
-	kAAFColorSpaceHSV	= 4,
-	kAAFColorSpaceYCrCb	= 5,
-	kAAFColorSpaceYDrDb	= 6,
-	kAAFColorSpaceCMYK	= 7
+    {
+        kAAFColorSpaceRGB	= 0,
+        kAAFColorSpaceYUV	= 1,
+        kAAFColorSpaceYIQ	= 2,
+        kAAFColorSpaceHSI	= 3,
+        kAAFColorSpaceHSV	= 4,
+        kAAFColorSpaceYCrCb	= 5,
+        kAAFColorSpaceYDrDb	= 6,
+        kAAFColorSpaceCMYK	= 7
     } 	aafColorSpace_e;
 
 typedef struct _aafTimecode_t
@@ -946,6 +1043,13 @@ typedef struct _aafDefaultFade_t
     aafBoolean_t valid;
     } 	aafDefaultFade_t;
 
+/* Buffer descriptor */
+typedef struct _aafIOBufferDesc_t
+    {
+    aafMemPtr_t buf;
+    aafUInt32 bufSize;
+    } 	aafIOBufferDesc_t;
+
 /************************************************************
  *
  * Multiple Media Representations Criteria types
@@ -955,10 +1059,11 @@ typedef aafInt32 aafCriteriaType_t;
 
 typedef 
 enum _aafCriteriaType_e
-    {	kAAFAnyRepresentation	= 0,
-	kAAFFastestRepresentation	= 1,
-	kAAFBestFidelityRepresentation	= 2,
-	kAAFSmallestRepresentation	= 3
+    {
+        kAAFAnyRepresentation	= 0,
+        kAAFFastestRepresentation	= 1,
+        kAAFBestFidelityRepresentation	= 2,
+        kAAFSmallestRepresentation	= 3
     } 	aafCriteriaType_e;
 
 typedef struct _aafMediaCriteria_t
@@ -975,17 +1080,18 @@ typedef aafInt32 aafSearchTag_t;
 
 typedef 
 enum _aafSearchTag_e
-    {	kAAFNoSearch	= 0,
-	kAAFByMobID	= 1,
-	kAAFByMobKind	= 2,
-	kAAFByName	= 3,
-	kAAFByClass	= 4,
-	kAAFByDataDef	= 5,
-	kAAFByMediaCrit	= 6,
-	kAAFByUsageCode	= 7,
-	kAAFByMasterMobUsageCode	= 8,
-	kAAFBySourceMobUsageCode	= 9,
-	kAAFByCompositionMobUsageCode	= 10
+    {
+        kAAFNoSearch	= 0,
+        kAAFByMobID	= 1,
+        kAAFByMobKind	= 2,
+        kAAFByName	= 3,
+        kAAFByClass	= 4,
+        kAAFByDataDef	= 5,
+        kAAFByMediaCrit	= 6,
+        kAAFByUsageCode	= 7,
+        kAAFByMasterMobUsageCode	= 8,
+        kAAFBySourceMobUsageCode	= 9,
+        kAAFByCompositionMobUsageCode	= 10
     } 	aafSearchTag_e;
 
 #if 0
@@ -1024,22 +1130,24 @@ typedef aafInt32 aafDefinitionKind_t;
 
 typedef 
 enum _aafDefinitionKind_e
-    {	kAAFClassDefinition	= 1,
-	kAAFPropertyDefinition	= 2,
-	kAAFTypeDefinition	= 4,
-	kAAFDataDefinition	= 8,
-	kAAFOperationDefinition	= 16,
-	kAAFAllDefinitions	= -1
+    {
+        kAAFClassDefinition	= 1,
+        kAAFPropertyDefinition	= 2,
+        kAAFTypeDefinition	= 4,
+        kAAFDataDefinition	= 8,
+        kAAFOperationDefinition	= 16,
+        kAAFAllDefinitions	= -1
     } 	aafDefinitionKind_e;
 
 typedef aafInt32 aafDefinitionCritType_t;
 
 typedef 
 enum _aafDefinitionCritType_e
-    {	kAAFNoDefSearch	= 0,
-	kAAFByDefKind	= 1,
-	kAAFByDefName	= 2,
-	kAAFByDefClass	= 3
+    {
+        kAAFNoDefSearch	= 0,
+        kAAFByDefKind	= 1,
+        kAAFByDefName	= 2,
+        kAAFByDefClass	= 3
     } 	aafDefinitionCritType_e;
 
 typedef struct _aafDefinitionCrit_t
@@ -1057,10 +1165,11 @@ typedef aafInt32 aafIdentificationCritType_t;
 
 typedef 
 enum _aafIdentificationCritType_e
-    {	kAAFNoIdSearch	= 0,
-	kAAFByIdProductID	= 1,
-	kAAFByIdGeneration	= 2,
-	kAAFByIdRefImplVersion	= 3
+    {
+        kAAFNoIdSearch	= 0,
+        kAAFByIdProductID	= 1,
+        kAAFByIdGeneration	= 2,
+        kAAFByIdRefImplVersion	= 3
     } 	aafIdentificationCritType_e;
 
 typedef struct _aafIdentificationCrit_t
@@ -1083,20 +1192,22 @@ typedef aafInt32 aafSearchDictionaryTag_t;
 
 typedef 
 enum _aafSearchDictionaryTag_e
-    {	kAAFAllClasses	= 0,
-	kAAFByClassID	= 1,
-	kAAFByParentClassID	= 2,
-	kAAFByPropertyID	= 3,
-	kAAFByTypeID	= 4,
-	kAAFByClassName	= 5
+    {
+        kAAFAllClasses	= 0,
+        kAAFByClassID	= 1,
+        kAAFByParentClassID	= 2,
+        kAAFByPropertyID	= 3,
+        kAAFByTypeID	= 4,
+        kAAFByClassName	= 5
     } 	aafSearchDictionaryTag_e;
 
 typedef aafInt32 eAAFByteOrder_t;
 
 typedef 
 enum _eAAFByteOrder_e
-    {	kAAFByteOrderLittle	= 0,
-	kAAFByteOrderBig	= 1
+    {
+        kAAFByteOrderLittle	= 0,
+        kAAFByteOrderBig	= 1
     } 	eAAFByteOrder_e;
 
 #if 0
@@ -1132,23 +1243,24 @@ typedef aafInt32 eAAFTypeCategory_t;
 
 typedef 
 enum _eAAFTypeCategory_e
-    {	kAAFTypeCatUnknown	= 0,
-	kAAFTypeCatInt	= 1,
-	kAAFTypeCatCharacter	= 2,
-	kAAFTypeCatStrongObjRef	= 3,
-	kAAFTypeCatWeakObjRef	= 4,
-	kAAFTypeCatRename	= 5,
-	kAAFTypeCatEnum	= 6,
-	kAAFTypeCatFixedArray	= 7,
-	kAAFTypeCatVariableArray	= 8,
-	kAAFTypeCatSet	= 9,
-	kAAFTypeCatRecord	= 10,
-	kAAFTypeCatStream	= 11,
-	kAAFTypeCatString	= 12,
-	kAAFTypeCatExtEnum	= 13,
-	kAAFTypeCatIndirect	= 14,
-	kAAFTypeCatOpaque	= 15,
-	kAAFTypeCatEncrypted	= 16
+    {
+        kAAFTypeCatUnknown	= 0,
+        kAAFTypeCatInt	= 1,
+        kAAFTypeCatCharacter	= 2,
+        kAAFTypeCatStrongObjRef	= 3,
+        kAAFTypeCatWeakObjRef	= 4,
+        kAAFTypeCatRename	= 5,
+        kAAFTypeCatEnum	= 6,
+        kAAFTypeCatFixedArray	= 7,
+        kAAFTypeCatVariableArray	= 8,
+        kAAFTypeCatSet	= 9,
+        kAAFTypeCatRecord	= 10,
+        kAAFTypeCatStream	= 11,
+        kAAFTypeCatString	= 12,
+        kAAFTypeCatExtEnum	= 13,
+        kAAFTypeCatIndirect	= 14,
+        kAAFTypeCatOpaque	= 15,
+        kAAFTypeCatEncrypted	= 16
     } 	eAAFTypeCategory_e;
 
 typedef aafAlphaTransparency_t aafAlphaTransparencyType_t;
@@ -1224,6 +1336,8 @@ typedef aafMobID_t *aafMobID_constref;
 
 typedef aafVersionType_t *aafVersionType_constref;
 
+typedef aafIOBufferDesc_t *aafIOBufferDesc_constref;
+
 typedef unsigned char *aafMemConstPtr_t;
 
 typedef aafCharacter *aafCharacter_constptr;
@@ -1236,11 +1350,15 @@ typedef aafProductVersion_t *aafProductVersion_constptr;
 
 typedef aafProductIdentification_t *aafProductIdentification_constptr;
 
+typedef aafRGBAComponent_t *aafRGBAComponent_constptr;
+
 typedef aafSearchCrit_t *aafSearchCrit_constptr;
 
 typedef aafUID_t *aafUID_constptr;
 
 typedef aafMobID_t *aafMobID_constptr;
+
+typedef aafIOBufferDesc_t *aafIOBufferDesc_constptr;
 
 #endif // 0
 #if defined(__cplusplus)
@@ -1263,6 +1381,7 @@ typedef aafMobID_t *aafMobID_constptr;
 #define aafUID_constref              const aafUID_t &
 #define aafMobID_constref            const aafMobID_t &
 #define aafVersionType_constref      const aafVersionType_t &
+#define aafIOBufferDesc_constref     const aafIOBufferDesc_t &
 #else // !__cplusplus
 #define aafArgIDType_constref         const aafArgIDType_t * const
 #define aafEdgecodeHeader_constref    const aafEdgecodeHeader_t * const
@@ -1283,6 +1402,7 @@ typedef aafMobID_t *aafMobID_constptr;
 #define aafUID_constref               const aafUID_t * const
 #define aafMobID_constref             const aafMobID_t * const
 #define aafVersionType_constref       const aafVersionType_t * const
+#define aafIOBufferDesc_constref      const aafIOBufferDesc_t * const
 #endif // !__cplusplus
 #define aafMemConstPtr_t              const unsigned char *
 #define aafCharacter_constptr         const aafCharacter *
@@ -1290,9 +1410,11 @@ typedef aafMobID_t *aafMobID_constptr;
 #define aafOperationChoice_constptr   const aafOperationChoice_t *
 #define aafProductVersion_constptr    const aafProductVersion_t *
 #define aafProductIdentification_constptr const aafProductIdentification_t *
+#define aafRGBAComponent_constptr     const aafRGBAComponent_t *
 #define aafSearchCrit_constptr        const aafSearchCrit_t *
 #define aafUID_constptr               const aafUID_t *
 #define aafMobID_constptr             const aafMobID_t *
+#define aafIOBufferDesc_constptr      const aafIOBufferDesc_t *
 
 
 extern RPC_IF_HANDLE IAAFTypes_v0_0_c_ifspec;

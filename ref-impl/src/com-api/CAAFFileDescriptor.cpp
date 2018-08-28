@@ -320,8 +320,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalpCodecDef->ReleaseReference(); // We are through with this pointer.
+          internalpCodecDef = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalpCodecDef should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalpCodecDef == 0);
+
   return hr;
 }
 
@@ -575,8 +586,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalpFormat->ReleaseReference(); // We are through with this pointer.
+          internalpFormat = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalpFormat should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalpFormat == 0);
+
   return hr;
 }
 

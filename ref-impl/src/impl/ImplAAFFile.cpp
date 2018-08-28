@@ -40,6 +40,7 @@
 #include "OMUtilities.h"
 #include "OMClassFactory.h"
 #include "OMMemoryRawStorage.h"
+#include "OMExceptions.h"
 
 #ifndef OM_NO_STRUCTURED_STORAGE
 # include "OMSSStoredObjectFactory.h"
@@ -54,8 +55,9 @@
 
 #include "OMXMLStoredObjectFactory.h"
 #include "OMKLVStoredObjectFactory.h"
+
 #include "OMKLVStoredObject.h"
-#include "OMMXFStorage.h"
+#include "OMMXFStorageBase.h"
 
 #include "ImplAAFDataDef.h"
 #include "ImplAAFDictionary.h"
@@ -82,6 +84,11 @@ typedef ImplAAFSmartPointer<ImplAAFRandomRawStorage>
 
 // For IAAFRawStorage
 #include "AAF.h"
+
+// If defined RESTORE_MXF_EXTENSIONS causes MXF-specific properies
+// to be overwritten or, if they don't exist, created with the values
+// returned by Object Manager
+#define RESTORE_MXF_EXTENSIONS
 
 extern "C" const aafClassID_t CLSID_AAFRandomRawStorage;
 
@@ -126,10 +133,7 @@ inline void checkExpression(bool test, AAFRESULT r)
     throw r;
 }
 
-inline int equalUID(const aafUID_t & a, const aafUID_t & b)
-{
-  return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
-}
+
 
 //
 // Returns true if all flags set are defined flags; returns false if
@@ -252,24 +256,50 @@ ImplAAFFile::OpenExistingRead (const aafCharacter * pFileName,
 		  loadMode = OMFile::lazyLoad;
 	}
 
-	// Save the mode flags for now. They are not currently (2/4/1999) used by the
-	// OM to open the doc file. Why do we return an error if modeFlags != 0?
-	//
-	// Answer: because none of them are implemented yet.
 	_modeFlags = modeFlags;
+
+    if (!OMFile::readable(pFileName))
+      return AAFRESULT_NOT_READABLE;
 
 	//NOTE: Depending on LARGE sectors flag check encoding 
 	if (modeFlags & AAF_FILE_MODE_USE_LARGE_SS_SECTORS)
-    	  return AAFRESULT_BAD_FLAGS;
+		return AAFRESULT_BAD_FLAGS;
+
+	OMStoredObjectEncoding encoding;
+	if (OMFile::isRecognized(pFileName, encoding)) {
+		if (OMFile::isBeingModified(pFileName, encoding))
+			return AAFRESULT_FILE_BEING_MODIFIED;
+	} else {
+		return AAFRESULT_NOT_AAF_FILE;
+	}
 
 	try
 	{
-		// Ask the OM to open the file.
-		_file = OMFile::openExistingRead(pFileName,
-										 _factory,
-										 0,
+#if 0 // DICTIONARYLESSFILES
+		OMStoredObjectEncoding MXFEncoding = ENCODING(kAAFFileKind_AafKlvBinary);
+		if (encoding == MXFEncoding)
+		{
+		  HRESULT r = _factory->RegisterMetaDictionaries();
+		  if (!SUCCEEDED(r)) return r;
+		}
+#endif
+		try {
+		  // Ask the OM to open the file.
+		  _file = OMFile::openExistingRead(pFileName,
+  										 _factory,
+  										 0,
 										 loadMode,
 										 _metafactory);
+		} catch (OMException& e) {
+			delete _file;
+			_file = 0;
+			if (e.hasResult()) {
+				throw e.result();
+			} else {
+				throw AAFRESULT_BADOPEN;
+			}
+		}
+
 		checkExpression(NULL != _file, AAFRESULT_INTERNAL_ERROR);
 
 		// Restore the meta dictionary, it should be the same object
@@ -324,12 +354,28 @@ ImplAAFFile::OpenExistingRead (const aafCharacter * pFileName,
 		if (hr != AAFRESULT_SUCCESS)
 		  return hr;
 		_factory->SetEnableDefRegistration (regWasEnabled);
+		if (!_factory->IsOMStorableInitialized())
+		{
+			// Finish initialization of the OMStorable part of the dictionary
+			// for files that do not contain an AAF dictionary, such as
+			// foreign MXF files.
+			// Note the difference from initializing the dictionary object for
+			// new files: the call to InitializeOMStorable() is done _after_
+			// calling GetDictionary(). This is to ensure that when reading
+			// an existing file the dictionary is initialized from the file
+			// if the file contains it. And if the file is opened in lazy
+			// loading mode the dictionary will not be restored until it is
+			// accessed, for example, via GetDictionary().
+			_factory->InitializeOMStorable
+				  (_factory->GetBuiltinDefs()->cdDictionary());
+		}
 		dictionary->InitBuiltins();
 		dictionary->ReleaseReference();
 		dictionary = 0;
 
-		restoreMirroredMetadata();
-
+#ifdef RESTORE_MXF_EXTENSIONS
+		stat = restoreMirroredMetadata();
+#endif
 	}
 	catch (AAFRESULT &r)
 	{
@@ -355,8 +401,8 @@ ImplAAFFile::OpenExistingRead (const aafCharacter * pFileName,
 
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
-				 aafUInt32 modeFlags,
-				 aafProductIdentification_t * pIdent)
+								 aafUInt32 modeFlags,
+								 aafProductIdentification_t * pIdent)
 {
 	OMFile::OMLoadMode	loadMode = OMFile::eagerLoad;	// The default behavior
 	AAFRESULT stat = AAFRESULT_SUCCESS;
@@ -389,11 +435,10 @@ ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 		loadMode = OMFile::lazyLoad;
 	}
 
-	// Save the mode flags for now. They are not currently (2/4/1999) used by the
-	// OM to open the doc file. Why do we return an error if modeFlags != 0?
-	//
-	// Answer: because none of them are implemented yet.
 	_modeFlags = modeFlags;
+
+    if (!OMFile::modifiable(pFileName))
+      return AAFRESULT_NOT_MODIFIABLE;
 
 	// JPT REVIEW - What purpose does this serve? None that I can see.
 	//NOTE: Depending on LARGE sectors flag set encoding 
@@ -408,15 +453,37 @@ ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 	    return AAFRESULT_FILEKIND_NOT_REGISTERED;
 	}
 
+	OMStoredObjectEncoding encoding;
+	if (!OMFile::isRecognized(pFileName, encoding)) {
+		return AAFRESULT_NOT_AAF_FILE;
+	}
+
+	if (!OMFile::compatibleStoredFormat(pFileName,
+									    OMFile::modifyMode,
+									    encoding)) {
+		return AAFRESULT_FILEREV_NOT_SUPP;
+	}
+
+	if (OMFile::isBeingModified(pFileName, encoding)) {
+		return AAFRESULT_FILE_BEING_MODIFIED;
+	}
 
 	try 
 	{
+#if 0 // DICTIONARYLESSFILES
+		OMStoredObjectEncoding MXFEncoding = ENCODING(kAAFFileKind_AafKlvBinary);
+		if (encoding == MXFEncoding)
+		{
+		  HRESULT r = _factory->RegisterMetaDictionaries();
+		  if (!SUCCEEDED(r)) return r;
+		}
+#endif
 		// Ask the OM to open the file.
 		_file = OMFile::openExistingModify(pFileName,
-						   _factory,
-						   0,
-						   loadMode,
-						   _metafactory);
+										   _factory,
+										   0,
+										   loadMode,
+										   _metafactory);
 		checkExpression(NULL != _file, AAFRESULT_INTERNAL_ERROR);
 
 		// Restore the meta dictionary, it should be the same object
@@ -461,6 +528,12 @@ ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 							AAFRESULT_FILEREV_DIFF);
 		  }
 
+		// Update the file format version
+		if (sCurrentAAFObjectModelVersion)
+		  {
+			_head->SetObjectModelVersion(sCurrentAAFObjectModelVersion);
+		  }
+
 		// Now that the file is open and the header has been
 		// restored, complete the initialization of the
 		// dictionary. We obtain the dictionary via the header
@@ -470,6 +543,21 @@ ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 		if (hr != AAFRESULT_SUCCESS)
 		  return hr;
 		_factory->SetEnableDefRegistration (regWasEnabled);
+		if (!_factory->IsOMStorableInitialized())
+		{
+			// Finish initialization of the OMStorable part of the dictionary
+			// for files that do not contain an AAF dictionary, such as
+			// foreign MXF files.
+			// Note the difference from initializing the dictionary object for
+			// new files: the call to InitializeOMStorable() is done _after_
+			// calling GetDictionary(). This is to ensure that when reading
+			// an existing file the dictionary is initialized from the file
+			// if the file contains it. And if the file is opened in lazy
+			// loading mode the dictionary will not be restored until it is
+			// accessed, for example, via GetDictionary().
+			_factory->InitializeOMStorable
+				  (_factory->GetBuiltinDefs()->cdDictionary());
+		}
 		dictionary->InitBuiltins();
 		dictionary->ReleaseReference();
 		dictionary = 0;
@@ -488,8 +576,9 @@ ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 		// Now, always add the information from THIS application */
 		_head->AddIdentificationObject(pIdent);
 
-		restoreMirroredMetadata();
-
+#ifdef RESTORE_MXF_EXTENSIONS
+		stat = restoreMirroredMetadata();
+#endif
 	}
 	catch (AAFRESULT &rc)
 	{
@@ -511,16 +600,16 @@ ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 	return stat;
 }
 
+aafVersionType_t theVersion = { 1,1};
 
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFFile::OpenNewModify (const aafCharacter * pFileName,
-			    aafUID_constptr pFileKind,
-			    aafUInt32 modeFlags,
-			    aafProductIdentification_t * pIdent)
+							aafUID_constptr pFileKind,
+							aafUInt32 modeFlags,
+							aafProductIdentification_t * pIdent)
 {
 	ImplAAFContentStorage	*pCStore = NULL;
 	AAFRESULT stat = AAFRESULT_SUCCESS;
-	aafVersionType_t		theVersion = { 1, 1 };
 
 	if (! _initialized)
 		return AAFRESULT_NOT_INITIALIZED;
@@ -543,13 +632,12 @@ ImplAAFFile::OpenNewModify (const aafCharacter * pFileName,
 	if (! areAllModeFlagsSupported (modeFlags))
 	  return AAFRESULT_NOT_IN_CURRENT_VERSION;
 
+    if (!OMFile::creatable(pFileName))
+      return AAFRESULT_NOT_CREATABLE;
+
 	if (!OMFile::hasFactory(ENCODING(*pFileKind)))
 	  return AAFRESULT_FILEKIND_NOT_REGISTERED;
 
-	// modeFlags only in RawStorage API
-	// remove when implemented in NamedFile API
-	//if( modeFlags )
-	 // return AAFRESULT_NOT_IN_CURRENT_VERSION;
 
 	try
 	{
@@ -600,13 +688,12 @@ ImplAAFFile::OpenNewModify (const aafCharacter * pFileName,
 
 		// Attempt to create the file.
 		_file = OMFile::openNewModify(pFileName,
-					      _factory,
-					      0,
-					      byteOrder,
-					      _head,
-					      ENCODING(*pFileKind),
-					      _metafactory);
-
+									  _factory,
+									  0,
+									  byteOrder,
+									  _head,
+									  ENCODING(*pFileKind),
+									  _metafactory);
 		checkExpression(NULL != _file, AAFRESULT_INTERNAL_ERROR);
 
 		// Restore the meta dictionary, it should be the same object
@@ -640,8 +727,9 @@ ImplAAFFile::OpenNewModify (const aafCharacter * pFileName,
 		dictionary = 0;
 		GetRevision(&_setrev);
 
-		restoreMirroredMetadata();
-
+#ifdef RESTORE_MXF_EXTENSIONS
+		stat = restoreMirroredMetadata();
+#endif
 	}
 	catch (AAFRESULT &rc)
 	{
@@ -740,7 +828,6 @@ ImplAAFFile::OpenTransient (aafProductIdentification_t * pIdent)
 		}
 		_head->SetByteOrder(_byteOrder);
 		// FIXME FIXME - Hardcoded version!!!
-		aafVersionType_t theVersion = { 1, 1 };
 		_head->SetFileRevision (theVersion);
 		
 		ImplAAFContentStorage * pCStore = 0;
@@ -786,7 +873,7 @@ ImplAAFFile::CreateAAFFileOnRawStorage
    aafUInt32 modeFlags,
    aafProductIdentification_constptr pIdent)
 {
- 	OMFile::OMLoadMode	loadMode = OMFile::eagerLoad;	// The default behavior
+	OMFile::OMLoadMode	loadMode = OMFile::eagerLoad;	// The default behavior
 
   if (! _initialized)
 	return AAFRESULT_NOT_INITIALIZED;
@@ -805,6 +892,12 @@ ImplAAFFile::CreateAAFFileOnRawStorage
 
   if (modeFlags & AAF_FILE_MODE_LAZY_LOADING)
       loadMode = OMFile::lazyLoad;
+
+  if(existence == kAAFFileExistence_existing && pFileKind != NULL)
+    return AAFRESULT_INVALID_PARAM;
+
+  if(existence == kAAFFileExistence_new && pFileKind == NULL)
+    return AAFRESULT_NULL_PARAM;
 
   AAFRESULT hr;
   aafBoolean_t b = kAAFFalse;
@@ -858,7 +951,7 @@ ImplAAFFile::CreateAAFFileOnRawStorage
 		  pFileKind = &kAAFFileKind_DontCare;
 
 		// can specify DontCare or a required FileKind on open existing
-      if (!equalUID(*pFileKind,kAAFFileKind_DontCare) && !OMFile::hasFactory(ENCODING(*pFileKind)))
+      if ((*pFileKind) != kAAFFileKind_DontCare && !OMFile::hasFactory(ENCODING(*pFileKind)))
 	      return AAFRESULT_FILEKIND_NOT_REGISTERED;
 
 	  break;
@@ -924,7 +1017,6 @@ ImplAAFFile::CreateAAFFileOnRawStorage
 			  _byteOrder = 0x4d4d; // 'MM'
 			}
 		  _head->SetByteOrder(_byteOrder);
-		  aafVersionType_t theVersion = { 1, 1 };
 		  _head->SetFileRevision (theVersion);
 
 		  //JeffB!!! We must decide whether def-only files have a
@@ -936,7 +1028,6 @@ ImplAAFFile::CreateAAFFileOnRawStorage
 
 		  // Attempt to create the file.
 		  const OMStoredObjectEncoding aafFileEncoding = ENCODING(*pFileKind);
-		  // replaces const OMStoredObjectEncoding aafFileEncoding = *reinterpret_cast<const OMStoredObjectEncoding*> (pFileKind);
 
 		  if (kAAFFileAccess_read == access)
 			{
@@ -997,7 +1088,7 @@ ImplAAFFile::CreateAAFFileOnRawStorage
 												  _factory,
 												  0,
 												  loadMode,
-													aafFileEncoding,
+												  aafFileEncoding,
 												  _metafactory);
 			}
 		  else // read-only
@@ -1036,15 +1127,63 @@ ImplAAFFile::Open ()
   if (! _file)
 	return AAFRESULT_NOT_INITIALIZED;
 
+  if (_existence == kAAFFileExistence_existing) {
+    OMStoredObjectEncoding e;
+    if (!OMFile::isRecognized(_file->rawStorage(), e))
+      return AAFRESULT_NOT_AAF_FILE;
+
+    if (!OMFile::compatibleStoredFormat(_file->rawStorage(),
+                                        _file->accessMode(),
+                                        e))
+      return AAFRESULT_FILEREV_NOT_SUPP;
+
+    if (OMFile::isBeingModified(_file->rawStorage(), e))
+      return AAFRESULT_FILE_BEING_MODIFIED;
+
+#if 0 // DICTIONARYLESSFILES
+    OMStoredObjectEncoding MXFEncoding = ENCODING(kAAFFileKind_AafKlvBinary);
+    if (e == MXFEncoding) {
+      HRESULT r = _factory->RegisterMetaDictionaries();
+      if (!SUCCEEDED(r)) return r;
+    }
+#endif
+  }
+
   AAFRESULT stat = AAFRESULT_SUCCESS;
+
+  try {
+	  _file->open ();
+	  // _isOpen = kAAFTrue;
+  } catch (OMException& e) {
+    delete _file;
+    _file = 0;
+    if (e.hasResult()) {
+      throw e.result();
+    } else {
+      throw AAFRESULT_BADOPEN;
+    }
+  }
 
   try
 	{
-	  _file->open ();
-	  // _isOpen = kAAFTrue;
 
 	  if (kAAFFileExistence_new == _existence) // new
 		{
+		  // Restore the meta dictionary, it should be the same object
+		  // as _metafactory
+		  OMDictionary* mf = _file->dictionary();
+		  ASSERTU(mf == _metafactory);
+
+		  // Make sure all definitions are present in the meta dictionary
+		  ImplAAFMetaDictionary* d = dynamic_cast<ImplAAFMetaDictionary*>(mf);
+		  ASSERTU(d);
+		  checkResult( d->InstantiateAxiomaticDefinitions() );
+
+		  // Make sure properties that exist in builtin class
+		  // definitions but not the file's class definition,
+		  // are merged to the file's class definition.
+		  checkResult( d->MergeBuiltinClassDefs() );
+
 		  // Now that the file is open and the header has been
 		  // restored, complete the initialization of the
 		  // dictionary. We obtain the dictionary via the header
@@ -1115,12 +1254,33 @@ ImplAAFFile::Open ()
 		  if (hr != AAFRESULT_SUCCESS)
 			return hr;
 		  _factory->SetEnableDefRegistration (regWasEnabled);
+		  if (!_factory->IsOMStorableInitialized())
+		  {
+			// Finish initialization of the OMStorable part of the dictionary
+			// for files that do not contain an AAF dictionary, such as
+			// foreign MXF files.
+			// Note the difference from initializing the dictionary object for
+			// new files: the call to InitializeOMStorable() is done _after_
+			// calling GetDictionary(). This is to ensure that when reading
+			// an existing file the dictionary is initialized from the file
+			// if the file contains it. And if the file is opened in lazy
+			// loading mode the dictionary will not be restored until it is
+			// accessed, for example, via GetDictionary().
+			_factory->InitializeOMStorable
+				  (_factory->GetBuiltinDefs()->cdDictionary());
+		  }
 		  dictionary->InitBuiltins();
 		  dictionary->ReleaseReference ();
 		  dictionary = 0;
 
 		  if (IsWriteable())
 			{
+			  // Update the file format version
+			  if (sCurrentAAFObjectModelVersion)
+				{
+				  _head->SetObjectModelVersion(sCurrentAAFObjectModelVersion);
+				}
+
 			  // NOTE: If modifying an existing file WITHOUT an IDNT
 			  // object, add a dummy IDNT object to indicate that this
 			  // program was not the creator.
@@ -1141,7 +1301,9 @@ ImplAAFFile::Open ()
 		  ASSERTU (0);
 		}
 
-	  restoreMirroredMetadata();
+#ifdef RESTORE_MXF_EXTENSIONS
+		stat = restoreMirroredMetadata();
+#endif
 	}
 
   catch (AAFRESULT &r)
@@ -1155,53 +1317,14 @@ ImplAAFFile::Open ()
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFFile::Save ()
 {
-	if (! _initialized)
-		return AAFRESULT_NOT_INITIALIZED;
+	return Save(true);
+}
 
-	if (!IsOpen())
-		return AAFRESULT_NOT_OPEN;
 
-	if (! _file)
-		return AAFRESULT_NOT_OPEN;
-	if (! _file->isOpen())
-		return AAFRESULT_NOT_OPEN;
-
-	// If any new modes are added then the following line will
-	// have to be updated.
-	if (IsWriteable ()) {
-	  // Assure no registration of def objects in dictionary during
-	  // save operation
-	  ImplAAFDictionarySP dictSP;
-	  AAFRESULT hr = _head->GetDictionary(&dictSP);
-	  if (AAFRESULT_FAILED (hr))
-		return hr;
-	  dictSP->AssureClassPropertyTypes ();
-	  bool regWasEnabled = dictSP->SetEnableDefRegistration (false);
-
-	  // OMFile::save() allows us to pass a client context to be
-	  // regurgitated to the OMStorable::onSave() callback.  We'll use
-	  // it to pass the AUID of the latest generation.
-	  ImplAAFIdentificationSP pLatestIdent;
-	  hr = _head->GetLastIdentification (&pLatestIdent);
-	  if (AAFRESULT_FAILED (hr)) return hr;
-	  aafUID_t latestGen;
-	  hr = pLatestIdent->GetGenerationID (&latestGen);
-	  if (AAFRESULT_FAILED (hr)) return hr;
-
-	  saveMirroredMetadata();
-
-	  // Record the fact that this file was modified
-	  _head->SetModified();
-
-	  _file->saveFile(&latestGen);
-
-	  dictSP->SetEnableDefRegistration (regWasEnabled);
-
-	} else {
-	  return AAFRESULT_WRONG_OPENMODE;
-	}
-
-	return AAFRESULT_SUCCESS;
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFFile::SaveIntermediate ()
+{
+	return Save(false);
 }
 
 
@@ -1351,6 +1474,16 @@ ImplAAFFile::ImplAAFFile () :
 
 ImplAAFFile::~ImplAAFFile ()
 {
+	// Close() may throw but the destructor shouldn't.
+	try
+	{
+		if (IsOpen())
+			Close();
+	}
+	catch(...)
+	{
+	}
+
 	InternalReleaseObjects();
 
 	// cleanup the container.
@@ -1378,17 +1511,19 @@ void ImplAAFFile::InternalReleaseObjects()
 {
 }
 
-void ImplAAFFile::saveMirroredMetadata(void)
+AAFRESULT ImplAAFFile::saveMirroredMetadata(void)
 {
+  AAFRESULT hr = AAFRESULT_SUCCESS;
+
   ASSERTU(_file != 0);
   if (OMKLVStoredObject::hasMxfStorage(_file)) {
-    OMMXFStorage*  p_storage = OMKLVStoredObject::mxfStorage( _file );
+    OMMXFStorageBase*  p_storage = OMKLVStoredObject::mxfStorage( _file );
     ASSERTU( p_storage != 0 );
 
     // Operational pattern
     //
     aafUID_t  operational_pattern;
-    AAFRESULT hr = _head->GetOperationalPattern( &operational_pattern );
+    hr = _head->GetOperationalPattern( &operational_pattern );
     if( hr == AAFRESULT_SUCCESS )
     {
       OMKLVKey operational_pattern_label;
@@ -1399,6 +1534,8 @@ void ImplAAFFile::saveMirroredMetadata(void)
     }
     else if( hr == AAFRESULT_PROP_NOT_PRESENT )
     {
+      // Ignore the error value
+      hr = AAFRESULT_SUCCESS;
       // should set a value meaning unconstrained here
     }
 
@@ -1443,11 +1580,52 @@ void ImplAAFFile::saveMirroredMetadata(void)
           hr = AAFRESULT_SUCCESS;
       }
     }
+
+    return hr;
  }
 
-void ImplAAFFile::restoreMirroredMetadata(void)
+AAFRESULT ImplAAFFile::restoreMirroredMetadata(void)
 {
-  // tjb - nothing yet
+  AAFRESULT hr = AAFRESULT_SUCCESS;
+
+  ASSERTU(_file != 0);
+  if (OMKLVStoredObject::hasMxfStorage(_file))
+  {
+    OMMXFStorageBase*  p_storage = OMKLVStoredObject::mxfStorage( _file );
+    ASSERTU( p_storage != 0 );
+
+    ImplAAFHeader* p_header = _head;
+
+	aafUID_t  operational_pattern;
+    convert( *(OMUniqueObjectIdentification*)&operational_pattern,
+             p_storage->operationalPattern() );
+
+    hr = p_header->SetOperationalPattern( operational_pattern );
+
+
+    // EssenceContainers
+    OMMXFStorageBase::LabelSetIterator*  iter = p_storage->essenceContainerLabels();
+    while( ++(*iter) )
+    {
+        OMKLVKey  essence_container_label = iter->value();
+
+        aafUID_t  essence_container;
+        convert( *(OMUniqueObjectIdentification*)&essence_container,
+                 essence_container_label );
+
+        aafBoolean_t  present = kAAFFalse;
+        p_header->IsEssenceContainerPresent( essence_container,
+                                            &present );
+        if( !present )
+        {
+            p_header->AddEssenceContainer( essence_container );
+        }
+    }
+
+    delete iter;
+  }
+
+  return hr;
 }
 
 //***********************************************************
@@ -1618,6 +1796,60 @@ OMRawStorage * ImplAAFFile::RawStorage ()
   return r;
 }
 
+AAFRESULT ImplAAFFile::Save (bool finalize)
+{
+	if (! _initialized)
+		return AAFRESULT_NOT_INITIALIZED;
+
+	if (!IsOpen())
+		return AAFRESULT_NOT_OPEN;
+
+	if (! _file)
+		return AAFRESULT_NOT_OPEN;
+	if (! _file->isOpen())
+		return AAFRESULT_NOT_OPEN;
+
+	// If any new modes are added then the following line will
+	// have to be updated.
+	if (IsWriteable ()) {
+	  // Assure no registration of def objects in dictionary during
+	  // save operation
+	  ImplAAFDictionarySP dictSP;
+	  AAFRESULT hr = _head->GetDictionary(&dictSP);
+	  if (AAFRESULT_FAILED (hr))
+		return hr;
+	  dictSP->AssureClassPropertyTypes ();
+	  bool regWasEnabled = dictSP->SetEnableDefRegistration (false);
+
+	  // OMFile::save() allows us to pass a client context to be
+	  // regurgitated to the OMStorable::onSave() callback.  We'll use
+	  // it to pass the AUID of the latest generation.
+	  ImplAAFIdentificationSP pLatestIdent;
+	  hr = _head->GetLastIdentification (&pLatestIdent);
+	  if (AAFRESULT_FAILED (hr)) return hr;
+	  aafUID_t latestGen;
+	  hr = pLatestIdent->GetGenerationID (&latestGen);
+	  if (AAFRESULT_FAILED (hr)) return hr;
+
+	  hr = saveMirroredMetadata();
+	  if (AAFRESULT_FAILED (hr))
+		return hr;
+
+	  // Record the fact that this file was modified
+	  _head->SetModified();
+
+	  _file->saveFile(finalize, &latestGen);
+
+	  dictSP->SetEnableDefRegistration (regWasEnabled);
+
+	} else {
+	  return AAFRESULT_WRONG_OPENMODE;
+	}
+
+	return AAFRESULT_SUCCESS;
+}
+
+
 // The default structured storage encodings ids from the point of view
 // of the OM.
 #define AAF512Encoding ENCODING(kAAFFileKind_Aaf512Binary)
@@ -1744,4 +1976,5 @@ void ImplAAFFile::registerFactories(void)
                                                        AAFKLVEncoding,
                                                        L"KLV",
                                                        L"AAF KLV"));
+
 }

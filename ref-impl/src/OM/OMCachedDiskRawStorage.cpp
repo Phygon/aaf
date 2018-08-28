@@ -249,7 +249,7 @@ bool OMCachedDiskRawStorage::isReadable(void) const
     result = true;
   } else {
     result = false;
-}
+  }
   return result;
 }
 
@@ -263,7 +263,7 @@ bool OMCachedDiskRawStorage::isWritable(void) const
     result = true;
   } else {
     result = false;
-}
+  }
   return result;
 }
 
@@ -342,4 +342,98 @@ OMCachedDiskRawStorage::OMCachedDiskRawStorage(OMStream* file,
 {
   TRACE("OMCachedDiskRawStorage::OMCachedDiskRawStorage");
   PRECONDITION("Valid file", _file != 0);
+}
+
+void OMCachedDiskRawStorage::streamReadAt(OMUInt64 position,
+                                          OMByte* bytes,
+                                          OMUInt32 byteCount,
+                                          OMUInt32& bytesRead) const
+{
+  TRACE("OMCachedDiskRawStorage::streamReadAt");
+  readAt(position, bytes, byteCount, bytesRead);
+}
+
+void OMCachedDiskRawStorage::streamReadAt(OMUInt64 position,
+                                          OMIOBufferDescriptor* buffers,
+                                          OMUInt32 bufferCount,
+                                          OMUInt32& bytesRead) const
+{
+  TRACE("OMCachedDiskRawStorage::streamReadAt");
+
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount != 0);
+
+  OMUInt32 totalBytesRead = 0;
+  OMUInt64 pos = position;
+  for (OMUInt32 i = 0; i < bufferCount; i++) {
+    OMUInt32 readCount;
+    readAt(pos, buffers[i]._buffer, buffers[i]._bufferSize, readCount);
+    pos = pos + readCount;
+    totalBytesRead = totalBytesRead + readCount;
+    if (readCount != buffers[i]._bufferSize) {
+      break;
+    }
+  }
+  bytesRead = totalBytesRead;
+}
+
+void OMCachedDiskRawStorage::streamReadAt(
+                                        OMUInt64 /* position */,
+                                        OMByte* /* buffer */,
+                                        const OMUInt32 /* bytes */,
+                                        void* /* */ /* completion */,
+                                        const void* /* clientArgument */) const
+{
+  TRACE("OMCachedDiskRawStorage::streamReadAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMCachedDiskRawStorage::streamReadAt(
+                                        OMUInt64 /* position */,
+                                        OMIOBufferDescriptor* /* buffers */,
+                                        OMUInt32 /* bufferCount */,
+                                        void* /* */ /* completion */,
+                                        const void* /* clientArgument */) const
+{
+  TRACE("OMCachedDiskRawStorage::streamReadAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMCachedDiskRawStorage::streamWriteAt(OMUInt64 position,
+                                           const OMByte* bytes,
+                                           OMUInt32 byteCount,
+                                           OMUInt32& bytesWritten)
+{
+  TRACE("OMCachedDiskRawStorage::streamWriteAt");
+  writeAt(position, bytes, byteCount, bytesWritten);
+}
+
+void OMCachedDiskRawStorage::streamWriteAt(OMUInt64 /* position */,
+                                           OMIOBufferDescriptor* /* buffers */,
+                                           OMUInt32 /* bufferCount */,
+                                           OMUInt32& /* bytesWritten */)
+{
+  TRACE("OMCachedDiskRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMCachedDiskRawStorage::streamWriteAt(OMUInt64 /* position */,
+                                           const OMByte* /* buffer */,
+                                           const OMUInt32 /* bytes */,
+                                           void* /* */ /* completion */,
+                                           const void* /* clientArgument */)
+{
+  TRACE("OMCachedDiskRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
+}
+
+void OMCachedDiskRawStorage::streamWriteAt(
+                                     OMUInt64 /* position */,
+                                     const OMIOBufferDescriptor* /* buffers */,
+                                     OMUInt32 /* bufferCount */,
+                                     void* /* */ /* completion */,
+                                     const void* /* clientArgument */)
+{
+  TRACE("OMCachedDiskRawStorage::streamWriteAt");
+  ASSERT("Unimplemented code not reached", false);
 }

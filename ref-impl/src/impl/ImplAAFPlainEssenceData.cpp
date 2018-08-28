@@ -40,17 +40,13 @@
 
 
 ImplAAFPlainEssenceData::ImplAAFPlainEssenceData ()
-: _mediaDataContainer(0),
-  _mediaDataFilter(0)
+: _mediaDataContainer(0)
 {
 }
 
 
 ImplAAFPlainEssenceData::~ImplAAFPlainEssenceData ()
 {
-  delete _mediaDataFilter;
-  _mediaDataFilter = 0;
-
   if (_mediaDataContainer)
   {
     _mediaDataContainer->ReleaseReference();
@@ -78,8 +74,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (!_mediaDataContainer->persistent())
     return AAFRESULT_OBJECT_NOT_PERSISTENT;
   
-  ASSERTU(_mediaDataFilter);
-  _mediaDataFilter->write(buffer, bytes, *bytesWritten);
+  _mediaDataContainer->mediaDataFilter()->write(buffer, bytes, *bytesWritten);
   if (0 < bytes && 0 == *bytesWritten)
     return AAFRESULT_CONTAINERWRITE;
 
@@ -99,8 +94,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (!_mediaDataContainer->persistent())
     return AAFRESULT_OBJECT_NOT_PERSISTENT;
   
-  ASSERTU(_mediaDataFilter);
-  _mediaDataFilter->read(buffer, bytes, *bytesRead);
+  _mediaDataContainer->mediaDataFilter()->read(buffer, bytes, *bytesRead);
   if (0 < bytes && 0 == *bytesRead)
     return AAFRESULT_END_OF_DATA;
 
@@ -116,9 +110,8 @@ AAFRESULT STDMETHODCALLTYPE
   if (!_mediaDataContainer->persistent())
     return AAFRESULT_OBJECT_NOT_PERSISTENT;
 
-  ASSERTU(_mediaDataFilter);
   OMUInt64 tmpOffset = offset;
-  _mediaDataFilter->setPosition(tmpOffset);
+  _mediaDataContainer->mediaDataFilter()->setPosition(tmpOffset);
 
   return AAFRESULT_SUCCESS;
 }
@@ -134,9 +127,8 @@ AAFRESULT STDMETHODCALLTYPE
   if (!_mediaDataContainer->persistent())
     return AAFRESULT_OBJECT_NOT_PERSISTENT;
 
-  ASSERTU(_mediaDataFilter);
   OMUInt64 tmpOffset;
-  tmpOffset = _mediaDataFilter->position();
+  tmpOffset = _mediaDataContainer->mediaDataFilter()->position();
   *pOffset = tmpOffset;
 
   return AAFRESULT_SUCCESS;
@@ -153,8 +145,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (!_mediaDataContainer->persistent())
     return AAFRESULT_OBJECT_NOT_PERSISTENT;
 
-  ASSERTU(_mediaDataFilter);
-  *pSize = _mediaDataFilter->size();
+  *pSize = _mediaDataContainer->mediaDataFilter()->size();
 
   return AAFRESULT_SUCCESS;
 }
@@ -250,9 +241,6 @@ AAFRESULT STDMETHODCALLTYPE
 
   _mediaDataContainer = pRawEssenceData;
   _mediaDataContainer->AcquireReference();
-
-  _mediaDataFilter = pRawEssenceData->createMediaDataFilter();
-  ASSERTU(_mediaDataFilter);
 
 
   return AAFRESULT_SUCCESS;

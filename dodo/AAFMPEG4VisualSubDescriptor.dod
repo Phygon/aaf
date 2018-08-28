@@ -1,0 +1,456 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFMPEG4VisualSubDescriptor\
+#endm
+#c
+#startm .parent-module 0
+AAFSubDescriptor\
+#endm
+#c
+#c #import ./AAFSubDescriptor.exp
+AD_HEAD
+AD_IDL(///
+/// The IAAFMPEG4VisualSubDescriptor interface is implemented by objects which
+/// describe MPEG-4 visual essence.
+///
+/// In addition to the specific error results listed for each method\,
+/// all methods in this interface may also return one of the following
+/// values:
+/// 
+/// AAFRESULT_NOMEMORY
+///   - insufficient system memory is available to perform the
+///     operation.
+///)
+AD_CLASS_UUID(5AB8E204, AB5E, 441C, 97, F3, 67, 15, 92, 9A, 2E, 01)
+
+AD_DEFAULT_UUID(DB76B59F, 59C2, 49C0, 85, DF, 4C, 84, 34, 7A, 70, 83)
+AD_XCLASS_BEGIN(Concrete, StoredObject)
+AD_METHOD0(Initialize,
+		   Initializes a newly allocated\, IAAFMPEG4VisualSubDescriptor-supporting
+  /// object. This method must be called after allocation\, and before
+  /// any other method can be called.
+  ///
+  /// Succeeds if:
+  /// - Initialize\(\) has not yet been called on this object.
+  ///
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect\, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  \(This is the only code indicating success.\)
+  ///
+  /// AAFRESULT_ALREADY_INITIALIZED
+  ///   - Initialize\(\) has already been called on this object.)
+
+
+AD_XMETHOD1(SetSingleSequence,
+            [in],
+                objPass,
+                aafBoolean_t,
+                singleSequence,
+            True if all configuration information in the essence stream are identical except vbv_occupancy. False if there are differences among configuration information within the Essence stream except vbv_occupancy.,
+
+     Set the flag specifying if all configuration information in the essence stream
+  /// are identical except vbv_occupancy.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MPEG4VisualSingleSequence property will not be
+  /// changed.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT)
+
+
+AD_XMETHOD1(GetSingleSequence,
+            [out],
+                objPass,
+                aafBoolean_t *,
+                pSingleSequence,
+            True if all configuration information in the essence stream are identical except vbv_occupancy. False if there are differences among configuration information within the Essence stream except vbv_occupancy.,
+
+     Get the flag specifying if all configuration information in the essence stream
+  /// are identical except vbv_occupancy.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pSingleSequence pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pSingleSequence.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(If pSingleSequence\))
+
+
+AD_XMETHOD1(SetConstantBVOPs,
+            [in],
+                objPass,
+                aafBoolean_t,
+                constantBVOPs,
+            True if the number of B-VOPs is always constant.,
+
+     Set the flag specifying if the number of B-VOPs is always constant.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MPEG4VisualConstantBVOPs property will not be
+  /// changed.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT)
+
+
+AD_XMETHOD1(GetConstantBVOPs,
+            [out],
+                objPass,
+                aafBoolean_t *,
+                pConstantBVOPs,
+            True if the number of B-VOPs is always constant.,
+
+     Get the flag specifying if the number of B-VOPs is always constant.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pConstantBVOPs pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pConstantBVOPs.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(If pConstantBVOPs\))
+
+
+AD_XMETHOD1(SetCodedContentType,
+            [in],
+                objPass,
+                aafMPEG4VisualCodedContentType_t,
+                codedContentType,
+            coded content kind.,
+
+     Set coded content kind.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MPEG4VisualCodedContentType property will not be
+  /// changed.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT)
+
+
+AD_XMETHOD1(GetCodedContentType,
+            [out],
+                objPass,
+                aafMPEG4VisualCodedContentType_t *,
+                pCodedContentType,
+            coded content kind.,
+
+     Get coded content kind.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pCodedContentType pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pCodedContentType.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(If pCodedContentType\))
+
+
+AD_XMETHOD1(SetLowDelay,
+            [in],
+                objPass,
+                aafBoolean_t,
+                lowDelay,
+            True if the VOL contains no B-VOPs.,
+
+     Set the flag specifying if the VOL contains no B-VOPs.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MPEG4VisualLowDelay property will not be
+  /// changed.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT)
+
+
+AD_XMETHOD1(GetLowDelay,
+            [out],
+                objPass,
+                aafBoolean_t *,
+                pLowDelay,
+            True if the VOL contains no B-VOPs.,
+
+     Get the flag specifying if the VOL contains no B-VOPs.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pLowDelay pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pLowDelay.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(If pLowDelay\))
+
+
+AD_XMETHOD1(SetClosedGOV,
+            [in],
+                objPass,
+                aafBoolean_t,
+                closedGOV,
+            True if closed_gov is set in all GOV headers.,
+
+     Set the flag specifying if closed_gov is set in all GOV headers.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MPEG4VisualClosedGOV property will not be
+  /// changed.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT)
+
+
+AD_XMETHOD1(GetClosedGOV,
+            [out],
+                objPass,
+                aafBoolean_t *,
+                pClosedGOV,
+            True if closed_gov is set in all GOV headers.,
+
+     Get the flag specifying if closed_gov is set in all GOV headers.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pClosedGOV pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pClosedGOV.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(If pClosedGOV\))
+
+
+AD_XMETHOD1(SetIdenticalGOV,
+            [in],
+                objPass,
+                aafBoolean_t,
+                identicalGOV,
+            True if every GOV in the sequence is constructed the same.,
+
+     Set the flag specifying if every GOV in the sequence is constructed the same.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MPEG4VisualIdenticalGOV property will not be
+  /// changed.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT)
+
+
+AD_XMETHOD1(GetIdenticalGOV,
+            [out],
+                objPass,
+                aafBoolean_t *,
+                pIdenticalGOV,
+            True if every GOV in the sequence is constructed the same.,
+
+     Get the flag specifying if every GOV in the sequence is constructed the same.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pIdenticalGOV pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pIdenticalGOV.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(If pIdenticalGOV\))
+
+
+AD_XMETHOD1(SetMaxGOV,
+            [in],
+                objPass,
+                aafUInt16,
+                maxGOV,
+            The maximum occurring spacing between I frames.,
+
+     Set the maximum occurring spacing between I frames.
+  /// A value of 0 or the absence of this property implies no limit to
+  // the maximum GOV or the maximum GOV is unknown.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MPEG4VisualMaxGOV property will not be
+  /// changed.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT)
+
+
+AD_XMETHOD1(GetMaxGOV,
+            [out],
+                objPass,
+                aafUInt16 *,
+                pMaxGOV,
+            The maximum occurring spacing between I frames.,
+
+     Get the maximum occurring spacing between I frames.
+  /// A value of 0 or the absence of this property implies no limit to
+  // the maximum GOV or the maximum GOV is unknown.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pMaxGOV pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pMaxGOV.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(If pMaxGOV\))
+
+
+AD_XMETHOD1(SetBVOPCount,
+            [in],
+                objPass,
+                aafUInt16,
+                bvopCount,
+            The maximum number of B-VOPs between P or I-VOPs.,
+
+     Set the maximum occurring spacing between I frames.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MPEG4VisualBVOPCount property will not be
+  /// changed.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT)
+
+
+AD_XMETHOD1(GetBVOPCount,
+            [out],
+                objPass,
+                aafUInt16 *,
+                pBVOPCount,
+            The maximum number of B-VOPs between P or I-VOPs.,
+
+     Get the maximum occurring spacing between I frames.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pBVOPCount pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pBVOPCount.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(If pBVOPCount\))
+
+
+AD_XMETHOD1(SetBitRate,
+            [in],
+                objPass,
+                aafUInt32,
+                bitRate,
+            The maximum bit rate of the MPEG-4 Visual stream.,
+
+     Set the maximum bit rate of the MPEG-4 Visual stream in bits per second.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MPEG4VisualBitRate property will not be
+  /// changed.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT)
+
+
+AD_XMETHOD1(GetBitRate,
+            [out],
+                objPass,
+                aafUInt32 *,
+                pBitRate,
+            The maximum bit rate of the MPEG-4 Visual stream.,
+
+     Get the maximum bit rate of the MPEG-4 Visual stream in bits per second.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pBitRate pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pBitRate.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(If pBitRate\))
+
+
+AD_XMETHOD1(SetProfileAndLevel,
+            [in],
+                objPass,
+                aafUInt8,
+                profileAndLevel,
+            The MPEG-4 visual profile and level.,
+
+     Set the MPEG-4 visual profile and level.
+  /// The meaning of the bits is given in Table G.1 of ISO/IEC 14496-2.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// 
+  /// If this method fails the MPEG4VisualProfileAndLevel property will not be
+  /// changed.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT)
+
+
+AD_XMETHOD1(GetProfileAndLevel,
+            [out],
+                objPass,
+                aafUInt8 *,
+                pProfileAndLevel,
+            The MPEG-4 visual profile and level.,
+
+     Get the MPEG-4 visual profile and level.
+  /// The meaning of the bits is given in Table G.1 of ISO/IEC 14496-2.
+  /// 
+  /// Succeeds if all of the following are true:
+  /// - the object is initialized.
+  /// - the pProfileAndLevel pointer is valid.
+  /// 
+  /// If this method fails nothing will be written to *pProfileAndLevel.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_NO_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(If pProfileAndLevel\))
+
+
+AD_XCLASS_END(Concrete, StoredObject)

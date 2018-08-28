@@ -97,7 +97,6 @@
 #include "ImplAAFTaggedValueUtil.h"
 
 #include "OMAssertions.h"
-#include <string.h>
 #include <wchar.h>
 #include "AAFResult.h"
 #include "AAFComponentVisitor.h"
@@ -140,7 +139,6 @@ ImplAAFMob::ImplAAFMob ()
 	(void)aafMobIDNew(&_mobID);		// Move this out of constructor when we get 2-stage create
 	AAFGetDateTime(&_creationTime);
 	AAFGetDateTime(&_lastModified);
-	::memset( &_clsid, 0, sizeof( aafClassID_t ) );
 }
 
 
@@ -176,7 +174,7 @@ ImplAAFMob::~ImplAAFMob ()
 		{
 			ImplAAFKLVData* pKLVData = _KLVData.clearValueAt(j);
 			if (pKLVData)
-			  pKLVData->ReleaseReference(); 
+			  pKLVData->ReleaseReference();
 			pKLVData = 0;
 		}
 	}
@@ -509,7 +507,7 @@ AAFRESULT STDMETHODCALLTYPE
 				}	
 				else if(hr== AAFRESULT_MOB_NOT_FOUND)
 				{
-				    CHECK(cstore->RemoveMob(this));
+					CHECK(cstore->RemoveMob(this));
 					_mobID = newMobID;
 					CHECK(cstore->AddMob(this));
 				}
@@ -753,7 +751,7 @@ AAFRESULT STDMETHODCALLTYPE
                            ImplAAFSegment * pSegment,
                            aafSlotID_t  slotID,
                            aafCharacter_constptr  pSlotName,
-                           aafPosition_t  origin,
+                           aafPosition_t  /*origin*/,
                            ImplAAFEventMobSlot ** ppNewSlot)
 {
 	ImplAAFEventMobSlot	*aSlot = NULL;
@@ -1266,221 +1264,6 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
-// trr: Does this method only work for AAFSourceMobs? If so we should probably move
-// it the AAFSourceMob.dod.
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::OffsetToTimecode (aafSlotID_t*slotID,
-                           aafPosition_t *  offset,
-                           aafTimecode_t *  result)
-{
-	ImplAAFTimelineMobSlot	*slot = NULL;
-	ImplAAFSegment			*seg = NULL;
-	aafTimecode_t 			timecode;
-	aafMediaCriteria_t		mediaCrit;
-	ImplAAFFindSourceInfo	*sourceInfo = NULL;
-	aafRational_t			editRate;
-	aafPosition_t			frameOffset64;
-	ImplEnumAAFMobSlots		*slotIter = NULL;
-	ImplAAFDataDef			*dataDef = NULL;
-	ImplAAFMob				*tapeMob = NULL;
-
-  // Validate input pointers...
-  if (NULL == slotID || NULL == offset || NULL == result)
-    return (AAFRESULT_NULL_PARAM);
-
-  memset(result, 0, sizeof(aafTimecode_t));
-	memset(&timecode, 0, sizeof(aafTimecode_t));
-	result->startFrame = 0;
-	
-	XPROTECT()
-	{
-
-		mediaCrit.type = kAAFAnyRepresentation;
-		CHECK(InternalSearchSource(*slotID, *offset, kAAFTapeMob,
-			&mediaCrit, NULL, &sourceInfo));
-		
-		CHECK(sourceInfo->GetMob(&tapeMob));
-		CHECK(tapeMob->GetSlots (&slotIter));
-		while(slotIter->NextOne((ImplAAFMobSlot**)&slot) == AAFRESULT_SUCCESS)
-		{
-			CHECK(slot->GetEditRate(&editRate));
-			CHECK(slot->GetSegment(&seg));
-			slot->ReleaseReference();
-			slot = NULL;
-			/* Verify that it's a timecode slot by looking at the
-			* datadef of the slot segment.
-			*/
-			CHECK(seg->GetDataDef(&dataDef));
-			aafBool	isTimecode = kAAFFalse;
-			CHECK(dataDef->IsTimecodeKind(&isTimecode));
-			if (isTimecode)
-			{
-				/* Assume found at this point, so finish generating result */
-//!!!				CHECK(AAFConvertEditRate(sourceInfo.editrate, sourceInfo.position,
-//					editRate, kRoundCeiling, &frameOffset64));
-				
-				CHECK(tapeMob->OffsetToMobTimecode(seg, &frameOffset64, &timecode));
-				dataDef->ReleaseReference();
-				dataDef = NULL;
-				break;
-			}
-			dataDef->ReleaseReference();
-			dataDef = NULL;
-		} /* for */
-		tapeMob->ReleaseReference();
-		tapeMob = NULL;
-		slotIter->ReleaseReference();
-		slotIter = NULL;
-    sourceInfo->ReleaseReference();
-		
-		
-		*result = timecode;
-	} /* XPROTECT */
-	XEXCEPT
-	{
-		if (tapeMob)
-		  dataDef->ReleaseReference();
-		dataDef = 0;
-		if (dataDef)
-		  dataDef->ReleaseReference();
-		dataDef = 0;
-		if (slotIter)
-		  slotIter->ReleaseReference();
-		slotIter = 0;
-		if (slot)
-		  slot->ReleaseReference();
-		slot = 0;
-    if (sourceInfo)
-      sourceInfo->ReleaseReference();
-    sourceInfo = NULL;
-	}
-	XEND;
-	
-	return(AAFRESULT_SUCCESS);
-}
-
-
-// trr: Does this method only work for AAFSourceMobs? If so we should probably move
-// it the AAFSourceMob.dod.
-AAFRESULT STDMETHODCALLTYPE
-    ImplAAFMob::TimecodeToOffset (aafTimecode_t  timecode,
-                           aafSlotID_t  slotID,
-                           aafFrameOffset_t *  result)
-{
-	ImplEnumAAFMobSlots *iterHdl = NULL;
-	ImplEnumAAFComponents *sequIter = NULL;
-	ImplAAFMobSlot *slot = NULL;
-	ImplAAFTimelineMobSlot *timelineSlot = NULL;
-	ImplAAFPulldown *pdwn = NULL;
-	ImplAAFSegment *seg = NULL;
-	ImplAAFSegment *pdwnInput = NULL;
-	aafPosition_t zero;
-	aafBool found = kAAFFalse;
-	aafRational_t	editRate;
-	ImplAAFFindSourceInfo	*sourceInfo = NULL;
-	ImplAAFMob	*tapeMob = NULL;
-
-  // Validate input pointer...
-  if (NULL == result)
-    return (AAFRESULT_NULL_PARAM);
-
-	zero = 0;
-	
-	XPROTECT()
-	{
-		CHECK(InternalSearchSource(slotID, zero, kAAFTapeMob,
-			NULL /* mediaCrit */, NULL, &sourceInfo));
-		
-		CHECK(sourceInfo->GetMob(&tapeMob));
-		CHECK(tapeMob->GetSlots(&iterHdl));
-		while(iterHdl->NextOne(&slot) == AAFRESULT_SUCCESS)
-		{
-			timelineSlot = dynamic_cast<ImplAAFTimelineMobSlot*>(slot);
-			if(timelineSlot != NULL)
-			{
-				CHECK(timelineSlot->GetEditRate(&editRate));
-				CHECK(timelineSlot->GetSegment(&seg));
-			
-				if(seg->SegmentTCToOffset(&timecode, &editRate, result) == AAFRESULT_SUCCESS)
-					found = kAAFTrue;
-				
-				timelineSlot->ReleaseReference();
-				timelineSlot = NULL;
-				seg->ReleaseReference();
-				seg = NULL;
-			}
-			
-			slot->ReleaseReference();
-			slot = NULL;
-		}
-		
-		if(!found)
-		{
-			RAISE(AAFRESULT_TIMECODE_NOT_FOUND);
-		}
-		
-		/* Release reference, so the useCount is decremented */
-		tapeMob->ReleaseReference();	
-		tapeMob = NULL;
-		sourceInfo->ReleaseReference();	
-		sourceInfo = NULL;
-		iterHdl->ReleaseReference();
-		iterHdl = NULL;
-		if(sequIter != NULL)
-		{
-			sequIter->ReleaseReference();
-			sequIter = NULL;
-		}
-		if(pdwn != NULL)
-		{
-			pdwn->ReleaseReference();
-			pdwn = NULL;
-		}
-		if(seg != NULL)
-		{
-			seg->ReleaseReference();
-			seg = NULL;
-		}
-		if(pdwnInput != NULL)
-		{
-			pdwnInput->ReleaseReference();
-			pdwnInput = NULL;
-		}
-	}
-	
-	XEXCEPT
-	{
-		if (tapeMob)
-		  tapeMob->ReleaseReference();	
-		tapeMob = 0;
-		if (sourceInfo)
-		  sourceInfo->ReleaseReference();	
-		sourceInfo = 0;
-		if(iterHdl != NULL)
-		  iterHdl->ReleaseReference();
-		iterHdl = 0;
-		if(sequIter != NULL)
-		  sequIter->ReleaseReference();
-		sequIter = 0;
-		if(slot != NULL)
-		  slot->ReleaseReference();
-		slot = 0;
-		if(pdwn != NULL)
-		  pdwn->ReleaseReference();
-		pdwn = 0;
-		if(seg != NULL)
-		  seg->ReleaseReference();
-		seg = 0;
-		if(pdwnInput != NULL)
-		  pdwnInput->ReleaseReference();
-		pdwnInput = 0;
-	}
-	XEND;
-	
-	return(AAFRESULT_SUCCESS);
-}
-
-
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFMob::Copy (const aafCharacter *  destMobName,
                            ImplAAFMob ** destMob)
@@ -1509,6 +1292,7 @@ AAFRESULT STDMETHODCALLTYPE
 		CHECK( spHeader->AddMob(newMob) );
 
 		deepCopyTo( newMob, 0 );
+		newMob->onCopy( 0 );
 
  		// newMob created by shallowCopy() is already reference counted.
 		*destMob = newMob;
@@ -1595,6 +1379,63 @@ AAFRESULT STDMETHODCALLTYPE
 		return AAFRESULT_NULL_PARAM;
         }
 
+	const aafBoolean_t deferEssenceAndMetadataStreams = kAAFFalse;
+	return CloneExternalAdvanced(resolveDependencies,
+						includeMedia, 
+						deferEssenceAndMetadataStreams,
+						destFile,
+						destMob);
+}
+
+ /*************************************************************************
+ * Function: CloneExternalAdvanced()
+ *
+ *      This function clones the given mob in the source file into
+ *      a destination mob in the destination file with the same Mob ID.
+ *      If resolveDependencies is kAAFTrue, it will also clone all mobs 
+ *      referenced by the given source mob. 
+ *
+ *      If includeMedia is kAAFTrue, it will also copy the media data 
+ *      associated with the source mob.  The destination mob is
+ *      returned. All private data is also cloned.
+ *
+ *      If deferStreams is kAAFTrue, it will defer copying contents of
+ *      media and metadata streams until the destFile is saved. In this
+ *      case the file that contains this Mob must remain open the save
+ *      the save is complete.
+ *
+ * Argument Notes:
+ *
+ * ReturnValue:
+ *		Error code (see below).
+ *
+ * Possible Errors:
+ *		Standard errors (see top of file).
+ *************************************************************************/
+AAFRESULT STDMETHODCALLTYPE
+   ImplAAFMob::CloneExternalAdvanced (aafDepend_t  resolveDependencies,
+			      aafIncMedia_t  includeMedia,
+				  aafBoolean_t deferStreams,
+			      ImplAAFFile * destFile,
+			      ImplAAFMob ** destMob)
+{
+	if(destFile == NULL)
+        {
+		return AAFRESULT_NULL_PARAM;
+        }
+	if(destMob == NULL)
+        {
+		return AAFRESULT_NULL_PARAM;
+        }
+	if(kAAFIncludeMedia == includeMedia && deferStreams)
+        {
+		// The current implementation keeps deferred streams in memory.
+		// Essence and index streams are more likely to be very large
+		// compared to metadata streams and are not suitable for storing
+		// in memory.
+		return AAFRESULT_NOT_IMPLEMENTED;
+        }
+
 
 	HRESULT hr = AAFRESULT_SUCCESS;
 
@@ -1638,7 +1479,13 @@ AAFRESULT STDMETHODCALLTYPE
 					CHECK( destFile->GetHeader(&spDstHeader) );
 					CHECK( spDstHeader->AddEssenceData(pNewEssenceData) );
 
-					spEssenceData->deepCopyTo( pNewStorable, 0 );
+					ASSERTU(deferStreams == kAAFFalse);
+					spEssenceData->deepCopyTo( pNewStorable, 0, false );
+					pNewStorable->onCopy( 0 );
+
+					// pNewEssenceData created by shallowCopy() is reference counted.
+					pNewEssenceData->ReleaseReference();
+					pNewEssenceData = NULL;
 				}
 			}
 
@@ -1687,7 +1534,9 @@ AAFRESULT STDMETHODCALLTYPE
 			CHECK( destFile->GetHeader(&spDstHeader) );
 			CHECK( spDstHeader->AddMob(pNewMob) );
 
-			deepCopyTo( pNewStorable, 0 );
+			const bool deferStreamData = (deferStreams ? true : false);
+			deepCopyTo( pNewStorable, 0, deferStreamData );
+			pNewStorable->onCopy( 0 );
 
 			// pNewMob created by shallowCopy() is already reference counted.
 			*destMob = pNewMob;
@@ -1839,10 +1688,12 @@ ImplAAFMob::AddPhysSourceRef (aafAppendOption_t  addType,
 */
 AAFRESULT ImplAAFMob::InternalSearchSource(	
 										   aafSlotID_t trackID,
+										   aafUInt32 channelID,
 										   aafPosition_t offset,
 										   aafMobKind_t mobKind,
 										   aafMediaCriteria_t *pMediaCrit,
 										   aafOperationChoice_t *pOperationChoice,
+										   aafRounding_t editRateConversion,
 										   ImplAAFFindSourceInfo **ppSourceInfo)
 {
 	ImplAAFMobSlot 			*track = NULL;
@@ -1856,6 +1707,8 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 	aafLength_t				cpntLen, nextLen, minLength, newLen;
 	ImplAAFPulldown			*pulldownObj = NULL;
 	aafSlotID_t				nextTrackID;
+	bool					nextHasChannelIDs = false;
+	aafUInt32				nextChannelID = kDistinguishedChannelID;
 	ImplAAFFindSourceInfo	*sourceInfo = NULL ;
 	ImplAAFComponent		*leafObj = NULL;
 	ImplAAFOperationGroup	*effeObject = NULL;
@@ -1867,15 +1720,13 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 	sourceInfo = (ImplAAFFindSourceInfo *)CreateImpl(CLSID_AAFFindSourceInfo);
 	if (NULL == sourceInfo)
 		return (AAFRESULT_NOMEMORY);
-	sourceInfo->AcquireReference();		// This will be passed out
-	*ppSourceInfo = sourceInfo;
 	sourceInfo->Clear();
 	
 	XPROTECT()
 	{
 		/* Find segment at offset */
 		CHECK(FindSlotBySlotID (trackID,  &track));
-		CHECK(track->FindSegment(offset, &rootObj, &srcRate, &diffPos));
+		CHECK(track->FindSegment(offset, pMediaCrit, &rootObj, &srcRate, &diffPos));
 		CHECK(rootObj->GetLength(&cpntLen));
 		CHECK(sourceInfo->SetComponent(rootObj));
 		
@@ -1888,34 +1739,58 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 			zeroPos,
 			&leafObj, &minLength, &foundTransition, &effeObject,
 			&nestDepth, NULL));
-		if (minLength < cpntLen)
+		if (minLength != AAF_UNKNOWN_LENGTH && cpntLen != AAF_UNKNOWN_LENGTH)
 		{
-			/* Figure out diffPos */
-			newLen = minLength;
-			/* NOTE: What should diffPos be in this case? */
+			if (minLength < cpntLen)
+			{
+				/* Figure out diffPos */
+				newLen = minLength;
+				/* NOTE: What should diffPos be in this case? */
+			}
+			else
+			{
+				newLen = cpntLen;
+			}
 		}
 		else
 		{
-			newLen = cpntLen;
+			if (minLength != AAF_UNKNOWN_LENGTH)
+			{
+				XASSERT(cpntLen == AAF_UNKNOWN_LENGTH, AAFRESULT_INTERNAL_ERROR);
+				newLen = minLength;
+			}
+			else
+			{
+				newLen = cpntLen;
+			}
 		}
 		
 		/*** Find the next mob, factoring in mask object edit rate conversions,
 		*** and 1.0 track mappings.
 		***/
-		CHECK(FindNextMob(track, (ImplAAFSegment *)leafObj, 
-			cpntLen, diffPos,
-			&nextMob, &nextTrackID, &nextPos, &pulldownObj, &pulldownPhase, &nextLen));
+		CHECK(FindNextMob(track, 
+			channelID,
+			(ImplAAFSegment *)leafObj, cpntLen, diffPos, editRateConversion,
+			&nextMob, &nextTrackID, 
+			&nextHasChannelIDs, &nextChannelID, 
+			&nextPos, &pulldownObj, &pulldownPhase, &nextLen));
 		if(pulldownObj != NULL)
 		{
 			CHECK(sourceInfo->AddPulldown(pulldownObj));
 		} 
 		
 		/*** Find component at referenced position in new mob ***/
-		CHECK(nextMob->MobFindSource(nextTrackID, nextPos, nextLen,
-			mobKind, pMediaCrit, pOperationChoice,
+		CHECK(nextMob->MobFindSource(nextTrackID, 
+			nextHasChannelIDs, nextChannelID,
+			nextPos, nextLen,
+			mobKind, pMediaCrit, pOperationChoice, editRateConversion,
 			sourceInfo, &sourceFound));
 		if (!sourceFound)
 			RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
+
+                // Set output value
+		sourceInfo->AcquireReference();
+		*ppSourceInfo = sourceInfo;
 
 		nextMob->ReleaseReference();
 		nextMob = 0;
@@ -2014,11 +1889,15 @@ AAFRESULT ImplAAFMob::MobFindLeaf(ImplAAFMobSlot *track,
 * and will map track IDs for 1.0 files.
 */
 AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track, 
+								  aafUInt32 channelID,
 								  ImplAAFSegment *segment,
 								  aafLength_t length,
 								  aafPosition_t diffPos,
+								  aafRounding_t editRateConversion,
 								  ImplAAFMob **retMob,
 								  aafSlotID_t *retTrackID,
+								  bool* retHasChannelIDs,
+								  aafUInt32 *retChannelID,
 								  aafPosition_t *retPos,
 								  ImplAAFPulldown **pulldownObj,
 								  aafInt32 *pulldownPhase,
@@ -2029,13 +1908,19 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 	aafBool					isMask = kAAFFalse, reverse = kAAFFalse;
 	aafSourceRef_t			sourceRef;
 	ImplAAFMob				*nextMob = NULL;
-	aafMobID_t			nullMobID = {{0,0,0,0,0,0,0,0,0,0,0,0},
-					0,0,0,0,{0,0,0,{0,0,0,0,0,0,0,0}}}; // Need "isNIL" utility
 	ImplAAFMobSlot 			*nextTrack = NULL;
 	aafSlotID_t				tmpTrackID, nextTrackID;
+	bool					nextHasChannelIDs = false;
+	aafUInt32				nextChannelID = kDistinguishedChannelID;
 	aafPosition_t			tmpPos, convertPos;
+	ImplAAFDataDef			*dataDef = NULL;
 
-	if(segment == NULL || retMob == NULL || retTrackID == NULL || retPos == NULL || retLen == NULL)
+	aafUInt32* pChannelIDs = NULL;
+	aafUInt32* pMonoSourceSlotIDs = NULL;
+
+	if(segment == NULL || retMob == NULL || retTrackID == NULL
+		|| retHasChannelIDs == NULL || retChannelID == NULL
+		|| retPos == NULL || retLen == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
 	XPROTECT()
@@ -2043,25 +1928,108 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 		/* Initialize return parameters */
 		*retMob = NULL;
 		*retTrackID = 0;
+		*retChannelID = 0;
 		if(pulldownObj)
 			*pulldownObj = NULL;
 		
 		/* Get source editrate from track, for later conversion */
 		
-		CHECK(segment->TraverseToClip(length, (ImplAAFSegment **)&sclp, pulldownObj, pulldownPhase,& sclpLen,
+		CHECK(segment->TraverseToClip(length, &sclp, pulldownObj, pulldownPhase,& sclpLen,
 			&isMask));
 		
 		
 		CHECK(sclp->GetSourceReference(&sourceRef));
-		if (memcmp(&nullMobID, &sourceRef.sourceID, sizeof(sourceRef.sourceID)) == 0)
+		if (isNull(sourceRef.sourceID))
 		{
 			RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
 		}
 		/* Get next mob */
 		CHECK(sclp->ResolveRef(&nextMob));
-		
+
 		tmpTrackID = sourceRef.sourceSlotID;
-		
+
+		//////////////////////////////////////////////////////////////////////////
+		// Check if it’s a reference from a mono channel track to a multi-channel track.
+		aafUInt32 monoSourceSlotIDsSize = 0;
+		CHECK(sclp->GetMonoSourceSlotIDsSize(&monoSourceSlotIDsSize));
+		if ( monoSourceSlotIDsSize > 0 )
+		{
+			aafUInt32 monoSourceSlotIDsLen = monoSourceSlotIDsSize/sizeof(aafUInt32);
+			
+			// If ChannelID is zero we are not able to find multi-channel source Mob Slot.
+			if ( channelID == kDistinguishedChannelID )
+			{
+				RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
+			}
+			// If MonoSourceSlotIDs is empty or ChannelID is out of bounds
+			// we are not able to find multi-channel source Mob Slot.
+			else if ( channelID > monoSourceSlotIDsLen )
+			{
+				RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
+			}
+
+			pMonoSourceSlotIDs = new aafUInt32[monoSourceSlotIDsLen];
+			CHECK(sclp->GetMonoSourceSlotIDs(monoSourceSlotIDsSize, pMonoSourceSlotIDs));
+
+			// AAF spec says: "If the MonoSourceSlotIDs property is present, 
+			// then an importing application shall ignore the value of SourceMobSlotID."
+			// So we need to set up correct value for track ID in this case.
+
+			// Here ChannelID is an 1-based index of MonoSourceSlotIDs array.
+			tmpTrackID = pMonoSourceSlotIDs[channelID-1];
+
+			// By definition Source Clip with MonoSourceSlotIDs references mono tracks.
+			nextHasChannelIDs = false;
+			nextChannelID = kDistinguishedChannelID;
+
+			delete[] pMonoSourceSlotIDs;
+			pMonoSourceSlotIDs = NULL;
+		}
+		else
+		{
+			// Note that ChannelIDs are only checked if the Source Clip
+			// doesn't contain MonoSourceSlotIDs, i.e. if the Source Clip
+			// doesn't explicitly specify a reference to mono tracks.
+			// Having both ChannelIDs and MonoSourceSlotIDs isn't allowed by
+			// AAF or MXF data models but this implementation doesn't enforce
+			// this rule.
+
+			//////////////////////////////////////////////////////////////////////////
+			// Check if it’s a reference to a multi-channel track.
+			aafUInt32 channelIDsSize = 0;
+			CHECK(sclp->GetChannelIDsSize(&channelIDsSize));
+			if ( channelIDsSize > 0 )
+			{
+				nextHasChannelIDs = true;
+
+				pChannelIDs = new aafUInt32[channelIDsSize/sizeof(aafUInt32)];
+				CHECK(sclp->GetChannelIDs(channelIDsSize, pChannelIDs));
+
+				// If the input ChannelID is 0 and ChannelsIDs is present it means that
+				// someone calls the old interface on a mono track that references a multi-channel track.
+				// I am not sure that this is correct behavior when the referring track is multi-channel
+				// but I’m not going to worry about that case for now.
+				if( channelID == kDistinguishedChannelID )
+				{
+					nextChannelID = pChannelIDs[0];
+				}
+				// If ChannelID is not zero it's an 1-based index of ChannelIDs array.
+				else
+				{
+					nextChannelID = pChannelIDs[channelID-1];
+				}
+				
+				delete[] pChannelIDs;
+				pChannelIDs = NULL;
+			}
+			else
+			{
+				// This is usual case for non-interleaved MobSlot.
+				nextHasChannelIDs = false;
+				nextChannelID = channelID;
+			}
+		}
+
 		/* Get destination track's edit rate */
 		CHECK(nextMob->FindSlotBySlotID(tmpTrackID, (ImplAAFMobSlot **)&nextTrack));
 		CHECK(nextTrack->GetSlotID(&nextTrackID));
@@ -2074,7 +2042,10 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 		*/
 		if (isMask)
 		{
-			reverse = kAAFFalse;
+            //sdaigle (jan 18, 2001): changing reverse to "true"
+            //since we are going back up the source chain...
+            //reverse = kAAFFalse;
+            reverse = kAAFTrue;
 			/* !!!Check out if we need phase returned from here */
 			CHECK((*pulldownObj)->MapOffset(diffPos, reverse, &tmpPos, NULL));
 		}
@@ -2084,13 +2055,32 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 		tmpPos += sourceRef.startTime;
 		if (!isMask)
 		{
-			CHECK(nextTrack->ConvertToMyRate(tmpPos,track, &convertPos));
+			CHECK(nextTrack->ConvertToMyRate(tmpPos,track, editRateConversion, &convertPos));
 		}
 		else
-			convertPos = tmpPos;
-		
+		{
+			// If the pulldown edit rate is an audio rate, then the length and
+			// the offset inside the pulldown use audio rate and need to be
+			// converted.
+			CHECK(sclp->GetDataDef(&dataDef));
+			aafBool isSoundKind = kAAFFalse;
+			dataDef->IsSoundKind(&isSoundKind);
+			if (isSoundKind)
+			{
+				CHECK(nextTrack->ConvertToMyRate(tmpPos,track, editRateConversion, &convertPos));
+			}
+			else
+			{
+				convertPos = tmpPos;
+			}
+			dataDef->ReleaseReference();
+			dataDef = 0;
+		}
+
 		*retMob = nextMob;
 		*retTrackID = nextTrackID;
+		*retChannelID = nextChannelID;
+		*retHasChannelIDs = nextHasChannelIDs;
 		*retPos = convertPos;
 		*retLen = sclpLen;
 
@@ -2109,6 +2099,14 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 		nextMob = 0;
 		if (sclp)
 			sclp->ReleaseReference();
+		if (dataDef)
+			dataDef->ReleaseReference();
+		dataDef = 0;
+
+		delete[] pChannelIDs;
+		pChannelIDs = NULL;
+		delete[] pMonoSourceSlotIDs;
+		pMonoSourceSlotIDs = NULL;
 	}
 	XEND;
 	
@@ -2117,11 +2115,14 @@ AAFRESULT ImplAAFMob::FindNextMob(ImplAAFMobSlot *track,
 
 AAFRESULT ImplAAFMob::MobFindSource(
 									aafSlotID_t trackID,
+									bool hasChannelIDs,
+									aafUInt32 channelID,  /* 0 - is not a multichannel Mob Slot */
 									aafPosition_t offset, /* offset in referenced units */
 									aafLength_t length,   /* expected length of clip */
 									aafMobKind_t mobKind,
 									aafMediaCriteria_t *mediaCrit,
 									aafOperationChoice_t *operationChoice,
+									aafRounding_t editRateConversion,
 									ImplAAFFindSourceInfo *sourceInfo,
 									aafBool *foundSource)
 {
@@ -2132,6 +2133,8 @@ AAFRESULT ImplAAFMob::MobFindSource(
 	ImplAAFOperationGroup	*effeObject = NULL;
 	ImplAAFMob				*nextMob = NULL;
 	aafSlotID_t				foundTrackID;
+	bool					foundHasChannelIDs = false;
+	aafUInt32				foundChannelID = 0;
 	aafBool					nextFoundSource = kAAFFalse, foundTransition = kAAFFalse;
 	aafPosition_t			foundPos, diffPos, zeroPos;
 	aafRational_t			srcRate;
@@ -2151,9 +2154,13 @@ AAFRESULT ImplAAFMob::MobFindSource(
 		
 		/* Verify that track and position are valid */
 		CHECK(FindSlotBySlotID (trackID,  &track));
-		CHECK(track->FindSegment(offset, &rootObj, &srcRate, &diffPos));
+		CHECK(track->FindSegment(offset, mediaCrit, &rootObj, &srcRate, &diffPos));
 		CHECK(rootObj->GetLength(&tmpLength));
-		if (length < tmpLength)
+		if (tmpLength == AAF_UNKNOWN_LENGTH)
+		{
+			tmpLength = length;
+		}
+		else if (length != AAF_UNKNOWN_LENGTH && length < tmpLength)
 		{
 			tmpLength = length;
 		}
@@ -2179,7 +2186,8 @@ AAFRESULT ImplAAFMob::MobFindSource(
 		
 		if (*foundSource)
 		{
-			CHECK(sourceInfo->Init(this, trackID, offset,
+			CHECK(sourceInfo->Init(this, trackID, 
+				hasChannelIDs, channelID, offset,
 				srcRate, tmpLength,
 				/*!!!*/NULL));		// What to put in for CPNT
 				
@@ -2211,23 +2219,41 @@ AAFRESULT ImplAAFMob::MobFindSource(
 			zeroPos,
 			&leafObj, &minLength, &foundTransition,
 			&effeObject, &nestDepth, NULL));
-		
-		if (minLength < length)
+
+		if (minLength != AAF_UNKNOWN_LENGTH && length != AAF_UNKNOWN_LENGTH)
 		{
-			/* Figure out diffPos!!! (changed newDIffPos -> tmpLength */
-			newLen = minLength;
+			if (minLength < length)
+			{
+				/* Figure out diffPos!!! (changed newDIffPos -> tmpLength */
+				newLen = minLength;
+			}
+			else
+			{
+				newLen = length;
+			}
 		}
 		else
 		{
-			newLen = length;
+			if (minLength != AAF_UNKNOWN_LENGTH)
+			{
+				XASSERT(length == AAF_UNKNOWN_LENGTH, AAFRESULT_INTERNAL_ERROR);
+				newLen = minLength;
+			}
+			else
+			{
+				newLen = length;
+			}
 		}
 		
 		/*** Find the next mob, factoring in mask object edit rate conversions,
 		*** and 1.0 track mappings.
 		***/
-		CHECK(FindNextMob(track, (ImplAAFSegment *)leafObj, 
-			tmpLength, diffPos,
-			&nextMob, &foundTrackID, &foundPos, &pulldownObj, &pulldownPhase, &foundLen));
+		CHECK(FindNextMob(track, 
+			channelID, (ImplAAFSegment *)leafObj,
+			tmpLength, diffPos, editRateConversion,
+			&nextMob, &foundTrackID, 
+			&foundHasChannelIDs, &foundChannelID, 
+			&foundPos, &pulldownObj, &pulldownPhase, &foundLen));
 		
 //		if(pulldownObj != NULL)
 //		{
@@ -2248,9 +2274,10 @@ AAFRESULT ImplAAFMob::MobFindSource(
 //			}
 //		} 
 		/* Find component at referenced position in new mob */
-		CHECK(nextMob->MobFindSource(foundTrackID,
+		CHECK(nextMob->MobFindSource(foundTrackID, 
+			foundHasChannelIDs, foundChannelID,
 			foundPos, foundLen,
-			mobKind, mediaCrit, operationChoice,
+			mobKind, mediaCrit, operationChoice, editRateConversion,
 			sourceInfo, &nextFoundSource));
 		if (nextFoundSource)
 		{
@@ -2360,7 +2387,7 @@ HRESULT ImplAAFMob::IsClassIDEqual( const aafClassID_t* classId, bool& result ) 
 
   ASSERTU( sizeof(aafUID_t) == sizeof(aafClassID_t) );
 
-  if ( ::memcmp( classId, &thisClassId, sizeof(aafUID_t) ) == 0 ) {
+  if ( *classId == thisClassId ) {
     result = true;
   }
   else {
@@ -2378,7 +2405,7 @@ bool ImplAAFMob::IsUsageCodeEqual( const aafUID_t* usageCode ) const
 
   aafUID_t thisUsageCode = _usageCode;
 
-  if ( ::memcmp( usageCode, &thisUsageCode, sizeof(aafUID_t) ) == 0 ) {
+  if ( *usageCode == thisUsageCode ) {
     return true;
   }
   else {

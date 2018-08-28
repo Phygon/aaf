@@ -21,7 +21,7 @@
 # (http://www.amwa.tv/policies).
 #
 # Copyright Notices:
-# The Original Code of this file is Copyright 1998-2009, licensor of the
+# The Original Code of this file is Copyright 1998-2012, licensor of the
 # Advanced Media Workflow Association.  All rights reserved.
 #
 # The Initial Developer of the Original Code of this file and the
@@ -31,39 +31,44 @@
 #
 ###############################################################################
 
-AWK=awk
-CP=cp -p
-ECHO=echo
-RM=rm -f
+cmake_minimum_required(VERSION 3.0.2)
 
-AWKFILE=mkdict.awk
-EXCEL="c:/program files/Microsoft Office/Office/EXCEL.EXE"
-INSTALL_DIR=../ref-impl/include
+if(NOT DEFINED AAFSDK_ROOT)
+    message(FATAL_ERROR "'AAFSDK_ROOT' must be set. Run a build from the top-level CMakeLists.txt script.")
+endif()
 
-all : AAFMetaDictionary.h
+if(NOT (APPLE OR WIN32))
+    return()
+endif()
 
-AAFMetaDict.csv : AAFMetaDict.xls
-	@$(ECHO) "1) Save the new .xls file as a .csv file"
-	@$(ECHO) "   Choose File/Save As ..."
-	@$(ECHO) "   File name: AAFMetaDict.csv"
-	@$(ECHO) "   Save as type: CSV(OS/2 or MSDOS)"
-	@$(ECHO) "   Choose Yes in the annoying dialog"
-	@$(ECHO) "2) Get out of Excel"
-	@$(ECHO) "   Choose File/Exit"
-	@$(ECHO) "   Choose No in the annoying dialog"
-	$(EXCEL) /e /r AAFMetaDict.xls /p .
+# MSVC: ./AAFWinSDK/<vsXX>/Utilities/aaffmtconv/<Win32|x64>/<Debug|Release>/
+# Makefile: ./AAFx86_64LinuxSDK/g++/bin/<debug|>
+set(TARGET_DIR "${AAFSDK_TARGET_DIR}/Utilities/aaffmtconv")
 
-AAFMetaDictionary.h : AAFMetaDict.csv $(AWKFILE)
-	$(AWK) -f $(AWKFILE) -v APP=AAF -v ALIAS=YES -v SYM=s_sym AAFMetaDict.csv > AAFMetaDictionary.h
+add_executable(aaffmtconv aaffmtconv.cpp)
 
-$(INSTALL_DIR)/AAFMetaDictionary.h: AAFMetaDictionary.h
-	@$(ECHO) "Installing new Meta Dictionary"
-	$(RM) $(INSTALL_DIR)/AAFMetaDictionary.h
-	$(CP) AAFMetaDictionary.h $(INSTALL_DIR)/AAFMetaDictionary.h 
+target_link_libraries(aaffmtconv PRIVATE
+    AAFIID
+    AAFLIB
+)
 
-install: $(INSTALL_DIR)/AAFMetaDictionary.h
+if(MSVC)
+    # file description
+    # internal name
+    # file name
+    target_generate_rc_file(aaffmtconv
+        "Avid AAF file format conversion utility"
+        "aaffmtconv"
+        "aaffmtconv.exe"
+    )
+endif()
 
-clean:
-	$(RM) AAFMetaDict.csv
-	$(RM) AAFMetaDictionary.h
+set_target_properties(aaffmtconv PROPERTIES
+    VERSION ${AAFSDK_VERSION_STRING}
+)
 
+set_target_properties(aaffmtconv PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${TARGET_DIR}
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${TARGET_DIR}
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${TARGET_DIR}
+)

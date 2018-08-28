@@ -156,6 +156,7 @@ BIG_FILE="stadium_house"
 AAF_TEST_DIR=`pwd`
 export PATH=$AAF_TEST_DIR:$PATH
 export LD_LIBRARY_PATH=$AAF_TEST_DIR:$LD_LIBRARY_PATH
+export DYLD_LIBRARY_PATH=${AAF_TEST_DIR}:${DYLD_LIBRARY_PATH}
 
 #Uncomment appropriate line depending on OS
 BASEDIR=$HOME

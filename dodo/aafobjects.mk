@@ -39,22 +39,32 @@ AAFNONPERSISTENTOBJECTS=""
 # These are files which specify COM interfaces, but which are
 # implemented in other objects.
 AAFCOMINTERFACESONLY="\
+	AAFFindSourceInfo2 \
+	AAFMob3 \
+	AAFSaveIntermediate \
+	AAFSearchSource2 \
+	AAFSearchSource3 \
+	AAFPlainStreamData2 \
 	AAFAES3PCMDescriptor2 \
 	AAFCDCIDescriptor2 \
 	AAFComponent2 \
 	AAFCompositionMob2 \
 	AAFDataDef2 \
 	AAFDataDef3 \
+	AAFDataDef4 \
 	AAFDiagnosticOutput \
 	AAFDictionary2 \
 	AAFDigitalImageDescriptor2 \
 	AAFEndian \
 	AAFEssenceDataEx \
 	AAFEssenceData2 \
+	AAFEssenceDescriptor2 \
 	AAFEssenceMultiAccess \
 	AAFEventMobSlot2 \
 	AAFFileDescriptor2 \
 	AAFHeader2 \
+	AAFHeader3 \
+    AAFJPEG2000SubDescriptor2 \
 	AAFKLVEssenceDataParameters \
 	AAFKLVStreamParameters \
 	AAFMasterMob2 \
@@ -62,11 +72,13 @@ AAFCOMINTERFACESONLY="\
 	AAFMasterMobEx \
 	AAFMob2 \
 	AAFProgress \
+	AAFCopyByte \
 	AAFRGBADescriptor2 \
 	AAFSearchSource \
 	AAFSourceReference2 \
 	AAFStreamAccess \
 	AAFTimelineMobSlot2 \
+	AAFTypeDefStream2 \
 	AAFTypeDefStreamEx \
 	AAFTypeDefStream3 \
 	AAFTypeDefVariableArrayEx "
@@ -78,7 +90,10 @@ AAFCOMINTERFACESONLY="\
 HUMAN_TYPED_IMPL="\
 	AAFAES3PCMDescriptor \
 	AAFAIFCDescriptor \
+	AAFAsyncStreamRawStorage \
+	AAFAudioChannelLabelSubDescriptor \
 	AAFAuxiliaryDescriptor \
+	AAFAVCSubDescriptor \
 	AAFBWFImportDescriptor \
 	AAFCDCIDescriptor \
 	AAFCachePageAllocator \
@@ -116,17 +131,23 @@ HUMAN_TYPED_IMPL="\
 	AAFFindSourceInfo \
 	AAFGPITrigger \
 	AAFGetFileBits \
+    AAFGroupOfSoundfieldGroupsLabelSubDescriptor \
 	AAFHeader \
+	AAFIOCompletion \
 	AAFIdentification \
 	AAFImportDescriptor \
 	AAFInterpolationDef \
+	AAFJPEG2000SubDescriptor \
 	AAFKLVData \
 	AAFKLVDataDefinition \
 	AAFLocator \
 	AAFMasterMob \
+	AAFMCALabelSubDescriptor \
 	AAFMetaDefinition \
 	AAFMob  \
 	AAFMobSlot \
+	AAFMPEG4VisualSubDescriptor \
+	AAFMPEGAudioDescriptor \
 	AAFMPEGVideoDescriptor \
 	AAFMultipleDescriptor \
 	AAFNestedScope\
@@ -158,10 +179,13 @@ HUMAN_TYPED_IMPL="\
 	AAFSequence \
 	AAFSetFileBits \
 	AAFSoundDescriptor \
+    AAFSoundfieldGroupLabelSubDescriptor \
 	AAFSourceClip \
 	AAFSourceMob \
 	AAFSourceReference \
 	AAFStaticMobSlot \
+	AAFStreamRawStorage \
+	AAFSubDescriptor \
 	AAFTIFFDescriptor \
 	AAFTaggedValue \
 	AAFTaggedValueDefinition \
@@ -173,6 +197,7 @@ HUMAN_TYPED_IMPL="\
 	AAFTimelineMobSlot \
 	AAFTransition \
 	AAFTypeDef \
+	AAFTypeDefGenericCharacter \
 	AAFTypeDefCharacter \
 	AAFTypeDefEnum \
 	AAFTypeDefExtEnum \
@@ -219,6 +244,7 @@ HUMAN_TYPED_IMPL="\
 	EnumAAFPropertyValues \
 	EnumAAFRIFFChunks \
 	EnumAAFSegments \
+	EnumAAFSubDescriptors \
 	EnumAAFTaggedValueDefs \
 	EnumAAFTaggedValues \
 	EnumAAFTypeDefs "
@@ -268,12 +294,14 @@ AUTO_GEN_IMPL="\
 
 PLUGIN_OBJECTS="\
 	AAFClassExtension \
+	AAFDictionaryExtension \
 	AAFEssenceCodec \
 	AAFEssenceCodec2 \
 	AAFEssenceCodec3 \
 	AAFEssenceContainer \
 	AAFEssenceDataStream \
 	AAFEssenceDataStream2 \
+	AAFEssenceDataStreamEx \
 	AAFEssenceStream \
 	AAFInterpolator \
 	AAFMultiEssenceCodec \

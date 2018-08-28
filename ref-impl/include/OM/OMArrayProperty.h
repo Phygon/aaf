@@ -103,6 +103,10 @@ public:
     //          <c OMArrayProperty> at the first position.
   void prependValue(const Element* value);
 
+    // @cmember Remove the last (index == count() - 1) element
+    //          from this <c OMArrayProperty>.
+  void removeLast(void);
+
     // @cmember Get the value of this <c OMArrayProperty>.  The
     //          value is obtained by copying the value from the
     //          <c OMArrayProperty>. The buffer is at address
@@ -155,7 +159,8 @@ public:
   virtual void shallowCopyTo(OMProperty* destination) const;
 
   virtual void deepCopyTo(OMProperty* destination,
-                          void* clientContext) const;
+                          void* clientContext,
+                          bool deferStreamData) const;
 
 private:
 

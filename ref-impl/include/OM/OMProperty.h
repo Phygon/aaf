@@ -168,7 +168,8 @@ public:
   virtual void shallowCopyTo(OMProperty* destination) const = 0;
 
   virtual void deepCopyTo(OMProperty* destination,
-                          void* clientContext) const = 0;
+                          void* clientContext,
+                          bool deferStreamData) const = 0;
 
     // @cmember Set the bit that indicates that this optional <c OMProperty>
     //          is present.
@@ -195,12 +196,8 @@ protected:
     //          representation of this <c OMProperty>.
   OMFile* file(void) const;
 
-  virtual const wchar_t* storedName(void) const;
-
   OMPropertyId _propertyId;
   OMStoredForm _storedForm;
-  wchar_t* _storedName;
-  const wchar_t* _name;
 
 private:
 
@@ -278,7 +275,8 @@ public:
   virtual void shallowCopyTo(OMProperty* destination) const;
 
   virtual void deepCopyTo(OMProperty* destination,
-                          void* clientContext) const;
+                          void* clientContext,
+                          bool deferStreamData) const;
 
 protected:
   // @access Protected members.

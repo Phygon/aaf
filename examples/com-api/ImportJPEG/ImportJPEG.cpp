@@ -307,7 +307,7 @@ static HRESULT OpenAAFFile(aafWChar * pFileName, bool comp_enable)
 						MobSlotID, sampleRate.numerator, sampleRate.denominator,
 						maxSampleSize, storedRect.xSize, storedRect.ySize);
 	
-			printf("\t\tFrameLayout=%s CountSamples=%"AAFFMT64"d\n", frameLayoutStr, sampleCount);
+			printf("\t\tFrameLayout=%s CountSamples=%" AAFFMT64 "d\n", frameLayoutStr, sampleCount);
 
 			// Buffer to receive samples from ReadSamples
 			aafUInt8 *dataBuf = new aafUInt8[maxSampleSize];

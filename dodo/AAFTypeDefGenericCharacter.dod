@@ -1,0 +1,102 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFTypeDefGenericCharacter\
+#endm
+#c
+#startm .parent-module 0
+AAFTypeDef\
+#endm
+#c
+#import ./AAFTypeDef.exp
+AD_HEAD
+AD_IDL(///
+/// This interface is used to define Integer types used in AAF persistent
+/// objects.
+AD_STD_COMMENT_IFC_HEADER)
+AD_FORWARD_DECLARATION(AAFPropertyValue)
+
+AD_CLASS_UUID(F0A3C310, 3E79, 454D, 84, 1A, B1, 22, E9, 4D, DC, 9A)
+
+AD_DEFAULT_UUID(5BDD2354, D8C6, 4208, 82, 6A, 7F, 54, 05, F3, 4C, CC)
+AD_XCLASS_BEGIN(Concrete, StoredObject)
+
+AD_XMETHOD4(Initialize,
+			[in\, ref],
+			objPass,
+			aafUID_constref,
+			id,
+			AUID to be used to identify this type,
+
+			[in],
+			objPass,
+			aafUInt8,
+			size,
+			the size of this character type in bytes,
+
+			[in\, string],
+			objPass,
+			aafCharacter_constptr,
+			pTypeName,
+			name of this type definition,
+
+			[in\, string],
+			objPass,
+			aafCharacter_constptr,
+			pTypeDescription,
+			description of this type definition,
+
+     Initializes this type def to be identified by the given AUID\, and to
+  /// have the given size in bytes.
+  ///
+  /// The implementation of this method may only allow certain values
+  /// for 'size'.  It *will* allow at least 1\, 2\, 4-byte
+  /// characters; some implementations may allow more than that.
+  ///
+  /// This method must be called after allocation\, and before
+  /// any other method can be called.
+  ///
+  /// Succeeds if:
+  /// - Initialize\(\) has not yet been called on this object.
+  /// - size is a valid value.
+  AD_STD_COMMENT_METH_ERR_HEADER
+  AD_STD_COMMENT_METH_ERR_ALREADY_INIT
+  AD_STD_COMMENT_METH_ERR_NULL_PARAM\(pTypeName\)
+  ///
+  /// AAFRESULT_BAD_SIZE
+  ///  - size is not a valid value.)
+
+
+AD_OVERRIDE(.method-GetTypeCategory)
+
+AD_XCLASS_END(Concrete, StoredObject)

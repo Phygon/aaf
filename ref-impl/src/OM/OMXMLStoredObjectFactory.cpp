@@ -246,6 +246,22 @@ OMXMLStoredObjectFactory::isRecognized(OMRawStorage* rawStorage)
   return isRecog;
 }
 
+  // @mfunc Is the file named <p fileName> an incomplete (in-progress) file ?
+  //          If so, the result is true.
+bool OMXMLStoredObjectFactory::isBeingModified(const wchar_t* fileName)
+{
+  TRACE("OMXMLStoredObjectFactory::isBeingModified");
+  return false;
+}
+
+  // @mfunc Does <p rawStorage> contain an incomplete (in-progress) file ?
+  //          If so, the result is true.
+bool OMXMLStoredObjectFactory::isBeingModified(OMRawStorage* rawStorage)
+{
+  TRACE("OMXMLStoredObjectFactory::isBeingModified");
+  return false;
+}
+
   // @mfunc Can a file be created successfully on the given
   //        <c OMRawStorage> and accessed successfully in the mode
   //        specified by <p accessMode> ?
@@ -271,6 +287,24 @@ bool OMXMLStoredObjectFactory::compatibleNamedFile(
   TRACE("OMXMLStoredObjectFactory::compatibleNamedFile");
 
   return true;
+}
+
+  // @mfunc Can the contents of a file on the given <c OMRawStorage>
+  //        be accessed successfully in the mode specified by
+  //        <p accessMode> ?
+  //        This method attempts to identify issues with the file
+  //        contents before opening the file and restoring its metadata.
+  //   @parm The <c OMRawStorage>.
+  //   @parm The <t OMAccessMode>.
+  //   @rdesc True if the file contents can be accessed, false otherwise.
+bool OMXMLStoredObjectFactory::compatibleStoredFormat(
+                                  const OMRawStorage* NNAME(rawStorage),
+                                  const OMFile::OMAccessMode NNAME(accessMode))
+{
+  TRACE("OMXMLStoredObjectFactory::compatibleStoredFormat");
+  // Missing checks ?
+  bool result = true;
+  return result;
 }
 
   // @mfunc Perform any necessary actions when <p file> is closed.

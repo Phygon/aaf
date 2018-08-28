@@ -58,9 +58,17 @@
 #endif
 
 
+//
+// Forward declaration
+//
+class ImplAAFSourceMob;
+
+
 class CAAFSourceMob
   : public IAAFSourceMob,
     public IAAFSearchSource,
+    public IAAFSearchSource2,
+    public IAAFSearchSource3,
     public CAAFMob
 {
 protected:
@@ -228,9 +236,6 @@ public:
   /// Note: The startTC parameter is expressed in frames since
   /// midnight.
   /// 
-  /// The length32 parameter can be the value FULL_RANGE, in which
-  /// case the length is 24 hours.
-  ///
   /// Succeeds if all of the following are true:
   /// - The specified slot ID is not yet used.
   /// - This source mob references an AAFTapeDescriptor as an essence
@@ -618,6 +623,220 @@ public:
    (
     // @parm [in] aafSlotID_t | slotID | Slot ID
     aafSlotID_t  slotID,
+
+    // @parm [in] aafPosition_t | offset | Offset
+    aafPosition_t  offset,
+
+    // @parm [in] aafMobKind_t | mobKind | Mob Kind
+    aafMobKind_t  mobKind,
+
+    // @parm [in] aafMediaCriteria_t * | pMediaCrit | Media Criteria
+    aafMediaCriteria_t *  pMediaCrit,
+
+    // @parm [in] aafOperationChoice_t * | pOperationChoice | Operation Choice
+    aafOperationChoice_t *  pOperationChoice,
+
+    // @parm [out] AAFFindSourceInfo | ppSourceInfo | Source Information
+    IAAFFindSourceInfo ** ppSourceInfo
+  );
+
+  //***********************************************************
+  // METHOD NAME: SearchSourceAdvanced()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFSearchSource2 | SearchSourceAdvanced |
+  // This method returns the source information for a slot in a
+  /// Master Mob or Source Mob.  It follows the Source Clip references
+  /// in the specified slot until it encounters the kind of Mob
+  /// specified in the mobKind parameter.  This method cannot be used
+  /// on a Composition Mob and is not intended to be called
+  /// iteratively.
+  ///
+  /// This method is similar to SearchSource, except it attempts to
+  /// compensate for errors introduced when converting offsets and
+  /// lengths between different edit rates, while traversing Source Clip
+  /// reference chain. It accounts for the fact that the result of
+  /// the conversion is often not exactly on a frame/sample boundary
+  /// but within small enough distance that it can be rounded up to
+  /// the boundary. This method produces better results with Source Clip
+  /// reference chains that mix audio and video edit rates.
+  ///
+  /// The returned component and find source info are AddRef()ed
+  /// before they are returned.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - ppSourceInfo is non-NULL
+  /// - a Mob of the requested kind is found
+  /// 
+  /// This method will return the following codes. If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - ppCpnt is null.
+  ///
+  /// OM_ERR_INVALID_MOBTYPE
+  ///	- The enumerator is out of range (bad cast, or writing
+  ///      toolkit newer than reader)
+  ///
+  /// OM_ERR_TRAVERSAL_NOT_POSS
+  ///	- Can not find a mob of the given kind.
+  // @end
+  // 
+  STDMETHOD (SearchSourceAdvanced)
+   (
+    // @parm [in] aafSlotID_t | slotID | Slot ID
+    aafSlotID_t  slotID,
+
+    // @parm [in] aafPosition_t | offset | Offset
+    aafPosition_t  offset,
+
+    // @parm [in] aafMobKind_t | mobKind | Mob Kind
+    aafMobKind_t  mobKind,
+
+    // @parm [in] aafMediaCriteria_t * | pMediaCrit | Media Criteria
+    aafMediaCriteria_t *  pMediaCrit,
+
+    // @parm [in] aafOperationChoice_t * | pOperationChoice | Operation Choice
+    aafOperationChoice_t *  pOperationChoice,
+
+    // @parm [out] AAFFindSourceInfo | ppSourceInfo | Source Information
+    IAAFFindSourceInfo ** ppSourceInfo
+  );
+
+  //***********************************************************
+  // METHOD NAME: SearchMultichannelSource()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFSearchSource3 | SearchMultichannelSource |
+  // This function returns the source information for a specified channel
+  /// of a multi-channel Mob Slot in a Master Mob or Source Mob.  It follows
+  /// the Source Clip references in the specified slot until it encounters
+  /// the kind of Mob specified in the mobKind parameter.  This function
+  /// cannot be used on a Composition Mob and is not intended to be called
+  /// iteratively.
+  ///
+  /// To find source information for a mono-channel Mob Slot the legacy 
+  /// methods SearchSource() and SearchSourceAdvanced() shall be used. 
+  /// Applications should query their returned objects for IAAFFindSourceInfo2 
+  /// to retrieve information about multi-channel sources.
+  ///
+  /// The returned component and find source info are AddRef()ed
+  /// before they are returned.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - ppSourceInfo is non-NULL
+  /// - a Mob of the requested kind is found
+  /// 
+  /// This method will return the following codes.  If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_INVALID_PARAM;
+  ///   - Channel ID is zero.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - ppCpnt is null.
+  ///
+  /// OM_ERR_INVALID_MOBTYPE
+  ///   - The enumerator is out of range (bad cast, or writing
+  ///      toolkit newer than reader)
+  ///
+  /// OM_ERR_TRAVERSAL_NOT_POSS
+  ///   - Can not find a mob of the given kind.
+  // @end
+  // 
+  STDMETHOD (SearchMultichannelSource)
+   (
+    // @parm [in] aafSlotID_t | slotID | Slot ID
+    aafSlotID_t  slotID,
+
+    // @parm [in] aafUInt32 | channelID | Channel ID
+    aafUInt32  channelID,
+
+    // @parm [in] aafPosition_t | offset | Offset
+    aafPosition_t  offset,
+
+    // @parm [in] aafMobKind_t | mobKind | Mob Kind
+    aafMobKind_t  mobKind,
+
+    // @parm [in] aafMediaCriteria_t * | pMediaCrit | Media Criteria
+    aafMediaCriteria_t *  pMediaCrit,
+
+    // @parm [in] aafOperationChoice_t * | pOperationChoice | Operation Choice
+    aafOperationChoice_t *  pOperationChoice,
+
+    // @parm [out] AAFFindSourceInfo | ppSourceInfo | Source Information
+    IAAFFindSourceInfo ** ppSourceInfo
+  );
+
+  //***********************************************************
+  // METHOD NAME: SearchMultichannelSourceAdvanced()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFSearchSource3 | SearchMultichannelSourceAdvanced |
+  // This function returns the source information for a specified channel
+  /// of a multi-channel Mob Slot in a Master Mob or Source Mob.  It follows
+  /// the Source Clip references in the specified slot until it encounters
+  /// the kind of Mob specified in the mobKind parameter.  This function
+  /// cannot be used on a Composition Mob and is not intended to be called
+  /// iteratively.
+  ///
+  /// To find source information for a mono-channel Mob Slot the legacy 
+  /// methods SearchSource() and SearchSourceAdvanced() shall be used. 
+  /// Applications should query their returned objects for IAAFFindSourceInfo2 
+  /// to retrieve information about multi-channel sources.
+  ///
+  /// This method is similar to SearchMultichannelSource, except it attempts to
+  /// compensate for errors introduced when converting offsets and
+  /// lengths between different edit rates, while traversing Source Clip
+  /// reference chain. It accounts for the fact that the result of
+  /// the conversion is often not exactly on a frame/sample boundary
+  /// but within small enough distance that it can be rounded up to
+  /// the boundary. This method produces better results with Source Clip
+  /// reference chains that mix audio and video edit rates.
+  ///
+  /// The returned component and find source info are AddRef()ed
+  /// before they are returned.
+  ///
+  /// Succeeds if all of the following are true:
+  /// - ppSourceInfo is non-NULL
+  /// - a Mob of the requested kind is found
+  /// 
+  /// This method will return the following codes. If more than one of
+  /// the listed errors is in effect, it will return the first one
+  /// encountered in the order given below:
+  /// 
+  /// AAFRESULT_SUCCESS
+  ///   - succeeded.  (This is the only code indicating success.)
+  ///
+  /// AAFRESULT_INVALID_PARAM;
+  ///   - Channel ID is zero.
+  ///
+  /// AAFRESULT_NULL_PARAM
+  ///   - ppCpnt is null.
+  ///
+  /// OM_ERR_INVALID_MOBTYPE
+  ///   - The enumerator is out of range (bad cast, or writing
+  ///      toolkit newer than reader)
+  ///
+  /// OM_ERR_TRAVERSAL_NOT_POSS
+  ///   - Can not find a mob of the given kind.
+  // @end
+  // 
+  STDMETHOD (SearchMultichannelSourceAdvanced)
+   (
+    // @parm [in] aafSlotID_t | slotID | Slot ID
+    aafSlotID_t  slotID,
+
+    // @parm [in] aafUInt32 | channelID | Channel ID
+    aafUInt32  channelID,
 
     // @parm [in] aafPosition_t | offset | Offset
     aafPosition_t  offset,

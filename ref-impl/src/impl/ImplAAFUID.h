@@ -35,8 +35,8 @@
 #define __ImplAAFUID_h__
 
 
-#ifndef __AAFTypes_h__
-#include "AAFTypes.h"
+#ifndef _AAF_UTIL_API_
+#include "AAFUtils.h"
 #endif
 
 #include <string.h>
@@ -49,10 +49,11 @@
 class ImplAAFUID
 {
 public:
-  ImplAAFUID () {memset (&_rep, 0, sizeof (_rep));}
+  ImplAAFUID ()
+  { _rep = kNullUID; }
 
   ImplAAFUID (const aafUID_t & auid)
-  { memcpy (&_rep, &auid, sizeof (_rep)); }
+  { _rep = auid; }
 
   inline friend int operator==
   (const ImplAAFUID & lhs, const ImplAAFUID & rhs);
@@ -70,7 +71,7 @@ inline int operator==
  const ImplAAFUID & lhs,
  const ImplAAFUID & rhs)
 {
-  return ! memcmp (&lhs._rep, &rhs._rep, sizeof (lhs._rep));
+  return lhs._rep == rhs._rep;
 }
 
 #endif // ! __ImplAAFUID_h__

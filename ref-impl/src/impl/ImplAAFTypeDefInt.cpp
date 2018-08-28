@@ -71,7 +71,7 @@ static void pvtSignExtend (const aafMemPtr_t inVal,
 						   aafMemPtr_t outVal,
 						   aafUInt32   outValSize)
 {
-  aafInt32 localValue;	// only 4 bytes; see below for why it's OK.
+  aafInt32 localValue = 0;	// only 4 bytes; see below for why it's OK.
 
   ASSERTU (inVal);
   ASSERTU (outVal);
@@ -144,7 +144,7 @@ static void pvtZeroFill (const aafMemPtr_t inVal,
 						   aafMemPtr_t outVal,
 						   aafUInt32   outValSize)
 {
-  aafUInt32 localValue;	// only 4 bytes; see below for why it's OK.
+  aafUInt32 localValue = 0;	// only 4 bytes; see below for why it's OK.
 
   ASSERTU (inVal);
   ASSERTU (outVal);
@@ -591,8 +591,7 @@ void ImplAAFTypeDefInt::externalize(const OMByte* internalBytes,
   ASSERTU (internalBytes);
   ASSERTU (externalBytes);
   // ASSERTU (internalBytesSize == externalBytesSize);
-  const OMUInt32 thisPropValSize = PropValSize ();
-  ASSERTU (externalBytesSize == thisPropValSize);
+  ASSERTU (externalBytesSize == PropValSize ());
 
   if (internalBytesSize > externalBytesSize)
 	{

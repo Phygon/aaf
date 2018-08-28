@@ -254,7 +254,7 @@ static HRESULT OpenAAFFile(aafWChar * pFileName)
 								audioSampleBits, sampleRate.numerator, sampleRate.denominator,
 								numChannels, maxSampleBytes);
 			
-					printf("\t\tCountSamples=%"AAFFMT64"d\n", sampleCount);
+					printf("\t\tCountSamples=%" AAFFMT64 "d\n", sampleCount);
 	
 					// Set a suitable buffer size						
 					dataBuff = new unsigned char[maxSampleBytes];

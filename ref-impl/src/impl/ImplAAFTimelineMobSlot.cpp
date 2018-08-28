@@ -188,6 +188,7 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
+					  aafMediaCriteria_t *mediaCrit,
 					  ImplAAFSegment **segment,
 					  aafRational_t *srcRate,
 					  aafPosition_t *diffPos)
@@ -235,7 +236,7 @@ AAFRESULT ImplAAFTimelineMobSlot::FindSegment(aafPosition_t offset,
 		// All that, to explain the following line of code:
    		offset += origin;
 		
-		CHECK(tmpSegment->FindSubSegment(offset, &begPos, segment, &foundClip));
+		CHECK(tmpSegment->FindSubSegment(offset, mediaCrit, &begPos, segment, &foundClip));
 		if(!foundClip)
 			RAISE(AAFRESULT_TRAVERSAL_NOT_POSS);
 
@@ -275,6 +276,25 @@ AAFRESULT ImplAAFTimelineMobSlot::ConvertToEditRate(aafPosition_t srcPos,
 	return AAFRESULT_SUCCESS;
 }
 
+AAFRESULT ImplAAFTimelineMobSlot::ConvertToEditRate(aafPosition_t srcPos,
+										aafRational_t destRate,
+										aafRounding_t editRateConversion,
+										aafPosition_t *convertPos)
+{
+	aafRational_t	srcRate;
+
+	XPROTECT()
+	{
+		CHECK(GetEditRate(&srcRate));
+		CHECK(AAFConvertEditRate(srcRate, srcPos,
+						destRate, editRateConversion, convertPos));
+	}
+	XEXCEPT
+	XEND;
+
+	return AAFRESULT_SUCCESS;
+}
+
 AAFRESULT ImplAAFTimelineMobSlot::ConvertToMyRate(aafPosition_t srcPos,
 										  ImplAAFMobSlot *srcSlot,
 										aafPosition_t *convertPos)
@@ -292,5 +312,36 @@ AAFRESULT ImplAAFTimelineMobSlot::ConvertToMyRate(aafPosition_t srcPos,
 	return AAFRESULT_SUCCESS;
 }
 
+AAFRESULT ImplAAFTimelineMobSlot::ConvertToMyRate(aafPosition_t srcPos,
+										  ImplAAFMobSlot *srcSlot,
+										aafRounding_t editRateConversion,
+										aafPosition_t *convertPos)
+{
+	aafRational_t	destRate;
+	
+	XPROTECT()
+	{
+		CHECK(GetEditRate(&destRate));
+		CHECK(srcSlot->ConvertToEditRate(srcPos, destRate, editRateConversion, convertPos));
+	}
+	XEXCEPT
+	XEND;
 
+	return AAFRESULT_SUCCESS;
+}
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFTimelineMobSlot::SetSegment (ImplAAFSegment* pSegment)
+{
+	XPROTECT()
+	{
+		CHECK(ImplAAFMobSlot::SetSegment(pSegment));
+
+		// Specify type of the containing MobSlot
+		pSegment->SetMobSlotType(ImplAAFComponent::MobSlotType_Timeline);
+	}
+	XEXCEPT
+	XEND;
+
+	return AAFRESULT_SUCCESS;
+}

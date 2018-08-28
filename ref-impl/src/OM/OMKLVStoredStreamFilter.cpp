@@ -37,11 +37,13 @@
 #include "OMAssertions.h"
 #include "OMKLVStoredStream.h"
 #include "OMMXFStorage.h"
+#include "OMUtilities.h"
 
 OMKLVStoredStreamFilter::OMKLVStoredStreamFilter(OMKLVStoredStream* stream)
 : _stream(stream),
   _initialized(false),
   _keyWritten(false),
+  _dirty(false),
   _position(0),
   _klvLength(0),
   _klvLengthOffset(0),
@@ -101,6 +103,68 @@ void OMKLVStoredStreamFilter::read(OMByte* data,
   }
 }
 
+void OMKLVStoredStreamFilter::read(OMIOBufferDescriptor* buffers,
+                                   OMUInt32 bufferCount,
+                                   OMUInt32& bytesRead) const
+{
+  TRACE("OMKLVStoredStreamFilter::read");
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount > 0);
+
+  if (!_initialized) {
+    initialize();
+  }
+
+  _stream->setPosition(_klvValueOffset + _position);
+  _stream->read(buffers, bufferCount, bytesRead);
+
+  OMKLVStoredStreamFilter* non_const_this =
+                                    const_cast<OMKLVStoredStreamFilter*>(this);
+  non_const_this->_position += bytesRead;
+}
+
+void OMKLVStoredStreamFilter::read(OMUInt64 position,
+                                   OMByte* buffer,
+                                   const OMUInt32 bytes,
+                                   void* /* */ completion,
+                                   const void* clientArgument) const
+{
+  TRACE("OMKLVStoredStreamFilter::read");
+  PRECONDITION("Valid data buffer", buffer != 0);
+  PRECONDITION("Valid size", bytes > 0);
+
+  if (!_initialized) {
+    initialize();
+  }
+
+  _stream->read(_klvValueOffset + position,
+                buffer,
+                bytes,
+                completion,
+                clientArgument);
+}
+
+void OMKLVStoredStreamFilter::read(OMUInt64 position,
+                                   OMIOBufferDescriptor* buffers,
+                                   OMUInt32 bufferCount,
+                                   void* /* */ completion,
+                                   const void* clientArgument) const
+{
+  TRACE("OMKLVStoredStreamFilter::read");
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount > 0);
+
+  if (!_initialized) {
+    initialize();
+  }
+
+  _stream->read(_klvValueOffset + position,
+                buffers,
+                bufferCount,
+                completion,
+                clientArgument);
+}
+
 void OMKLVStoredStreamFilter::write(void* ANAME(data), OMUInt32 ANAME(size))
 {
   TRACE("OMKLVStoredStreamFilter::write");
@@ -124,29 +188,107 @@ void OMKLVStoredStreamFilter::write(const OMByte* data,
 
   if (!_keyWritten)
   {
-    OMKLVKey key = _stream->label();
-    if (key == nullOMKLVKey) {
-      OMKLVKey defalutKey = {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x02, 0x01, 0x01,
-                             0x0d, 0x01, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00};
-      key = defalutKey;
-      _stream->setLabel(key);
-    }
-    _stream->setPosition(0);
-    OMKLVStoredStream::writeKLVKey(*_stream, key);
-    _keyWritten = true;
-
-    ARESULT(const OMUInt64 lengthPosition)
-                                 OMKLVStoredStream::reserveKLVLength(*_stream);
-    ASSERT("Valid KLV length offset", _klvLengthOffset == lengthPosition);
-    ASSERT("Valid KLV value offset", _klvValueOffset == _stream->position());
+    writeKey();
   }
 
   _stream->setPosition(_klvValueOffset + _position);
   _stream->write(data, bytes, bytesWritten);
-  _position += bytesWritten;
+  _position = _position + bytesWritten;
   if (_position > _klvLength) {
-    OMKLVStoredStream::fixupKLVLength(*_stream, _klvLengthOffset);
     _klvLength = _position;
+    _dirty = true;
+  }
+}
+
+void OMKLVStoredStreamFilter::write(OMIOBufferDescriptor* buffers,
+                                    OMUInt32 bufferCount,
+                                    OMUInt32& bytesWritten)
+{
+  TRACE("OMKLVStoredStreamFilter::write");
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount > 0);
+
+  if (!_initialized) {
+    initialize();
+  }
+
+  if (!_keyWritten)
+  {
+    writeKey();
+  }
+
+  _stream->setPosition(_klvValueOffset + _position);
+  _stream->write(buffers,
+                 bufferCount,
+                 bytesWritten);
+  _position = _position + bytesWritten;
+  if (_position > _klvLength) {
+    _klvLength = _position;
+    _dirty = true;
+  }
+}
+
+void OMKLVStoredStreamFilter::write(OMUInt64 position,
+                                    const OMByte* buffer,
+                                    const OMUInt32 bytes,
+                                    void* /* */ completion,
+                                    const void* clientArgument)
+{
+  TRACE("OMKLVStoredStreamFilter::write");
+  PRECONDITION("Valid data", buffer != 0);
+  PRECONDITION("Valid size", bytes > 0);
+
+  if (!_initialized) {
+    initialize();
+  }
+
+  if (!_keyWritten)
+  {
+    writeKey();
+  }
+
+  _stream->write(_klvValueOffset + position,
+                 buffer,
+                 bytes,
+                 completion,
+                 clientArgument);
+  const OMUInt64 estimatedNewPosition = position + bytes;
+  if (estimatedNewPosition > _klvLength) {
+    _klvLength = estimatedNewPosition;
+    _dirty = true;
+  }
+}
+
+  // Asynchronous write - multiple buffers
+void OMKLVStoredStreamFilter::write(OMUInt64 position,
+                                    const OMIOBufferDescriptor* buffers,
+                                    OMUInt32 bufferCount,
+                                    void* /* */ completion,
+                                    const void* clientArgument)
+{
+  TRACE("OMKLVStoredStreamFilter::write");
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount > 0);
+
+  if (!_initialized) {
+    initialize();
+  }
+
+  if (!_keyWritten)
+  {
+    writeKey();
+  }
+
+  _stream->write(_klvValueOffset + position,
+                 buffers,
+                 bufferCount,
+                 completion,
+                 clientArgument);
+  const OMUInt64 estimatedNewPosition =
+                            position + ioVectorByteCount(buffers, bufferCount);
+  if (estimatedNewPosition > _klvLength) {
+    _klvLength = estimatedNewPosition;
+    _dirty = true;
   }
 }
 
@@ -203,6 +345,31 @@ void OMKLVStoredStreamFilter::setPosition(const OMUInt64 newPosition) const
   OMKLVStoredStreamFilter* non_const_this =
                                     const_cast<OMKLVStoredStreamFilter*>(this);
   non_const_this->_position = newPosition;
+}
+
+void OMKLVStoredStreamFilter::synchronize(void) const
+{
+  TRACE("OMKLVStoredStreamFilter::synchronize");
+
+  if (_initialized && _dirty) {
+    const OMUInt64 savedPosition = _stream->position();
+    OMKLVStoredStreamFilter* non_const_this =
+                                    const_cast<OMKLVStoredStreamFilter*>(this);
+
+    // Discrepancy between the length maintained by the filter and
+    // the actual stream length indicates that the stream has been
+    // modified outside this filter.
+    if ((_klvValueOffset + _klvLength) < _stream->size()) {
+      non_const_this->_klvLength = _stream->size() - _klvValueOffset;
+    }
+
+	// Go to the end of the stream
+    _stream->setPosition(_klvValueOffset + _klvLength);
+    // Update KLV length
+    OMKLVStoredStream::fixupKLVLength(*_stream, _klvLengthOffset);
+    _stream->setPosition(savedPosition);
+    non_const_this->_dirty = false;
+  }
 }
 
 void OMKLVStoredStreamFilter::close(void)
@@ -262,7 +429,7 @@ OMUInt32 OMKLVStoredStreamFilter::blockSize(void) const
   return _stream->blockSize();
 }
 
-void OMKLVStoredStreamFilter::initialize() const
+void OMKLVStoredStreamFilter::initialize(void) const
 {
   TRACE("OMKLVStoredStreamFilter::initialize");
   PRECONDITION("Not already initialized", _initialized == false);
@@ -284,6 +451,16 @@ void OMKLVStoredStreamFilter::initialize() const
     // Attempt to read the length following the key
     if (OMKLVStoredStream::readKLVLength(*_stream, length)) {
       valuePosition = _stream->position();
+      // If this initialize() is called on stream that's being
+      // written to it's possible that the stream KLV length in
+      // the file is not up-to-date. If the stream size reported
+      // by OMStoredStream is larger than the size recorded in the
+      // file assume that the latter is expired.
+      if (length == 0) {
+        if (_stream->size() > valuePosition) {
+          length = _stream->size() - valuePosition;
+        }
+      }
       readKL = true;
     }
   }
@@ -301,6 +478,7 @@ void OMKLVStoredStreamFilter::initialize() const
   non_const_this->_klvLength = length;
   non_const_this->_klvValueOffset = valuePosition;
   if (currentStreamPosition > _klvValueOffset) {
+    ASSERTU(currentStreamPosition >= _klvValueOffset);
     non_const_this->_position = currentStreamPosition - _klvValueOffset;
   } else {
     non_const_this->_position = 0;
@@ -309,4 +487,27 @@ void OMKLVStoredStreamFilter::initialize() const
 
   // Restore the current stream position
   _stream->setPosition( currentStreamPosition );
+}
+
+void OMKLVStoredStreamFilter::writeKey(void)
+{
+  TRACE("OMKLVStoredStreamFilter::writeKey");
+  PRECONDITION("Key not already written", _keyWritten == false);
+
+  OMKLVKey key = _stream->label();
+  if (key == nullOMKLVKey) {
+    OMKLVKey defalutKey = {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x02, 0x01, 0x01,
+                           0x0d, 0x01, 0x03, 0x01, 0x00, 0x00, 0x00, 0x00};
+    key = defalutKey;
+    _stream->setLabel(key);
+  }
+  _stream->setPosition(0);
+  OMKLVStoredStream::writeKLVKey(*_stream, key);
+  _keyWritten = true;
+
+  ARESULT(const OMUInt64 lengthPosition)
+                                 OMKLVStoredStream::reserveKLVLength(*_stream);
+  POSTCONDITION("Valid KLV length offset", _klvLengthOffset == lengthPosition);
+  POSTCONDITION("Valid KLV value offset", _klvValueOffset == _stream->position());
+  PRECONDITION("Key written", _keyWritten == true);
 }

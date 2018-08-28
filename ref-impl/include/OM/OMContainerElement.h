@@ -203,7 +203,7 @@ public:
 
     // @cmember Constructor.
   OMStrongReferenceVectorElement(OMProperty* property,
-                                 const wchar_t* name,
+                                 const OMUniqueObjectIdentification& id,
                                  OMUInt32 localKey);
 
     // @cmember Copy constructor.
@@ -227,16 +227,11 @@ public:
   OMStorable* setValue(const OMStorable* value);
 
     // @cmember The local key of this <c OMStrongReferenceVectorElement>.
-  OMUInt32 localKey(void) const;
-
-private:
-
-    // @cmember The local key of this <c OMStrongReferenceVectorElement>.
     //          The key is unique only within a given container instance
     //          and is assigned to each element of the container in such
     //          way as to be independent of the element's position within
     //          the container.
-  OMUInt32 _localKey;
+  OMUInt32 localKey(void) const;
 
 };
 
@@ -252,14 +247,14 @@ public:
 
     // @cmember Constructor.
   OMStrongReferenceSetElement(OMProperty* property,
-                              const wchar_t* name,
+                              const OMUniqueObjectIdentification& id,
                               OMUInt32 localKey,
                               void* identification,
                               size_t identificationSize);
 
     // @cmember Constructor.
   OMStrongReferenceSetElement(OMProperty* property,
-                              const wchar_t* name,
+                              const OMUniqueObjectIdentification& id,
                               OMUInt32 localKey,
                               OMUInt32 referenceCount,
                               void* identification,

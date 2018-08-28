@@ -1,4 +1,3 @@
-
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -45,7 +44,7 @@ using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
-#include <wchar.h>
+#include "AAFWideString.h"
 #include <string.h>
 
 #include "CAAFBuiltinDefs.h"
@@ -70,10 +69,10 @@ static const aafUID_t propDef_id =
 static const aafUID_t TEST_UID = kAAFTypeID_UInt8;
 
 //Initialize our Non-Implemented flags to False ...
-//static aafBoolean_t	 bSetDefaultValue_NI = kAAFFalse;       
-//static aafBoolean_t  bSetIsSearchable_NI = kAAFFalse;       
-//static aafBoolean_t  bGetDefaultValue_NI = kAAFFalse;       
-//static aafBoolean_t  bGetIsSearchable_NI = kAAFFalse;       
+//static aafBoolean_t	 bSetDefaultValue_NI = kAAFFalse;
+//static aafBoolean_t  bSetIsSearchable_NI = kAAFFalse;
+//static aafBoolean_t  bGetDefaultValue_NI = kAAFFalse;
+//static aafBoolean_t  bGetIsSearchable_NI = kAAFFalse;
 
 
 // convenient error handlers.
@@ -293,9 +292,9 @@ extern "C" HRESULT CAAFMetaDefinition_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IAAFMasterMob tests have not been implemented:" << endl; 
-//		cout << "     Initialize" << endl; 
-//		cout << "     SetName" << endl; 
+//		cout << "The following IAAFMasterMob tests have not been implemented:" << endl;
+//		cout << "     Initialize" << endl;
+//		cout << "     SetName" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 	

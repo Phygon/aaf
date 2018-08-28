@@ -32,7 +32,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#if defined(_MSC_VER)
+#if defined(_MSC_VER) && (_MSC_VER <= 1600)
 
 typedef signed char         int8_t;
 typedef signed short int    int16_t;
@@ -44,8 +44,7 @@ typedef unsigned long int   uint32_t;
 typedef unsigned __int64    uint64_t;
 
 #else
-#include <unistd.h>
-#include <inttypes.h>
+#include <stdint.h>
 #endif
 
 #include <limits.h>

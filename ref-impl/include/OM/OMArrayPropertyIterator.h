@@ -38,8 +38,6 @@
 #include "OMDataContainerIterator.h"
 #include "OMVectorIterator.h"
 
-#include <stddef.h>
-
 template <typename Element>
 class OMArrayProperty;
 
@@ -102,7 +100,7 @@ public:
 
     // @cmember The number of <p Elements>s in the associated
     //          <c OMArrayProperty>.
-  virtual size_t count(void) const;
+  virtual OMUInt32 count(void) const;
 
     // @cmember Advance this <c OMArrayPropertyIterator> to the next
     //          <p Element>, if any.
@@ -144,7 +142,7 @@ public:
     // @cmember Return the index of the <p Element> in the
     //          associated <c OMArrayProperty> at the position
     //          currently designated by this <c OMArrayPropertyIterator>.
-  virtual size_t index(void) const;
+  virtual OMUInt32 index(void) const;
 
 protected:
 

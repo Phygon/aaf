@@ -49,7 +49,7 @@ using namespace std;
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
-#include <wchar.h>
+#include "AAFWideString.h"
 #include <string.h>
 
 #include "CAAFBuiltinDefs.h"
@@ -520,7 +520,7 @@ static HRESULT verityTaggedValueAttributes(
     checkResult(spVA->GetElements(spArrayPropertyValue, &spPropertyValues));
     
     aafCharacter buffer[32]; // must be big enought for sample tags and values.
-    aafUInt32 index, bufferSize;;
+    aafUInt32 index, bufferSize;
     for (index = 0; index < elementCount; index++)
     {
       IAAFPropertyValueSP spElementValue;
@@ -1274,7 +1274,7 @@ static HRESULT CreateAAFFile(
 		//////////////////// done /!!!!!!!!!!!!!!!!!!!!!!
 		
 		//Verify results right away (during this creation process) ....
-		checkResult(verifyContents (kAAFUnitTestReadWrite, pHeader, pDict, kAAFTrue));  //True => minimal testing 
+		checkResult(verifyContents (kAAFUnitTestReadWrite, pHeader, pDict, kAAFFalse));  //True => minimal testing, False => full testing 
 		
 	}
 	catch (HRESULT & rResult)

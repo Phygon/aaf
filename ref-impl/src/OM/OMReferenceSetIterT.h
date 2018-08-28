@@ -158,7 +158,7 @@ bool OMReferenceSetIterator<UniqueIdentification,
   //   @rdesc The number of <p ReferencedObject>s
   //   @this const
 template <typename UniqueIdentification, typename ReferencedObject>
-size_t OMReferenceSetIterator<UniqueIdentification,
+OMUInt32 OMReferenceSetIterator<UniqueIdentification,
                               ReferencedObject>::count(void) const
 {
   return _iterator.count();

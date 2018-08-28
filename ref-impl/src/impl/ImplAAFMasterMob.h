@@ -240,7 +240,115 @@ public:
     ImplAAFFindSourceInfo ** ppSourceInfo
   );
 
+  virtual AAFRESULT STDMETHODCALLTYPE 
+  SearchMultichannelSource (
+	  // @parm [in] aafSlotID_t | slotID | Slot ID
+	  aafSlotID_t  slotID,
 
+	  // @param [in] aafUInt32 | channelID | Channel ID
+	  aafUInt32  channelID,
+
+	  // @parm [in] aafPosition_t | offset | Offset
+	  aafPosition_t  offset,
+
+	  // @parm [in] aafMobKind_t | mobKind | Mob Kind
+	  aafMobKind_t  mobKind,
+
+	  // @parm [in] aafMediaCriteria_t * | pMediaCrit | Media Criteria
+	  aafMediaCriteria_t *  pMediaCrit,
+
+	  // @parm [in] aafOperationChoice_t * | pOperationChoice | Operation Choice
+	  aafOperationChoice_t *  pOperationChoice,
+
+	  // @parm [out] AAFFindSourceInfo | ppSourceInfo | Source Information
+	  ImplAAFFindSourceInfo ** ppSourceInfo
+  );
+
+
+  //***********************************************************
+  // METHOD NAME: SearchSourceAdvanced()
+  //
+  // DESCRIPTION:
+  // @mfunc AAFRESULT | AAFSearchSource2 | SearchSource |
+  // This function returns the source information for a slot in a
+  // Master Mob or Source Mob.  It follows the Source Clip references
+  // in the specified slot until it encounters the kind of Mob
+  // specified in the mobKind parameter.  This function cannot be used
+  // on a Composition Mob and is not intended to be called
+  // iteratively.
+  //
+  // This method is similar to SearchSource, except it attempts to
+  // compensate for errors introduced when converting offsets and
+  // lengths between different edit rates, while traversing Source Clip
+  // reference chain. It accounts for the fact that the result of
+  // the conversion is often not exactly on a frame/sample boundary
+  // but within small enough distance that it can be rounded up to
+  // the boundary. This method produces better results with Source Clip
+  // reference chains that mix audio and video edit rates.
+  //
+  // Succeeds if all of the following are true:
+  // - the ppThisCpnt pointer is valid.
+  // (other conditions here)
+  // 
+  // If this method fails nothing is written to *ppThisCpnt.
+  // 
+  // This method will return the following codes.  If more than one of
+  // the listed errors is in effect, it will return the first one
+  // encountered in the order given below:
+  // 
+  // AAFRESULT_SUCCESS
+  //   - succeeded.  (This is the only code indicating success.)
+  //
+  // AAFRESULT_NULL_PARAM
+  //   - ppCpnt is null.
+  //
+  // (other codes here.)
+  // @end
+  // 
+  virtual AAFRESULT STDMETHODCALLTYPE
+  SearchSourceAdvanced (
+    // @parm [in] aafSlotID_t | slotID | Slot ID
+    aafSlotID_t  slotID,
+
+    // @parm [in] aafPosition_t | offset | Offset
+    aafPosition_t  offset,
+
+    // @parm [in] aafMobKind_t | mobKind | Mob Kind
+    aafMobKind_t  mobKind,
+
+    // @parm [in] aafMediaCriteria_t * | pMediaCrit | Media Criteria
+    aafMediaCriteria_t *  pMediaCrit,
+
+    // @parm [in] aafOperationChoice_t * | pOperationChoice | Operation Choice
+    aafOperationChoice_t *  pOperationChoice,
+
+    // @parm [out] AAFFindSourceInfo | ppSourceInfo | Source Information
+    ImplAAFFindSourceInfo ** ppSourceInfo
+  );
+
+  virtual AAFRESULT STDMETHODCALLTYPE 
+  SearchMultichannelSourceAdvanced (
+	  // @parm [in] aafSlotID_t | slotID | Slot ID
+	  aafSlotID_t  slotID,
+
+	  // @param [in] aafUInt32 | channelID | Channel ID
+	  aafUInt32  channelID,
+
+	  // @parm [in] aafPosition_t | offset | Offset
+	  aafPosition_t  offset,
+
+	  // @parm [in] aafMobKind_t | mobKind | Mob Kind
+	  aafMobKind_t  mobKind,
+
+	  // @parm [in] aafMediaCriteria_t * | pMediaCrit | Media Criteria
+	  aafMediaCriteria_t *  pMediaCrit,
+
+	  // @parm [in] aafOperationChoice_t * | pOperationChoice | Operation Choice
+	  aafOperationChoice_t *  pOperationChoice,
+
+	  // @parm [out] AAFFindSourceInfo | ppSourceInfo | Source Information
+	  ImplAAFFindSourceInfo ** ppSourceInfo
+  );
 
   //***********************************************************
   // METHOD NAME: GetMobKind()

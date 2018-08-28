@@ -207,8 +207,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppEssence->ReleaseReference(); // We are through with this pointer.
+          internalppEssence = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppEssence should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppEssence == 0);
+
   return hr;
 }
 
@@ -938,20 +949,379 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppSourceInfo->ReleaseReference(); // We are through with this pointer.
+          internalppSourceInfo = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppSourceInfo should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppSourceInfo == 0);
+
 
   return hr;
 }
 
 
+HRESULT STDMETHODCALLTYPE
+    CAAFSourceMob::SearchSourceAdvanced (aafSlotID_t  slotID,
+        aafPosition_t  offset,
+        aafMobKind_t  mobKind,
+        aafMediaCriteria_t *  pMediaCrit,
+        aafOperationChoice_t *  pOperationChoice,
+        IAAFFindSourceInfo ** ppSourceInfo)
+{
+  HRESULT hr;
+
+  ImplAAFSourceMob * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFSourceMob*> (pO);
+  assert (ptr);
+
+
+
+  //
+  // set up for mobKind
+  //
+  if (! Is_aafMobKind_t_Valid(mobKind))
+    return AAFRESULT_INVALID_ENUM_VALUE;
+
+
+
+  //
+  // set up for ppSourceInfo
+  //
+  ImplAAFFindSourceInfo * internalppSourceInfo = NULL;
+  ImplAAFFindSourceInfo ** pinternalppSourceInfo = NULL;
+  if (ppSourceInfo)
+    {
+      pinternalppSourceInfo = &internalppSourceInfo;
+    }
+
+  try
+    {
+      hr = ptr->SearchSourceAdvanced (slotID,
+    offset,
+    mobKind,
+    pMediaCrit,
+    pOperationChoice,
+    pinternalppSourceInfo);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+
+
+
+
+
+  //
+  // cleanup for ppSourceInfo
+  //
+  if (SUCCEEDED(hr))
+    {
+      IUnknown *pUnknown;
+      HRESULT hStat;
+
+      if (internalppSourceInfo)
+        {
+          pUnknown = static_cast<IUnknown *> (internalppSourceInfo->GetContainer());
+          hStat = pUnknown->QueryInterface(IID_IAAFFindSourceInfo, (void **)ppSourceInfo);
+          assert (SUCCEEDED (hStat));
+          //pUnknown->Release();
+          internalppSourceInfo->ReleaseReference(); // We are through with this pointer.
+          internalppSourceInfo = 0;
+        }
+    }
+
+  // If the call to the Impl method above fails, internalppSourceInfo should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppSourceInfo == 0);
+
+
+  return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFSourceMob::SearchMultichannelSource (aafSlotID_t  slotID,
+        aafUInt32  channelID,
+        aafPosition_t  offset,
+        aafMobKind_t  mobKind,
+        aafMediaCriteria_t *  pMediaCrit,
+        aafOperationChoice_t *  pOperationChoice,
+        IAAFFindSourceInfo ** ppSourceInfo)
+{
+  HRESULT hr;
+
+  ImplAAFSourceMob * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFSourceMob*> (pO);
+  assert (ptr);
+
+
+
+
+  //
+  // set up for mobKind
+  //
+  if (! Is_aafMobKind_t_Valid(mobKind))
+    return AAFRESULT_INVALID_ENUM_VALUE;
+
+
+
+  //
+  // set up for ppSourceInfo
+  //
+  ImplAAFFindSourceInfo * internalppSourceInfo = NULL;
+  ImplAAFFindSourceInfo ** pinternalppSourceInfo = NULL;
+  if (ppSourceInfo)
+    {
+      pinternalppSourceInfo = &internalppSourceInfo;
+    }
+
+  try
+    {
+      hr = ptr->SearchMultichannelSource (slotID,
+    channelID,
+    offset,
+    mobKind,
+    pMediaCrit,
+    pOperationChoice,
+    pinternalppSourceInfo);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+
+
+
+
+
+
+  //
+  // cleanup for ppSourceInfo
+  //
+  if (SUCCEEDED(hr))
+    {
+      IUnknown *pUnknown;
+      HRESULT hStat;
+
+      if (internalppSourceInfo)
+        {
+          pUnknown = static_cast<IUnknown *> (internalppSourceInfo->GetContainer());
+          hStat = pUnknown->QueryInterface(IID_IAAFFindSourceInfo, (void **)ppSourceInfo);
+          assert (SUCCEEDED (hStat));
+          //pUnknown->Release();
+          internalppSourceInfo->ReleaseReference(); // We are through with this pointer.
+          internalppSourceInfo = 0;
+        }
+    }
+
+  // If the call to the Impl method above fails, internalppSourceInfo should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppSourceInfo == 0);
+
+
+  return hr;
+}
+
+
+HRESULT STDMETHODCALLTYPE
+    CAAFSourceMob::SearchMultichannelSourceAdvanced (aafSlotID_t  slotID,
+        aafUInt32  channelID,
+        aafPosition_t  offset,
+        aafMobKind_t  mobKind,
+        aafMediaCriteria_t *  pMediaCrit,
+        aafOperationChoice_t *  pOperationChoice,
+        IAAFFindSourceInfo ** ppSourceInfo)
+{
+  HRESULT hr;
+
+  ImplAAFSourceMob * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFSourceMob*> (pO);
+  assert (ptr);
+
+
+
+
+  //
+  // set up for mobKind
+  //
+  if (! Is_aafMobKind_t_Valid(mobKind))
+    return AAFRESULT_INVALID_ENUM_VALUE;
+
+
+
+  //
+  // set up for ppSourceInfo
+  //
+  ImplAAFFindSourceInfo * internalppSourceInfo = NULL;
+  ImplAAFFindSourceInfo ** pinternalppSourceInfo = NULL;
+  if (ppSourceInfo)
+    {
+      pinternalppSourceInfo = &internalppSourceInfo;
+    }
+
+  try
+    {
+      hr = ptr->SearchMultichannelSourceAdvanced (slotID,
+    channelID,
+    offset,
+    mobKind,
+    pMediaCrit,
+    pOperationChoice,
+    pinternalppSourceInfo);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+
+
+
+
+
+
+  //
+  // cleanup for ppSourceInfo
+  //
+  if (SUCCEEDED(hr))
+    {
+      IUnknown *pUnknown;
+      HRESULT hStat;
+
+      if (internalppSourceInfo)
+        {
+          pUnknown = static_cast<IUnknown *> (internalppSourceInfo->GetContainer());
+          hStat = pUnknown->QueryInterface(IID_IAAFFindSourceInfo, (void **)ppSourceInfo);
+          assert (SUCCEEDED (hStat));
+          //pUnknown->Release();
+          internalppSourceInfo->ReleaseReference(); // We are through with this pointer.
+          internalppSourceInfo = 0;
+        }
+    }
+
+  // If the call to the Impl method above fails, internalppSourceInfo should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppSourceInfo == 0);
+
+
+  return hr;
+}
+
+
+
 //
 // 
-// 
+//
 inline int EQUAL_UID(const GUID & a, const GUID & b)
 {
   return (0 == memcmp((&a), (&b), sizeof (aafUID_t)));
-}
+} 
 HRESULT CAAFSourceMob::InternalQueryInterface
 (
     REFIID riid,
@@ -974,6 +1344,18 @@ HRESULT CAAFSourceMob::InternalQueryInterface
         ((IUnknown *)*ppvObj)->AddRef();
         return S_OK;
     }
+    if (EQUAL_UID(riid,IID_IAAFSearchSource2)) 
+    { 
+        *ppvObj = (IAAFSearchSource2 *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
+    if (EQUAL_UID(riid,IID_IAAFSearchSource3)) 
+    { 
+        *ppvObj = (IAAFSearchSource3 *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
 
     // Always delegate back to base implementation.
     return CAAFMob::InternalQueryInterface(riid, ppvObj);
@@ -983,4 +1365,5 @@ HRESULT CAAFSourceMob::InternalQueryInterface
 // Define the contrete object support implementation.
 // 
 AAF_DEFINE_FACTORY(AAFSourceMob)
+
 

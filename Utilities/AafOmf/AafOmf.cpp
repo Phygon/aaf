@@ -67,7 +67,7 @@ using namespace std;
 #include "AAFClassDefUIDs.h"
 #include "EffectTranslate.h"
 
-//#include "AAFUtils.h"
+
 //AAFRESULT aafMobIDNew(aafMobID_t *mobID);
 //AAFRESULT aafMobIDFromMajorMinor(
 //        aafUInt32	major,

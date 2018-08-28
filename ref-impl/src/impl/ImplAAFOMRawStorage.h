@@ -42,9 +42,9 @@ struct IAAFRawStorage;
 struct IAAFRandomRawStorage;
 struct IAAFStreamRawStorage;
 struct IAAFAsyncStreamRawStorage;
+struct IAAFCopyByte;
 
-struct IAAFRawStorage;
-struct IAAFRandomRawStorage;
+class ChainedIOCompletion;
 
 class ImplAAFOMRawStorage : public OMRawStorage
 {
@@ -91,6 +91,18 @@ public:
                       OMUInt32 byteCount,
                       OMUInt32& bytesRead) const;
 
+#if 0  // Enable thei code once OMRawStorage has stream I/O methods
+  virtual void streamReadAt(OMUInt64 position,
+                            OMByte* bytes,
+                            OMUInt32 byteCount,
+                            OMUInt32& bytesRead) const;
+
+  virtual void streamReadAt(OMUInt64 position,
+                            OMIOBufferDescriptor* buffers,
+                            OMUInt32 bufferCount,
+                            OMUInt32& bytesRead) const;
+#endif
+
   // @cmember Is it possible to write to this <c OMRawStorage> ?
   virtual bool isWritable(void) const;
 
@@ -124,6 +136,34 @@ public:
                        const OMByte* bytes,
                        OMUInt32 byteCount,
                        OMUInt32& bytesWritten);
+
+    // @cmember Attempt to write the byte specified by <p theByte>
+    //          <p byteCount> times starting at offset <p position> in this
+    //          <c OMRawStorage>.
+    //          The actual number of bytes written is returned in
+    //          <p bytesWritten>.
+    //          Writing to positions greater than
+    //          <mf OMRawStorage::size> causes this <c OMRawStorage>
+    //          to be extended, however such extension can fail, causing
+    //          <p bytesWritten> to be less than <p byteCount>.
+    //          @precondition <f isWritable()> && <f isPositionable()>
+    //   @devnote How is failure to extend indicated ?
+  virtual void writeCopyByteAt(OMUInt64 position,
+                               OMByte theByte,
+                               OMUInt32 byteCount,
+                               OMUInt32& bytesWritten);
+
+#if 0  // Enable thei code once OMRawStorage has stream I/O methods
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMByte* bytes,
+                             OMUInt32 byteCount,
+                             OMUInt32& bytesWritten);
+
+  virtual void streamWriteAt(OMUInt64 position,
+                             OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             OMUInt32& bytesWritten);
+#endif
 
   // @cmember May this <c OMRawStorage> be changed in size ?
   //          An implementation of <c OMRawStorage> for disk files
@@ -180,10 +220,57 @@ public:
   //          files.
   virtual void synchronize(void);
 
+  virtual void streamReadAt(OMUInt64 position,
+                            OMByte* bytes,
+                            OMUInt32 byteCount,
+                            OMUInt32& bytesRead) const;
+
+  virtual void streamReadAt(OMUInt64 position,
+                            OMIOBufferDescriptor* buffers,
+                            OMUInt32 bufferCount,
+                            OMUInt32& bytesRead) const;
+
+  virtual void streamReadAt(OMUInt64 position,
+                            OMByte* buffer,
+                            const OMUInt32 bytes,
+                            void* /* */ completion,
+                            const void* clientArgument) const;
+
+  virtual void streamReadAt(OMUInt64 position,
+                            OMIOBufferDescriptor* buffers,
+                            OMUInt32 bufferCount,
+                            void* /* */ completion,
+                            const void* clientArgument) const;
+
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMByte* bytes,
+                             OMUInt32 byteCount,
+                             OMUInt32& bytesWritten);
+
+  virtual void streamWriteAt(OMUInt64 position,
+                             OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             OMUInt32& bytesWritten);
+
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMByte* buffer,
+                             const OMUInt32 bytes,
+                             void* /* */ completion,
+                             const void* clientArgument);
+
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             void* /* */ completion,
+                             const void* clientArgument);
 
 private:
   IAAFRawStorage * _rep;
   IAAFRandomRawStorage * _randRep;
+  IAAFStreamRawStorage * _streamRep;
+  IAAFAsyncStreamRawStorage * _asyncStreamRep;
+  IAAFCopyByte * _copyByteRep;
+  ChainedIOCompletion* _pending; // Only one pending operation currently supported
   OMUInt64 _position;
 };
 
@@ -193,7 +280,7 @@ class ImplAAFOMCachedRawStorage : public OMBaseCachedDiskRawStorage
 {
 public:
 
-  ImplAAFOMCachedRawStorage(IAAFRawStorage* rep,
+  ImplAAFOMCachedRawStorage(IAAFRandomRawStorage* randRep,
                             aafUInt32 pageCount,
                             aafUInt32 pageSize,
                             OMCachePageAllocator* allocator);
@@ -212,6 +299,50 @@ public:
 
   virtual void synchronize(void);
 
+  virtual void streamReadAt(OMUInt64 position,
+                            OMByte* bytes,
+                            OMUInt32 byteCount,
+                            OMUInt32& bytesRead) const;
+
+  virtual void streamReadAt(OMUInt64 position,
+                            OMIOBufferDescriptor* buffers,
+                            OMUInt32 bufferCount,
+                            OMUInt32& bytesRead) const;
+
+  virtual void streamReadAt(OMUInt64 position,
+                            OMByte* buffer,
+                            const OMUInt32 bytes,
+                            void* /* */ completion,
+                            const void* clientArgument) const;
+
+  virtual void streamReadAt(OMUInt64 position,
+                            OMIOBufferDescriptor* buffers,
+                            OMUInt32 bufferCount,
+                            void* /* */ completion,
+                            const void* clientArgument) const;
+
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMByte* bytes,
+                             OMUInt32 byteCount,
+                             OMUInt32& bytesWritten);
+
+  virtual void streamWriteAt(OMUInt64 position,
+                             OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             OMUInt32& bytesWritten);
+
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMByte* buffer,
+                             const OMUInt32 bytes,
+                             void* /* */ completion,
+                             const void* clientArgument);
+
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             void* /* */ completion,
+                             const void* clientArgument);
+
 private:
 
   // OMPageCage overrides
@@ -224,11 +355,9 @@ private:
                           OMUInt32 byteCount,
                           const OMByte* source);
 
-  // @cmember Return the size of the specified raw storage. If the
-  //          raw storage is not IAAFRandomRawStorage the returned
-  //          size is always zero.
+  // @cmember Return the size of the specified raw storage.
   //          This utility method is used in the class constructor.
-  static aafUInt64 getRawStorageSize( IAAFRawStorage* );
+  static aafUInt64 getRawStorageSize( IAAFRandomRawStorage* );
 
 
 private:

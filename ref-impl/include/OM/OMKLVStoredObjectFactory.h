@@ -110,6 +110,20 @@ public:
     //          If so, the result is true.
   virtual bool isRecognized(OMRawStorage* rawStorage);
 
+    // @cmember Is the file named <p fileName> an incomplete (in-progress) file ?
+    //          If so, the result is true.
+  virtual bool isBeingModified(const wchar_t* fileName);
+
+    // @cmember Does <p rawStorage> contain an incomplete (in-progress) file ?
+    //          If so, the result is true.
+  virtual bool isBeingModified(OMRawStorage* rawStorage);
+
+    // @cmember Does the file in <p rawStorage> comply to operational
+    //          pattern <p operationalPattern>?
+    //          If so, the result is true.
+  virtual bool readOperationalPattern(OMRawStorage* rawStorage,
+                                      OMKLVKey& operationalPattern);
+
     // @cmember Can a file be created successfully on the given
     //          <c OMRawStorage> and accessed successfully in the mode
     //          specified by <p accessMode> ?
@@ -119,6 +133,14 @@ public:
     // @cmember Can a file be created successfully as a named file and
     //          accessed successfully in the mode specified by <p accessMode> ?
   virtual bool compatibleNamedFile(const OMFile::OMAccessMode accessMode);
+
+    // @cmember Can the contents of a file on the given <c OMRawStorage>
+    //          be accessed successfully in the mode specified by
+    //          <p accessMode> ?
+    //          This method attempts to identify issues with the file
+    //          contents before opening the file and restoring its metadata.
+  virtual bool compatibleStoredFormat(const OMRawStorage* rawStorage,
+                                      const OMFile::OMAccessMode accessMode);
 
     // @cmember Perform any necessary actions when <p file> is closed.
   virtual void close(OMFile* file);

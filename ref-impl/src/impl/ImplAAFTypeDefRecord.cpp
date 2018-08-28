@@ -130,7 +130,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFTypeDefRecord::Initialize (
       const aafUID_t & id,
       ImplAAFTypeDef ** ppMemberTypes,
-      aafCharacter_constptr * pMemberNames,
+      aafString_t * pMemberNames,
       aafUInt32 numMembers,
       const aafCharacter * pTypeName)
 {
@@ -1190,9 +1190,8 @@ void ImplAAFTypeDefRecord::externalize(const OMByte* internalBytes,
 	  hr = pNonConstThis->GetMemberType (member, &ptdm);
 	  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 	  externalMemberSize = ptdm->PropValSize ();
-	  // OFM 2007-08-09 merge forward
-	  // internalMemberSize = _internalSizes[member];
-      internalMemberSize = ptdm->internalSize (externalBytes, externalMemberSize);
+	  internalMemberSize = _internalSizes[member];
+       //   internalMemberSize = ptdm->internalSize (externalBytes, externalMemberSize); JeffB: Try changing back
 
 	  ptdm->type()->externalize (internalBytes,
 						 internalMemberSize,
@@ -1216,7 +1215,8 @@ void ImplAAFTypeDefRecord::externalize(const OMByte* internalBytes,
 }
 
 
-OMUInt32 ImplAAFTypeDefRecord::internalSize(void) const
+OMUInt32 ImplAAFTypeDefRecord::internalSize(const OMByte* /*externalBytes*/,
+											OMUInt32 /*externalBytesSize*/) const
 {
   if (IsRegistered ())
 	return NativeSize ();
@@ -1224,8 +1224,8 @@ OMUInt32 ImplAAFTypeDefRecord::internalSize(void) const
 	return PropValSize ();
 }
 
-OMUInt32 ImplAAFTypeDefRecord::internalSize(const OMByte* /*externalBytes*/,
-											OMUInt32 /*externalBytesSize*/) const
+
+OMUInt32 ImplAAFTypeDefRecord::internalSize(void) const
 {
   if (IsRegistered ())
 	return NativeSize ();
@@ -1262,9 +1262,8 @@ void ImplAAFTypeDefRecord::internalize(const OMByte* externalBytes,
 	  hr = pNonConstThis->GetMemberType (member, &ptdm);
 	  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 	  externalMemberSize = ptdm->PropValSize ();
-	  // OFM 2007-08-09 merge forward
-	  // internalMemberSize = _internalSizes[member];
-      internalMemberSize = ptdm->internalSize (externalBytes, externalMemberSize);
+	  internalMemberSize = _internalSizes[member];
+      //    internalMemberSize = ptdm->internalSize (externalBytes, externalMemberSize);
 
 	  ptdm->type()->internalize (externalBytes,
 						 externalMemberSize,
@@ -1401,7 +1400,7 @@ void ImplAAFTypeDefRecord::AttemptBuiltinRegistration (void)
   if (! _registrationAttempted)
 	{
 	  ImplAAFDictionarySP pDict;
-	  AAFRESULT hr = GetDictionary(&pDict);
+	  ARESULT (AAFRESULT hr) GetDictionary(&pDict);
 	  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 	  pDict->pvtAttemptBuiltinSizeRegistration (this);
 	  _registrationAttempted = kAAFTrue;

@@ -40,7 +40,6 @@
 #include "AAFResult.h"
 
 #include "CAAFBuiltinDefs.h"
-#include "AAFDefUIDs.h"
 #include "ModuleTest.h"
 
 using namespace std;
@@ -174,6 +173,27 @@ static HRESULT Test_IAAFPCMDescriptor_PeakEnvelopeData(
     IAAFPCMDescriptor*,
     testMode_t );
 
+static HRESULT Test_IAAFPCMDescriptor_PeakEnvelopeData_NotPresent(
+    IAAFPCMDescriptor* );
+static HRESULT Test_IAAFPCMDescriptor_PeakEnvelopeData_Write(
+    IAAFPCMDescriptor* );
+static HRESULT Test_IAAFPCMDescriptor_PeakEnvelopeData_Read(
+    IAAFPCMDescriptor* );
+
+ #ifdef TEST_NEW_STREAM_WRITING
+static HRESULT StartPeakEnvelopeDataKLV(
+    IAAFPCMDescriptor*,
+    const testKLVKey_t&,
+    aafInt64*,
+    aafInt64* );
+static HRESULT FinishPeakEnvelopeDataKLV(
+    IAAFPCMDescriptor*,
+    aafInt64,
+    aafInt64 );
+#endif
+static HRESULT SkipPeakEnvelopeDataKLV(
+    IAAFPCMDescriptor*,
+    aafInt64* );
 
 
 //
@@ -281,7 +301,7 @@ static HRESULT CreateAAFFile(
         checkResult(pHeader->AddMob(pMob));
 
 
-        // Test initialized SoundDescriptor.
+        // Test initialized PCMDescriptor.
         checkResult(Test_IAAFPCMDescriptor(pPCMDesc,
                                            kAAFUnitTestReadWrite));
 
@@ -1464,163 +1484,227 @@ static HRESULT Test_IAAFPCMDescriptor_PeakEnvelopeData(
 
         if( mode == kAAFUnitTestReadWrite )
         {
-            // ReadPeakEnvelopeData() should fail if the property not present.
-            unsigned char  buffer[ peakEnvelopeDataSize ];
-            memcpy( buffer, bogusPeakEnvelopeData, peakEnvelopeDataSize );
-            aafUInt32  bytesRead = 0;
-            hr = pPCMDesc->ReadPeakEnvelopeData( peakEnvelopeDataSize,
-                                                 buffer,
-                                                 &bytesRead );
-            checkExpression( hr == AAFRESULT_PROP_NOT_PRESENT,
-                             AAFRESULT_TEST_FAILED );
-            checkExpression( memcmp( buffer, bogusPeakEnvelopeData,
-                                     peakEnvelopeDataSize ) == 0,
-                             AAFRESULT_TEST_FAILED );
-            checkExpression( bytesRead == 0, AAFRESULT_TEST_FAILED );
+            // Test the interface behaviour when the property is not present
+            checkResult( Test_IAAFPCMDescriptor_PeakEnvelopeData_NotPresent(
+                            pPCMDesc ) );
 
 
-            // ReadPeakEnvelopeData() should fail if function
-            // arguments are invalid.
-            hr = pPCMDesc->ReadPeakEnvelopeData( peakEnvelopeDataSize,
-                                                 0,
-                                                 &bytesRead );
-            checkExpression( hr==AAFRESULT_NULL_PARAM, AAFRESULT_TEST_FAILED );
-            hr = pPCMDesc->ReadPeakEnvelopeData( peakEnvelopeDataSize,
-                                                 buffer,
-                                                 0 );
-            checkExpression( hr==AAFRESULT_NULL_PARAM, AAFRESULT_TEST_FAILED );
-            checkExpression( memcmp( buffer, bogusPeakEnvelopeData,
-                                     peakEnvelopeDataSize ) == 0,
-                             AAFRESULT_TEST_FAILED );
-            checkExpression( bytesRead == 0, AAFRESULT_TEST_FAILED );
-
-
-            // WritePeakEnvelopeData() should fail if the function
-            // arguments are invalid.
-            aafUInt32  bytesWritten = 0;
-            hr = pPCMDesc->WritePeakEnvelopeData( peakEnvelopeDataSize,
-                                                  0,
-                                                  &bytesWritten );
-            checkExpression( hr==AAFRESULT_NULL_PARAM, AAFRESULT_TEST_FAILED );
-            checkExpression( bytesWritten == 0, AAFRESULT_TEST_FAILED );
-
-
-            // WritePeakEnvelopeData() should always succeed
-            hr = pPCMDesc->WritePeakEnvelopeData(
-                    peakEnvelopeDataSize,
-                    (aafDataBuffer_t)(gTestData.peakEnvelopeData),
-                    &bytesWritten );
-            checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
-            checkExpression( bytesWritten == peakEnvelopeDataSize, AAFRESULT_TEST_FAILED );
-
-
-            // GetPeakEnvelopeDataPosition() should fail if the function
-            // arguments are invalid.
-            hr = pPCMDesc->GetPeakEnvelopeDataPosition( 0 );
-            checkExpression( hr==AAFRESULT_NULL_PARAM, AAFRESULT_TEST_FAILED );
-
-
-            // GetPeakEnvelopeDataPosition() should always succeed
-            aafPosition_t  position = 0;
-            hr = pPCMDesc->GetPeakEnvelopeDataPosition( &position );
-            checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
-            checkExpression( position == peakEnvelopeDataSize, AAFRESULT_TEST_FAILED );
-
-
-            // After writing to the stream the current position is
-            // past the end of the last byte, thefore Read() should
-            // fail.
-            bytesRead = 0;
-            hr = pPCMDesc->ReadPeakEnvelopeData( peakEnvelopeDataSize,
-                                                 buffer,
-                                                 &bytesRead );
-            checkExpression( hr == AAFRESULT_END_OF_DATA, AAFRESULT_TEST_FAILED );
-            checkExpression( bytesRead == 0, AAFRESULT_TEST_FAILED );
-
-
-            // GetPeakEnvelopeDataSize() should fail if the function
-            // arguments are invalid.
-            hr = pPCMDesc->GetPeakEnvelopeDataSize( 0 );
-            checkExpression( hr==AAFRESULT_NULL_PARAM, AAFRESULT_TEST_FAILED );
-
-
-            // GetPeakEnvelopeDataSize() should always succeed
-            aafLength_t  size = 0;
-            hr = pPCMDesc->GetPeakEnvelopeDataSize( &size );
-            checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
-            checkExpression( size == peakEnvelopeDataSize, AAFRESULT_TEST_FAILED );
+            // Create PeakEnvelopeData
+            checkResult( Test_IAAFPCMDescriptor_PeakEnvelopeData_Write( pPCMDesc ) );
         }
 
 
         if( mode == kAAFUnitTestReadWrite || mode == kAAFUnitTestReadOnly )
         {
-            // Check the stream size
-            aafLength_t  size = 0;
-            hr = pPCMDesc->GetPeakEnvelopeDataSize( &size );
-            checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
-            checkExpression( size == peakEnvelopeDataSize, AAFRESULT_TEST_FAILED );
+            checkResult( pPCMDesc->SetPeakEnvelopeDataPosition( 0 ) );
 
-
-            // Make sure the current position is at the beginning of the stream
-            hr = pPCMDesc->SetPeakEnvelopeDataPosition( 0 );
-            checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
-
-
-            // Read less data than there's in the stream
-            unsigned char  buffer[ peakEnvelopeDataSize * 2 ];
-            memcpy( buffer, bogusPeakEnvelopeData, peakEnvelopeDataSize );
-            aafUInt32  bytesRead = 0;
-            aafUInt32  bytesToRead = peakEnvelopeDataSize / 2;
-            hr = pPCMDesc->ReadPeakEnvelopeData( bytesToRead,
-                                                 buffer,
-                                                 &bytesRead );
-            checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
-            checkExpression( bytesRead == bytesToRead,
-                             AAFRESULT_TEST_FAILED );
-            checkExpression( memcmp( buffer, gTestData.peakEnvelopeData,
-                                     bytesToRead ) == 0,
-                             AAFRESULT_TEST_FAILED );
-
-
-            // Make sure the current position is at the beginning of the stream
-            hr = pPCMDesc->SetPeakEnvelopeDataPosition( 0 );
-            checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
-
-
-            // Read more data than there's in the stream
-            memcpy( buffer, bogusPeakEnvelopeData, peakEnvelopeDataSize );
-            bytesRead = 0;
-            bytesToRead = peakEnvelopeDataSize * 2;
-            hr = pPCMDesc->ReadPeakEnvelopeData( bytesToRead,
-                                                 buffer,
-                                                 &bytesRead );
-            checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
-            checkExpression( bytesRead == peakEnvelopeDataSize,
-                             AAFRESULT_TEST_FAILED );
-            checkExpression( memcmp( buffer, gTestData.peakEnvelopeData,
-                                     peakEnvelopeDataSize ) == 0,
-                             AAFRESULT_TEST_FAILED );
-
-
-            // Make sure the current position is at the beginning of the stream
-            hr = pPCMDesc->SetPeakEnvelopeDataPosition( 0 );
-            checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
-
-
-            // Read whole stream
-            memcpy( buffer, bogusPeakEnvelopeData, peakEnvelopeDataSize );
-            bytesRead = 0;
-            bytesToRead = peakEnvelopeDataSize;
-            hr = pPCMDesc->ReadPeakEnvelopeData( bytesToRead,
-                                                 buffer,
-                                                 &bytesRead );
-            checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
-            checkExpression( bytesRead == bytesToRead,
-                             AAFRESULT_TEST_FAILED );
-            checkExpression( memcmp( buffer, gTestData.peakEnvelopeData,
-                                     bytesToRead ) == 0,
-                             AAFRESULT_TEST_FAILED );
+            // Read PeakEnvelopeData
+            checkResult( Test_IAAFPCMDescriptor_PeakEnvelopeData_Read( pPCMDesc ) );
         }
+
+
+        // If we got to this point none of the tests above
+        // failed and the status can be set to 'success'.
+        hr = S_OK;
+    }
+    catch( HRESULT e )
+    {
+        hr = e;
+    }
+
+
+    return hr;
+}
+
+
+
+static HRESULT Test_IAAFPCMDescriptor_PeakEnvelopeData_NotPresent(
+    IAAFPCMDescriptor* pPCMDesc )
+{
+    HRESULT  hr = S_OK;
+
+
+    try
+    {
+        unsigned char  bogusPeakEnvelopeData[ peakEnvelopeDataSize ];
+        memset( bogusPeakEnvelopeData, 0xED, peakEnvelopeDataSize );
+
+
+        unsigned char  buffer[ peakEnvelopeDataSize ];
+        memcpy( buffer, bogusPeakEnvelopeData, peakEnvelopeDataSize );
+
+
+        // ReadPeakEnvelopeData() should fail if the property not present.
+        aafUInt32  bytesRead = 0;
+        hr = pPCMDesc->ReadPeakEnvelopeData( peakEnvelopeDataSize,
+                                                buffer,
+                                                &bytesRead );
+        checkExpression( hr == AAFRESULT_PROP_NOT_PRESENT,
+                            AAFRESULT_TEST_FAILED );
+        checkExpression( memcmp( buffer, bogusPeakEnvelopeData,
+                                    peakEnvelopeDataSize ) == 0,
+                            AAFRESULT_TEST_FAILED );
+        checkExpression( bytesRead == 0, AAFRESULT_TEST_FAILED );
+
+
+        // If we got to this point none of the tests above
+        // failed and the status can be set to 'success'.
+        hr = S_OK;
+    }
+    catch( HRESULT e )
+    {
+        hr = e;
+    }
+
+
+    return hr;
+}
+
+
+
+static HRESULT Test_IAAFPCMDescriptor_PeakEnvelopeData_Write(
+    IAAFPCMDescriptor* pPCMDesc )
+{
+    HRESULT  hr = S_OK;
+
+
+    try
+    {
+        unsigned char  bogusPeakEnvelopeData[ peakEnvelopeDataSize ];
+        memset( bogusPeakEnvelopeData, 0xED, peakEnvelopeDataSize );
+
+
+        // ReadPeakEnvelopeData() should fail if function
+        // arguments are invalid.
+        unsigned char  buffer[ peakEnvelopeDataSize ];
+        memcpy( buffer, bogusPeakEnvelopeData, peakEnvelopeDataSize );
+        aafUInt32  bytesRead = 0;
+        hr = pPCMDesc->ReadPeakEnvelopeData( peakEnvelopeDataSize,
+                                                0,
+                                                &bytesRead );
+        checkExpression( hr==AAFRESULT_NULL_PARAM, AAFRESULT_TEST_FAILED );
+        hr = pPCMDesc->ReadPeakEnvelopeData( peakEnvelopeDataSize,
+                                                buffer,
+                                                0 );
+        checkExpression( hr==AAFRESULT_NULL_PARAM, AAFRESULT_TEST_FAILED );
+        checkExpression( memcmp( buffer, bogusPeakEnvelopeData,
+                                    peakEnvelopeDataSize ) == 0,
+                            AAFRESULT_TEST_FAILED );
+        checkExpression( bytesRead == 0, AAFRESULT_TEST_FAILED );
+
+
+        // SetPeakEnvelopeDataPosition() should always succeed.
+        hr = pPCMDesc->SetPeakEnvelopeDataPosition( 0 );
+        checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
+
+
+        // WritePeakEnvelopeData() should fail if the function
+        // arguments are invalid.
+        aafUInt32  bytesWritten = 0;
+        hr = pPCMDesc->WritePeakEnvelopeData( peakEnvelopeDataSize,
+                                                0,
+                                                &bytesWritten );
+        checkExpression( hr==AAFRESULT_NULL_PARAM, AAFRESULT_TEST_FAILED );
+        checkExpression( bytesWritten == 0, AAFRESULT_TEST_FAILED );
+
+
+        // WritePeakEnvelopeData() should always succeed
+        hr = pPCMDesc->WritePeakEnvelopeData(
+                peakEnvelopeDataSize,
+                (aafDataBuffer_t)(gTestData.peakEnvelopeData),
+                &bytesWritten );
+        checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
+        checkExpression( bytesWritten == peakEnvelopeDataSize, AAFRESULT_TEST_FAILED );
+
+
+        // GetPeakEnvelopeDataPosition() should fail if the function
+        // arguments are invalid.
+        hr = pPCMDesc->GetPeakEnvelopeDataPosition( 0 );
+        checkExpression( hr==AAFRESULT_NULL_PARAM, AAFRESULT_TEST_FAILED );
+
+
+        // GetPeakEnvelopeDataPosition() should always succeed
+        aafPosition_t  position = 0;
+        hr = pPCMDesc->GetPeakEnvelopeDataPosition( &position );
+        checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
+        checkExpression( position == peakEnvelopeDataSize, AAFRESULT_TEST_FAILED );
+
+
+        // After writing to the stream the current position is
+        // past the end of the last byte, thefore Read() should
+        // fail.
+        bytesRead = 0;
+        hr = pPCMDesc->ReadPeakEnvelopeData( peakEnvelopeDataSize,
+                                                buffer,
+                                                &bytesRead );
+        checkExpression( hr == AAFRESULT_END_OF_DATA, AAFRESULT_TEST_FAILED );
+        checkExpression( bytesRead == 0, AAFRESULT_TEST_FAILED );
+
+
+        // GetPeakEnvelopeDataSize() should fail if the function
+        // arguments are invalid.
+        hr = pPCMDesc->GetPeakEnvelopeDataSize( 0 );
+        checkExpression( hr==AAFRESULT_NULL_PARAM, AAFRESULT_TEST_FAILED );
+
+
+        // GetPeakEnvelopeDataSize() should always succeed
+        aafLength_t  size = 0;
+        hr = pPCMDesc->GetPeakEnvelopeDataSize( &size );
+        checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
+        checkExpression( size == peakEnvelopeDataSize, AAFRESULT_TEST_FAILED );
+
+
+
+        // If we got to this point none of the tests above
+        // failed and the status can be set to 'success'.
+        hr = S_OK;
+    }
+    catch( HRESULT e )
+    {
+        hr = e;
+    }
+
+
+    return hr;
+}
+
+
+
+static HRESULT Test_IAAFPCMDescriptor_PeakEnvelopeData_Read(
+    IAAFPCMDescriptor* pPCMDesc )
+{
+    HRESULT  hr = S_OK;
+
+
+    try
+    {
+        unsigned char  bogusPeakEnvelopeData[ peakEnvelopeDataSize ];
+        memset( bogusPeakEnvelopeData, 0xED, peakEnvelopeDataSize );
+
+
+        // Make sure the current position is at the beginning of the data
+        hr = pPCMDesc->SetPeakEnvelopeDataPosition( 0 );
+        checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
+
+
+        // Check the stream size
+        aafLength_t  size = 0;
+        hr = pPCMDesc->GetPeakEnvelopeDataSize( &size );
+        checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
+        checkExpression( size == peakEnvelopeDataSize, AAFRESULT_TEST_FAILED );
+
+
+        // ReadPeakEnvelopeData() should succeed.
+        unsigned char  buffer[ peakEnvelopeDataSize ];
+        memcpy( buffer, bogusPeakEnvelopeData, peakEnvelopeDataSize );
+        aafUInt32  bytesRead = 0;
+        hr = pPCMDesc->ReadPeakEnvelopeData( peakEnvelopeDataSize,
+                                                buffer,
+                                                &bytesRead );
+        checkExpression( hr == AAFRESULT_SUCCESS, AAFRESULT_TEST_FAILED );
+        checkExpression( memcmp( buffer, gTestData.peakEnvelopeData,
+                                    peakEnvelopeDataSize ) == 0,
+                            AAFRESULT_TEST_FAILED );
 
 
         // If we got to this point none of the tests above

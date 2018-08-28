@@ -51,8 +51,7 @@
 ImplAAFTimecodeStream::ImplAAFTimecodeStream ()
 : _sampleRate(		PID_TimecodeStream_SampleRate,	L"SampleRate"),
   _source(			PID_TimecodeStream_Source,		L"Source"),
-  _sourceType(		PID_TimecodeStream_SourceType,	L"SourceType"),
-  _sourceStreamFilter(_source.createFilter())
+  _sourceType(		PID_TimecodeStream_SourceType,	L"SourceType")
 {
   _persistentProperties.put(_sampleRate.address());
   _persistentProperties.put(_source.address());
@@ -61,10 +60,7 @@ ImplAAFTimecodeStream::ImplAAFTimecodeStream ()
 
 
 ImplAAFTimecodeStream::~ImplAAFTimecodeStream ()
-{
-	delete _sourceStreamFilter;
-	_sourceStreamFilter = NULL;
-}
+{}
 
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFTimecodeStream::GetPositionTimecode (
@@ -465,7 +461,7 @@ AAFRESULT STDMETHODCALLTYPE
 	if(pValue == NULL || bytesRead == NULL)
 		return(AAFRESULT_NULL_PARAM);
 
-	if (_sourceStreamFilter->size() > valueSize)
+	if (_source.filter()->size() > valueSize)
 	  return AAFRESULT_SMALLBUF;
 
 	XPROTECT()
@@ -538,7 +534,7 @@ AAFRESULT STDMETHODCALLTYPE
   
   try
   {
-    _sourceStreamFilter->write(buffer, bytes, *bytesWritten);
+    _source.filter()->write(buffer, bytes, *bytesWritten);
     if (0 < bytes && 0 == *bytesWritten)
       result = AAFRESULT_CONTAINERWRITE;
   }
@@ -569,7 +565,7 @@ AAFRESULT STDMETHODCALLTYPE
   
   try
   {
-    _sourceStreamFilter->read(buffer, bytes, *bytesRead);
+    _source.filter()->read(buffer, bytes, *bytesRead);
     if (0 < bytes && 0 == *bytesRead)
       result = AAFRESULT_END_OF_DATA;
   }
@@ -596,7 +592,7 @@ AAFRESULT STDMETHODCALLTYPE
   try
   {
     OMUInt64 tmpOffset = offset;
-    _sourceStreamFilter->setPosition(tmpOffset);
+    _source.filter()->setPosition(tmpOffset);
   }
   //catch (OMException& ome)
   //{
@@ -625,7 +621,7 @@ AAFRESULT STDMETHODCALLTYPE
   try
   {
     OMUInt64 tmpOffset;
-    tmpOffset = _sourceStreamFilter->position();
+    tmpOffset = _source.filter()->position();
     *pOffset = tmpOffset;
   }
   //catch (OMException& ome)
@@ -655,7 +651,7 @@ AAFRESULT STDMETHODCALLTYPE
 
   try
   {
-    *pSize = _sourceStreamFilter->size();
+    *pSize = _source.filter()->size();
   }
   //catch (OMException& ome)
   //{

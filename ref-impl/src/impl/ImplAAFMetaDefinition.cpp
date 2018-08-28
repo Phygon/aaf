@@ -401,7 +401,27 @@ void ImplAAFMetaDefinition::InitOMProperties (ImplAAFClassDef * pClassDef)
     OMPropertyId defPid = propDefSP->OmPid ();
     // ASSERTU (ps->isAllowed (defPid));
     OMProperty * pProp = 0;
-    if (ps->isPresent (defPid))
+
+    if (ps->dynamicBuiltinIsPresent(propDefSP->identification()))
+    {
+      // the property is a built-in dynamic property
+    
+      // the property id of the built-in property definition needs to be set to 
+      // the correct value if the property definition originated from a file
+      ASSERTU(defPid != 0);
+      HRESULT hr;
+      ImplAAFDictionary* pDictionary = 0;
+      hr = GetDictionary(&pDictionary);
+      ASSERTU(AAFRESULT_SUCCEEDED(hr) && pDictionary != 0);
+      pDictionary->associate(*reinterpret_cast<const aafUID_t*>(&propDefSP->identification()), 
+        defPid);
+      pDictionary->ReleaseReference();
+    
+      // the dynamic built-in property needs to be finalised with the property id
+      ps->finaliseDynamicBuiltin(propDefSP->identification(), defPid);
+    }
+
+	if (ps->isPresent (defPid))
     {
       // Defined property was already in property set.  (Most
       // probably declared in the impl constructor.)  Get that
@@ -419,8 +439,7 @@ void ImplAAFMetaDefinition::InitOMProperties (ImplAAFClassDef * pClassDef)
   {
       ImplAAFPropertyDef * pPropDef =
         (ImplAAFPropertyDef*) propDefSP;
-      OMPropertyDefinition * pOMPropDef =
-        dynamic_cast<OMPropertyDefinition*>(pPropDef);
+      OMPropertyDefinition * pOMPropDef = fast_dynamic_cast<OMPropertyDefinition*>(pPropDef);
       ASSERTU (pOMPropDef);
       
       ASSERTU (pProp);

@@ -76,8 +76,6 @@ CAAFFindSourceInfo::~CAAFFindSourceInfo ()
 {
 }
 
-
-
 HRESULT STDMETHODCALLTYPE
     CAAFFindSourceInfo::GetMob (IAAFMob ** ppMob)
 {
@@ -149,8 +147,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppMob->ReleaseReference(); // We are through with this pointer.
+          internalppMob = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppMob should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppMob == 0);
+
   return hr;
 }
 
@@ -308,6 +317,65 @@ HRESULT STDMETHODCALLTYPE
 }
 
 
+HRESULT STDMETHODCALLTYPE
+    CAAFFindSourceInfo::GetMultichannelSourceReference (aafSourceRef_t *  pSourceRef,
+        aafBoolean_t *  pHasChannelIDs,
+        aafUInt32 *  pChannelID)
+{
+  HRESULT hr;
+
+  ImplAAFFindSourceInfo * ptr;
+  ImplAAFRoot * pO;
+  pO = GetRepObject ();
+  assert (pO);
+  ptr = static_cast<ImplAAFFindSourceInfo*> (pO);
+  assert (ptr);
+
+
+
+
+  try
+    {
+      hr = ptr->GetMultichannelSourceReference (pSourceRef,
+    pHasChannelIDs,
+    pChannelID);
+    }
+  catch (OMException& e)
+    {
+      // OMExceptions should be handled by the impl code. However, if an
+      // unhandled OMException occurs, control reaches here. We must not
+      // allow the unhandled exception to reach the client code, so we
+      // turn it into a failure status code.
+      //
+      // If the OMException contains an HRESULT, it is returned to the
+      // client, if not, AAFRESULT_UHANDLED_EXCEPTION is returned.
+      //
+      hr = OMExceptionToResult(e, AAFRESULT_UNHANDLED_EXCEPTION);
+    }
+  catch (OMAssertionViolation &)
+    {
+      // Control reaches here if there is a programming error in the
+      // impl code that was detected by an assertion violation.
+      // We must not allow the assertion to reach the client code so
+      // here we turn it into a failure status code.
+      //
+      hr = AAFRESULT_ASSERTION_VIOLATION;
+    }
+  catch (...)
+    {
+      // We CANNOT throw an exception out of a COM interface method!
+      // Return a reasonable exception code.
+      //
+      hr = AAFRESULT_UNEXPECTED_EXCEPTION;
+    }
+
+
+
+
+  return hr;
+}
+
+
 //
 // 
 // 
@@ -331,6 +399,13 @@ HRESULT CAAFFindSourceInfo::InternalQueryInterface
         return S_OK;
     }
 
+    if (EQUAL_UID(riid,IID_IAAFFindSourceInfo2)) 
+    { 
+        *ppvObj = (IAAFFindSourceInfo2 *)this; 
+        ((IUnknown *)*ppvObj)->AddRef();
+        return S_OK;
+    }
+
     // Always delegate back to base implementation.
     return CAAFRoot::InternalQueryInterface(riid, ppvObj);
 }
@@ -339,4 +414,3 @@ HRESULT CAAFFindSourceInfo::InternalQueryInterface
 // Define the contrete object support implementation.
 // 
 AAF_DEFINE_FACTORY(AAFFindSourceInfo)
-

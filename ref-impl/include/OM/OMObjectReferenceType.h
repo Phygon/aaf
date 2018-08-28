@@ -38,7 +38,6 @@
 #include "OMType.h"
 #include "OMSingleton.h"
 #include "OMClassDefinition.h"
-#include "OMVector.h"
 
 // @author Tim Bingham | tjb | Avid Technology, Inc. |
 //         OMObjectReferenceType

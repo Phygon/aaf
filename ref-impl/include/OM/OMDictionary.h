@@ -97,6 +97,9 @@ static const OMObjectIdentification Class_TypeDefinitionIndirect =
 static const OMObjectIdentification Class_TypeDefinitionOpaque =
 {0x0D010101, 0x0222, 0x0000, {0x06, 0x0E, 0x2B, 0x34, 0x02, 0x06, 0x01, 0x01}};
 
+// {0E040101-0000-0000-060E-2B3402060101}
+static const OMObjectIdentification Class_TypeDefinitionGenericCharacter =
+{0x0E040101, 0x0000, 0x0000, {0x06, 0x0E, 0x2B, 0x34, 0x02, 0x06, 0x01, 0x01}};
 // {0101010D-0223-0000-060E-2B3402060101}
 static const OMObjectIdentification Class_TypeDefinitionCharacter =
 {0x0D010101, 0x0223, 0x0000, {0x06, 0x0E, 0x2B, 0x34, 0x02, 0x06, 0x01, 0x01}};
@@ -148,6 +151,11 @@ static const OMObjectIdentification Type_UniqueObjectIdentification =
 // tjb - the OM shouldn't know about this AAF specific type
 static const OMObjectIdentification Type_TransferCharacteristic =
 {0x02020102, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+
+// {03010200-0000-0000-060E-2B3401040101}
+// 06.0E.2B.34.01.04.01.01.03.01.02.00.00.00.00.00
+static const OMObjectIdentification Type_ProductVersion =
+{0x03010200, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 #endif
 
 // Special classes
@@ -191,6 +199,13 @@ public:
                         const wchar_t* description,
                         const OMUniqueObjectIdentification& parent,
                         bool isConcrete);
+
+  virtual void newProperty(const OMUniqueObjectIdentification& id,
+                           const wchar_t* name,
+                           const wchar_t* description,
+                           const OMUniqueObjectIdentification& type,
+                           bool& isRequired,
+                           const OMUniqueObjectIdentification& memberOf);
 
   virtual const OMPropertyDefinition* newProperty(const OMUniqueObjectIdentification& id,
                            const wchar_t* name,
@@ -273,6 +288,14 @@ public:
   virtual void newExtendibleEnumeratedType(
                                  const OMObjectIdentification& id,
                                  const wchar_t* name,
+                                 const wchar_t* description,
+                                 const wchar_t** elementNames,
+                                 const OMObjectIdentification* elementValues,
+                                 OMUInt32 elementCount);
+
+  virtual void newExtendibleEnumeratedType(
+                                 const OMObjectIdentification& id,
+                                 const wchar_t* name,
                                  const wchar_t* description);
 
   virtual void newExtendibleEnumeratedTypeElement(
@@ -300,10 +323,14 @@ public:
 
   bool isMeta(const OMObjectIdentification& id) const;
 
+  virtual bool isRequired(const OMStoredObjectEncoding& encoding) const = 0;
+
   virtual ClassDefinitionsIterator* classDefinitions(void) const = 0;
   
   virtual void typeDefinitions(OMVector<OMType*>& typeDefs) const = 0;
 //  virtual TypeDefinitionsIterator* typeDefinitions(void) const = 0;
+
+  virtual void extend(void) = 0;
 
   static void mapFromKLV(OMPropertyId& id);
 

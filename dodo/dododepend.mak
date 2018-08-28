@@ -48,12 +48,12 @@ depend.mk : aafobjects.mk GenDepend.sh
 	@ $(RM) -f depend.tmp
 	$(ECHO) Doing first depend step...
 	$(CP)  aafobjects.mk tmp.sh
-	$(CHMOD) a+w tmp.sh
+	$(CHMOD) u+w tmp.sh
 	$(CAT) GenDepend.sh >> tmp.sh
 	$(SH) tmp.sh > depend.tmp
 	$(ECHO) Doing second depend step...
 	$(CP)  aafobjects.mk tmp2.sh
-	$(CHMOD) a+w tmp2.sh
+	$(CHMOD) u+w tmp2.sh
 	$(CAT) GenDepend2.sh >> tmp2.sh
 	$(SH) tmp2.sh
 	$(RM) tmp.sh tmp2.sh

@@ -305,11 +305,9 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFSourceClip::SetSourceReference (aafSourceRef_t  sourceRef)
 {
 	AAFRESULT   aafError = AAFRESULT_SUCCESS;
-	static const aafMobID_t nullMobID = {{0,0,0,0,0,0,0,0,0,0,0,0},0,0,0,0,
-					{0,0,0,{0,0,0,0,0,0,0,0}}};
 	
 	/* If MobID is NUL - make the rest of the fields 0 too. */
-	if(memcmp(&sourceRef.sourceID, &nullMobID, sizeof(sourceRef.sourceID)) == 0)
+	if(isNull(sourceRef.sourceID))
 	{
 		sourceRef.sourceSlotID = 0;
 		sourceRef.startTime = 0;
@@ -324,7 +322,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 
 AAFRESULT ImplAAFSourceClip::TraverseToClip(aafLength_t length,
-											ImplAAFSegment **sclp,
+											ImplAAFSourceClip **sclp,
 											ImplAAFPulldown ** /*pulldownObj*/,
 											aafInt32 * /*pulldownPhase*/,
 											aafLength_t *sclpLen,
@@ -336,9 +334,20 @@ AAFRESULT ImplAAFSourceClip::TraverseToClip(aafLength_t length,
 		// We are returning a reference to this object so bump the ref count
 		AcquireReference();
 		CHECK((*sclp)->GetLength(sclpLen));
-		if (length < *sclpLen)
+		if (length != AAF_UNKNOWN_LENGTH && *sclpLen != AAF_UNKNOWN_LENGTH)
 		{
-			*sclpLen = length;
+			if (length < *sclpLen)
+			{
+				*sclpLen = length;
+			}
+		}
+		else
+		{
+			if (length != AAF_UNKNOWN_LENGTH)
+			{
+				XASSERT(*sclpLen == AAF_UNKNOWN_LENGTH, AAFRESULT_INTERNAL_ERROR);
+				*sclpLen = length;
+			}
 		}
 	} /* XPROTECT */
 	

@@ -36,6 +36,8 @@
 
 #ifndef OM_NO_STRUCTURED_STORAGE
 
+#include "OMStructuredStorage.h"
+
 #include "OMSSStoredObject.h"
 
 #include "OMStoredPropertySetIndex.h"
@@ -71,7 +73,6 @@
 #include "OMExceptions.h"
 #include "OMUtilities.h"
 
-#include "OMMSStructuredStorage.h"
 #include "OMSSStoredStream.h"
 #include "OMType.h"
 #include "OMUniqueObjectIdentType.h"
@@ -139,7 +140,7 @@ size_t OMSSStoredObject::_maxOpenStreams = 0;
 
   // @mfunc Open the root <c OMSSStoredObject> using the root storage
   //        <p in_storage>. <p mode> specifies the mode in which
-  //		to open the root.
+  //        to open the root.
   //   @parm The root storage 
   //   @parm The access mode of the object.
   //   @rdesc An <c OMSSStoredObject> representing the root storage
@@ -155,8 +156,8 @@ OMSSStoredObject* OMSSStoredObject::open(IStorage *in_storage, OMFile::OMAccessM
   HRESULT status = in_storage->Stat(&statstg, STATFLAG_NONAME);
   checkStatus(status);
   PRECONDITION ("Valid root storage access mode: ", 
-  		((mode == OMFile::modifyMode && (statstg.grfMode & (STGM_READWRITE))) ||
-		(mode == OMFile::readOnlyMode && (statstg.grfMode & STGM_READ) == 0)));
+          ((mode == OMFile::modifyMode && (statstg.grfMode & (STGM_READWRITE)) ||
+        (mode == OMFile::readOnlyMode && (statstg.grfMode & STGM_READ) == 0))));
 
   OMSSStoredObject* newStore = new OMSSStoredObject(in_storage);
   ASSERT("Valid heap pointer", newStore != 0);
@@ -188,7 +189,7 @@ OMSSStoredObject* OMSSStoredObject::create(IStorage *in_storage,
   HRESULT status = in_storage->Stat(&statstg, STATFLAG_NONAME);
   checkStatus(status);
   PRECONDITION ("Valid root storage access mode: ", 
-  	((statstg.grfMode & STGM_READWRITE) || (statstg.grfMode & STGM_WRITE)));
+      ((statstg.grfMode & STGM_READWRITE) || (statstg.grfMode & STGM_WRITE)));
 
   PRECONDITION("Valid byte order",
                       (byteOrder == littleEndian) || (byteOrder == bigEndian));
@@ -227,7 +228,57 @@ OMStoredObject* OMSSStoredObject::create(const wchar_t* name)
   return result;
 }
 
-  // @mfunc Open an exsiting <c OMSSStoredObject>, named <p name>,
+  // @mfunc Create a new <c OMSSStoredObject>, contained by this
+  //        <c OMSSStoredObject>. The new <c OMSSStoredObject> is
+  //        a stored representatin of an <c OMStorable> referenced by
+  //        <p containingProperty>.
+  //   @parm The property that references the new <c OMSSStoredObject>.
+  //   @rdesc A new <c OMSSStoredObject> contained by this
+  //          <c OMSSStoredObject>.
+OMStoredObject* OMSSStoredObject::create(const OMProperty* containingProperty)
+{
+  TRACE("OMSSStoredObject::create");
+  PRECONDITION("Valid property", containingProperty != 0);
+  PRECONDITION("Valid property stored form",
+               containingProperty->storedForm() == SF_STRONG_OBJECT_REFERENCE);
+
+  const wchar_t* storedName = referenceName(containingProperty->name(),
+                                            containingProperty->propertyId());
+  OMStoredObject* result = create(storedName);
+  delete [] storedName;
+  storedName = 0;
+  return result;
+}
+
+  // @mfunc Create a new <c OMSSStoredObject>, contained by this
+  //        <c OMSSStoredObject>. The new <c OMSSStoredObject> is
+  //        a stored representatin of an <c OMStorable> referenced by
+  //        an element <p localKey> of <p containingProperty>.
+  //   @parm The vector/set property that references the new
+  //         <c OMSSStoredObject>.
+  //   @parm The local key of the element of the vector/set property that
+  //         references the new <c OMSSStoredObject>.
+  //   @rdesc A new <c OMSSStoredObject> contained by this
+  //          <c OMSSStoredObject>.
+OMStoredObject* OMSSStoredObject::create(const OMProperty* containingProperty,
+                                         OMUInt32 localKey)
+{
+  TRACE("OMSSStoredObject::create");
+  PRECONDITION("Valid property", containingProperty != 0);
+  PRECONDITION("Valid property stored form",
+       containingProperty->storedForm() == SF_STRONG_OBJECT_REFERENCE_VECTOR ||
+       containingProperty->storedForm() == SF_STRONG_OBJECT_REFERENCE_SET);
+
+  const wchar_t* storedName = elementName(containingProperty->name(),
+                                          containingProperty->propertyId(),
+                                          localKey);
+  OMStoredObject* result = create(storedName);
+  delete [] storedName;
+  storedName = 0;
+  return result;
+}
+
+  // @mfunc Open an existing <c OMSSStoredObject>, named <p name>,
   //        contained by this <c OMSSStoredObject>.
   //   @parm The name of the existing <c OMSSStoredObject>.
   //   @rdesc The existing <c OMSSStoredObject> contained by this
@@ -241,6 +292,56 @@ OMStoredObject* OMSSStoredObject::open(const wchar_t* name)
   OMSSStoredObject* result = new OMSSStoredObject(newStorage);
   ASSERT("Valid heap pointer", result != 0);
   result->open(_mode);
+  return result;
+}
+
+  // @mfunc Open an existing <c OMSSStoredObject>, contained by this
+  //        <c OMSSStoredObject>. The existing <c OMSSStoredObject> is
+  //        a stored representatin of an <c OMStorable> referenced by
+  //        <p containingProperty>.
+  //   @parm The property that references the existing <c OMSSStoredObject>.
+  //   @rdesc The existing <c OMSSStoredObject> contained by this
+  //          <c OMSSStoredObject>.
+OMStoredObject* OMSSStoredObject::open(const OMProperty* containingProperty)
+{
+  TRACE("OMSSStoredObject::open");
+  PRECONDITION("Valid property", containingProperty != 0);
+  PRECONDITION("Valid property stored form",
+               containingProperty->storedForm() == SF_STRONG_OBJECT_REFERENCE);
+
+  const wchar_t* storedName = referenceName(containingProperty->name(),
+                                            containingProperty->propertyId());
+  OMStoredObject* result = open(storedName);
+  delete [] storedName;
+  storedName = 0;
+  return result;
+}
+
+  // @mfunc Open an existing <c OMSSStoredObject>, contained by this
+  //        <c OMSSStoredObject>. The existing <c OMSSStoredObject> is
+  //        a stored representatin of an <c OMStorable> referenced by
+  //        an element <p localKey> of <p containingProperty>.
+  //   @parm The vector/set property that references the existing
+  //         <c OMSSStoredObject>.
+  //   @parm The local key of the element of the vector/set property that
+  //         references the existing <c OMSSStoredObject>.
+  //   @rdesc The existing <c OMSSStoredObject> contained by this
+  //          <c OMSSStoredObject>.
+OMStoredObject* OMSSStoredObject::open(const OMProperty* containingProperty,
+                                       OMUInt32 localKey)
+{
+  TRACE("OMSSStoredObject::open");
+  PRECONDITION("Valid property", containingProperty != 0);
+  PRECONDITION("Valid property stored form",
+       containingProperty->storedForm() == SF_STRONG_OBJECT_REFERENCE_VECTOR ||
+       containingProperty->storedForm() == SF_STRONG_OBJECT_REFERENCE_SET);
+
+  const wchar_t* storedName = elementName(containingProperty->name(),
+                                          containingProperty->propertyId(),
+                                          localKey);
+  OMStoredObject* result = open(storedName);
+  delete [] storedName;
+  storedName = 0;
   return result;
 }
 
@@ -381,7 +482,7 @@ void OMSSStoredObject::save(const OMSimpleProperty& property)
     OMByte* buffer = new OMByte[externalBytesSize];
     ASSERT("Valid heap pointer", buffer != 0);
 
-	ASSERT( "Zero property length", 0 != externalBytesSize );
+    ASSERT( "Zero property length", 0 != externalBytesSize );
 
     // Externalize property value
     propertyType->externalize(bits,
@@ -402,7 +503,9 @@ void OMSSStoredObject::save(const OMSimpleProperty& property)
   } else {
     // tjb - temporary, no type information, do it the old way
     //
-    write(propertyId, storedForm, bits, size);
+    ASSERT("Property not too big", size <= OMPROPERTYSIZE_MAX);
+    OMPropertySize externalBytesSize = static_cast<OMPropertySize>(size);
+    write(propertyId, storedForm, bits, externalBytesSize);
   }
 }
 
@@ -434,7 +537,7 @@ void OMSSStoredObject::save(const OMDataVector& property)
   // size
   // Doh! 32-bit size and count but 16-bit property size
   OMUInt64 size = externalElementSize * elementCount;
-  // ASSERT("Valid size"); // tjb
+  ASSERT("Property not too big", size <= OMPROPERTYSIZE_MAX);
   OMPropertySize propertySize = static_cast<OMPropertySize>(size);
 
   _index->insert(propertyId, storedForm, _offset, propertySize);
@@ -492,7 +595,7 @@ void OMSSStoredObject::save(const OMDataSet& property)
   // size
   // Doh! 32-bit size and count but 16-bit property size
   OMUInt64 size = externalElementSize * elementCount;
-  // ASSERT("Valid size"); // tjb
+  ASSERT("Property not too big", size <= OMPROPERTYSIZE_MAX);
   OMPropertySize propertySize = static_cast<OMPropertySize>(size);
 
   _index->insert(propertyId, storedForm, _offset, propertySize);
@@ -568,16 +671,6 @@ void OMSSStoredObject::save(const OMStrongReferenceVector& vector)
     //
     index->insert(position, element.localKey());
 
-#if defined(OM_DEBUG)
-    wchar_t* name = elementName(vector.name(),
-                                vector.propertyId(),
-                                element.localKey());
-    ASSERT("Consistent names", compareWideString(element.reference().name(),
-                                                 name) == 0);
-    delete [] name;
-    name = 0; // for BoundsChecker
-#endif
-
     // save the object
     //
     element.save();
@@ -606,12 +699,21 @@ void OMSSStoredObject::save(const OMStrongReferenceSet& set)
 {
   TRACE("OMSSStoredObject::save");
 
+#ifdef HACK_SKIP_PRIMARY_MOB_DEF
+  bool skipPrimaryMob = !isPrimaryMobPresent(set.container()->file());
+#endif
+
   // create a set index
   //
   OMUInt32 count = 0;
   OMContainerIterator<OMStrongReferenceSetElement>& iterator = *set.iterator();
   while (++iterator) {
     OMStrongReferenceSetElement& element = iterator.value();
+#ifdef HACK_SKIP_PRIMARY_MOB_DEF
+    if (skipPrimaryMob && elementHasPrimaryMobDefinition(set, element)) {
+      continue;
+    }
+#endif
     // Count the elements that will be saved.
     if (element.isSticky() || element.referenceCount() > 0) {
       count = count + 1;
@@ -634,6 +736,12 @@ void OMSSStoredObject::save(const OMStrongReferenceSet& set)
 
     OMStrongReferenceSetElement& element = iterator.value();
 
+#ifdef HACK_SKIP_PRIMARY_MOB_DEF
+    if (skipPrimaryMob && elementHasPrimaryMobDefinition(set, element)) {
+      continue;
+    }
+#endif
+
     // Save elements that are sticky or that are referenced.
     if (element.isSticky() || element.referenceCount() > 0) {
 
@@ -648,16 +756,6 @@ void OMSSStoredObject::save(const OMStrongReferenceSet& set)
                     element.localKey(),
                     referenceCount,
                     key);
-
-#if defined(OM_DEBUG)
-      wchar_t* name = elementName(set.name(),
-                                  set.propertyId(),
-                                  element.localKey());
-      ASSERT("Consistent names", compareWideString(element.reference().name(),
-                                                   name) == 0);
-      delete [] name;
-      name = 0; // for BoundsChecker
-#endif
 
       // save the object
       //
@@ -714,8 +812,6 @@ void OMSSStoredObject::save(const OMWeakReference& singleton)
   /* Does nothing. Remove, replace? - Alexey
   singleton.reference().save();
   */
-
-  singleton.clearTargetTag();
 }
 
   // @mfunc Save the <c OMWeakReferenceVector> <p vector> in this
@@ -769,8 +865,6 @@ void OMSSStoredObject::save(const OMWeakReferenceVector& vector)
   //
   saveName(vector, name);
   delete [] name;
-
-  vector.clearTargetTag();
 }
 
   // @mfunc Save the <c OMWeakReferenceSet> <p set> in this
@@ -823,8 +917,6 @@ void OMSSStoredObject::save(const OMWeakReferenceSet& set)
   //
   saveName(set, name);
   delete [] name;
-
-  set.clearTargetTag();
 }
 
   // @mfunc Save the <c OMPropertyTable> <p table> in this
@@ -933,7 +1025,6 @@ OMSSStoredObject::restoreObject(const OMStrongObjectReference& reference)
 {
   TRACE("OMSSStoredObject::restoreObject");
 
-  const wchar_t* name = reference.name();
   OMProperty* property = reference.property();
   OMStorable* containingObject = property->propertySet()->container();
 
@@ -947,7 +1038,7 @@ OMSSStoredObject::restoreObject(const OMStrongObjectReference& reference)
   ASSERT("Valid class definition", object->definition() != 0);
 #endif
   // Attach the object.
-  object->attach(containingObject, name);
+  object->attach(property, reference);
   object->setStore(this);
   object->restoreContents();
   return object;
@@ -1159,10 +1250,14 @@ void OMSSStoredObject::restore(OMStrongReference& singleton,
 {
   TRACE("OMSSStoredObject::restore");
 
+  // Read and discard the name.
   wchar_t* name = referenceName(singleton.name(), singleton.propertyId());
   restoreName(singleton, name, externalSize);
-  OMStrongObjectReference newReference(&singleton, name);
   delete [] name;
+  name = 0;
+
+  OMStrongObjectReference newReference(&singleton,
+                                       nullOMUniqueObjectIdentification);
   singleton.reference() = newReference;
   singleton.reference().restore();
 }
@@ -1198,12 +1293,11 @@ void OMSSStoredObject::restore(OMStrongReferenceVector& vector,
     OMUInt32 localKey;
     for (OMUInt32 i = 0; i < entries; i++) {
       vectorIndex->iterate(context, localKey);
-      wchar_t* name = elementName(vectorName, vectorId, localKey);
-      OMStrongReferenceVectorElement element(&vector, name, localKey);
+      OMStrongReferenceVectorElement element(&vector,
+                                             nullOMUniqueObjectIdentification,
+                                             localKey);
       element.restore();
       vector.insert(i, element);
-      delete [] name;
-      name = 0; // for BoundsChecker
     }
   }
   delete vectorIndex;
@@ -1258,20 +1352,17 @@ void OMSSStoredObject::restore(OMStrongReferenceSet& set,
     // safely ignore the external one.
     //
     if (!set.contains(key)) {
-      wchar_t* name = elementName(setName, setId, localKey);
       // Sticky reference counts were previously incorrectly persisted
       // as 0x00000001 instead of 0xffffffff so we subract 2 below for
       // compatability.
       OMStrongReferenceSetElement element(&set,
-                                          name,
+                                          nullOMUniqueObjectIdentification,
                                           localKey,
                                           count - 2,
                                           key,
                                           keySize);
       element.restore();
       set.insert(key, element);
-      delete [] name;
-      name = 0; // for BoundsChecker
     }
   }
   delete [] key;
@@ -2148,6 +2239,7 @@ void OMSSStoredObject::restore(OMPropertyId propertyId,
     reorderUniqueMaterialIdentification(id);
   }
 }
+
   // @mfunc Restore a collection (vector/set) of weak references.
   //   @parm The name of the collection.
   //   @parm The unique identifications of the targets.
@@ -2371,7 +2463,7 @@ void OMSSStoredObject::readFromStream(IStream* stream,
   PRECONDITION("Valid data buffer", data != 0);
   PRECONDITION("Valid size", size > 0);
 
-  OMUInt32 bytesRead;
+  ULONG bytesRead;
   HRESULT status = stream->Read(data, size, &bytesRead);
   checkStatus(status);
   ASSERT("IStream::Read() succeeded", SUCCEEDED(status));
@@ -2395,7 +2487,10 @@ void OMSSStoredObject::readFromStream(IStream* stream,
   PRECONDITION("Valid data buffer", data != 0);
   PRECONDITION("Valid size", bytes > 0);
 
-  HRESULT status = stream->Read(data, bytes, &bytesRead);
+  // HACK ALERT for GCC/Linux - Accomodate any variety of int and long incompatibility
+  ULONG tempLong=static_cast<ULONG>(bytesRead);
+  HRESULT status = stream->Read(data, bytes, &tempLong);
+  bytesRead=static_cast<OMUInt32>(tempLong);
   checkStatus(status);
   ASSERT("IStream::Read() succeeded", SUCCEEDED(status));
 }
@@ -2414,7 +2509,7 @@ void OMSSStoredObject::writeToStream(IStream* stream,
   PRECONDITION("Valid data", data != 0);
   PRECONDITION("Valid size", size > 0);
 
-  OMUInt32 bytesWritten;
+  ULONG bytesWritten;
   HRESULT status = stream->Write(data, size, &bytesWritten);
   checkStatus(status);
   ASSERT("IStream::Write() succeeded", SUCCEEDED(status));
@@ -2438,7 +2533,9 @@ void OMSSStoredObject::writeToStream(IStream* stream,
   PRECONDITION("Valid data", data != 0);
   PRECONDITION("Valid size", bytes > 0);
 
-  HRESULT status = stream->Write(data, bytes, &bytesWritten);
+  // HACK ALERT for GCC/Linux - Accomodate any variety of int and long incompatibility
+  ULONG tempLong=static_cast<ULONG>(bytesWritten);
+  HRESULT status = stream->Write(data, bytes, &tempLong);
   checkStatus(status);
   ASSERT("IStream::Write() succeeded", SUCCEEDED(status));
 }

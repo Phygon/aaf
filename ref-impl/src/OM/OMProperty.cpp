@@ -53,11 +53,9 @@
   //   @parm The name of this <c OMProperty>.
 OMProperty::OMProperty(const OMPropertyId propertyId,
                        const OMStoredForm storedForm,
-                       const wchar_t* name)
+                       const wchar_t* ANAME(name))
 : _propertyId(propertyId),
   _storedForm(storedForm),
-  _storedName(0),
-  _name(name),
   _propertySet(0),
   _definition(0),
 #if 1 // HACK4MEIP2
@@ -69,7 +67,7 @@ OMProperty::OMProperty(const OMPropertyId propertyId,
 {
   TRACE("OMProperty::OMProperty");
 
-  PRECONDITION("Valid name", validWideString(_name));
+  PRECONDITION("Valid name", validWideString(name));
 }
 
   // @mfunc Temporary pseudo-constructor for clients which provide
@@ -94,8 +92,6 @@ void OMProperty::initialize(const OMPropertyDefinition* definition)
 OMProperty::~OMProperty(void)
 {
   TRACE("OMProperty::~OMProperty");
-
-  delete [] _storedName;
 }
 
   // @mfunc Close this <c OMProperty>.
@@ -151,7 +147,9 @@ const wchar_t* OMProperty::name(void) const
 {
   TRACE("OMProperty::name");
 
-  return _name;
+  const wchar_t* result = definition()->name();
+  POSTCONDITION("Valid name", validWideString(result));
+  return result;
 }
 
   // @mfunc The property id of this <c OMProperty>.
@@ -257,17 +255,6 @@ OMFile* OMProperty::file(void) const
   return container()->file();
 }
 
-const wchar_t* OMProperty::storedName(void) const
-{
-  TRACE("OMProperty::storedName");
-
-  if (_storedName == 0) {
-    OMProperty* p = const_cast<OMProperty*>(this);
-    p->_storedName = OMStoredObject::referenceName(_name, propertyId());
-  }
-  return _storedName;
-}
-
 // class OMSimpleProperty
 // @author Tim Bingham | tjb | Avid Technology, Inc. | OMSimpleProperty
 
@@ -299,7 +286,7 @@ OMSimpleProperty::OMSimpleProperty(const OMPropertyId propertyId,
 }
 
   // @mfunc Destructor.
-OMSimpleProperty::~OMSimpleProperty(void) 
+OMSimpleProperty::~OMSimpleProperty(void)
 {
   TRACE("OMSimpleProperty::~OMSimpleProperty");
 
@@ -373,7 +360,8 @@ void OMSimpleProperty::shallowCopyTo(OMProperty* destination) const
 }
 
 void OMSimpleProperty::deepCopyTo(OMProperty* /* destination */,
-                                  void* /* clientContext */) const
+                                  void* /* clientContext */,
+                                  bool /* deferStreamData */) const
 {
   TRACE("OMSimpleProperty::deepCopyTo");
   // Nothing to do - this is a deep copy

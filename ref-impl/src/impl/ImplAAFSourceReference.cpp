@@ -41,8 +41,6 @@
 #include "AAFResult.h"
 #include "AAFUtils.h"
 
-#include <OMVariableSizeProperty.h>
-
 ImplAAFSourceReference::ImplAAFSourceReference ():
 	_sourceID(			PID_SourceReference_SourceID,		L"SourceID"),
 	_sourceMobSlotId(	PID_SourceReference_SourceMobSlotID,	L"SourceMobSlotID"),

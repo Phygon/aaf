@@ -42,8 +42,7 @@
 
   // @mfunc Constructor.
 OMStrongReferenceVectorElement::OMStrongReferenceVectorElement(void)
-: OMContainerElement<OMStrongObjectReference>(),
-  _localKey(0)
+: OMContainerElement<OMStrongObjectReference>()
 {
   TRACE("OMStrongReferenceVectorElement::OMStrongReferenceVectorElement");
 }
@@ -56,11 +55,10 @@ OMStrongReferenceVectorElement::OMStrongReferenceVectorElement(void)
   //         it's vector.
 OMStrongReferenceVectorElement::OMStrongReferenceVectorElement(
                                                           OMProperty* property,
-                                                          const wchar_t* name,
+                                        const OMUniqueObjectIdentification& id,
                                                           OMUInt32 localKey)
 : OMContainerElement<OMStrongObjectReference>(
-                                      OMStrongObjectReference(property, name)),
-  _localKey(localKey)
+                               OMStrongObjectReference(property, id, localKey))
 {
   TRACE("OMStrongReferenceVectorElement::OMStrongReferenceVectorElement");
 }
@@ -69,8 +67,7 @@ OMStrongReferenceVectorElement::OMStrongReferenceVectorElement(
   //   @parm The <c OMStrongReferenceVectorElement> to copy.
 OMStrongReferenceVectorElement::OMStrongReferenceVectorElement(
                                      const OMStrongReferenceVectorElement& rhs)
-: OMContainerElement<OMStrongObjectReference>(rhs),
-  _localKey(rhs._localKey)
+: OMContainerElement<OMStrongObjectReference>(rhs)
 {
   TRACE("OMStrongReferenceVectorElement::OMStrongReferenceVectorElement");
 }
@@ -98,7 +95,6 @@ OMStrongReferenceVectorElement::operator= (
   }
 
   OMContainerElement<OMStrongObjectReference>::operator=(rhs);
-  _localKey = rhs._localKey;
   return *this;
 }
 
@@ -113,11 +109,6 @@ bool OMStrongReferenceVectorElement::operator== (
   TRACE("OMStrongReferenceVectorElement::operator==");
 
   bool result = OMContainerElement<OMStrongObjectReference>::operator==(rhs);
-  if (result) {
-    if (_localKey != rhs._localKey) {
-      result = false;
-    }
-  }
   return result;
 }
 
@@ -140,7 +131,7 @@ OMUInt32 OMStrongReferenceVectorElement::localKey(void) const
 {
   TRACE("OMStrongReferenceVectorElement::localKey");
 
-  return  _localKey;
+  return _reference.localKey();
 }
 
 // class OMStrongReferenceSetElement
@@ -165,11 +156,11 @@ OMStrongReferenceSetElement::OMStrongReferenceSetElement(void)
   //   @parm TBS
 OMStrongReferenceSetElement::OMStrongReferenceSetElement(
                                                      OMProperty* property,
-                                                     const wchar_t* name,
+                                                     const OMUniqueObjectIdentification& id,
                                                      OMUInt32 localKey,
                                                      void* identification,
                                                      size_t identificationSize)
-: OMStrongReferenceVectorElement(property, name, localKey)
+: OMStrongReferenceVectorElement(property, id, localKey)
 {
   TRACE("OMStrongReferenceSetElement::OMStrongReferenceSetElement");
 
@@ -186,12 +177,12 @@ OMStrongReferenceSetElement::OMStrongReferenceSetElement(
   //   @parm TBS
 OMStrongReferenceSetElement::OMStrongReferenceSetElement(
                                                      OMProperty* property,
-                                                     const wchar_t* name,
+                                                     const OMUniqueObjectIdentification& id,
                                                      OMUInt32 localKey,
                                                      OMUInt32 referenceCount,
                                                      void* identification,
                                                      size_t identificationSize)
-: OMStrongReferenceVectorElement(property, name, localKey),
+: OMStrongReferenceVectorElement(property, id, localKey),
   _identification(0),
   _identificationSize(identificationSize),
   _referenceCount(referenceCount)
@@ -431,10 +422,10 @@ OMWeakReferenceVectorElement::OMWeakReferenceVectorElement(void)
   //   @parm A tag identifying the <c OMStrongReferenceVectorProperty>
   //         in which the target resides.
 OMWeakReferenceVectorElement::OMWeakReferenceVectorElement(
-                                                    OMProperty* property,
-                                                    const void* identification,
-                                                    size_t identificationSize,
-                                                    OMPropertyTag targetTag)
+                                   OMProperty* property,
+                                   const void* identification,
+                                   size_t identificationSize,
+                                   OMPropertyTag targetTag)
 : OMContainerElement<OMWeakObjectReference>(
   OMWeakObjectReference(property,
                         identification,

@@ -36,9 +36,22 @@
 #define OMUTILITIES_H
 
 #include "OMDataTypes.h"
+#include "OMAssertions.h"
 
 #include <stdio.h>
 #include <stddef.h>
+
+template<class B, class A>
+inline B fast_dynamic_cast(const A &a)
+{
+  TRACE("template<class B, class A> inline B fast_dynamic_cast(const A &a)");
+  // Unlike reinterpret_cast, static_cast can
+  // catch invalid conversions at compile time.
+  B b = static_cast<B>(a);
+  ASSERT("Valid type", b == dynamic_cast<B>(a));
+  return b;
+}
+
 
 // @module OMUtilities | Utility functions including error handling,
 //         obtaining information about the host computer, wide character
@@ -212,26 +225,36 @@ bool validWideString(const wchar_t* string);
 
   // Convert an OMUInt8 to a hexadecimal string like this -
   // XX
-void toString(const OMUInt8&i, char* is);
+void toString(const OMUInt8& i, char* is);
 
   // Convert an OMUInt16 to a hexadecimal string like this -
   // XXXX
-void toString(const OMUInt16&i, char* is);
+void toString(const OMUInt16& i, char* is);
 
   // Convert an OMUInt32 to a hexadecimal string like this -
   // XXXXXXXX
-void toString(const OMUInt32&i, char* is);
+void toString(const OMUInt32& i, char* is);
+
+  // Convert an OMUInt64 to a hexadecimal string like this -
+  // XXXXXXXXXXXXXXXX
+void toString(const OMUInt64& i, char* is);
 
   // Convert an OMObjectIdentification to a string like this -
   //{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}
 void toString(const OMObjectIdentification& id, char* idString);
+
+  // Convert an OMKLVKey to a string like this -
+  //XX.XX.XX.XX.XX.XX.XX.XX.XX.XX.XX.XX.XX.XX.XX.XX
+void toString(const OMKLVKey& key, char* keyString);
 
   // Caller allocated buffers must be at least this big -
   //
 const size_t OMUInt8StringBufferSize = 3;
 const size_t OMUInt16StringBufferSize = 5;
 const size_t OMUInt32StringBufferSize = 9;
+const size_t OMUInt64StringBufferSize = 17;
 const size_t OMObjectIdentificationStringBufferSize = 39;
+const size_t OMKLVKeyStringBufferSize = 48;
 
   // Conversions from strings
 
@@ -247,12 +270,23 @@ void fromString(OMUInt16& i, const char* is);
   // XXXXXXXX
 void fromString(OMUInt32& i, const char* is);
 
+  // Parse an OMUInt64 from a hexadecimal string like this -
+  // XXXXXXXXXXXXXXXX
+void fromString(OMUInt64& i, const char* is);
+
   // Parse an OMObjectIdentification from a string like this -
   //{XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}
 void fromString(OMObjectIdentification& id, const char* idString);
 
-  // Does idString represent a vaild OMObjectIdentification ?
+  // Does idString represent a valid OMObjectIdentification ?
 bool isValidObjectIdentificationString(const char* idString);
+
+  // Parse an OMKLVKey from a string like this -
+  //XX.XX.XX.XX.XX.XX.XX.XX.XX.XX.XX.XX.XX.XX.XX.XX
+void fromString(OMKLVKey& key, const char* keyString);
+
+  // Does idString represent a valid OMKLVKey ?
+bool isValidKLVKeyString(const char* keyString);
 
   // @func Convert the <c OMUniqueObjectIdentification> id
   //       into the <c OMKLVKey> key.
@@ -280,14 +314,14 @@ OMPropertyId* savePropertyPath(const OMPropertyId* path);
 
 int comparePropertyPath(const OMPropertyId* path1, const OMPropertyId* path2);
 
-  // @func Open a named file. Just like ANSI fopen() except for
+  // @func Open a named file. Just like ISO fopen() except for
   //       wchar_t* file names and modes.
   //   @parm The file name.
   //   @parm The mode.
-  //   @rdesc An ANSI FILE*
+  //   @rdesc An ISO FILE*
 FILE* wfopen(const wchar_t* fileName, const wchar_t* mode);
 
-  // @func Remove the named file. Just like ANSI remove() except for
+  // @func Remove the named file. Just like ISO remove() except for
   //       wchar_t* file names.
   //   @parm The file name.
   //   @rdesc 0 if the file is successfuly deleted -1 otherwise.
@@ -297,4 +331,10 @@ int wremove(const wchar_t* fileName);
 
 OMUniqueObjectIdentification createUniqueIdentifier(void);
 
+  // @func Return the sum of the buffer sizes
+  //   @parm Array of buffer descriptors.
+  //   @parm Number of elements in the array of buffer descriptors.
+  //   @rdesc The sum of buffer sizes in the buffer descriptors.
+OMUInt64 ioVectorByteCount(const OMIOBufferDescriptor* buffers,
+						   const OMUInt32 bufferCount);
 #endif

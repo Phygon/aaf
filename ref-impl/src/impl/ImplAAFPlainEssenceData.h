@@ -38,7 +38,6 @@
 
 class ImplAAFEssenceData;
 class ImplAAFSourceMob;
-class OMDataStreamPropertyFilter;
 
 class ImplAAFPlainEssenceData : public ImplAAFRoot
 {
@@ -241,7 +240,6 @@ public:
 
 private:
   ImplAAFEssenceData* _mediaDataContainer;
-  OMDataStreamPropertyFilter* _mediaDataFilter;
 
 };
 

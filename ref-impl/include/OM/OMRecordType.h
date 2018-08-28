@@ -37,7 +37,6 @@
 
 #include "OMType.h"
 #include "OMDataTypes.h"
-#include "OMVector.h"
 
 class OMTypeVisitor;
 

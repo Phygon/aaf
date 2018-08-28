@@ -41,9 +41,6 @@
 
 
 
-class OMDataStreamPropertyFilter;
-
-
 class ImplAAFPCMDescriptor : public ImplAAFSoundDescriptor
 {
 public:
@@ -345,7 +342,6 @@ protected:
     OMFixedSizeProperty<aafPosition_t>          _peakOfPeaksPosition;
     OMFixedSizeProperty<aafTimeStamp_t>         _peakEnvelopeTimestamp;
     OMDataStreamProperty                        _peakEnvelopeData;
-    OMDataStreamPropertyFilter*                 _peakEnvelopeDataFilter;
 };
 
 #endif // ! __ImplAAFPCMDescriptor_h__

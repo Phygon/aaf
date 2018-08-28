@@ -36,8 +36,6 @@
 #include <AAFContainerDefs.h>
 #include <AAFDataDefs.h>
 
-#include "../../../../ref-impl/include/AAFSDKBuild.h"
-
 #include <assert.h>
 
 #include <memory>
@@ -226,9 +224,9 @@ void EssenceCreate::RunTest( CmdState& state, int argc, char** argv )
 
   if ( type == "picture" ) {
 
-#if AAF_MAJOR_VERSION >= 1 && AAF_MINOR_VERSION >= 1
+#if (AAFSDK_VERSION_MAJOR == 1 && AAFSDK_VERSION_MINOR > 0) || AAFSDK_VERSION_MAJOR > 1
     dataDefId = kAAFDataDef_Picture;
-#elif AAF_MAJOR_VERSION == 1 && AAF_MINOR_VERSION == 0
+#elif AAFSDK_VERSION_MAJOR == 1 && AAFSDK_VERSION_MINOR == 0
     dataDefId = DDEF_Picture;
 #else
 #error unsupported version
@@ -238,9 +236,9 @@ void EssenceCreate::RunTest( CmdState& state, int argc, char** argv )
     sampleRate.denominator = MULTI_GEN_VIDEO_RATE_DEN;
   }
   else if ( type == "sound" ) {
-#if AAF_MAJOR_VERSION >= 1 && AAF_MINOR_VERSION >= 1
+#if (AAFSDK_VERSION_MAJOR == 1 && AAFSDK_VERSION_MINOR > 0) || AAFSDK_VERSION_MAJOR > 1
     dataDefId = kAAFDataDef_Sound;
-#elif AAF_MAJOR_VERSION == 1 && AAF_MINOR_VERSION == 0
+#elif AAFSDK_VERSION_MAJOR == 1 && AAFSDK_VERSION_MINOR == 0
     dataDefId = DDEF_Sound;
 #else
 #error unsupported version

@@ -59,12 +59,13 @@ static HRESULT CreateAAFFile(
     testRawStorageType_t rawStorageType,
     aafProductIdentification_constref productID)
 {
+  mtc::SimpleFilePointers filePointers;
+
   try {
     using namespace mtc;
 
     IAAFSmartPointer<IAAFHeader> pHeader;
     IAAFSmartPointer<IAAFDictionary> pDict;
-    SimpleFilePointers filePointers;
     CreateSimpleAAFFile( pFileName,
 			 fileKind,
 			 rawStorageType,
@@ -103,6 +104,9 @@ static HRESULT CreateAAFFile(
     CheckResult( filePointers.pFile->Close() );
   }
   catch( const AAFRESULT& hr ) {
+    if(filePointers.pFile) {
+      filePointers.pFile->Close();
+    }
     return hr;
   }
 
@@ -111,10 +115,11 @@ static HRESULT CreateAAFFile(
 
 static HRESULT ReadAAFFile(aafWChar * pFileName)
 {
+  mtc::SimpleFilePointers filePointers;
+
   try {
     using namespace mtc;
 
-    SimpleFilePointers filePointers;
     ReadSimpleAAFFile( pFileName, &filePointers );
 
     IAAFSmartPointer<IAAFDictionary2> pDict2;
@@ -169,6 +174,9 @@ static HRESULT ReadAAFFile(aafWChar * pFileName)
     CheckResult( filePointers.pFile->Close() );
   }
   catch( const AAFRESULT& hr ) {
+    if(filePointers.pFile) {
+      filePointers.pFile->Close();
+    }
     cout << "failed hr = " << hr << endl;
     return hr;
   }

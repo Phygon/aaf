@@ -1,7 +1,5 @@
-
 //=---------------------------------------------------------------------=
 //
-
 // $Id$ $Name$
 //
 // The contents of this file are subject to the AAF SDK Public Source
@@ -43,7 +41,7 @@
 using namespace std;
 #include <stdio.h>
 #include <stdlib.h>
-#include <wchar.h>
+#include "AAFWideString.h"
 #include <string.h>
 #include <assert.h>
 
@@ -52,11 +50,37 @@ using namespace std;
 #include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 #include "AAFExtEnum.h"
+#include "AAFOperationDefs.h"
+#include "AAFFileKinds.h"
 
 #include "CAAFBuiltinDefs.h"
 
+typedef IAAFSmartPointer<IAAFComponent>			    IAAFComponentSP;
+typedef IAAFSmartPointer<IAAFDictionary>			IAAFDictionarySP;
+typedef IAAFSmartPointer<IAAFCompositionMob>		IAAFCompositionMobSP;
+typedef IAAFSmartPointer<IAAFCommentMarker>			IAAFCommentMarkerSP;
+typedef IAAFSmartPointer<IAAFEssenceData>			IAAFEssenceDataSP;
+typedef IAAFSmartPointer<IAAFEssenceData2>			IAAFEssenceData2SP;
+typedef IAAFSmartPointer<IAAFEssenceGroup>			IAAFEssenceGroupSP;
+typedef IAAFSmartPointer<IAAFEssenceDescriptor>		IAAFEssenceDescriptorSP;
+typedef IAAFSmartPointer<IAAFEventMobSlot>			IAAFEventMobSlotSP;
+typedef IAAFSmartPointer<IAAFHeader>				IAAFHeaderSP;
+typedef IAAFSmartPointer<IAAFMasterMob>				IAAFMasterMobSP;
 typedef IAAFSmartPointer<IAAFMob>					IAAFMobSP;
+typedef IAAFSmartPointer<IAAFMob2>					IAAFMob2SP;
+typedef IAAFSmartPointer<IAAFMob3>					IAAFMob3SP;
+typedef IAAFSmartPointer<IAAFMobSlot>				IAAFMobSlotSP;
 typedef IAAFSmartPointer<IAAFFile>					IAAFFileSP;
+typedef IAAFSmartPointer<IAAFOperationGroup>		IAAFOperationGroupSP;
+typedef IAAFSmartPointer<IAAFOperationDef>		    IAAFOperationDefSP;
+typedef IAAFSmartPointer<IAAFPlainEssenceData>		IAAFPlainEssenceDataSP;
+typedef IAAFSmartPointer<IAAFSegment>		        IAAFSegmentSP;
+typedef IAAFSmartPointer<IAAFSequence>		        IAAFSequenceSP;
+typedef IAAFSmartPointer<IAAFSoundDescriptor>		IAAFSoundDescriptorSP;
+typedef IAAFSmartPointer<IAAFSourceClip>			IAAFSourceClipSP;
+typedef IAAFSmartPointer<IAAFSourceReference>		IAAFSourceReferenceSP;
+typedef IAAFSmartPointer<IAAFSourceMob>				IAAFSourceMobSP;
+typedef IAAFSmartPointer<IAAFTimelineMobSlot>		IAAFTimelineMobSlotSP;
 
 
 
@@ -106,6 +130,66 @@ static const aafMobID_t MOBTestID4 =
 	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
 	{ 0xcc77fbf1, 0x4dfa, 0x11d4, { 0x87, 0xe, 0x0, 0x10, 0x5a, 0x23, 0x45, 0x9 } } };
 
+// {BB496538-B7D2-4560-9C7D-F577DF7D3748}
+static const aafMobID_t MOBTestID5 = 
+{ { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
+	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
+	{ 0xbb496538, 0xb7d2, 0x4560, { 0x9c, 0x7d, 0xf5, 0x77, 0xdf, 0x7d, 0x37, 0x48 } } };
+
+// {E504F8D1-7579-47c7-A3DB-FBE073DE71C8}
+static const aafMobID_t MOBTestID6 = 
+{ { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
+	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
+    { 0xe504f8d1, 0x7579, 0x47c7, { 0xa3, 0xdb, 0xfb, 0xe0, 0x73, 0xde, 0x71, 0xc8 } } };
+
+// {5C4D8AD8-4E9D-47f9-9A69-6F7D39EF5EAC}
+static const aafMobID_t MOBTestID7 = 
+{ { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
+	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
+    { 0x5c4d8ad8, 0x4e9d, 0x47f9, { 0x9a, 0x69, 0x6f, 0x7d, 0x39, 0xef, 0x5e, 0xac } } };
+
+// {25A6EDFE-5312-48c1-8FF3-099504F4D9F2}
+static const aafMobID_t MOBTestID8 = 
+{ { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
+	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
+    { 0x25a6edfe, 0x5312, 0x48c1, { 0x8f, 0xf3, 0x09, 0x95, 0x04, 0xf4, 0xd9, 0xf2 } } };
+
+// {31DFEF88-2E40-4090-A383-338D40FA8F3E}
+static const aafMobID_t MOBTestID9 = 
+{ { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
+	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
+	{ 0x31dfef88, 0x2e40, 0x4090, { 0xa3, 0x83, 0x33, 0x8d, 0x40, 0xfa, 0x8f, 0x3e } } };
+
+// {0CE66544-B034-425A-9156-7089CB29D230}
+static const aafMobID_t MOBTestID10 = 
+{ { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
+	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
+	{ 0x0ce66544, 0xb034, 0x425a, { 0x91, 0x56, 0x70, 0x89, 0xcb, 0x29, 0xd2, 0x30 } } };
+
+// {6C0F6BDE-A5CA-4164-AD98-F6CC4DD50F75}
+static const aafMobID_t MOBTestID11 = 
+{ { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
+	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
+	{ 0x6c0f6bde, 0xa5ca, 0x4164, { 0xad, 0x98, 0xf6, 0xcc, 0x4d, 0xd5, 0x0f, 0x75 } } };
+
+// {8C280D76-BF13-49df-88DA-B6B88AF7ADF7}
+static const aafMobID_t MOBTestID12 = 
+{ { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
+	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
+	{ 0x8c280d76, 0xbf13, 0x49df, { 0x88, 0xda, 0xb6, 0xb8, 0x8a, 0xf7, 0xad, 0xf7 } } };
+
+// {A6ABBC5C-6AAE-4667-8B4D-2EC8B3DE72A9}
+static const aafMobID_t MOBTestID13 = 
+{ { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
+	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
+	{ 0xa6abbc5c, 0x6aae, 0x4667, { 0x8b, 0x4d, 0x2e, 0xc8, 0xb3, 0xde, 0x72, 0xa9 } } };
+
+// {FA121DEF-16F2-4117-8D06-D9B35630D8F1}
+static const aafMobID_t MOBTestID14 = 
+{ { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
+	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
+	{ 0xfa121def, 0x16f2, 0x4117, { 0x8d, 0x06, 0xd9, 0xb3, 0x56, 0x30, 0xd8, 0xf1 } } };
+
 // {C92063EB-FEA6-4fb3-8EB5-A120CB21E3C4}
 static const aafMobID_t MOBTestID_Static = 
 { { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
@@ -153,7 +237,7 @@ static const char KLVfrowney[] =        /* 16x16 frowney face */
 namespace {
 const aafCharacter* AttributeNames[]  = { L"Attribute A Name", L"Attribute B Name" };
 const aafCharacter* AttributeValues[] = { L"Attribute A Value", L"Attribute B Value" };
-};
+}
 
 
 static aafFrameOffset_t 	TCstartFrame = 108000;	// One hour
@@ -171,6 +255,753 @@ inline void checkExpression(bool expression, HRESULT r)
 {
   if (!expression)
     throw r;
+}
+
+static HRESULT CreateEssenceData(
+	IAAFHeader* pHeader,
+	const aafMobID_t sourceMobID,
+	aafDataBuffer_t data,
+	aafUInt32 dataSize)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFDictionarySP pDictionary;
+		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs(pDictionary);
+
+		// Create SoundDescriptor
+		IAAFSoundDescriptorSP pSoundDesc;
+		checkResult(defs.cdSoundDescriptor()->CreateInstance(IID_IAAFSoundDescriptor, (IUnknown **)&pSoundDesc));
+		const aafRational_t audioSamplingRate = {48000, 1};
+		checkResult(pSoundDesc->SetAudioSamplingRate(audioSamplingRate));
+		checkResult(pSoundDesc->SetChannelCount(1));
+		checkResult(pSoundDesc->SetQuantizationBits(16));
+
+		// Create SourceMob and set its descriptor
+		IAAFSourceMobSP pSourceMob;
+		checkResult(defs.cdSourceMob()->CreateInstance(IID_IAAFSourceMob, (IUnknown **)&pSourceMob));
+		IAAFEssenceDescriptorSP pEssenceDesc;
+		checkResult(pSoundDesc->QueryInterface(IID_IAAFEssenceDescriptor, (void**)&pEssenceDesc));
+		checkResult(pSourceMob->SetEssenceDescriptor(pEssenceDesc));
+
+		// Add the SourceMob to the Header
+		IAAFMobSP pMob;
+		checkResult(pSourceMob->QueryInterface(IID_IAAFMob, (void**)&pMob));
+		checkResult(pMob->SetMobID(sourceMobID));
+		checkResult(pHeader->AddMob(pMob));
+
+		// Create EssenceData
+		IAAFEssenceDataSP pEssenceData;
+		checkResult(defs.cdEssenceData()->CreateInstance(IID_IAAFEssenceData, (IUnknown **)&pEssenceData));
+		checkResult(pEssenceData->Initialize(pSourceMob));
+		checkResult(pHeader->AddEssenceData(pEssenceData));
+		IAAFEssenceData2SP pEssenceData2;
+		checkResult(pEssenceData->QueryInterface(IID_IAAFEssenceData2, (void**)&pEssenceData2));
+		IAAFPlainEssenceDataSP pPlainEssenceData;
+		checkResult(pEssenceData2->GetPlainEssenceData(0, &pPlainEssenceData));
+		aafUInt32 bytesWritten = 0;
+		checkResult(pPlainEssenceData->Write(dataSize, data, &bytesWritten));
+		checkExpression(bytesWritten == dataSize, AAFRESULT_TEST_FAILED);
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+// Get object's Data Definition property
+static HRESULT GetDataDef(
+	IUnknown* pUnknownWithDataDef,
+	IAAFDataDef** pDataDef)
+{
+	HRESULT hr = S_OK;
+
+	IAAFComponentSP pComponent;
+	IAAFMobSlotSP pMobSlot;
+	if (pUnknownWithDataDef->QueryInterface(IID_IAAFComponent, (void**)&pComponent) == S_OK)
+	{
+		hr = pComponent->GetDataDef(pDataDef);
+	}
+	else if (pUnknownWithDataDef->QueryInterface(IID_IAAFMobSlot, (void**)&pMobSlot) == S_OK)
+	{
+		IAAFSegmentSP pSegment;
+		checkResult(pMobSlot->GetSegment(&pSegment));
+		hr = GetDataDef(pSegment, pDataDef);
+	}
+	else
+	{
+		hr = AAFRESULT_TEST_FAILED;
+	}
+
+	return hr;
+}
+
+// Get object's Length property
+static HRESULT GetLength(
+	IUnknown* pUnknownWithDataDef,
+	aafLength_t* pLength)
+{
+	HRESULT hr = S_OK;
+
+	IAAFComponentSP pComponent;
+	IAAFMobSlotSP pMobSlot;
+	if (pUnknownWithDataDef->QueryInterface(IID_IAAFComponent, (void**)&pComponent) == S_OK)
+	{
+		hr = pComponent->GetLength(pLength);
+	}
+	else if (pUnknownWithDataDef->QueryInterface(IID_IAAFMobSlot, (void**)&pMobSlot) == S_OK)
+	{
+		IAAFSegmentSP pSegment;
+		checkResult(pMobSlot->GetSegment(&pSegment));
+		hr = GetLength(pSegment, pLength);
+	}
+	else
+	{
+		hr = AAFRESULT_TEST_FAILED;
+	}
+
+	return hr;
+}
+
+// Create a Source Clip object referencing full length of a 1st Slot of the specified mob
+static HRESULT CreateSourceClip(
+	IAAFHeader* pHeader,
+	const aafMobID_t& referencedMobID,
+	IAAFSourceClip** pSourceClip)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFDictionarySP pDictionary;
+		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs(pDictionary);
+
+		// Obtain information needed to buld a referecen to a specified Mob
+		aafSourceRef_t reference = {referencedMobID, 1, 0};
+		aafLength_t referenceLength = 0;
+		IAAFDataDefSP pReferenceDataDef(defs.ddkAAFPicture());
+
+		IAAFMobSP pReferencedMob;
+		if AAFRESULT_SUCCEEDED(pHeader->LookupMob(referencedMobID, &pReferencedMob))
+		{
+			IAAFMobSlotSP pReferencedSlot;
+			if (AAFRESULT_SUCCEEDED(pReferencedMob->GetSlotAt(0, &pReferencedSlot)))
+			{
+				checkResult(pReferencedSlot->GetSlotID(&(reference.sourceSlotID)));
+				checkResult(GetDataDef(pReferencedSlot, &pReferenceDataDef));
+				checkResult(GetLength(pReferencedSlot, &referenceLength));
+			}
+		}
+
+		// Create a Source Clip with a reference to a specified Mob
+		IAAFSourceClipSP pResult;
+		checkResult(defs.cdSourceClip()->CreateInstance(IID_IAAFSourceClip, (IUnknown **)&pResult));
+		checkResult(pResult->Initialize(pReferenceDataDef, referenceLength, reference));
+
+		*pSourceClip = pResult;
+		(*pSourceClip)->AddRef();
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+static HRESULT CreateSequence(
+	IAAFHeader* pHeader,
+	IUnknown* pUnknownComponent,
+	IAAFSequence** pSequence)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFDictionarySP pDictionary;
+		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs(pDictionary);
+
+		IAAFDataDefSP pDataDef;
+		checkResult(GetDataDef(pUnknownComponent, &pDataDef));
+
+		IAAFSequenceSP pResult;
+		checkResult(defs.cdSequence()->CreateInstance(IID_IAAFSequence, (IUnknown **)&pResult));
+		checkResult(pResult->Initialize(pDataDef));
+
+		IAAFComponentSP pComponent;
+		checkResult(pUnknownComponent->QueryInterface(IID_IAAFComponent, (void**)&pComponent));
+		checkResult(pResult->AppendComponent(pComponent));
+
+		*pSequence = pResult;
+		(*pSequence)->AddRef();
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+static HRESULT RegisterOperationDef(
+	IAAFHeader* pHeader,
+	const aafUID_t& operationDefID)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFDictionarySP pDictionary;
+		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs(pDictionary);
+
+		IAAFOperationDefSP pOperationDef;
+		checkResult(defs.cdOperationDef()->CreateInstance(IID_IAAFOperationDef, (IUnknown **)&pOperationDef));
+		if (operationDefID == kAAFEffectSMPTEVideoWipe)
+		{
+			checkResult(pOperationDef->Initialize(kAAFEffectSMPTEVideoWipe, L"SmpteWipeDummy", L"SmpteWipeDummy"));
+			checkResult(pDictionary->RegisterOperationDef(pOperationDef));
+			checkResult(pOperationDef->SetDataDef (defs.ddkAAFPicture()));
+			checkResult(pOperationDef->SetNumberInputs(1));
+			checkResult(pOperationDef->SetBypass(1));
+		}
+		else
+		{
+			hr = AAFRESULT_TEST_FAILED;
+		}
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+static HRESULT CreateOperationGroup(
+	IAAFHeader* pHeader,
+	const aafUID_t& operationDefID,
+	const aafMobID_t& inputMobID,
+	const aafMobID_t& renderMobID,
+	IAAFOperationGroup** pOperationGroup)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFDictionarySP pDictionary;
+		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs(pDictionary);
+
+		checkResult(RegisterOperationDef(pHeader,operationDefID));
+
+		// Create an Input Segment for the Operation Group first -
+		// it is convinient for determining the length of the Opearion Group.
+		IAAFSourceClipSP pSourceClip;
+		checkResult(CreateSourceClip(pHeader, inputMobID, &pSourceClip));
+		IAAFSequenceSP pSequence;
+		checkResult(CreateSequence(pHeader, pSourceClip, &pSequence));
+		IAAFSegmentSP pInputSegment;
+		checkResult(pSequence->QueryInterface(IID_IAAFSegment, (void **)&pInputSegment));
+
+		// Create an Operation Group
+		IAAFOperationDefSP pOperationDef;
+		checkResult(pDictionary->LookupOperationDef(operationDefID, &pOperationDef));
+		IAAFDataDefSP pDataDef;
+		checkResult(pOperationDef->GetDataDef(&pDataDef));
+		aafLength_t length = 0;
+		checkResult(GetLength(pInputSegment, &length));
+
+		IAAFOperationGroupSP pResult;
+		checkResult(defs.cdOperationGroup()->CreateInstance(IID_IAAFOperationGroup, (IUnknown **)&pResult));
+		checkResult(pResult->Initialize(pDataDef, length, pOperationDef));
+
+		// Add an Input Segment to the  Operation Group
+		checkResult(pResult->AppendInputSegment(pInputSegment));
+
+		// Create Operation Group's Render
+		checkResult(CreateEssenceData(pHeader, renderMobID, (aafDataBuffer_t)KLVfrowney, sizeof(KLVfrowney)));
+		IAAFSourceClipSP pRenderSourceClip;
+		checkResult(CreateSourceClip(pHeader, renderMobID, &pRenderSourceClip));
+		IAAFSourceReferenceSP pRenderSourceReference;
+		checkResult(pRenderSourceClip->QueryInterface(IID_IAAFSourceReference, (void **)&pRenderSourceReference));
+		checkResult(pResult->SetRender(pRenderSourceReference));
+
+		*pOperationGroup = pResult;
+		(*pOperationGroup)->AddRef();
+
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+static HRESULT CreateCommentMarker(
+	IAAFHeader* pHeader,
+	const aafMobID_t& annotationMobID,
+	IAAFCommentMarker** pCommentMarker)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFDictionarySP pDictionary;
+		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs(pDictionary);
+
+		// Create CommentMarker
+		IAAFCommentMarkerSP pResult;
+		checkResult(defs.cdCommentMarker()->CreateInstance(IID_IAAFCommentMarker, (IUnknown **)&pResult));
+
+		IAAFComponentSP pComponent;
+		checkResult(pResult->QueryInterface(IID_IAAFComponent, (void**)&pComponent));
+		checkResult(pComponent->SetDataDef(defs.ddkAAFDescriptiveMetadata()));
+
+		IAAFSourceClipSP pAnnotation;
+		checkResult(CreateSourceClip(pHeader, annotationMobID, &pAnnotation));
+		IAAFSourceReferenceSP pAnnotationSourceReference;
+		checkResult(pAnnotation->QueryInterface(IID_IAAFSourceReference, (void**)&pAnnotationSourceReference));
+		checkResult(pResult->SetAnnotation(pAnnotationSourceReference));
+
+		*pCommentMarker = pResult;
+		(*pCommentMarker)->AddRef();
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+// Create a Composition Mob
+static HRESULT CreateComposition(
+	IAAFHeader* pHeader,
+	const aafMobID_t& compositionMobID,
+	const aafMobID_t& masterMobID,
+	const aafMobID_t& compositionEffectRenderMobID,
+	const aafMobID_t& commentMarkerAnnotationMobID)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFDictionarySP pDictionary;
+		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs(pDictionary);
+
+		// Create CompositionMob
+		IAAFCompositionMobSP pCompositionMob;
+		checkResult(defs.cdCompositionMob()->CreateInstance(IID_IAAFCompositionMob, (IUnknown **)&pCompositionMob));
+
+		// Add the CompositionMob to the Header
+		IAAFMobSP pMob;
+		checkResult(pCompositionMob->QueryInterface(IID_IAAFMob, (void**)&pMob));
+		checkResult(pMob->SetMobID(compositionMobID));
+
+		// Create Operation Group
+		IAAFOperationGroupSP pOperationGroup;
+		checkResult(CreateOperationGroup(pHeader, kAAFEffectSMPTEVideoWipe, masterMobID, compositionEffectRenderMobID, &pOperationGroup));
+
+		// A Sequence with the Operation Group
+		IAAFSequenceSP pSequence;
+		checkResult(CreateSequence(pHeader, pOperationGroup, &pSequence));
+		IAAFSegmentSP pSegment;
+		checkResult(pSequence->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
+
+		const aafRational_t editRate = {25, 1};
+		IAAFTimelineMobSlotSP pTimelineMobSlot;
+		checkResult(pMob->AppendNewTimelineSlot(editRate, pSegment, 1, L"Planetary", 0, &pTimelineMobSlot));
+
+		// Create Comment Marker
+		IAAFCommentMarkerSP pCommentMarker;
+		checkResult(CreateCommentMarker(pHeader, commentMarkerAnnotationMobID, &pCommentMarker));
+		checkResult(pCommentMarker->QueryInterface(IID_IAAFSegment, (void **)&pSegment));
+
+		// Add Comment Marker to the Composition Mob (just for variaty don't wrap it in a Sequence).
+		IAAFMob2SP pMob2;
+		checkResult(pCompositionMob->QueryInterface(IID_IAAFMob2, (void**)&pMob2));
+		IAAFEventMobSlotSP pEventMobSlot;
+		checkResult(pMob2->AppendNewEventSlot(editRate, pSegment, 2, L"Plot", 0, &pEventMobSlot));
+
+		checkResult(pHeader->AddMob(pMob));
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+// Create a Master Mob with an Essence Group
+static HRESULT CreateEssenceGroup(
+	IAAFHeader* pHeader,
+	const aafMobID_t& masterMobID,
+	const aafMobID_t& choiceMobID,
+	const aafMobID_t& stillMobID)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFDictionarySP pDictionary;
+		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs(pDictionary);
+
+		// Create file mobs to serve as the 'choice' and 'still frame' for Essence Group
+		checkResult(CreateEssenceData(pHeader, choiceMobID, (aafDataBuffer_t)KLVfrowney, sizeof(KLVfrowney)));
+		checkResult(CreateEssenceData(pHeader, stillMobID, (aafDataBuffer_t)KLVsmiley, sizeof(KLVsmiley)));
+
+		// Create Source Clip referencing the file mob that will serve as
+		// the 'choice' for Essence Group
+		IAAFSourceClipSP pChoiceSourceClip;
+		checkResult(CreateSourceClip(pHeader, choiceMobID, &pChoiceSourceClip));
+
+		IAAFDataDefSP pDataDef;
+		checkResult(GetDataDef(pChoiceSourceClip, &pDataDef));
+		aafLength_t length = 0;
+		checkResult(GetLength(pChoiceSourceClip, &length));
+
+		// Create Essence Group
+		IAAFEssenceGroupSP pEssenceGroup;
+		checkResult(defs.cdEssenceGroup()->CreateInstance(IID_IAAFEssenceGroup, (IUnknown **)&pEssenceGroup));
+		IAAFComponentSP pComponent;
+		checkResult(pEssenceGroup->QueryInterface(IID_IAAFComponent, (void**)&pComponent));
+		checkResult(pComponent->SetDataDef(pDataDef));
+		checkResult(pComponent->SetLength(length));
+
+		// Add the 'choice' and the 'still frame' to the Essence Group
+		IAAFSegmentSP pChoiceSegment;
+		checkResult(pChoiceSourceClip->QueryInterface(IID_IAAFSegment, (void**)&pChoiceSegment));
+		checkResult(pEssenceGroup->AppendChoice(pChoiceSegment));
+
+		// Set a 'still frame' on the Essence Group
+		IAAFSourceClipSP pStillSourceClip;
+		checkResult(CreateSourceClip(pHeader, stillMobID, &pStillSourceClip));
+		// Still has to have length of 1
+		IAAFComponentSP pStillComponent;
+		checkResult(pStillSourceClip->QueryInterface(IID_IAAFComponent, (void**)&pStillComponent));
+		checkResult(pStillComponent->SetLength(1));
+		checkResult(pEssenceGroup->SetStillFrame(pStillSourceClip));
+
+		// Create MasterMob to hold the Essence Group
+		IAAFMasterMobSP pMasterMob;
+		checkResult(defs.cdMasterMob()->CreateInstance(IID_IAAFMasterMob, (IUnknown **)&pMasterMob));
+
+		IAAFMobSP pMob;
+		checkResult(pMasterMob->QueryInterface(IID_IAAFMob, (void**)&pMob));
+		checkResult(pMob->SetMobID(masterMobID));
+
+		IAAFSegmentSP pEssenceGroupSegment;
+		checkResult(pEssenceGroup->QueryInterface(IID_IAAFSegment, (void**)&pEssenceGroupSegment));
+		const aafRational_t editRate = {25, 1};
+		IAAFTimelineMobSlotSP pTimelineMobSlot;
+		checkResult(pMob->AppendNewTimelineSlot(editRate, pEssenceGroupSegment, 1, L"Neptune Seven", 0, &pTimelineMobSlot));
+
+		checkResult(pHeader->AddMob(pMob));
+
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+// Create Master Mob without Mob Slots
+static HRESULT CreateEmptyClip(
+	IAAFHeader* pHeader,
+	const aafMobID_t& masterMobID)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFDictionarySP pDictionary;
+		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs(pDictionary);
+
+		// Create MasterMob to hold the Essence Group
+		IAAFMasterMobSP pMasterMob;
+		checkResult(defs.cdMasterMob()->CreateInstance(IID_IAAFMasterMob, (IUnknown **)&pMasterMob));
+
+		IAAFMobSP pMob;
+		checkResult(pMasterMob->QueryInterface(IID_IAAFMob, (void**)&pMob));
+		checkResult(pMob->SetMobID(masterMobID));
+
+		checkResult(pHeader->AddMob(pMob));
+
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+static HRESULT CreateClonedAAFFile(
+    aafWChar * pFileName,
+    aafUID_constref fileKind,
+    testRawStorageType_t rawStorageType,
+    aafProductIdentification_constref productID)
+{
+	HRESULT hr = S_OK;
+	IAAFFileSP pDestFile;
+
+	try
+	{
+		// Create the desctination file that will receive "cloned" metadata
+		RemoveTestFile(pFileName);
+		checkResult(CreateTestFile( pFileName, fileKind, rawStorageType, productID, &pDestFile));
+
+		// TODO: kAAFFileKind_AafKlvBinary MXF writer implementation
+		// fails to write KLV key and length for essence streams created
+		// by CloneExternal(). Remove this once fixed.
+		const bool encodingSupportsEssenceCloning = (fileKind != kAAFFileKind_AafKlvBinary);
+
+		//
+		// Clone from a file with potentially different encoding.
+		//
+		if (AAFRESULT_SUCCEEDED(hr) && encodingSupportsEssenceCloning)
+		{
+			IAAFFileSP pSrcFile;
+			try
+			{
+				// Create the source file to clone metadata from
+				checkResult(AAFFileOpenTransient(const_cast<aafProductIdentification_t*>(&productID), &pSrcFile));
+				IAAFHeaderSP pHeader;
+				checkResult(pSrcFile->GetHeader(&pHeader));
+				checkResult(CreateEssenceData(pHeader, MOBTestID5, (aafDataBuffer_t)KLVfrowney, sizeof(KLVfrowney)));
+				IAAFMobSP pMob;
+				checkResult(pHeader->LookupMob(MOBTestID5, &pMob));
+
+				IAAFMobSP pClonedMob;
+				checkResult(pMob->CloneExternal(kAAFNoFollowDepend, kAAFIncludeMedia, pDestFile, &pClonedMob));
+				checkResult(pDestFile->Save());
+
+				checkResult(pSrcFile->Close());
+			}
+			catch (HRESULT& rResult)
+			{
+				pSrcFile->Close();
+				hr = rResult;
+			}
+		}
+
+		//
+		// Clone from a file with the same encoding.
+		//
+		if (AAFRESULT_SUCCEEDED(hr))
+		{
+			IAAFFileSP pSrcFile;
+			try
+			{
+				// Create the source file to clone metadata from
+				aafCharacter src_filename[128];
+				wcscpy(src_filename, pFileName);
+				wcscat(src_filename, L"_source");
+				RemoveTestFile(src_filename);
+				checkResult(CreateTestFile( src_filename, fileKind, rawStorageType, productID, &pSrcFile));
+				IAAFHeaderSP pHeader;
+				checkResult(pSrcFile->GetHeader(&pHeader));
+
+				//
+				// Clone from saved but not closed file.
+				//
+				checkResult(CreateEssenceData(pHeader, MOBTestID6, (aafDataBuffer_t)KLVfrowney, sizeof(KLVfrowney)));
+				checkResult(pSrcFile->Save());
+				{
+					IAAFMobSP pMob;
+					checkResult(pHeader->LookupMob(MOBTestID6, &pMob));
+					IAAFMobSP pClonedMob;
+					checkResult(pMob->CloneExternal(kAAFNoFollowDepend, kAAFIncludeMedia, pDestFile, &pClonedMob));
+					checkResult(pDestFile->Save());
+				}
+
+				//
+				// Clone from saved and closed file.
+				//
+				checkResult(CreateEssenceData(pHeader, MOBTestID7, (aafDataBuffer_t)KLVsmiley, sizeof(KLVsmiley)));
+				checkResult(CreateEssenceData(pHeader, MOBTestID8, (aafDataBuffer_t)KLVfrowney, sizeof(KLVfrowney)));
+				checkResult(CreateEssenceGroup(pHeader, MOBTestID10, MOBTestID9, MOBTestID11));
+				checkResult(CreateEmptyClip(pHeader, MOBTestID14));
+				checkResult(CreateComposition(pHeader, MOBTestID12, MOBTestID10, MOBTestID13, MOBTestID14));
+				checkResult(pSrcFile->Save());
+				checkResult(pSrcFile->Close());
+				// Reopen the closed source file
+				checkResult(AAFFileOpenExistingRead(src_filename, 0, &pSrcFile));
+
+				// Clone from saved and closed file.
+				checkResult(pSrcFile->GetHeader(&pHeader));
+				{
+					IAAFMobSP pMob;
+					checkResult(pHeader->LookupMob(MOBTestID7, &pMob));
+					IAAFMobSP pClonedMob;
+					checkResult(pMob->CloneExternal(kAAFNoFollowDepend, kAAFIncludeMedia, pDestFile, &pClonedMob));
+					checkResult(pDestFile->Save());
+				}
+				{
+					// Clone comples Composition Mob and its dependencies
+					IAAFMobSP pMob;
+					checkResult(pHeader->LookupMob(MOBTestID12, &pMob));
+					IAAFMobSP pClonedMob;
+					checkResult(pMob->CloneExternal(kAAFFollowDepend, kAAFNoIncludeMedia, pDestFile, &pClonedMob));
+					checkResult(pDestFile->Save());
+				}
+
+				// Clone from saved and closed file while deferring copying of stream contents.
+				{
+					IAAFMobSP pMob;
+					checkResult(pHeader->LookupMob(MOBTestID8, &pMob));
+					// TODO: Fix CloneExternalAdvanced() to support deferred
+					// copying of the media.
+					//
+					// TODO: Add a test case for CloneExternalAdvanced() to
+					// test deferred copying of stream properties other than
+					// essence and index stream properties.
+					//
+					// This call is disabled because it currently doesn't
+					// support cloning with media when deferred stream copying
+					// is enabled.
+#if 0				
+					IAAFMob3SP pMob3;
+					if (AAFRESULT_SUCCEEDED(pMob->QueryInterface(IID_IAAFMob3, (void**)&pMob3)))
+					{
+						IAAFMobSP pClonedMob;
+						checkResult(pMob3->CloneExternalAdvanced(kAAFNoFollowDepend, kAAFIncludeMedia, kAAFTrue, pDestFile, &pClonedMob));
+					}
+					else
+#endif
+					{
+						// Fall back to the original method if the toolkit version doesn't implement IAAFMob3
+						IAAFMobSP pClonedMob;
+						checkResult(pMob->CloneExternal(kAAFNoFollowDepend, kAAFIncludeMedia, pDestFile, &pClonedMob));
+					}
+					checkResult(pDestFile->Save());
+				}
+
+				checkResult(pSrcFile->Close());
+			}
+			catch (HRESULT& rResult)
+			{
+				pSrcFile->Close();
+				hr = rResult;
+			}
+		}
+
+		checkResult(pDestFile->Close());
+	}
+	catch (HRESULT& rResult)
+	{
+		pDestFile->Close();
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+static HRESULT ReadEssenceData(IAAFHeader* pHeader, const aafMobID_t sourceMobID, aafDataBuffer_t buffer, aafUInt32 bufferSize, aafUInt32* pBytesRead)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFEssenceDataSP pEssenceData;
+		checkResult(pHeader->LookupEssenceData(sourceMobID, &pEssenceData));
+		IAAFEssenceData2SP pEssenceData2;
+		checkResult(pEssenceData->QueryInterface(IID_IAAFEssenceData2, (void**)&pEssenceData2));
+		IAAFPlainEssenceDataSP pPlainEssenceData;
+		checkResult(pEssenceData2->GetPlainEssenceData(0, &pPlainEssenceData));
+		checkResult(pPlainEssenceData->Read(bufferSize, buffer, pBytesRead));
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+static bool MobExists(IAAFHeader* pHeader, const aafMobID_t& mobID)
+{
+	IAAFMobSP pMob;
+	return  (pHeader->LookupMob(mobID, &pMob) == S_OK);
+}
+
+static HRESULT ReadClonedAAFFile(aafWChar * pFileName)
+{
+	HRESULT hr = S_OK;
+
+	IAAFFileSP pFile;
+
+	try
+	{
+		// Open the file
+		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
+		IAAFHeaderSP pHeader;
+		checkResult(pFile->GetHeader(&pHeader));
+
+		aafUInt8 buffer[500];
+		aafUInt32 bytesRead = 0;
+
+		memset(buffer, 0, sizeof(buffer));
+		bytesRead = 0;
+		checkResult(ReadEssenceData(pHeader, MOBTestID7, buffer, sizeof(buffer), &bytesRead));
+		checkExpression(bytesRead == sizeof(KLVsmiley), AAFRESULT_TEST_FAILED);
+		checkExpression(memcmp(buffer, KLVsmiley, bytesRead) == 0, AAFRESULT_TEST_FAILED);
+
+		memset(buffer, 0, sizeof(buffer));
+		bytesRead = 0;
+		checkResult(ReadEssenceData(pHeader, MOBTestID8, buffer, sizeof(buffer), &bytesRead));
+		checkExpression(bytesRead == sizeof(KLVfrowney), AAFRESULT_TEST_FAILED);
+		checkExpression(memcmp(buffer, KLVfrowney, bytesRead) == 0, AAFRESULT_TEST_FAILED);
+
+		checkExpression(MobExists(pHeader, MOBTestID9), AAFRESULT_TEST_FAILED);
+		checkExpression(MobExists(pHeader, MOBTestID10), AAFRESULT_TEST_FAILED);
+		checkExpression(MobExists(pHeader, MOBTestID11), AAFRESULT_TEST_FAILED);
+		checkExpression(MobExists(pHeader, MOBTestID12), AAFRESULT_TEST_FAILED);
+		checkExpression(MobExists(pHeader, MOBTestID13), AAFRESULT_TEST_FAILED);
+		checkExpression(MobExists(pHeader, MOBTestID14), AAFRESULT_TEST_FAILED);
+
+		// The following 2 tests currently fail due to known bugs.
+		// For test cases see CreateClonedAAFFile() and how streams
+		// associated with these mobs were created
+
+		memset(buffer, 0, sizeof(buffer));
+		bytesRead = 0;
+		checkExpression(ReadEssenceData(pHeader, MOBTestID5, buffer, sizeof(buffer), &bytesRead) == S_OK, AAFRESULT_TEST_PARTIAL_SUCCESS);
+		checkExpression(bytesRead == sizeof(KLVfrowney), AAFRESULT_TEST_PARTIAL_SUCCESS);
+		checkExpression(memcmp(buffer, KLVfrowney, bytesRead) == 0, AAFRESULT_TEST_PARTIAL_SUCCESS);
+
+		memset(buffer, 0, sizeof(buffer));
+		bytesRead = 0;
+		checkResult(ReadEssenceData(pHeader, MOBTestID6, buffer, sizeof(buffer), &bytesRead));
+		checkExpression(bytesRead == sizeof(KLVfrowney), AAFRESULT_TEST_PARTIAL_SUCCESS);
+		checkExpression(memcmp(buffer, KLVfrowney, bytesRead) == 0, AAFRESULT_TEST_PARTIAL_SUCCESS);
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	if (pFile)
+	{
+		pFile->Close();
+	}
+
+	return hr;
 }
 
 static HRESULT CreateAAFFile(
@@ -714,10 +1545,23 @@ static HRESULT CreateAAFFile(
 
 	  // Remove the previous test file if any.
 	  RemoveTestFile(dest_filename);
-	  checkResult(CreateTestFile( dest_filename, fileKind, rawStorageType, productID, &spDestFile ));
-	  checkResult(pMob->CloneExternal(kAAFNoFollowDepend, kAAFNoIncludeMedia, spDestFile, &spClonedMob));
-	  checkResult(spDestFile->Save());	  	
-	  checkResult(spDestFile->Close());	  	
+	  try
+	  {
+		checkResult(CreateTestFile( dest_filename, fileKind, rawStorageType, productID, &spDestFile ));
+		hr = pMob->CloneExternal(kAAFNoFollowDepend, kAAFNoIncludeMedia, spDestFile, &spClonedMob);
+		checkExpression(hr == AAFRESULT_SUCCESS || hr == AAFRESULT_NOT_IMPLEMENTED || hr == AAFRESULT_NOT_IN_CURRENT_VERSION,
+						AAFRESULT_TEST_FAILED);
+	  }
+	  catch (HRESULT& rResult)
+	  {
+		hr = rResult;
+	  }
+
+	  if (spDestFile)
+	  {
+		spDestFile->Save();
+		spDestFile->Close();
+	  }
 	}
   catch (HRESULT& rResult)
 	{
@@ -1281,6 +2125,23 @@ extern "C" HRESULT CAAFMob_test(
 		if(hr == AAFRESULT_SUCCESS)
 		{
 			hr = ReadAAFFile( pFileName );
+		}
+
+		if(hr == AAFRESULT_SUCCESS)
+		{
+			aafCharacter pClonedFileName[ fileNameBufLen ];
+			wcscpy(pClonedFileName, pFileName);
+			wcscat(pClonedFileName, L"_cloned");
+
+			if(mode == kAAFUnitTestReadWrite)
+			{
+				hr = CreateClonedAAFFile(pClonedFileName, fileKind, rawStorageType, productID);
+			}
+
+			if(hr == AAFRESULT_SUCCESS)
+			{
+				hr = ReadClonedAAFFile(pClonedFileName);
+			}
 		}
 	}
 	catch (...)

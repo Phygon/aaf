@@ -1,0 +1,191 @@
+#c *********************************************************************
+#c
+#c $Id$ $Name$
+#c
+#c The contents of this file are subject to the AAF SDK Public Source
+#c License Agreement Version 2.0 (the "License"); You may not use this
+#c file except in compliance with the License.  The License is available
+#c in AAFSDKPSL.TXT, or you may obtain a copy of the License from the
+#c Advanced Media Workflow Association, Inc., or its successor.
+#c
+#c Software distributed under the License is distributed on an "AS IS"
+#c basis, WITHOUT WARRANTY OF ANY KIND, either express or implied.  See
+#c the License for the specific language governing rights and limitations
+#c under the License.  Refer to Section 3.3 of the License for proper use
+#c of this Exhibit.
+#c
+#c WARNING:  Please contact the Advanced Media Workflow Association,
+#c Inc., for more information about any additional licenses to
+#c intellectual property covering the AAF Standard that may be required
+#c to create and distribute AAF compliant products.
+#c (http://www.amwa.tv/policies).
+#c
+#c Copyright Notices:
+#c The Original Code of this file is Copyright 1998-2018, licensor of the
+#c Advanced Media Workflow Association.  All rights reserved.
+#c
+#c The Initial Developer of the Original Code of this file and the
+#c licensor of the Advanced Media Workflow Association is
+#c Avid Technology.
+#c All rights reserved.
+#c
+#c *********************************************************************
+#startm .this-module 0
+AAFEssenceDataStreamEx\
+#endm
+#c
+#startm .parent-module 0
+AAFRoot\
+#endm
+#c
+AD_HEAD
+
+AD_IDL(//
+// The IAAFEssenceDataStreamEx interface is an additional interface implemented by objects
+// which stream over AAF files\, and were therefore created by the AAFContainerDef for
+// AAF files.  This interface allows the setting of one additional parameter \(a pointer
+// to the AAFEssenceData object to stream over\) which was not general-purpose enough
+// to be in the IAAFEssenceStream interface.
+//
+// The IAAFEssenceDataStreamEx extends the IAAFEssenceDataStream interface by adding
+// methods to set and get the optional SampleIndex property
+//
+// Objects which support this interface must be created by methods in IAAFContainerDef\, since
+// the container definition is what is used to differentiate between the different streams.
+// If the stream needs a reference to data other than a file pointer \(ex. the AAFContainer
+// makes a stream which needs a reference to a structureed storage stream\) will have another
+// interface to support the additional behaviour.  For an AAF container\, the additional interface
+// is IAAFEssenceDataStream.
+//
+// The following has been copied from the IAAFEssenceStream interface:
+//		The IAAFEssenceStream interface is an internal interface used by AAFEssenceAccess and
+//		essence codecs to read the low-level representation of the essence.  There are multiple
+//		classes implementing this interface\, each representing a different underlying container
+//		holding the essence data.  The idea of \"container\" is separate from any formatting such
+//		as WAVE or JPEG.  Examples of containers \(and therefore streams\)\, are essence embedded
+//		in AAF files\, and essence in a file all by itself \(ex. a WAVE file\).
+//
+//)
+
+AD_CLASS_UUID(a27d1088, cba0, 4685, ab, 80, 9f, 41, 0, d4, ea, 34)
+
+AD_DEFAULT_UUID(bc0f561a, 7834, 408f, b9, 7e, 81, 39, 97, a5, 5c, 5b)
+AD_XCLASS_BEGIN(Concrete, Transient)
+
+AD_XMETHOD1(Init,
+			[in],
+			objIn,
+			Unknown,
+			essenceData,
+			The EssenceData to stream over,
+			Init the stream over a particular EssenceData.)
+
+AD_METHOD3(WriteSampleIndex,
+			[in],
+			aafUInt32, 
+			bytes, the number of bytes to write,
+			[out\\\, size_is\\\(bytes\\\)],
+			aafDataBuffer_t, buffer, 
+			the buffer that contains at least bytes,
+			[out\\\,ref],
+			aafUInt32 *,
+			bytesWritten, the number of bytes actually written from the buffer,
+			Write some number of bytes to the stream exactly and with no formatting or compression.
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect\\\, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  \\\(This is the only code indicating success.\\\)
+	//
+	// AAFRESULT_NULL_PARAM
+	//   - pBuffer or pBytesRead is null.
+	//
+	// AAFRESULT_STREAM_FULL
+	//   - The essence can not be written because of a fault such as a disk full error in the
+	// underlying operating system.)
+
+
+AD_METHOD3(ReadSampleIndex,
+			[in],
+			aafUInt32,
+			buflen,
+			to a buffer of this size,
+			[out\\\, size_is\\\(buflen\\\)\\\, length_is\\\(*pBytesRead\\\)],
+			aafDataBuffer_t,
+			pBuffer,
+			here is the buffer,
+			[out\\\,ref],
+			aafUInt32 *,
+			pBytesRead,
+			Return bytes actually read,
+			Read some number of bytes from the stream exactly and with no formatting or compression.
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect\\\, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  \\\(This is the only code indicating success.\\\)
+	//
+	// AAFRESULT_NULL_PARAM
+	//   - pBuffer or pBytesRead is null.
+	//
+	// AAFRESULT_END_OF_ESSENCE
+	//   - Hit either the end-of-file on a raw essence file\\\, or the end of the essence property.
+	//	The pBytesRead parameter correctly reflects the number of bytes actually read.)
+
+AD_METHOD1(SeekSampleIndex,
+			[in],
+			aafPosition_t,
+			byteOffset,
+			The absolute byte offset into the stream.,
+			Seek to the absolute byte offset into the stream.)
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect\\\, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  \\\(This is the only code indicating success.\\\)
+	//
+	// AAFRESULT_STREAM_BOUNDS
+	//   - The new position would be outside of the bounds of the stream.)
+
+AD_METHOD1(GetSampleIndexPosition,
+			[out],
+			aafPosition_t *,
+			pPosition,
+			The position within the stream.,
+			Returns the position within the stream.
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect\\\, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  \\\(This is the only code indicating success.\\\)
+	//
+	// AAFRESULT_NULL_PARAM
+	//   - pPosition is null.)
+
+AD_METHOD1(GetSampleIndexLength,
+			[out],
+			aafLength_t *,
+			pLength,
+			The length of the stream.,
+			Returns the length of the stream.
+	// 
+	// This method should return only the following codes.  If more than one of
+	// the listed errors is in effect\\\, it should return the first one
+	// encountered in the order given below:
+	// 
+	// AAFRESULT_SUCCESS
+	//   - succeeded.  \\\(This is the only code indicating success.\\\)
+	//
+	// AAFRESULT_NULL_PARAM
+	//   - pLength is null.)
+
+AD_XCLASS_END(Concrete, Transient)
+

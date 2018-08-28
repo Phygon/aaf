@@ -52,6 +52,9 @@
 #include "OMStorable.h"
 #include "OMClassFactory.h"
 
+#include "OMDataStreamProperty.h"
+#include "OMDataStreamAccess.h"
+
 //#define OM_MXFDEBUG
 
 #if defined(OM_MXFDEBUG)
@@ -64,7 +67,7 @@
 
   // @mfunc Constructor.
 OMMXFStorage::OMMXFStorage(OMRawStorage* store)
-  : OMWrappedRawStorage(store),
+  : OMMXFStorageBase(store),
   _gridSize(0),
   _primerPosition(0),
   _headerByteCount(0),
@@ -155,6 +158,34 @@ OMMXFStorage::~OMMXFStorage(void)
   destroyPartitions();
 }
 
+  // @mfunc Called when this <c OMMXFStorage> is opened for reading.
+void OMMXFStorage::openRead(void)
+{
+  TRACE("OMMXFStorage::openRead");
+}
+
+  // @mfunc Called when this <c OMMXFStorage> is opened for modification.
+void OMMXFStorage::openModify(void)
+{
+  TRACE("OMMXFStorage::openModify");
+
+  //???
+  _metadataEnd = preallocatedMetadataSize;
+}
+
+  // @mfunc Called when this <c OMMXFStorage> is created for writing.
+void OMMXFStorage::createWrite(void)
+{
+  TRACE("OMMXFStorage::createWrite");
+}
+
+  // @mfunc Called when this <c OMMXFStorage> is created for for
+  //        modification.
+void OMMXFStorage::createModify(void)
+{
+  TRACE("OMMXFStorage::createModify");
+}
+
   // @mfunc Open this <c OMMXFStorage>.
 void OMMXFStorage::open(void)
 {
@@ -194,6 +225,12 @@ void OMMXFStorage::close(void)
   printPartitions();
   printStreams();
 #endif
+}
+
+  // @mfunc Called after we Save()
+void OMMXFStorage::postSave(bool finalize)
+{
+  TRACE("OMMXFStorage::postSave");
 }
 
   // @mfunc Set the operational pattern to <p pattern>.
@@ -267,6 +304,15 @@ OMUniqueObjectIdentification OMMXFStorage::generation(void) const
   return _generation;
 }
 
+bool OMMXFStorage::findMetadata(OMUInt64& partitionPosition)
+{
+  TRACE("OMMXFStorage::findMetadata");
+
+  bool result = OMMXFStorage::findHeader(this, partitionPosition);
+  return result;
+}
+
+/*
 bool OMMXFStorage::findHeader(const OMRawStorage* store,
                               OMUInt64& headerPosition)
 {
@@ -382,6 +428,7 @@ bool OMMXFStorage::isFill(const OMKLVKey& k)
   }
   return result;
 }
+*/
 
 void OMMXFStorage::writeHeaderPartition(OMUInt32 bodySID,
                                         OMUInt32 indexSID,
@@ -544,6 +591,34 @@ bool OMMXFStorage::isRandomIndex(OMUInt64 fileSize, OMUInt32 ripSize)
     }
   }
   return result;
+}
+
+  // @mfunc Write a fill key, a BER encoded length and
+  //        <p length> bytes of fill.
+  //   @parm The number of bytes of fill to write.
+void OMMXFStorage::writeKLVFill(const OMUInt64& from, const OMUInt64& to)
+{
+  TRACE("OMMXFStorage::writeKLVFill");
+
+  PRECONDITION("from < to", from < to);
+  PRECONDITION("Minimum fill", to - from >= minimumFill);
+  setPosition(from);
+  writeKLVKey(fillKey);
+
+  OMUInt64 lengthPosition = reserveKLVLength();
+  OMUInt64 pos = position();
+  OMUInt64 length = to - pos;
+
+    const OMByte fillPattern = 0;
+  OMUInt32 bytesWritten = 0;
+  ASSERT("Valid length", length < OMUINT32_MAX);
+  writeCopyByteAt( pos,
+                   fillPattern,
+                   static_cast<OMUInt32>(length),
+                   bytesWritten );
+  POSTCONDITION("All bytes written", bytesWritten == length);
+
+  fixupKLVLength(lengthPosition);
 }
 
   // @mfunc Write a fill key, a BER encoded length and
@@ -825,6 +900,7 @@ void OMMXFStorage::writeBerLength(OMUInt32 lengthSize, const OMUInt64& length)
   POSTCONDITION("All bytes written", x == (lengthSize + 1));
 }
 
+/*
   // @mfunc The minimum size of <p i> when encoded using <f berEncode>.
   //        The returned size includes the BER length byte.
   //   @parm The value to encode.
@@ -886,6 +962,7 @@ void OMMXFStorage::berEncode(OMByte* berValueBuffer,
     v = v << 8;
   }
 }
+*/
 
 void OMMXFStorage::readPartition(OMUInt64 ANAME(length),
                                  OMUInt32& bodySID,
@@ -1012,6 +1089,7 @@ void OMMXFStorage::readHeaderPartition(void)
   }
 }
 
+/*
 bool OMMXFStorage::read(const OMRawStorage* store,
                         OMUInt8& i)
 {
@@ -1118,6 +1196,7 @@ bool OMMXFStorage::skipBytes(const OMRawStorage* store, OMUInt64 length)
   store->setPosition(newPosition);
   return true; // tjb
 }
+*/
 
 void OMMXFStorage::read(OMUInt8& i) const
 {
@@ -1126,6 +1205,16 @@ void OMMXFStorage::read(OMUInt8& i) const
   OMUInt32 x;
   read(&result, sizeof(OMUInt8), x);
   ASSERT("All bytes read", x == sizeof(OMUInt8));
+  i = result;
+}
+
+void OMMXFStorage::read(OMInt8& i) const
+{
+  TRACE("OMMXFStorage::read");
+  OMInt8 result;
+  OMUInt32 x;
+  read(reinterpret_cast<OMByte*>(&result), sizeof(OMInt8), x);
+  ASSERT("All bytes read", x == sizeof(OMInt8));
   i = result;
 }
 
@@ -1167,6 +1256,20 @@ void OMMXFStorage::read(OMUInt64& i, bool reorderBytes) const
   ASSERT("All bytes read", x == sizeof(OMUInt64));
   if (reorderBytes) {
     OMType::reorderInteger(dest, sizeof(OMUInt64));
+  }
+  i = result;
+}
+
+void OMMXFStorage::read(OMInt64& i, bool reorderBytes) const
+{
+  TRACE("OMMXFStorage::read");
+  OMInt64 result;
+  OMUInt32 x;
+  OMByte* dest = reinterpret_cast<OMByte*>(&result);
+  read(dest, sizeof(OMInt64), x);
+  ASSERT("All bytes read", x == sizeof(OMInt64));
+  if (reorderBytes) {
+    OMType::reorderInteger(dest, sizeof(OMInt64));
   }
   i = result;
 }
@@ -1265,6 +1368,7 @@ void OMMXFStorage::skipV(OMUInt64 length) const
   setPosition(newPosition);
 }
 
+/*
 OMUInt64 OMMXFStorage::readBerLength(const OMRawStorage* store)
 {
   TRACE("OMMXFStorage::readBerLength");
@@ -1290,6 +1394,7 @@ OMUInt64 OMMXFStorage::readBerLength(const OMRawStorage* store)
   }
   return result;
 }
+*/
 
   // @mfunc Given pointer to a weak reference property return
   //        the InstanceUID of the referenced object.
@@ -1385,7 +1490,10 @@ void OMMXFStorage::associate(OMStorable* object,
   objectToInstanceId()->insert(object, instanceId);
   ObjectDirectoryEntry* ep = 0;
   if (instanceIdToObject()->find(instanceId, &ep)) {
-    ASSERT("No previous entry", ep->_object == 0);
+//  ASSERT("No previous entry", ep->_object == 0);
+    if (ep->_object != 0) {
+      throw OMException("Non-unique object identfier.");
+    }
     ep->_object = object;
   } else {
     // Root object is restored before the object directory
@@ -1465,7 +1573,7 @@ void OMMXFStorage::clearObjectDirectory(void)
   if (_instanceIdToObject != 0) {
     ObjectDirectoryIterator iterator(*_instanceIdToObject, OMBefore);
     while (++iterator) {
-      ObjectDirectoryEntry e = iterator.value();
+      ObjectDirectoryEntry& e = iterator.value();
       if (e._flags != 1) {
         if (e._object != 0) {
           OMClassFactory* factory = e._object->classFactory();
@@ -1500,7 +1608,7 @@ void OMMXFStorage::saveObjectDirectory(void)
   ObjectDirectoryIterator iterator(*_instanceIdToObject, OMBefore);
   while (++iterator) {
     OMUniqueObjectIdentification id = iterator.key();
-    ObjectDirectoryEntry e = iterator.value();
+    const ObjectDirectoryEntry& e = iterator.value();
     write(id, _reorderBytes);
     write(e._offset, _reorderBytes);
     write(e._flags);
@@ -1528,7 +1636,20 @@ void OMMXFStorage::restoreObjectDirectory(OMUInt64 headerOffset)
 
   OMKLVKey k;
   readKLVKey(k);
-  ASSERT("Expected key", k == objectDirectoryKey); // tjb - error
+  if (k != objectDirectoryKey) {
+    // Object directory key was not found at the expected position.
+    // Either the offset specified by Root::ObjectDirectory is incorrect or
+    // object directory is not present and Root::ObjectDirectory should not
+    // be set. Both are errors but because object directory is optional they
+    // should not affect restoring of the rest of the metadata.
+
+    // Reset the object directory offset.
+    this->setObjectDirectoryOffset(0);
+    // Restore the current position before bailing out.
+    setPosition(savedPosition);
+    return;
+  }
+
   OMUInt64 entries;
   OMUInt8 entrySize;
 #if defined(OM_DEBUG)
@@ -1594,6 +1715,25 @@ OMMXFStorage::ObjectSet* OMMXFStorage::objectToInstanceId(void)
     ASSERT("Valid heap pointer", _objectToInstanceId != 0);
   }
   return _objectToInstanceId;
+}
+
+bool OMMXFStorage::streamExists(OMUInt32 sid)
+{
+  TRACE("OMMXFStorage::streamExists");
+
+  Stream* s = 0;
+  bool result = findStream(sid, s);
+  return result;
+}
+
+// TODO: This should be made Avid private. 
+void OMMXFStorage::createStreamAndAddSegment(OMUInt32 sid,
+                                const OMKLVKey& label,
+                                OMUInt32 blockSize,
+                                OMUInt32 allocationSize,
+                                bool alignV)
+{
+  TRACE("OMMXFStorage::createStreamAndAddSegment");
 }
 
 OMUInt32 OMMXFStorage::addStream(OMDataStream* stream)
@@ -1735,6 +1875,9 @@ void OMMXFStorage::streamFragment(OMUInt32 sid,
                 (rawPosition >= seg->_origin) &&
                 (rawPosition < (seg->_origin + seg->_size)));
   POSTCONDITION("Valid byte count", rawByteCount != 0);
+  POSTCONDITION("Valid byte count",
+             ((rawPosition + rawByteCount - 1) >= seg->_origin) &&
+             ((rawPosition + rawByteCount - 1) < (seg->_origin + seg->_size)));
 }
 
 void OMMXFStorage::streamWriteFragment(OMUInt32 sid,
@@ -1779,7 +1922,7 @@ void OMMXFStorage::writeStreamAt(OMUInt32 sid,
   PRECONDITION("Valid buffer", bytes != 0);
   PRECONDITION("Buffer not empty", byteCount != 0);
 
-#if 0 // tjb not yet
+#if 1 // tjb not yet
   // Grow stream if needed
   OMUInt64 streamBytes = 0;
   Stream* s = 0;
@@ -1837,6 +1980,192 @@ void OMMXFStorage::writeStreamAt(OMUInt32 sid,
 #endif
 }
 
+void OMMXFStorage::writeStreamAt(OMUInt32 sid,
+                                 OMUInt64 position,
+                                 OMIOBufferDescriptor* buffers,
+                                 OMUInt32 bufferCount,
+                                 OMUInt32& bytesWritten)
+{
+  TRACE("OMMXFStorage::writeStreamAt");
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount != 0);
+#if 1 // tjb not yet
+  // Calculate write size
+  OMUInt32 byteCount = 0;
+  for (OMUInt32 k = 0; k < bufferCount; k++) {
+    byteCount = byteCount + buffers[k]._bufferSize;
+  }
+  // Grow stream if needed
+  OMUInt64 streamBytes = 0;
+  Stream* s = 0;
+  segmentMap()->find(sid, s);
+  if (s != 0) {
+    streamBytes = allocatedSize(s);
+  }
+  if ((position + byteCount) > streamBytes) {
+    streamGrow(sid, (position + byteCount) - streamBytes);
+  }
+
+  // Map position (and check that we don't split buffers)
+  OMUInt64 startPosition = 0;
+  for (OMUInt32 i = 0; i < bufferCount; i++) {
+    OMUInt64 pos = position;
+    OMUInt64 rawPosition;
+    OMUInt32 rawByteCount;
+    streamFragment(sid,
+                   pos,
+                   buffers[i]._bufferSize,
+                   rawPosition,
+                   rawByteCount);
+    ASSERT("Buffer not split", buffers[i]._bufferSize == rawByteCount);
+    pos = pos + buffers[i]._bufferSize;
+    if (i == 0) {
+      startPosition = rawPosition;
+    }
+  }
+  // Write through the raw storage
+  OMWrappedRawStorage::streamWriteAt(startPosition,
+                                     buffers,
+                                     bufferCount,
+                                     bytesWritten);
+  // Update stream size
+  segmentMap()->find(sid, s);
+  ASSERT("Stream found", s != 0);
+  OMUInt64 newPosition = position + bytesWritten;
+  if (newPosition > s->_size) {
+    s->_size = newPosition;
+  }
+#else
+  // tjb - temporary - loop calling single buffer write
+  OMUInt32 totalBytesWritten = 0;
+  OMUInt64 pos = position;
+  for (OMUInt32 i = 0; i < bufferCount; i++) {
+    OMUInt32 writeCount;
+    writeStreamAt(sid,
+                  pos,
+                  buffers[i]._buffer,
+                  buffers[i]._bufferSize,
+                  writeCount);
+    pos = pos + writeCount;
+    totalBytesWritten = totalBytesWritten + writeCount;
+    if (writeCount != buffers[i]._bufferSize) {
+      break;
+    }
+  }
+  bytesWritten = totalBytesWritten;
+#endif
+}
+
+void OMMXFStorage::writeStreamAt(OMUInt32 sid,
+                                 OMUInt64 position,
+                                 const OMByte* buffer,
+                                 const OMUInt32 bytes,
+                                 void* /* */ completion,
+                                 const void* clientArgument)
+{
+  TRACE("OMMXFStorage::writeStreamAt");
+  PRECONDITION("Valid buffer", buffer != 0);
+  PRECONDITION("Buffer not empty", bytes != 0);
+
+  // Grow stream if needed
+  OMUInt64 streamBytes = 0;
+  Stream* s = 0;
+  segmentMap()->find(sid, s);
+  if (s != 0) {
+    streamBytes = allocatedSize(s);
+  }
+  if ((position + bytes) > streamBytes) {
+    streamGrow(sid, (position + bytes) - streamBytes);
+  }
+  // Map position (and check that we don't split buffers)
+  OMUInt64 rawPosition;
+  OMUInt32 rawByteCount;
+  streamFragment(sid,
+                 position,
+                 bytes,
+                 rawPosition,
+                 rawByteCount);
+  ASSERT("Buffer not split", bytes == rawByteCount);
+  // Write through the raw storage
+  OMWrappedRawStorage::streamWriteAt(rawPosition,
+                                     buffer,
+                                     bytes,
+                                     completion,
+                                     clientArgument);
+  // The I/O hasn't happened yet, we can't predict whethter or not it will
+  // succeed, in any case this range of bytes becomes part of the stream
+  OMUInt32 bytesWritten = bytes;
+  // Update stream size
+  segmentMap()->find(sid, s);
+  ASSERT("Stream found", s != 0);
+  OMUInt64 newPosition = position + bytesWritten;
+  if (newPosition > s->_size) {
+    s->_size = newPosition;
+  }
+}
+
+void OMMXFStorage::writeStreamAt(OMUInt32 sid,
+                                 OMUInt64 position,
+                                 const OMIOBufferDescriptor* buffers,
+                                 OMUInt32 bufferCount,
+                                 void* /* */ completion,
+                                 const void* clientArgument)
+{
+  TRACE("OMMXFStorage::writeStreamAt");
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount != 0);
+
+  // Calculate write size
+  OMUInt32 byteCount = 0;
+  for (OMUInt32 k = 0; k < bufferCount; k++) {
+    byteCount = byteCount + buffers[k]._bufferSize;
+  }
+  // Grow stream if needed
+  OMUInt64 streamBytes = 0;
+  Stream* s = 0;
+  segmentMap()->find(sid, s);
+  if (s != 0) {
+    streamBytes = allocatedSize(s);
+  }
+  if ((position + byteCount) > streamBytes) {
+    streamGrow(sid, (position + byteCount) - streamBytes);
+  }
+
+  // Map position (and check that we don't split buffers)
+  OMUInt64 startPosition = 0;
+  for (OMUInt32 i = 0; i < bufferCount; i++) {
+    OMUInt64 pos = position;
+    OMUInt64 rawPosition;
+    OMUInt32 rawByteCount;
+    streamFragment(sid,
+                   pos,
+                   buffers[i]._bufferSize,
+                   rawPosition,
+                   rawByteCount);
+    ASSERT("Buffer not split", buffers[i]._bufferSize == rawByteCount);
+    pos = pos + buffers[i]._bufferSize;
+    if (i == 0) {
+      startPosition = rawPosition;
+    }
+  }
+  // Write through the raw storage
+  OMWrappedRawStorage::streamWriteAt(startPosition,
+                                     buffers,
+                                     bufferCount,
+                                     completion,
+                                     clientArgument);
+  // The I/O hasn't happened yet, we can't predict whethter or not it will
+  // succeed, in any case this range of bytes becomes part of the stream
+  OMUInt32 bytesWritten = byteCount;
+  // Update stream size
+  segmentMap()->find(sid, s);
+  ASSERT("Stream found", s != 0);
+  OMUInt64 newPosition = position + bytesWritten;
+  if (newPosition > s->_size) {
+    s->_size = newPosition;
+  }
+}
+
 void OMMXFStorage::streamRawRead(OMUInt32 /* sid */,
                                  OMUInt64 rawPosition,
                                  OMByte* rawBytes,
@@ -1884,7 +2213,7 @@ void OMMXFStorage::readStreamAt(OMUInt32 sid,
 
   PRECONDITION("Valid buffer", bytes != 0);
   PRECONDITION("Buffer not empty", byteCount != 0);
-#if 0 // tjb not yet
+#if 1 // tjb not yet
   // Calculate read size (not yet used)
   OMUInt32 readCount = byteCount;
   OMUInt64 streamBytes = streamSize(sid);
@@ -1894,20 +2223,24 @@ void OMMXFStorage::readStreamAt(OMUInt32 sid,
     readCount = static_cast<OMUInt32>(streamBytes - position);
   }
 
-  // Map position (and check that we don't split the buffer)
-  OMUInt64 rawPosition;
-  OMUInt32 rawByteCount;
-  streamFragment(sid,
-                 position,
-                 byteCount,
-                 rawPosition,
-                 rawByteCount);
-  ASSERT("Buffer not split", byteCount == rawByteCount);
-  // Read through the raw storage
-  OMWrappedRawStorage::streamReadAt(rawPosition,
-                                    bytes,
-                                    rawByteCount,
-                                    bytesRead);
+  if (readCount > 0) {
+    // Map position (and check that we don't split the buffer)
+    OMUInt64 rawPosition;
+    OMUInt32 rawByteCount;
+    streamFragment(sid,
+                   position,
+                   readCount,
+                   rawPosition,
+                   rawByteCount);
+    ASSERT("Buffer not split", readCount == rawByteCount);
+    // Read through the raw storage
+    OMWrappedRawStorage::streamReadAt(rawPosition,
+                                      bytes,
+                                      rawByteCount,
+                                      bytesRead);
+  } else {
+    bytesRead = 0;
+  }
 #else
   OMUInt32 readCount = byteCount;
   OMUInt64 streamBytes = streamSize(sid);
@@ -1928,6 +2261,161 @@ void OMMXFStorage::readStreamAt(OMUInt32 sid,
     p = p + r;
   }
 #endif
+}
+
+void OMMXFStorage::readStreamAt(OMUInt32 sid,
+                                OMUInt64 position,
+                                OMIOBufferDescriptor* buffers,
+                                OMUInt32 bufferCount,
+                                OMUInt32& bytesRead)
+{
+  TRACE("OMMXFStorage::readStreamAt");
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount != 0);
+#if 1 // tjb not yet
+  // Calculate read size (not yet used)
+  OMUInt32 byteCount = 0;
+  for (OMUInt32 k = 0; k < bufferCount; k++) {
+    byteCount = byteCount + buffers[k]._bufferSize;
+  }
+  OMUInt32 readCount = byteCount;
+  OMUInt64 streamBytes = streamSize(sid);
+  if (position > streamBytes) {
+    readCount = 0;
+  } else if ((position + byteCount) > streamBytes) {
+    readCount = static_cast<OMUInt32>(streamBytes - position);
+  }
+
+  // Map position (and check that we don't split buffers)
+  OMUInt64 startPosition = 0;
+  for (OMUInt32 i = 0; i < bufferCount; i++) {
+    OMUInt64 pos = position;
+    OMUInt64 rawPosition;
+    OMUInt32 rawByteCount;
+    streamFragment(sid,
+                   pos,
+                   buffers[i]._bufferSize,
+                   rawPosition,
+                   rawByteCount);
+    ASSERT("Buffer not split", buffers[i]._bufferSize == rawByteCount);
+    pos = pos + buffers[i]._bufferSize;
+    if (i == 0) {
+      startPosition = rawPosition;
+    }
+  }
+  // Read through the raw storage
+  OMWrappedRawStorage::streamReadAt(startPosition,
+                                    buffers,
+                                    bufferCount,
+                                    bytesRead);
+#else
+  // tjb - temporary - loop calling single buffer read
+  OMUInt32 totalBytesRead = 0;
+  OMUInt64 pos = position;
+  for (OMUInt32 i = 0; i < bufferCount; i++) {
+    OMUInt32 readCount;
+    readStreamAt(sid,
+                 pos,
+                 buffers[i]._buffer,
+                 buffers[i]._bufferSize,
+                 readCount);
+    pos = pos + readCount;
+    totalBytesRead = totalBytesRead + readCount;
+    if (readCount != buffers[i]._bufferSize) {
+      break;
+    }
+  }
+  bytesRead = totalBytesRead;
+#endif
+}
+
+void OMMXFStorage::readStreamAt(OMUInt32 sid,
+                                OMUInt64 position,
+                                OMByte* buffer,
+                                const OMUInt32 bytes,
+                                void* /* */ completion,
+                                const void* clientArgument)
+{
+  TRACE("OMMXFStorage::readStreamAt");
+
+  PRECONDITION("Valid buffer", buffer != 0);
+  PRECONDITION("Buffer not empty", bytes != 0);
+
+  // Calculate read size (not yet used)
+  OMUInt32 readCount = bytes;
+  OMUInt64 streamBytes = streamSize(sid);
+  if (position > streamBytes) {
+    readCount = 0;
+  } else if ((position + bytes) > streamBytes) {
+    readCount = static_cast<OMUInt32>(streamBytes - position);
+  }
+
+  // Map position (and check that we don't split the buffer)
+  OMUInt64 rawPosition;
+  OMUInt32 rawByteCount;
+  streamFragment(sid,
+                 position,
+                 bytes,
+                 rawPosition,
+                 rawByteCount);
+  ASSERT("Buffer not split", bytes == rawByteCount);
+  // Read through the raw storage
+  OMWrappedRawStorage::streamReadAt(rawPosition,
+                                    buffer,
+                                    rawByteCount,
+                                    completion,
+                                    clientArgument);
+  // The I/O hasn't happened yet
+}
+
+void OMMXFStorage::readStreamAt(OMUInt32 sid,
+                                OMUInt64 position,
+                                OMIOBufferDescriptor* buffers,
+                                OMUInt32 bufferCount,
+                                void* /* */ completion,
+                                const void* clientArgument)
+{
+  TRACE("OMMXFStorage::readStreamAt");
+  PRECONDITION("Valid buffers", buffers != 0);
+  PRECONDITION("Valid buffer count", bufferCount != 0);
+
+  // Calculate read size (not yet used)
+  OMUInt32 byteCount = 0;
+  for (OMUInt32 k = 0; k < bufferCount; k++) {
+    byteCount = byteCount + buffers[k]._bufferSize;
+  }
+  OMUInt32 readCount = byteCount;
+  OMUInt64 streamBytes = streamSize(sid);
+  if (position > streamBytes) {
+    readCount = 0;
+  } else if ((position + byteCount) > streamBytes) {
+    readCount = static_cast<OMUInt32>(streamBytes - position);
+  }
+
+  // Map position (and check that we don't split buffers)
+  OMUInt64 startPosition = 0;
+  for (OMUInt32 i = 0; i < bufferCount; i++) {
+    OMUInt64 pos = position;
+    OMUInt64 rawPosition;
+    OMUInt32 rawByteCount;
+    streamFragment(sid,
+                   pos,
+                   buffers[i]._bufferSize,
+                   rawPosition,
+                   rawByteCount);
+    ASSERT("Buffer not split", buffers[i]._bufferSize == rawByteCount);
+    pos = pos + buffers[i]._bufferSize;
+    if (i == 0) {
+      startPosition = rawPosition;
+    }
+  }
+  // Read through the raw storage
+  OMWrappedRawStorage::streamReadAt(startPosition,
+                                    buffers,
+                                    bufferCount,
+                                    completion,
+                                    clientArgument);
+  // The I/O hasn't happened yet
 }
 
 void OMMXFStorage::streamRestoreSegment(OMUInt32 sid,
@@ -2524,6 +3012,13 @@ void OMMXFStorage::restoreStreams(void)
 #endif
 }
 
+// Make Avid private?
+const OMMXFIndexStream* OMMXFStorage::indexStream(const OMUInt32 streamId) const
+{
+	throw OMException("Index parsing not supported.");
+	return 0;
+}
+
 void OMMXFStorage::checkStreams(void)
 {
   TRACE("OMMXFStorage::checkStreams");
@@ -2535,6 +3030,7 @@ void OMMXFStorage::checkStreams(void)
       OMUInt64 start = seg->_origin;
       OMUInt64 end = seg->_origin + seg->_size;
 #if !defined(OM_NEW_STREAM_PARSING) && !defined(OM_FASTER_STREAM_PARSING)
+#error "OM_FASTER_STREAM_PARSING must be defined"
       start = start - (sizeof(OMKLVKey) + 1 + sizeof(OMUInt64));
       end = end + fillBufferZoneSize;
 #endif
@@ -2551,6 +3047,19 @@ void OMMXFStorage::checkStreams(void)
     }
   }
 #endif
+}
+
+bool OMMXFStorage::findStream(OMUInt32 sid, Stream*& stream)
+{
+  TRACE("OMMXFStorage::findStream");
+
+  bool result = false;
+  Stream* s = 0;
+  if (segmentMap()->find(sid, s)) {
+    stream = s;
+    result = true;
+  }
+  return result;
 }
 
 OMMXFStorage::SegmentListIterator*
@@ -2676,52 +3185,50 @@ void OMMXFStorage::destroyFixups(void)
 //_fixups.clear();
 }
 
-bool OMMXFStorage::findPattern(const OMRawStorage* store,
-                               OMUInt64 currentPosition,
-                               OMUInt64& patternPosition,
-                               const OMByte* pattern,
-                               OMUInt64 patternSize,
-                               OMUInt32 limit)
+void OMMXFStorage::addDeferredStream(OMDataStreamProperty* stream)
 {
-  bool found = false;
-  OMUInt64 pos = currentPosition;
-  OMUInt32 c = 0;
-  size_t i = 0;
-  do {
-    OMByte b;
-    store->read(&b, 1, c);
-    if (c == 1) {
-      if (b != pattern[i]) {
-        pos = pos + i + 1;
-        i = 0;
-      } else {
-        if (i < patternSize - 1) {
-          i = i + 1;
-        } else {
-          patternPosition = pos;
-          found = true;
-        }
-      }
-    }
-  } while ((!found) && (pos < limit) && (c == 1));
-  return found;
+  TRACE("OMMXFStorage::addDeferredStream");
+  ASSERT("Stream has callback", stream->hasStreamAccess());
+
+  _deferredStreams.append(stream);
 }
 
-bool OMMXFStorage::endsMetadata(const OMKLVKey& k)
+void OMMXFStorage::performDeferredIO(void)
 {
-  TRACE("OMMXFStorage::endsMetadata");
+  TRACE("OMMXFStorage::performDeferredIO");
 
-  bool result = false;
-  if (isPartition(k)) {
-    result = true;
-  } else if (k == RandomIndexMetadataKey) {
-    result = true;
-  } else if (isEssence(k) || k == SystemMetadataKey) {
-    result = true;
-  } else if (isIndex(k)) {
-    result = true;
+  const OMUInt64 oldPosition = position();
+
+  StreamListIterator iterator(_deferredStreams, OMBefore);
+  while (++iterator) {
+    OMDataStreamProperty* stream = iterator.value();
+    ASSERT("Valid property", stream != 0);
+    ASSERT("Stream has callback", stream->hasStreamAccess());
+
+    // Set the current position to the end of the stream
+    //
+    OMUInt64 lastPosition = stream->size();
+    OMUInt64 currentPosition = stream->position();
+    if (currentPosition != lastPosition) {
+      stream->setPosition(lastPosition);
+    }
+    // Allow clients to write to the stream
+    //
+    stream->streamAccess()->save(*stream);
+
+    stream->close();
   }
-  return result;
+  _deferredStreams.clear();
+
+  setPosition(oldPosition);
+}
+
+void OMMXFStorage::postMetadataSavePosition(void)
+{
+  TRACE("OMMXFStorage::postMetadataSavePosition");
+
+  // We expect to be positioned just after the last metadata object
+  _metadataEnd = position();
 }
 
 void OMMXFStorage::markMetadataStart(OMUInt64 primerKeyPosition)
@@ -2956,7 +3463,7 @@ OMMXFStorage::streamSegment(OMUInt32 sid, OMUInt64 position)
 }
 
 
-OMUInt64 OMMXFStorage::validSize(Segment* segment)
+OMUInt64 OMMXFStorage::validSize(const Segment* segment)
 {
   TRACE("OMMXFStorage::validSize");
 
@@ -3028,7 +3535,7 @@ void OMMXFStorage::destroyPartitions(void)
   POSTCONDITION("No partitions", _partitions.count() == 0);
 }
 
-bool OMMXFStorage::findPartition(OMUInt64 address, OMUInt32& index)
+bool OMMXFStorage::findPartition(OMUInt64 address, OMUInt32& index) const
 {
   TRACE("OMMXFStorage::findPartition");
 

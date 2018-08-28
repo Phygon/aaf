@@ -36,7 +36,7 @@
 
 #ifndef OM_NO_STRUCTURED_STORAGE
 
-#include "OMMSStructuredStorage.h"
+#include "OMStructuredStorage.h"
 
 #if defined(OM_USE_GSF_SS)
 

@@ -56,7 +56,7 @@
   //        interface are provided -
   //
   //        <c OMDiskRawStorage>       - an implementation of <c OMRawStorage>
-  //                                     for disk files. Uses ANSI file
+  //                                     for disk files. Uses ISO file
   //                                     functions only.
   //
   //        <c OMMemoryRawStorage>     - an implementation of <c OMRawStorage>
@@ -137,6 +137,22 @@ public:
                        OMUInt32 byteCount,
                        OMUInt32& bytesWritten) = 0;
 
+    // @cmember Attempt to write the byte specified by <p theByte>
+    //          <p byteCount> times starting at offset <p position> in this
+    //          <c OMRawStorage>.
+    //          The actual number of bytes written is returned in
+    //          <p bytesWritten>.
+    //          Writing to positions greater than
+    //          <mf OMRawStorage::size> causes this <c OMRawStorage>
+    //          to be extended, however such extension can fail, causing
+    //          <p bytesWritten> to be less than <p byteCount>.
+    //          @precondition <f isWritable()> && <f isPositionable()>
+    //   @devnote How is failure to extend indicated ?
+  virtual void writeCopyByteAt(OMUInt64 position,
+                               OMByte theByte,
+                               OMUInt32 byteCount,
+                               OMUInt32& bytesWritten) = 0;
+
     // @cmember May this <c OMRawStorage> be changed in size ?
     //          An implementation of <c OMRawStorage> for disk files
     //          would most probably return true. An implemetation
@@ -195,6 +211,82 @@ public:
     //          noop in implemetations for network streams and for memory
     //          files.
   virtual void synchronize(void) = 0;
+
+  // Functions for accessing stream data within this <c OMRawStorage>
+
+    // @cmember Attempt to read the number of stream data bytes given by
+    //          <p byteCount> from offset <p position> in this
+    //          <c OMRawStorage> into the buffer at address <p bytes>.
+    //          The actual number of bytes read is returned in <p bytesRead>.
+  virtual void streamReadAt(OMUInt64 position,
+                            OMByte* bytes,
+                            OMUInt32 byteCount,
+                            OMUInt32& bytesRead) const = 0;
+
+    // @cmember Attempt to fill the vector of buffers given by <p buffers>
+    //          with stream data read from offset <p position> in
+    //          this <c OMRawStorage>. This is "read scatter".
+    //          The <p bufferCount> buffers are read in order until all have
+    //          been successfully read or an error is encountered. Once
+    //          an error has been encountered on one buffer no additional
+    //          buffers are read.
+    //          The number of bytes read is returned in <p bytesRead>.
+  virtual void streamReadAt(OMUInt64 position,
+                            OMIOBufferDescriptor* buffers,
+                            OMUInt32 bufferCount,
+                            OMUInt32& bytesRead) const = 0;
+
+    // Asynchronous read - single buffer
+  virtual void streamReadAt(OMUInt64 position,
+                            OMByte* buffer,
+                            const OMUInt32 bytes,
+                            void* /* */ completion,
+                            const void* clientArgument) const = 0;
+
+    // Asynchronous read - multiple buffers
+  virtual void streamReadAt(OMUInt64 position,
+                            OMIOBufferDescriptor* buffers,
+                            OMUInt32 bufferCount,
+                            void* /* */ completion,
+                            const void* clientArgument) const = 0;
+
+    // @cmember Attempt to write the number of stream data bytes given by
+    //          <p byteCount> to offset  <p position> in this <c OMRawStorage>
+    //          from the buffer at address <p bytes>.
+    //          The actual number of bytes written is returned in
+    //          <p bytesWritten>.
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMByte* bytes,
+                             OMUInt32 byteCount,
+                             OMUInt32& bytesWritten) = 0;
+
+    // @cmember Attempt to write the vector of buffers given by <p buffers>
+    //          to this <c OMRawStorage>. Stream data bytes are written
+    //          starting at offset <p position> in this <c OMRawStorage>.
+    //          This is "write gather".
+    //          The <p bufferCount> buffers are written in order until all have
+    //          been successfully written or an error is encountered. Once
+    //          an error has been encountered on one buffer no additional
+    //          buffers are written.
+    //          The number of bytes written is returned in <p bytesWritten>.
+  virtual void streamWriteAt(OMUInt64 position,
+                             OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             OMUInt32& bytesWritten) = 0;
+
+    // Asynchronous write - single buffer
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMByte* buffer,
+                             const OMUInt32 bytes,
+                             void* /* */ completion,
+                             const void* clientArgument) = 0;
+
+    // Asynchronous write - multiple buffers
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             void* /* */ completion,
+                             const void* clientArgument) = 0;
 
 };
 

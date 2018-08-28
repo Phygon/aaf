@@ -84,30 +84,6 @@ aafBoolean_t  AreUnksSame(T1& cls1, T2& cls2)
 		return kAAFFalse;
 }
 
-// FileKInd helper function
-static inline bool
-equalUID(const aafUID_t& lhs, const aafUID_t& rhs)
-{
-	return (memcmp(&lhs, &rhs, sizeof(aafUID_t))==0);
-}
-
-static bool
-isSSFileKind(const aafUID_t& fileKind)
-{
-	bool result=false;
-	if (equalUID(fileKind, testFileKindDefault)
-		|| equalUID(fileKind, kAAFFileKind_AafM512Binary)
-		|| equalUID(fileKind, kAAFFileKind_AafS512Binary)
-		|| equalUID(fileKind, kAAFFileKind_AafG512Binary)
-		|| equalUID(fileKind, kAAFFileKind_AafM4KBinary)
-		|| equalUID(fileKind, kAAFFileKind_AafS4KBinary)
-		|| equalUID(fileKind, kAAFFileKind_AafG4KBinary))
-	{
-		result=true;
-	}
-	return result;
-}
-
 static aafUID_t
 getSS4KFileKind(const aafUID_t& fileKind)
 {
@@ -715,6 +691,9 @@ static HRESULT ComprehensiveOpenTest(testMode_t /* mode */,
 
 	  checkExpression( AAFRESULT_FILEREV_DIFF == AAFFileOpenExistingRead( pBadVersionFileName, 0, &pFile ), AAFRESULT_TEST_FAILED );
 	  RemoveTestFile( pBadVersionFileName );
+	  checkExpression( AAFRESULT_NULL_PARAM == AAFFileOpenExistingRead( pBadVersionFileName, 0, 0 ), AAFRESULT_TEST_FAILED );
+	  checkExpression( AAFRESULT_NULL_PARAM == AAFFileOpenExistingRead( 0, 0, &pFile ), AAFRESULT_TEST_FAILED );
+	  checkExpression( AAFRESULT_NULL_PARAM == AAFFileOpenExistingRead( 0, 0, 0 ), AAFRESULT_TEST_FAILED );
   }
 
   /* **************************************************************************
@@ -1134,6 +1113,11 @@ static HRESULT ComprehensiveSaveCopyAsTest(testMode_t /* mode */,
 
   //	D) Read Success:
   //	   1. Read after SaveCopyAs
+  //	   2. Read after SaveCopyAs with checking properties
+  //
+  //	E) Early Release:
+  //	   1. Release before Close
+  //	   2. Release before Save
 
   int f = 0; // Local count of failures
   IAAFFile* pFile = 0;
@@ -1451,6 +1435,221 @@ static HRESULT ComprehensiveSaveCopyAsTest(testMode_t /* mode */,
 	  RemoveTestFile(pCopyName);
   }
 
+  /* **************************************************************************
+	 D) Read Success:
+		1. Read after SaveCopyAs:
+		   - CreateAAFFile(file)
+		   - file.OpenExistingRead(),
+		   - register extension type in file’s dictionary
+		   - add extension property of indirect type, whose actual type is
+		     the new extension type
+		   - copy.Open(),
+		   - file.SaveCopyAs(copy)
+		   - then ReadAAFFile(copy)
+		   - read the extension property
+		   - expect AAFRESULT_SUCCESS
+  ************************************************************************** */
+  {
+	  std::cout << "\tExecuting ComprehensiveSaveCopyAsTest D2." << std::endl;
+	  checkExpression( AAFRESULT_SUCCESS == CreateAAFFile( pFileName, fileKind, rawStorageType, productID ) );
+	  checkExpression( AAFRESULT_SUCCESS == AAFFileOpenExistingRead( pFileName, 0, &pFile ), AAFRESULT_TEST_FAILED );
+	  if( pFile )
+	  {
+		  {
+			  IAAFSmartPointer<IAAFHeader> pHeader;
+			  checkResult(pFile->GetHeader(&pHeader));
+			  IAAFSmartPointer<IAAFDictionary> pDictionary;
+			  checkResult(pHeader->GetDictionary(&pDictionary));
+
+			  // AUID_AAFTypeDefString
+			  IAAFSmartPointer<IAAFTypeDef> pTypeDef;
+			  checkResult(pDictionary->CreateMetaInstance(AUID_AAFTypeDefString, IID_IAAFTypeDef, (IUnknown **) &pTypeDef));
+
+			  {
+				  IAAFSmartPointer<IAAFTypeDefString> pTypeDefString;
+				  checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefString, (void **) &pTypeDefString));
+
+				  // kAAFTypeID_Int32
+				  IAAFSmartPointer<IAAFTypeDef> pTypeDefInt32;
+				  checkResult(pDictionary->LookupTypeDef (kAAFTypeID_Int32, &pTypeDefInt32));
+
+				  // {24E77451-0588-4a8a-BCE5-E87B3E8A2E35}
+				  const aafUID_t kAAFTypeID_Test =   { 0x24e77451, 0x588, 0x4a8a, { 0xbc, 0xe5, 0xe8, 0x7b, 0x3e, 0x8a, 0x2e, 0x35 } };
+				  checkResult(pTypeDefString->Initialize(kAAFTypeID_Test, pTypeDefInt32, L"TestTypeName"));
+				  checkResult(pDictionary->RegisterTypeDef(pTypeDef));
+			  }			  
+
+			  // AUID_AAFTypeDefIndirect
+			  IAAFSmartPointer<IAAFTypeDef> pTypeDef2;
+			  checkResult(pDictionary->LookupTypeDef(kAAFTypeID_Indirect, &pTypeDef2));
+
+			  IAAFSmartPointer<IAAFTypeDefIndirect> pTypeDefInderect;
+			  checkResult(pTypeDef2->QueryInterface(IID_IAAFTypeDefIndirect, (void **) &pTypeDefInderect));
+
+			  // AUID_AAFTypeDefIndirect property value
+			  static const aafCharacter * TEST_STR_VALUE = L"This is a TEST String";
+			  IAAFSmartPointer<IAAFPropertyValue> pPropertyValue;
+			  checkResult(pTypeDefInderect->CreateValueFromActualData(pTypeDef, (aafMemPtr_t)TEST_STR_VALUE, (wcslen(TEST_STR_VALUE) + 1) * sizeof(aafCharacter), &pPropertyValue));
+
+			  // Create a concrete subclass of Mob
+			  IAAFSmartPointer<IAAFMob>	pMob;
+			  checkResult(pHeader->LookupMob(TEST_MobID, &pMob));
+
+			  IAAFSmartPointer<IAAFObject>	 pObject;
+			  checkResult(pMob->QueryInterface(IID_IAAFObject, (void **) &pObject));
+
+			  IAAFSmartPointer<IAAFClassDef> pClassDef;
+			  checkResult(pObject->GetDefinition (&pClassDef));
+
+			  IAAFSmartPointer<IAAFPropertyDef> pPropertyDef;
+			  // {E6B2B198-BA9B-4e19-8AC2-7DF2EFDC9B50}
+			  const aafUID_t kAAFPropID_Test = { 0xe6b2b198, 0xba9b, 0x4e19, { 0x8a, 0xc2, 0x7d, 0xf2, 0xef, 0xdc, 0x9b, 0x50 } };
+			  checkResult(pClassDef->RegisterOptionalPropertyDef(kAAFPropID_Test, L"TestPropertyString", pTypeDef2, &pPropertyDef));
+
+			  checkResult(pObject->SetPropertyValue(pPropertyDef, pPropertyValue));
+		  }
+
+		  checkResult(CreateTestFile(pCopyName, fileKind, rawStorageType, productID, &pCopy));
+		  if (pCopy)
+		  {
+			  checkExpression( AAFRESULT_SUCCESS == pFile->SaveCopyAs( pCopy ), AAFRESULT_TEST_FAILED );
+
+			  // Cleanup for the next test
+			  pCopy->Close(), pCopy->Release(), pCopy = 0;
+
+			  //checkExpression( AAFRESULT_SUCCESS == ReadAAFFile( pCopyName ), AAFRESULT_TEST_FAILED );
+			  checkExpression( AAFRESULT_SUCCESS == AAFFileOpenExistingRead( pCopyName, 0, &pCopy ), AAFRESULT_TEST_FAILED );
+
+			  {
+				  IAAFSmartPointer<IAAFHeader> pHeader;
+				  checkResult(pCopy->GetHeader(&pHeader));
+
+				  // pDictionary
+				  IAAFSmartPointer<IAAFDictionary> pDictionary;
+				  checkResult(pHeader->GetDictionary(&pDictionary));
+				  // pMob
+				  IAAFSmartPointer<IAAFMob>	pMob;
+				  checkResult(pHeader->LookupMob(TEST_MobID, &pMob));
+				  // pObject
+				  IAAFSmartPointer<IAAFObject>	 pObject;
+				  checkResult(pMob->QueryInterface(IID_IAAFObject, (void **) &pObject));
+				  // pClassDef
+				  IAAFSmartPointer<IAAFClassDef> pClassDef;
+				  checkResult(pObject->GetDefinition(&pClassDef));
+				  // pPropertyDef
+				  IAAFSmartPointer<IAAFPropertyDef> pPropertyDef;
+				  const aafUID_t kAAFPropID_Test = { 0xe6b2b198, 0xba9b, 0x4e19, { 0x8a, 0xc2, 0x7d, 0xf2, 0xef, 0xdc, 0x9b, 0x50 } };
+				  checkResult(pClassDef->LookupPropertyDef(kAAFPropID_Test, &pPropertyDef));
+
+
+				  // Check if the object has this property definition.
+				  aafBool present = kAAFFalse;
+				  checkResult(pObject->IsPropertyPresent(pPropertyDef, &present));
+
+				  // Try to get the property definition name.
+				  aafUInt32 bufferLen = 0;
+				  checkResult(pPropertyDef->GetNameBufLen(&bufferLen));
+				  aafCharacter* propertyName = new aafCharacter[bufferLen];
+				  checkResult(pPropertyDef->GetName(propertyName, bufferLen));
+				  delete [] propertyName;
+
+				  // Get a pointer to the property value that we've set and pFile->SaveCopyAs to the file.
+				  IAAFSmartPointer<IAAFPropertyValue> pPropertyValue;
+				  checkResult(pObject->GetPropertyValue(pPropertyDef, &pPropertyValue));
+				  
+				  // pTypeDef
+				  IAAFSmartPointer<IAAFTypeDef> pTypeDef;
+				  checkResult(pDictionary->LookupTypeDef(kAAFTypeID_Indirect, &pTypeDef));
+				  // pTypeDefIndirect
+				  IAAFSmartPointer<IAAFTypeDefIndirect> pTypeDefInderect;
+				  checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefIndirect, (void**)&pTypeDefInderect));
+
+				  // The main check:
+				  // try to get the property value name.
+				  aafUInt32 stringBufferLen = 0;
+				  checkResult(pTypeDefInderect->GetActualSize(pPropertyValue, &stringBufferLen));
+				  aafCharacter* stringBuffer = new aafCharacter[stringBufferLen];
+				  checkResult(pTypeDefInderect->GetActualData(pPropertyValue, (aafMemPtr_t)stringBuffer, stringBufferLen));
+				  delete [] stringBuffer;
+
+
+				  pCopy->Close(), pCopy->Release(), pCopy = 0;
+			  }
+		  }
+		  else
+		  {
+			  f++;
+		  }
+
+		  // Cleanup for the next test
+		  pFile->Close(), pFile->Release(), pFile = 0;
+	  }
+	  else
+	  {
+		  f++;
+	  }
+	  RemoveTestFile(pFileName);
+	  RemoveTestFile(pCopyName);
+  }
+
+  /* **************************************************************************
+	 E) Early Release:
+		1. Release before Close:
+		   - Save(),
+		   - Release(),
+		   - Open(),
+		   - expect AAFRESULT_SUCCESS
+  ************************************************************************** */
+  {
+	  std::cout << "\tExecuting ComprehensiveOpenTest E1." << std::endl;
+	  checkResult(CreateTestFile(pFileName, fileKind, rawStorageType, productID, &pFile));
+	  if (pFile)
+	  {
+		  checkResult(pFile->Save());
+		  // Do not Close()
+		  pFile->Release();
+		  pFile = 0;
+		  checkExpression( AAFRESULT_SUCCESS == AAFFileOpenExistingRead( pFileName, 0, &pFile ), AAFRESULT_TEST_FAILED );
+		  pFile->Release();
+		  pFile = 0;
+	  }
+	  else
+	  {
+		  f++;
+	  }
+	  RemoveTestFile(pFileName);
+  }
+
+  /* **************************************************************************
+	 E) Early Release:
+		2. Release before Save:
+		   - Release(),
+		   - Open(),
+		   - expect STG_E_FILENOTFOUND
+		   - Create file again
+  ************************************************************************** */
+  /* Commented out due to a bug with Close() without Save() where a file
+  // on disk gets locked (Structured Storage issue?).
+  {
+	  std::cout << "\tExecuting ComprehensiveOpenTest E2." << std::endl;
+	  checkResult(CreateTestFile(pFileName, fileKind, rawStorageType, productID, &pFile));
+	  if (pFile)
+	  {
+		  // Do not Save(), do not Close()
+		  pFile->Release();
+		  pFile = 0;
+		  checkExpression( STG_E_FILENOTFOUND == AAFFileOpenExistingRead( pFileName, 0, &pFile ), AAFRESULT_TEST_FAILED );
+		  // Closing a file without saving may lock the file; try creating the file again to make sure it's not locked.
+		  checkExpression( AAFRESULT_SUCCESS == CreateAAFFile( pFileName, fileKind, rawStorageType, productID ) );
+	  }
+	  else
+	  {
+		  f++;
+	  }
+	  RemoveTestFile(pFileName);
+  }
+  */
+
 
 
   HRESULT hr;
@@ -1487,7 +1686,7 @@ static HRESULT NegativeTestPublicGlobalFunctions(
   aafUID_t k;
   aafBool b;
   HRESULT h;
-//  IAAFRawStorage* pStg = 0;
+  //IAAFRawStorage* pStg = 0;
 
   // no file present for functions that require one
   //
@@ -1586,7 +1785,7 @@ extern "C" HRESULT CAAFFile_test(
     aafUID_t fileKind,
     testRawStorageType_t rawStorageType,
     aafProductIdentification_t productID)
- {
+{
 	HRESULT hr = AAFRESULT_NOT_IMPLEMENTED;
 	HRESULT hr4K = AAFRESULT_SUCCESS;
 

@@ -360,7 +360,7 @@ static int DumpEssence(const char *file, bool mobIDfilename)
 		}
 		fclose(fp);
 		if (verbose)
-			printf(" written, size=%"AAFFMT64"d\n\n", essenceSize);
+			printf(" written, size=%" AAFFMT64 "d\n\n", essenceSize);
 
 		pSourceMob->Release();
 		pSourceMob = NULL;

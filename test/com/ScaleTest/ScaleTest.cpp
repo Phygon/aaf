@@ -369,12 +369,12 @@ static HRESULT CreateAAFFileEssenceData(const aafWChar *pFileName, bool useRawSt
 
 			if (verbose && (i+1) % 25 == 0)
 			{
-				printf("  %6"AAFFMT64"d frames %6.2f%% %"AAFFMT64"d bytes\r", i+1, (i+1) * 100.0 / frame_limit, *p_totalbytes);
+				printf("  %6" AAFFMT64 "d frames %6.2f%% %" AAFFMT64 "d bytes\r", i+1, (i+1) * 100.0 / frame_limit, *p_totalbytes);
 				fflush(stdout);
 			}
 		}
 		if (verbose)
-			printf("  %6"AAFFMT64"d frames %6.2f%%  bytes=%"AAFFMT64"d\n",
+			printf("  %6" AAFFMT64 "d frames %6.2f%%  bytes=%" AAFFMT64 "d\n",
 					frame_limit, frame_limit * 100.0 / frame_limit, *p_totalbytes);
 		pEssenceData->Release();
 
@@ -391,7 +391,7 @@ static HRESULT CreateAAFFileEssenceData(const aafWChar *pFileName, bool useRawSt
 
 		aafLength_t filesize = getFilesize(cFileName);
 		aafLength_t diff = filesize - SIZE_2GB;
-		printf("  Wrote %s (EssenceData API) filesize=%"AAFFMT64"d (2GB %s%"AAFFMT64"d)\n",
+		printf("  Wrote %s (EssenceData API) filesize=%" AAFFMT64 "d (2GB %s%" AAFFMT64 "d)\n",
 					cFileName, filesize,
 					(diff >= 0) ? "+" : "", diff);
 	}
@@ -443,7 +443,7 @@ static HRESULT ReadAAFFileEssenceData(const aafWChar *pFileName, aafLength_t fra
 			check(pEssenceData->GetSize(&size));
 			aaf_assert(size == bytes, "GetSize() matches total written bytes");
 
-			printf("    EssenceData GetSize() correct    (%"AAFFMT64"d bytes)\n", size);
+			printf("    EssenceData GetSize() correct    (%" AAFFMT64 "d bytes)\n", size);
 
 			// Only test the frame counter when it was written into the DV frame.
 			// Work out whether this EssenceData was written using a codec since
@@ -489,7 +489,7 @@ static HRESULT ReadAAFFileEssenceData(const aafWChar *pFileName, aafLength_t fra
 
 				if (verbose && (frame_counter+1) % 25 == 0)
 				{
-					printf("  %6"AAFFMT64"d frames %6.2f%% %"AAFFMT64"d bytes\r", i+frame_counter, (i+frame_counter) * 100.0 / frame_limit, totalRead);
+					printf("  %6" AAFFMT64 "d frames %6.2f%% %" AAFFMT64 "d bytes\r", i+frame_counter, (i+frame_counter) * 100.0 / frame_limit, totalRead);
 					fflush(stdout);
 				}
 
@@ -513,7 +513,7 @@ static HRESULT ReadAAFFileEssenceData(const aafWChar *pFileName, aafLength_t fra
 			}
 			aaf_assert(totalRead == bytes, "total Read() matches total written bytes");
 
-			printf("    EssenceData total Read() correct (%"AAFFMT64"d bytes)\n", totalRead);
+			printf("    EssenceData total Read() correct (%" AAFFMT64 "d bytes)\n", totalRead);
 
 			check(pMob->Release());
 			check(pSourceMob->Release());
@@ -681,7 +681,7 @@ static HRESULT ReadAAFFileCodec(const aafWChar *pFileName, aafLength_t frame_lim
 				}
 				aaf_assert(total_bytes == bytes, "total Read() matches total written bytes");
 
-				printf("  EssenceAccess total Read() correct (%"AAFFMT64"d bytes, %"AAFFMT64"d samples)\n", total_bytes, total_samples);
+				printf("  EssenceAccess total Read() correct (%" AAFFMT64 "d bytes, %" AAFFMT64 "d samples)\n", total_bytes, total_samples);
 
 				check(fmtTemplate->Release());
 				check(pFormat->Release());
@@ -909,13 +909,13 @@ static HRESULT CreateAAFFileCodec(const aafWChar * pFileName, bool useRawStorage
 			*p_totalbytes += bytesWritten;
 			if (verbose && (*p_totalbytes) % 1024*1024 == 0)
 			{
-				printf("  %12"AAFFMT64"d bytes %6.2f%%\r", *p_totalbytes, (*p_totalbytes) * 100.0 / size_limit);
+				printf("  %12" AAFFMT64 "d bytes %6.2f%%\r", *p_totalbytes, (*p_totalbytes) * 100.0 / size_limit);
 				fflush(stdout);
 			}
 		}
 	}
 	if (verbose)
-		printf("  %12"AAFFMT64"d bytes %6.2f%%\n", *p_totalbytes, (*p_totalbytes) * 100.0 / size_limit);
+		printf("  %12" AAFFMT64 "d bytes %6.2f%%\n", *p_totalbytes, (*p_totalbytes) * 100.0 / size_limit);
 
 	/* Set the essence to indicate that you have finished writing the samples */
 	check(pEssenceAccess->CompleteWrite());
@@ -941,7 +941,7 @@ static HRESULT CreateAAFFileCodec(const aafWChar * pFileName, bool useRawStorage
 
 	aafLength_t filesize = getFilesize(cFileName);
 	aafLength_t diff = filesize - SIZE_2GB;
-	printf("  Wrote %s (EssenceAccess API) filesize=%"AAFFMT64"d (2GB %s%"AAFFMT64"d)\n",
+	printf("  Wrote %s (EssenceAccess API) filesize=%" AAFFMT64 "d (2GB %s%" AAFFMT64 "d)\n",
 				cFileName, filesize,
 				(diff >= 0) ? "+" : "", diff);
 
@@ -960,6 +960,7 @@ struct CAAFInitialize
 			fprintf(stderr, "check environment variables -\n");
 			fprintf(stderr, "	Windows		- $PATH\n");
 			fprintf(stderr, "	Unix/Linux	- $LD_LIBRARY_PATH\n");
+			fprintf(stderr, "	MacOS X/Darwin	- $DYLD_LIBRARY_PATH\n");
 			exit(hr);
 		}
 	}

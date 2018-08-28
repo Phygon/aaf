@@ -122,7 +122,7 @@ OMRedBlackTree<Key, Value>::~OMRedBlackTree(void)
   //   @rdesc True if this is the first instance of an item identified
   //          by <p Key> <p k> in this <c OMRedBlackTree>, false otherwise.
 template <typename Key, typename Value>
-bool OMRedBlackTree<Key, Value>::insert(const Key k, Value v)
+bool OMRedBlackTree<Key, Value>::insert(const Key &k, const Value & v)
 {
   TRACE("OMRedBlackTree<Key, Value>::insert");
   INVARIANT();
@@ -150,7 +150,7 @@ bool OMRedBlackTree<Key, Value>::insert(const Key k, Value v)
   //          otherwise.
   //   @this const
 template <typename Key, typename Value>
-bool OMRedBlackTree<Key, Value>::find(const Key k, Value& v) const
+bool OMRedBlackTree<Key, Value>::find(const Key &k, Value& v) const
 {
   TRACE("OMRedBlackTree<Key, Value>::find");
   INVARIANT();
@@ -189,7 +189,7 @@ bool OMRedBlackTree<Key, Value>::find(const Key k, Value& v) const
   //          otherwise.
   //   @this const
 template <typename Key, typename Value>
-bool OMRedBlackTree<Key, Value>::find(const Key k, Value** v) const
+bool OMRedBlackTree<Key, Value>::find(const Key &k, Value** v) const
 {
   TRACE("OMRedBlackTree<Key, Value>::find");
   INVARIANT();
@@ -225,7 +225,7 @@ bool OMRedBlackTree<Key, Value>::find(const Key k, Value** v) const
   //          otherwise.
   //   @this const
 template <typename Key, typename Value>
-bool OMRedBlackTree<Key, Value>::contains(const Key k) const
+bool OMRedBlackTree<Key, Value>::contains(const Key &k) const
 {
   TRACE("OMRedBlackTree<Key, Value>::contains");
   INVARIANT();
@@ -258,7 +258,7 @@ bool OMRedBlackTree<Key, Value>::contains(const Key k) const
   //   @rdesc True if an item identified by <p Key> <p k> was found,
   //          false otherwise.
 template <typename Key, typename Value>
-bool OMRedBlackTree<Key, Value>::remove(const Key k)
+bool OMRedBlackTree<Key, Value>::remove(const Key &k)
 {
   TRACE("OMRedBlackTree<Key, Value>::remove");
   INVARIANT();
@@ -498,7 +498,7 @@ size_t OMRedBlackTree<Key, Value>::blackHeight(Node* subTree) const
 
 template <typename Key, typename Value>
 typename OMRedBlackTree<Key, Value>::Node*
-OMRedBlackTree<Key, Value>::find(Key k, Node* x) const
+OMRedBlackTree<Key, Value>::find(const Key &k, Node* x) const
 {
   TRACE("OMRedBlackTree<Key, Value>::find");
   INVARIANT();
@@ -519,7 +519,7 @@ OMRedBlackTree<Key, Value>::find(Key k, Node* x) const
 }
 
 template <typename Key, typename Value>
-bool OMRedBlackTree<Key, Value>::insert(Node* n, Key k, Value v)
+bool OMRedBlackTree<Key, Value>::insert(Node* n, const Key &k, const Value & v)
 {
   TRACE("OMRedBlackTree<Key, Value>::insert");
   // Cormen et. al. page 251 TREE-INSERT

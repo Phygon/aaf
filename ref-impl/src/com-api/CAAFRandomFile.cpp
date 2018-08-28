@@ -150,8 +150,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppGetFileBits->ReleaseReference(); // We are through with this pointer.
+          internalppGetFileBits = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppGetFileBits should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppGetFileBits == 0);
+
   return hr;
 }
 
@@ -350,8 +361,19 @@ HRESULT STDMETHODCALLTYPE
           assert (SUCCEEDED (hStat));
           //pUnknown->Release();
           internalppSetFileBits->ReleaseReference(); // We are through with this pointer.
+          internalppSetFileBits = 0;
         }
     }
+
+  // If the call to the Impl method above fails, internalppSetFileBits should
+  // not be modified, check this with an assertion.
+  //
+  // If this assertion fails there's a programming error in the Impl
+  // method above. Such a programming error also indicates a potential
+  // memory leak.
+  //
+  assert (SUCCEEDED(hr) || internalppSetFileBits == 0);
+
   return hr;
 }
 

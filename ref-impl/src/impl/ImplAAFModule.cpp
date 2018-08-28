@@ -37,7 +37,7 @@
 // @module AAFMODULE.CPP - AAF Factory functions for AAF DLL Module |
 //
 // Implementation of DLL Exports
-// 
+//
 // @end
 //
 // Tom Ransdell, Avid AAF Development Team
@@ -51,7 +51,6 @@
 #include "AAFResult.h"
 #include "AAFFileKinds.h"
 #include "AAFFileMode.h"
-#include "AAFSDKBuild.h"
 
 #include "ImplAAFPluginManager.h"
 #include "ImplAAFContext.h"
@@ -118,7 +117,7 @@ STDAPI ImplAAFLoad(const char * /*dllname*/)
 // AAFUnload()
 //
 // This is just a stub since the dll will be unloaded
-// when the client code terminates if the client code has 
+// when the client code terminates if the client code has
 // linked directly to the export library.
 //
 STDAPI ImplAAFUnload()
@@ -155,7 +154,7 @@ STDAPI ImplAAFUnload()
 // This function will return the following codes.  If more than one of
 // the listed errors is in effect, it will return the first one
 // encountered in the order given below:
-// 
+//
 // AAFRESULT_SUCCESS
 //   - succeeded.  (This is the only code indicating success.)
 //
@@ -176,7 +175,7 @@ STDAPI ImplAAFUnload()
 //
 // AAFRESULT_NOT_AAF_FILE
 //   - The named file does not claim to be a valid AAF file.
-// 
+//
 STDAPI ImplAAFFileOpenExistingRead (
   // Null-terminated string containing name of filesystem file to be
   // opened for reading.  Filename must be in a form that would be
@@ -252,9 +251,9 @@ STDAPI ImplAAFFileOpenExistingRead (
   //
   // For backwards compatibility with existing client code
   // the first checked in version of this function is implemented
-  // the same as the old client code which this function is 
+  // the same as the old client code which this function is
   // intended to replace...
-  // 
+  //
 
   // Create an instance of an uninitialized file object.
   pFile = static_cast<ImplAAFFile *>(::CreateImpl(CLSID_AAFFile));
@@ -320,7 +319,7 @@ STDAPI ImplAAFFileOpenExistingRead (
 // This function will return the following codes.  If more than one of
 // the listed errors is in effect, it will return the first one
 // encountered in the order given below:
-// 
+//
 // AAFRESULT_SUCCESS
 //   - succeeded.  (This is the only code indicating success.)
 //
@@ -344,7 +343,7 @@ STDAPI ImplAAFFileOpenExistingRead (
 //
 // AAFRESULT_NOTAAFFILE
 //   - The named file is not a valid AAF file.
-// 
+//
 
 STDAPI ImplAAFFileOpenExistingModify (
   // Null-terminated string containing name of filesystem file to be
@@ -427,9 +426,9 @@ STDAPI ImplAAFFileOpenExistingModify (
   //
   // For backwards compatibility with existing client code
   // the first checked in version of this function is implemented
-  // the same as the old client code which this function is 
+  // the same as the old client code which this function is
   // intended to replace...
-  // 
+  //
 
   // Create an instance of an uninitialized file object.
   pFile = static_cast<ImplAAFFile *>(::CreateImpl(CLSID_AAFFile));
@@ -486,7 +485,7 @@ STDAPI ImplAAFFileOpenExistingModify (
 // This function will return the following codes.  If more than one of
 // the listed errors is in effect, it will return the first one
 // encountered in the order given below:
-// 
+//
 // AAFRESULT_SUCCESS
 //   - succeeded.  (This is the only code indicating success.)
 //
@@ -505,7 +504,7 @@ STDAPI ImplAAFFileOpenExistingModify (
 // AAFRESULT_INSUFFICIENT_SPACE
 //   - There is insufficient space in the filesystem to create this
 //     file.
-// 
+//
 STDAPI ImplAAFFileOpenNewModify (
   // Null-terminated string containing name of filesystem file to be
   // opened for modification.  Filename must be in a form that would
@@ -526,6 +525,30 @@ STDAPI ImplAAFFileOpenNewModify (
   // Pointer to buffer to receive pointer to new file.
   /*[out]*/ ImplAAFFile ** ppFile)
 {
+	const aafUID_t* pFileKind = 0;
+	if (modeFlags & AAF_FILE_MODE_USE_LARGE_SS_SECTORS)
+		pFileKind = &kAAFFileKind_Aaf4KBinary;
+	else
+		pFileKind = &kAAFFileKind_Aaf512Binary;
+
+	return ImplAAFFileOpenNewModifyEx (pFileName,
+		pFileKind,
+		modeFlags,
+		pIdent,
+		ppFile);
+}
+
+//***********************************************************
+//
+// AAFFileOpenNewModifyEx()
+//
+STDAPI ImplAAFFileOpenNewModifyEx (
+  const aafCharacter *  pFileName,
+  aafUID_constptr  pFileKind,
+  aafUInt32  modeFlags,
+  aafProductIdentification_t *  pIdent,
+  ImplAAFFile **  ppFile)
+{
 #if USE_RAW_STORAGE
   IAAFRawStorage * pRawStg = 0;
   AAFRESULT hr = AAFCreateRawStorageDisk
@@ -535,12 +558,6 @@ STDAPI ImplAAFFileOpenNewModify (
 	 &pRawStg);
   if (AAFRESULT_SUCCEEDED (hr))
 	{
-	  const aafUID_t* pFileKind;
-	  if (modeFlags & AAF_FILE_MODE_USE_LARGE_SS_SECTORS)
-	  	pFileKind = &kAAFFileKind_Aaf4KBinary;
-		else
-	  	pFileKind = &kAAFFileKind_Aaf512Binary;
-
 	  hr = ImplAAFCreateAAFFileOnRawStorage
 		(pRawStg,
 		 kAAFFileExistence_new,
@@ -567,7 +584,7 @@ STDAPI ImplAAFFileOpenNewModify (
   HRESULT hr = S_OK;
   ImplAAFFile * pFile = 0;
 
-  if (!pFileName || !pIdent || !ppFile)
+  if (!pFileName || !pFileKind || !pIdent || !ppFile)
     return AAFRESULT_NULL_PARAM;
 
   // Initialize the out parameter.
@@ -576,9 +593,9 @@ STDAPI ImplAAFFileOpenNewModify (
   //
   // For backwards compatibility with existing client code
   // the first checked in version of this function is implemented
-  // the same as the old client code which this function is 
+  // the same as the old client code which this function is
   // intended to replace...
-  // 
+  //
 
   // Create an instance of an uninitialized file object.
   pFile = static_cast<ImplAAFFile *>(::CreateImpl(CLSID_AAFFile));
@@ -591,7 +608,7 @@ STDAPI ImplAAFFileOpenNewModify (
     if (SUCCEEDED(hr))
     {
       // Attempt to open a new file for modification.
-      hr = pFile->OpenNewModify(pFileName, modeFlags, pIdent);
+      hr = pFile->OpenNewModify(pFileName, pFileKind, modeFlags, pIdent);
       if (SUCCEEDED(hr))
       {
         *ppFile = pFile;
@@ -605,114 +622,6 @@ STDAPI ImplAAFFileOpenNewModify (
   }
 
   return hr;
-#endif // USE_RAW_STORAGE
-}
-
-//***********************************************************
-//
-// AAFFileOpenNewModifyEx()
-//
-STDAPI ImplAAFFileOpenNewModifyEx (
-  // Null-terminated string containing name of filesystem file to be
-  // opened for modification.  Filename must be in a form that would
-  // be acceptable to StgOpenStorage() for this platform.
-  /*[in, string]*/ const aafCharacter *  pFileName,
-
-	// the FileKind to create. Must be one of the constants defined in
-	// include/AAFFileKinds.h, or 0
-	// a stored object factory must have been registered by ImplAAFFile.cpp
-  /*[in]*/ aafUID_constptr pFileKind,
-
-  // File open mode flags.  May be any of the following ORed together.
-  // All other bits must be set to zero.
-  //  - kAAFFileModeUnbuffered - to indicate unbuffered mode.
-  //    Default is buffered.
-  //  - kAAFFileModeRevertable - to indicate that Revert is possible
-  //    on this file (for all changes except those to essence).
-  /*[in]*/ aafUInt32  modeFlags,
-
-  // Identification of the application which is creating this file.
-  /*[in]*/ aafProductIdentification_t *  pIdent,
-
-  // Pointer to buffer to receive pointer to new file.
-  /*[out]*/ ImplAAFFile ** ppFile)
-{
-
-#if USE_RAW_STORAGE
-  IAAFRawStorage * pRawStg = 0;
-  AAFRESULT hr = AAFCreateRawStorageDisk
-    (pFileName,
-     kAAFFileExistence_new,
-     kAAFFileAccess_modify,
-     &pRawStg);
-  if (AAFRESULT_SUCCEEDED (hr))
-    {
-      hr = ImplAAFCreateAAFFileOnRawStorage
-	(pRawStg,
-	 kAAFFileExistence_new,
-	 kAAFFileAccess_modify,
-	 pFileKind,
-	 modeFlags,
-	 pIdent,
-	 ppFile);
-      if (AAFRESULT_SUCCEEDED (hr))
-	{
-	  ASSERTU (ppFile);
-	  ASSERTU (*ppFile);
-	  hr = (*ppFile)->Open ();
-	}
-    }
-  if (pRawStg)
-    {
-      pRawStg->Release ();
-    }
-  
-  return hr;
-  
-#else // ! USE_RAW_STORAGE
-
-    HRESULT hr = S_OK;
-    ImplAAFFile * pFile = 0;
-
-    if (!pFileName || !pIdent || !ppFile)
-        return AAFRESULT_NULL_PARAM;
-
-    // Initialize the out parameter.
-    *ppFile = 0;
-
-    //
-    // For backwards compatibility with existing client code
-    // the first checked in version of this function is implemented
-    // the same as the old client code which this function is 
-    // intended to replace...
-    // 
-
-    // Create an instance of an uninitialized file object.
-    pFile = static_cast<ImplAAFFile *>(::CreateImpl(CLSID_AAFFile));
-    if(!pFile)
-        hr = AAFRESULT_NOMEMORY;
-    else
-    {
-        // Make sure the file is initialized (not open yet...)
-        hr = pFile->Initialize();
-        if (SUCCEEDED(hr))
-        {
-            // Attempt to open a new file for modification.
-            hr = pFile->OpenNewModify(pFileName, pFileKind, modeFlags, pIdent);
-            if (SUCCEEDED(hr))
-            {
-                *ppFile = pFile;
-                pFile = 0;
-            }
-        }
-
-        // Cleanup the file if it could not be initialized and opened.
-        if (FAILED(hr) && pFile)
-            pFile->ReleaseReference();
-    }
-
-    return hr;
-
 #endif // USE_RAW_STORAGE
 }
 
@@ -736,7 +645,7 @@ STDAPI ImplAAFFileOpenNewModifyEx (
 // This function will return the following codes.  If more than one of
 // the listed errors is in effect, it will return the first one
 // encountered in the order given below:
-// 
+//
 // AAFRESULT_SUCCESS
 //   - succeeded.  (This is the only code indicating success.)
 //
@@ -748,7 +657,7 @@ STDAPI ImplAAFFileOpenNewModifyEx (
 //
 // AAFRESULT_NULL_PARAM
 //   - the pIdent pointer argument is NULL.
-// 
+//
 STDAPI ImplAAFFileOpenTransient (
   // Identification which is to be associated with this file.
   /*[in]*/ aafProductIdentification_t *  pIdent,
@@ -793,7 +702,7 @@ STDAPI ImplAAFFileOpenTransient (
 #else // ! USE_RAW_STORAGE
 
   HRESULT hr = S_OK;
-	const aafClassID_t& fileID = *reinterpret_cast<const aafClassID_t *>(&CLSID_AAFFile); 
+	const aafClassID_t& fileID = *reinterpret_cast<const aafClassID_t *>(&CLSID_AAFFile);
   ImplAAFFile * pFile = 0;
 
   if (!pIdent || !ppFile)
@@ -805,9 +714,9 @@ STDAPI ImplAAFFileOpenTransient (
   //
   // For backwards compatibility with existing client code
   // the first checked in version of this function is implemented
-  // the same as the old client code which this function is 
+  // the same as the old client code which this function is
   // intended to replace...
-  // 
+  //
 
   // Create an instance of an uninitialized file object.
   pFile = static_cast<ImplAAFFile *>(::CreateImpl(fileID));
@@ -855,18 +764,9 @@ STDAPI ImplAAFFileIsAAFFile (
   if (pFileIsAAFFile == 0)
     return AAFRESULT_NULL_PARAM;
 
-  // Crude file existance check.  May be better done in 
-  // OMSSStoredObjectFactory::isRecognized(OMRawStorage* rawStorage) but
-  // reporting the right HRESULT is difficult from there.
-  // There may also be another reason for failing to open the file than
-  // non-existance. e.g. permissions problems.
-  // A better description of the problem may be "Cannot read from file."
-  FILE* f = wfopen(pFileName, L"rb");
-  if(f == 0)
-    return AAFRESULT_FILE_NOT_FOUND;
-  
-  fclose(f);
- 
+  if (!OMFile::readable(pFileName))
+    return AAFRESULT_NOT_READABLE;
+
   HRESULT hr = S_OK;
 
   OMStoredObjectEncoding encoding;
@@ -886,11 +786,55 @@ STDAPI ImplAAFFileIsAAFFile (
 //
 //
 STDAPI ImplAAFRawStorageIsAAFFile (
-  IAAFRawStorage * /* pRawStorage */,
-  aafUID_t * /* pAAFFileKind */,
-  aafBool *  /* pRawStorageIsAAFFile */)
+  IAAFRawStorage *  pRawStorage,
+  aafUID_t *  pAAFFileKind,
+  aafBool *  pRawStorageIsAAFFile)
 {
-  return AAFRESULT_NOT_IMPLEMENTED;
+  if (pRawStorage == 0)
+    return AAFRESULT_NULL_PARAM;
+
+  if (pAAFFileKind == 0)
+    return AAFRESULT_NULL_PARAM;
+
+  if (pRawStorageIsAAFFile == 0)
+    return AAFRESULT_NULL_PARAM;
+
+  CHECK_CLIENT_IMPLEMENTED_QI(pRawStorage, IID_IAAFRawStorage);
+
+  HRESULT hr = S_OK;
+
+
+  // Obtain OM representation of pRawStorage.
+  IAAFRoot* p_root_object = 0;
+  hr = pRawStorage->QueryInterface( IID_IAAFRoot,
+                               reinterpret_cast<void**>(&p_root_object));
+  ASSERTU(p_root_object != 0);
+
+  ImplAAFRoot* p_impl_root_object = 0;
+  p_root_object->GetImplRep( reinterpret_cast<void**>(&p_impl_root_object) );
+  ASSERTU(p_impl_root_object != 0);
+
+  p_root_object->Release();
+  p_root_object = 0;
+
+  ImplAAFRawStorage* p_impl_raw_storage =
+                        dynamic_cast<ImplAAFRawStorage*>(p_impl_root_object);
+  ASSERTU(p_impl_raw_storage != 0);
+
+  OMRawStorage*  p_om_raw_storage = p_impl_raw_storage->GetOMStorage();
+  ASSERTU(p_om_raw_storage != 0);
+
+
+  // Is RawStorage recognized?
+  OMStoredObjectEncoding encoding;
+  bool recognized = OMFile::isRecognized(p_om_raw_storage, encoding);
+  if (recognized) {
+    *pAAFFileKind = *reinterpret_cast<aafUID_t*>(&encoding);
+    *pRawStorageIsAAFFile = kAAFTrue;
+  } else {
+    *pRawStorageIsAAFFile = kAAFFalse;
+  }
+  return hr;
 }
 
 
@@ -912,18 +856,9 @@ STDAPI ImplAAFFileIsAAFFileKind (
   if (pFileIsAAFFile == 0)
     return AAFRESULT_NULL_PARAM;
 
-  // Crude file existance check.  May be better done in 
-  // OMSSStoredObjectFactory::isRecognized(OMRawStorage* rawStorage) but
-  // reporting the right HRESULT is difficult from there.
-  // There may also be another reason for failing to open the file than
-  // non-existance. e.g. permissions problems.
-  // A better description of the problem may be "Cannot read from file."
-  FILE* f = wfopen(pFileName, L"rb");
-  if(f == 0)
-    return AAFRESULT_FILE_NOT_FOUND;
-  
-  fclose(f);
- 
+  if (!OMFile::readable(pFileName))
+    return AAFRESULT_NOT_READABLE;
+
   HRESULT hr = S_OK;
   aafBool is_file_kind = kAAFFalse;
 
@@ -1058,31 +993,31 @@ STDAPI ImplAAFRawStorageIsAAFFileKind (
 // This function will return the following codes.  If more than one of
 // the listed errors is in effect, it will return the first one
 // encountered in the order given below:
-// 
+//
 // AAFRESULT_SUCCESS
 //   - succeeded.  (This is the only code indicating success.)
 //
 // AAFRESULT_NULL_PARAM
 //   - the pIdent pointer argument is NULL.
-// 
+//
 STDAPI ImplAAFGetPluginManager (
   /*[out]*/ ImplAAFPluginManager ** ppManager)
 {
 	HRESULT					hr = S_OK;
 	ImplAAFPluginManager	*implMgr;
-	
+
 	if (!ppManager)
 		return AAFRESULT_NULL_PARAM;
-	
+
 	// Initialize the out parameter.
 	*ppManager = 0;
-	
+
 	implMgr = ImplAAFPluginManager::GetPluginManager();
   if (!implMgr)
     hr = AAFRESULT_NOMEMORY;
   else
     *ppManager = implMgr;
-	
+
 	return hr;
 }
 
@@ -1096,6 +1031,11 @@ ImplAAFCreateRawStorageMemory
 	return AAFRESULT_NULL_PARAM;
 
   OMRawStorage * stg = 0;
+  if (access != kAAFFileAccess_write &&
+      access != kAAFFileAccess_modify) {
+	  return AAFRESULT_INVALID_PARAM;
+  }
+
   stg = OMMemoryRawStorage::openNewModify ();
 
   ASSERTU (stg);
@@ -1141,14 +1081,16 @@ ImplAAFCreateRawStorageDisk
 	  switch (access)
 		{
 		case kAAFFileAccess_read:
-		  return AAFRESULT_WRONG_OPENMODE;		  
+		  return AAFRESULT_WRONG_OPENMODE;
 		  break;
 		case kAAFFileAccess_write:
 		case kAAFFileAccess_modify:
+		  if (!OMFile::creatable(pFilename))
+			  return AAFRESULT_NOT_CREATABLE;
 		  stg = OMDiskRawStorage::openNewModify (pFilename);
 		  break;
 		default:
-		  return AAFRESULT_WRONG_OPENMODE;		  
+		  return AAFRESULT_WRONG_OPENMODE;
 		}
 	}
   else if (kAAFFileExistence_existing == existence)
@@ -1156,14 +1098,18 @@ ImplAAFCreateRawStorageDisk
 	  switch (access)
 		{
 		case kAAFFileAccess_read:
+		  if (!OMFile::readable(pFilename))
+			  return AAFRESULT_NOT_READABLE;
 		  stg = OMDiskRawStorage::openExistingRead (pFilename);
 		  break;
 		case kAAFFileAccess_write:
 		case kAAFFileAccess_modify:
+		  if (!OMFile::modifiable(pFilename))
+			  return AAFRESULT_NOT_MODIFIABLE;
 		  stg = OMDiskRawStorage::openExistingModify (pFilename);
 		  break;
 		default:
-		  return AAFRESULT_WRONG_OPENMODE;		  
+		  return AAFRESULT_WRONG_OPENMODE;
 		}
 	}
   else
@@ -1215,14 +1161,16 @@ ImplAAFCreateRawStorageCachedDisk
 	  switch (access)
 		{
 		case kAAFFileAccess_read:
-		  return AAFRESULT_WRONG_OPENMODE;		  
+		  return AAFRESULT_WRONG_OPENMODE;
 		  break;
 		case kAAFFileAccess_write:
 		case kAAFFileAccess_modify:
+		  if (!OMFile::creatable(pFilename))
+			  return AAFRESULT_NOT_CREATABLE;
 		  stg = OMCachedDiskRawStorage::openNewModify (pFilename, pageSize, pageCount);
 		  break;
 		default:
-		  return AAFRESULT_WRONG_OPENMODE;		  
+		  return AAFRESULT_WRONG_OPENMODE;
 		}
 	}
   else if (kAAFFileExistence_existing == existence)
@@ -1230,14 +1178,18 @@ ImplAAFCreateRawStorageCachedDisk
 	  switch (access)
 		{
 		case kAAFFileAccess_read:
+		  if (!OMFile::readable(pFilename))
+			  return AAFRESULT_NOT_READABLE;
 		  stg = OMCachedDiskRawStorage::openExistingRead (pFilename, pageSize, pageCount);
 		  break;
 		case kAAFFileAccess_write:
 		case kAAFFileAccess_modify:
+		  if (!OMFile::modifiable(pFilename))
+			  return AAFRESULT_NOT_MODIFIABLE;
 		  stg = OMCachedDiskRawStorage::openExistingModify (pFilename, pageSize, pageCount);
 		  break;
 		default:
-		  return AAFRESULT_WRONG_OPENMODE;		  
+		  return AAFRESULT_WRONG_OPENMODE;
 		}
 	}
   else
@@ -1320,10 +1272,10 @@ ImplAAFCreateRawStorageCached
     return hr;
 
   hr = ImplAAFCreateRawStorageCached2(pRawStorage,
-                                        pageCount,
-                                        pageSize,
-                                        pCachePageAllocator,
-                                        ppNewRawStorage);
+                                      pageCount,
+                                      pageSize,
+                                      pCachePageAllocator,
+                                      ppNewRawStorage);
 
   pCachePageAllocator->Release();
   pCachePageAllocator = 0;
@@ -1369,14 +1321,22 @@ ImplAAFCreateRawStorageCached2
   hr = pCachePageAllocator->Initialize(pageCount, pageSize);
   if (FAILED(hr)) return hr;
 
+  // Only random raw storages may be cached
+  IAAFRandomRawStorage* pRandomRawStorage = 0;
+  hr = pRawStorage->QueryInterface(IID_IAAFRandomRawStorage, (void **)&pRandomRawStorage);
+  if (FAILED(hr)) return hr;
+
   OMCachePageAllocator* pAllocator = new ImplAAFOMCachePageAllocator(pCachePageAllocator, pageCount, pageSize);
   ASSERTU(pAllocator);
-  ImplAAFOMCachedRawStorage* pStg = new ImplAAFOMCachedRawStorage(pRawStorage,
+  ImplAAFOMCachedRawStorage* pStg = new ImplAAFOMCachedRawStorage(pRandomRawStorage,
                                                                   pageCount,
                                                                   pageSize,
                                                                   pAllocator);
   ASSERTU(pStg);
 
+
+  ASSERTU(pRandomRawStorage);
+  pRandomRawStorage->Release();
 
   ImplAAFRawStorage * prs = static_cast<ImplAAFRawStorage *>
 	  (::CreateImpl(CLSID_AAFRandomRawStorage));
@@ -1529,9 +1489,8 @@ ImplAAFSetDiagnosticOutput
   return hr;
 }
 
-extern const char AAFReferenceImplementationIdent[];
-const char AAFReferenceImplementationIdent[] = "@(#) " AAF_SDK_RELEASE; // for Linux and Irix
-const aafProductVersion_t AAFReferenceImplementationVersion = {AAF_MAJOR_VERSION, AAF_MINOR_VERSION, AAF_MAINT_RELEASE, AAF_PATCH_LEVEL, AAF_RELEASE_STAGE};
+
+const aafProductVersion_t AAFReferenceImplementationVersion = {AAFSDK_VERSION_MAJOR, AAFSDK_VERSION_MINOR, AAFSDK_VERSION_PATCH, AAFSDK_VERSION_BUILD, AAFSDK_VERSION_RELEASE};
 
 
 STDAPI

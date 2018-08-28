@@ -36,7 +36,8 @@
 #include <iostream>
 using namespace std;
 #include <stdio.h>
-#include <wchar.h>
+
+#include "AAFWideString.h"
 #include "AAF.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"

@@ -36,6 +36,7 @@
 #ifndef __ImplAAFPulldown_h__
 #include "ImplAAFPulldown.h"
 #endif
+#include "ImplAAFSourceClip.h"
 
 #include "OMAssertions.h"
 #include <stdlib.h>
@@ -284,7 +285,7 @@ AAFRESULT ImplAAFPulldown::MapOffset(aafPosition_t offset,
 			{
 			  if (maskBits)
 				{
-				  revolutions = abs(offset32) / masksize;
+				  revolutions = (offset32 < 0 ? -offset32 : offset32) / masksize;
 				  remainder = (char)(offset32 % masksize);
 				  if(srcPhase != NULL)
 				  	*srcPhase = remainder;
@@ -303,8 +304,8 @@ AAFRESULT ImplAAFPulldown::MapOffset(aafPosition_t offset,
 			{
 			  if (maskBits)
 				{
-				  revolutions = abs(offset32) / maskones;
-				  remainder = (char)(offset32 % maskones);
+				  revolutions = (offset32 < 0 ? -offset32 : offset32) / maskones;
+				  remainder = (char)(offset32 % maskones) ;
 				  if(srcPhase != NULL)
 				  	*srcPhase = remainder;
 
@@ -334,7 +335,7 @@ AAFRESULT ImplAAFPulldown::GetRemFramesDrop(aafUInt32 maskBits,
 							aafUInt32 masksize,
 							aafInt32 *result)
 {
-  int remMask, maskBitsLeft;
+  aafInt32 remMask, maskBitsLeft;
   aafInt32 ret;
   unsigned char phasePtr;
 
@@ -367,7 +368,7 @@ AAFRESULT ImplAAFPulldown::GetRemFramesDouble(aafUInt32 maskBits,
 							aafUInt32 masksize,
 							aafInt32 *result)
 {
-  int remMask, maskBitsLeft;
+  aafInt32 remMask, maskBitsLeft;
   aafInt32 ret;
   aafUInt32 phasePtr;
 
@@ -445,8 +446,23 @@ AAFRESULT ImplAAFPulldown::aafPvtGetPulldownMask(
 			
 		case kAAFOneToOneNTSC:
 		case kAAFOneToOnePAL:
+		case kAAFOneToOneHDSixty:
 			*isOneToOne = kAAFTrue;
+			break;
 			
+		case kAAFTwentyFourToSixtyPD:
+			*outMask = 0xA2800000L;
+			*maskLen = 10;
+			*isOneToOne = kAAFFalse;
+			break;
+
+		case kAAFTwoToOnePD:
+			*outMask = 0x80000000L;
+			*maskLen = 1;
+			*isOneToOne = kAAFFalse;
+			break;
+
+		case kAAFVideoTapNTSC:
 		default:
 			return(AAFRESULT_PULLDOWN_KIND);
 	}
@@ -477,7 +493,7 @@ AAFRESULT ImplAAFPulldown::intSegmentOffsetToTC(aafPosition_t offset, aafTimecod
 }
 
 AAFRESULT ImplAAFPulldown::TraverseToClip(aafLength_t length,
-					ImplAAFSegment **sclp,
+					ImplAAFSourceClip **sclp,
 					 ImplAAFPulldown **pulldownObj,
 					 aafInt32 *pulldownPhase,
 					 aafLength_t *sclpLen,
@@ -488,32 +504,47 @@ AAFRESULT ImplAAFPulldown::TraverseToClip(aafLength_t length,
   
   XPROTECT()
     {
+	  // Pulldown can have either SourceClip or Timecode as its input segment.
+	  // Stop traversal if it's not a SourceClip.
+	  if(dynamic_cast<ImplAAFSourceClip*>((ImplAAFSegment*)_inputSegment) == NULL)
+		return(AAFRESULT_TRAVERSAL_NOT_POSS);
+
 	  *isMask = kAAFTrue;
-	  /* Get the (assumed) source clip out of the mask */
-	  *sclp = _inputSegment;
+	  *sclp = dynamic_cast<ImplAAFSourceClip*>((ImplAAFSegment*)_inputSegment);
 	  (*sclp)->AcquireReference();
-//!!!	  if (!(*sclp)->IsTypeOf("SCLP", &aafError));
-////		{
-//		  RAISE(OM_ERR_NO_MORE_MOBS);
-//		}
 	  tmpLen = length;
 	  CHECK((*sclp)->GetLength(sclpLen));
-	  CHECK(MapOffset(tmpLen, kAAFFalse, &length, &phase));
+	  //sdaigle (jan 18, 2001): changing reverse to "true"
+	  //since we are going back up the source chain...
+	  //reverse = kAAFFalse;
+	  //CHECK(MapOffset(tmpLen, kAAFFalse, &length, &phase));
+	  CHECK(MapOffset(tmpLen, kAAFTrue, &length, &phase));
 	  if(pulldownObj != NULL)
 	  	*pulldownObj = (ImplAAFPulldown *)this;
 	  if(pulldownPhase != NULL)
 	  	*pulldownPhase = phase;
- 	  if (length < *sclpLen)
+	  if (length != AAF_UNKNOWN_LENGTH && *sclpLen != AAF_UNKNOWN_LENGTH)
 		{
-		  *sclpLen = length;
+		  if (length < *sclpLen)
+			{
+			  *sclpLen = length;
+			}
+		}
+	  else
+		{
+		  if (length != AAF_UNKNOWN_LENGTH)
+			{
+			  XASSERT(*sclpLen == AAF_UNKNOWN_LENGTH, AAFRESULT_INTERNAL_ERROR);
+			  *sclpLen = length;
+			}
 		}
     }
-
   XEXCEPT
     {
 		if ( *sclp )
 			(*sclp)->ReleaseReference();
-	}
+		*sclp = NULL;
+    }
   XEND;
 
   return(AAFRESULT_SUCCESS);

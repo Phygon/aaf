@@ -40,6 +40,7 @@
 #include "AAFTypes.h"
 #include "AAFResult.h"
 #include "AAFUtils.h"
+#include "ImplAAFModule.h"
 
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
@@ -428,9 +429,4 @@ AAFRESULT STDMETHODCALLTYPE
 {
   _productId = PID;
   return AAFRESULT_SUCCESS;
-}
-
-void ImplAAFIdentification::onCopy(void* /*clientContext*/) const
-{
-  const_cast<ImplAAFIdentification*>(this)->setInitialized();
 }

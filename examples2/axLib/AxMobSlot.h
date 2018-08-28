@@ -80,7 +80,7 @@ private:
 
 class AxTimelineMobSlot : public AxMobSlot {
 public:
-        AxTimelineMobSlot( IAAFTimelineMobSlotSP spIaafTimelineMobSlot );
+	AxTimelineMobSlot( IAAFTimelineMobSlotSP spIaafTimelineMobSlot );
 	AxTimelineMobSlot( IAAFTimelineMobSlot2SP spIaafTimelineMobSlot );
 	~AxTimelineMobSlot();
 

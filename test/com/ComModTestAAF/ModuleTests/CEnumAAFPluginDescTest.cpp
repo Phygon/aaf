@@ -1,4 +1,3 @@
-
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -271,7 +270,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 		// Open the AAF file
 		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = true;
-		
+
 		// Get the AAF file header.
 		checkResult(pFile->GetHeader(&pHeader));
 
@@ -438,11 +437,11 @@ extern "C" HRESULT CEnumAAFPluginDefs_test(
 	// When a method and its unit test have been implemented, remove it from the list.
 //	if (SUCCEEDED(hr))
 //	{
-//		cout << "The following IEnumAAFPluginDef methods have not been tested:" << endl;       
-//		cout << "     Next" << endl; 
-//		cout << "     Skip" << endl; 
-//		cout << "     Reset" << endl; 
-//		cout << "     Clone" << endl; 
+//		cout << "The following IEnumAAFPluginDef methods have not been tested:" << endl;
+//		cout << "     Next" << endl;
+//		cout << "     Skip" << endl;
+//		cout << "     Reset" << endl;
+//		cout << "     Clone" << endl;
 //		hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 //	}
 

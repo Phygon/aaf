@@ -265,7 +265,7 @@ void* OMUnixDynamicLibrary::findSymbol(const char* symbolName)
   void* address = dlsym(_library, symbolName);
 #if defined(OM_DYNAMIC_LIBRARY_DEBUG)
   if (address == 0) {
-    char* error = dlerror();
+    const char* error = dlerror();
     omlog << "dlsym() failed - dlerror() returns"
           << " \"" << error << "\"." << endl;
   }
@@ -288,7 +288,7 @@ bool OMUnixDynamicLibrary::load(void)
     result = true;
   } else {
 #if defined(OM_DYNAMIC_LIBRARY_DEBUG)
-    char* error = dlerror();
+    const char* error = dlerror();
     omlog << "dlopen() failed - dlerror() returns"
           << " \"" << error << "\"." << endl;
 #endif
@@ -306,7 +306,7 @@ void OMUnixDynamicLibrary::unload(void)
     int closed = dlclose(_library);
 #if defined(OM_DYNAMIC_LIBRARY_DEBUG)
     if (closed != 0) {
-      char* error = dlerror();
+      const char* error = dlerror();
       omlog << "dlclose() failed - dlerror() returns"
             << " \"" << error << "\"." << endl;
     }
@@ -318,7 +318,12 @@ void OMUnixDynamicLibrary::unload(void)
 
 #elif defined(OM_USE_CFBUNDLE_LOADER)
 
+#if defined(OM_COMPILER_GCC_PPC_MACOSX) || defined (OM_COMPILER_GCC_INTEL_MACOSX) || defined(OM_COMPILER_GCC_INTEL_X86_64_MACOSX) || (defined(OM_COMPILER_MWERKS_PPC_MACOSX) && (__MWERKS__ >= 0x3200))
+// CodeWarrior 9 and later on Mac OS X
+#include <CoreFoundation/CoreFoundation.h>
+#else
 #include <CFBundle.h>
+#endif
 
 class OMMacOSXDynamicLibrary : public OMDynamicLibrary {
 public:
@@ -493,6 +498,8 @@ OMDynamicLibrary* OMDynamicLibrary::loadLibrary(const wchar_t* libraryName)
   result = new OMUnixDynamicLibrary(libraryName);
 #elif defined(OM_USE_CFBUNDLE_LOADER)
   result = new OMMacOSXDynamicLibrary(libraryName);
+#else
+  ASSERT("Unimplemented code not reached", false);
 #endif
   ASSERT("Valid heap pointer", result != 0);
   bool loaded = result->load();

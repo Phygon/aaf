@@ -193,7 +193,8 @@ void OMSetProperty<Element>::shallowCopyTo(OMProperty* destination) const
 
 template <typename Element>
 void OMSetProperty<Element>::deepCopyTo(OMProperty* /* destination */,
-                                        void* /* clientContext */) const
+                                        void* /* clientContext */,
+                                        bool /* deferStreamData */) const
 {
   TRACE("OMSetProperty<Element>::deepCopyTo");
   // Nothing to do - this is a deep copy

@@ -53,6 +53,7 @@ EXTERN_C const CLSID CLSID_AAFEssenceDataStream;
 
 class CAAFEssenceDataStream
   : public IAAFEssenceDataStream2,
+    public IAAFEssenceDataStreamEx,
     public IAAFEssenceDataStream,
     public IAAFEssenceStream,
     public CAAFUnknown
@@ -139,6 +140,30 @@ public:
 
   // Returns the length of the stream.
   STDMETHOD (GetLength)
+    (/*[out]*/ aafLength_t *  position); // The length of the stream. 
+
+  // Write some number of bytes to the stream exactly and with no formatting or compression.
+  STDMETHOD(WriteSampleIndex)
+    (/*[in]*/ aafUInt32  bytes, // write this many bytes
+     /*[out, size_is(bytes), length_is(*bytesWritten)]*/ aafDataBuffer_t  buffer, // here is the buffer
+     /*[out,ref]*/ aafUInt32 *  bytesWritten); // return bytes actually written.
+
+  // Read some number of bytes from the stream exactly and with no formatting or compression.
+  STDMETHOD (ReadSampleIndex)
+    (/*[in]*/ aafUInt32  buflen, // to a buffer of this size
+     /*[out, size_is(buflen), length_is(*bytesRead)]*/ aafDataBuffer_t  buffer, // here is the buffer
+     /*[out,ref]*/ aafUInt32 *  bytesRead); // Return bytes actually read 
+
+  // Seek to the absolute byte offset into the stream.
+  STDMETHOD (SeekSampleIndex)
+    (/*[in]*/ aafPosition_t  byteOffset); // The absolute byte offset into the stream. 
+
+  // Returns the position within the stream.
+  STDMETHOD (GetSampleIndexPosition)
+    (/*[out]*/ aafPosition_t *  position); // The position within the stream. 
+
+  // Returns the length of the stream.
+  STDMETHOD (GetSampleIndexLength)
     (/*[out]*/ aafLength_t *  position); // The length of the stream. 
 
   // Ensure that all bits are written.

@@ -126,6 +126,7 @@ AAFRESULT ImplAAFSegment::OffsetToTimecodeClip(aafPosition_t /*offset*/,
 }
 
 AAFRESULT ImplAAFSegment::FindSubSegment(aafPosition_t offset, 
+										 aafMediaCriteria_t * /*mediaCrit*/,
 										 aafPosition_t *sequPosPtr,
 										 ImplAAFSegment **subseg,
 										 aafBool *found)
@@ -138,30 +139,52 @@ AAFRESULT ImplAAFSegment::FindSubSegment(aafPosition_t offset,
 		CHECK(GetLength(&segLen));
 		begPos = 0;
 		zero = 0;
-		endPos = begPos;
-		endPos += segLen;
-		if ((begPos <= offset) &&
-			(offset < endPos))
+		if (segLen != AAF_UNKNOWN_LENGTH)
 		{
-			*found = kAAFTrue;
-			*subseg = this;
-			// We are returning a reference to this object so bump the ref count
-			AcquireReference();
-			*sequPosPtr = 0;
-		}
-		else if ((begPos == endPos) && (offset == zero))	 //JeffB: Handle zero-length sourceClips
-		{
-			*found = kAAFTrue;
-			*subseg = this;
-			// We are returning a reference to this object so bump the ref count
-			AcquireReference();
-			*sequPosPtr = 0;
+			endPos = begPos;
+			endPos += segLen;
+			if ((begPos <= offset) &&
+				(offset < endPos))
+			{
+				*found = kAAFTrue;
+				*subseg = this;
+				// We are returning a reference to this object so bump the ref count
+				AcquireReference();
+				*sequPosPtr = 0;
+			}
+			else if ((begPos == endPos) && (offset == zero))	 //JeffB: Handle zero-length sourceClips
+			{
+				*found = kAAFTrue;
+				*subseg = this;
+				// We are returning a reference to this object so bump the ref count
+				AcquireReference();
+				*sequPosPtr = 0;
+			}
+			else
+			{
+				*found = kAAFFalse;
+				*subseg = NULL;
+				*sequPosPtr = 0;
+			}
 		}
 		else
 		{
-			*found = kAAFFalse;
-			*subseg = NULL;
-			*sequPosPtr = 0;
+			// If the Segment length is unknown (-1) any non-negative
+			// offset falls within the Segment.
+			if (begPos <= offset)
+			{
+				*found = kAAFTrue;
+				*subseg = this;
+				// We are returning a reference to this object so bump the ref count
+				AcquireReference();
+				*sequPosPtr = 0;
+			}
+			else
+			{
+				*found = kAAFFalse;
+				*subseg = NULL;
+				*sequPosPtr = 0;
+			}
 		}
 	} /* XPROTECT */
 	XEXCEPT
@@ -173,7 +196,7 @@ AAFRESULT ImplAAFSegment::FindSubSegment(aafPosition_t offset,
 }
 
 AAFRESULT ImplAAFSegment::TraverseToClip(aafLength_t /*length*/,
-										 ImplAAFSegment ** /*sclp*/,
+										 ImplAAFSourceClip ** /*sclp*/,
 										 ImplAAFPulldown ** /*pulldownObj*/,
 										 aafInt32 * /*pulldownPhase*/,
 										 aafLength_t * /*sclpLen*/,

@@ -428,7 +428,7 @@ static bool InitializeTypeDefinitionEnumeration(
     result = pType->Initialize (*typeDefinitionEnumeration->id(),
         pElementType,
         memberValues,
-        memberNames,
+        const_cast<aafCharacter **>(memberNames), // THIS CAST SHOULD NOT BE NECESSARY!
         typeDefinitionEnumeration->memberCount(),
         typeDefinitionEnumeration->name());
     ASSERTU (AAFRESULT_SUCCEEDED(result));
@@ -658,7 +658,7 @@ static bool InitializeTypeDefinitionRecord(
     // Used the "high-level" Initialize method since the pvtInitialize is obsolete.
     result = pType->Initialize (*typeDefinitionRecord->id(),
                                 memberTypes,
-                                memberNames,
+                                const_cast<aafCharacter **>(memberNames), // THIS CAST SHOULD NOT BE NECESSARY!
                                 typeDefinitionRecord->fieldCount(),
                                 typeDefinitionRecord->name());
     ASSERTU (AAFRESULT_SUCCEEDED(result));
@@ -1146,11 +1146,11 @@ static bool InitializeTypeDefinitionWeakReference(
 
     // The first property id must be one of the two-roots strong reference properties.
     targetPids[0] = 0;
-    if (0 == memcmp(&targetSet[0], &kAAFPropID_Root_MetaDictionary, sizeof(kAAFPropID_Root_MetaDictionary)))
+    if (targetSet[0] == kAAFPropID_Root_MetaDictionary)
     {
       targetPids[0] = 1;
     }
-    else if (0 == memcmp(&targetSet[0], &kAAFPropID_Root_Header, sizeof(kAAFPropID_Root_Header)))
+    else if (targetSet[0] == kAAFPropID_Root_Header)
     {
       targetPids[0] = 2;
     }

@@ -123,6 +123,7 @@ interface I.this-module;
 #c Arguments: none
 #c
 #startm AD_TYPES_HEAD 00
+#c DO NOT REMOVE THIS LINE! dodo seems to be confused by the following #ifndef on Mac. Without this line dodo will emit two '#c' into the C++ header files!
 #ifndef __.this-module_h__
 #define __.this-module_h__
 
@@ -200,6 +201,30 @@ AD_CLASS_BEGIN\
 #c Arguments: additional interface name
 #c
 #startm AD_COM_EXT4_CLASS_BEGIN 04
+AD_CLASS_BEGIN\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT5_CLASS_BEGIN 05
+AD_CLASS_BEGIN\
+#endm
+
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT6_CLASS_BEGIN 06
 AD_CLASS_BEGIN\
 #endm
 
@@ -875,6 +900,27 @@ AD_CLASS_END\
 AD_CLASS_END\
 #endm
 
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT5_CLASS_END 05
+AD_CLASS_END\
+#endm
+
+#ccccccccccccccccccccccccccc
+#c
+#c Ends a class definition for classes which support more than the
+#c primary COM interface.
+#c
+#c Arguments: additional interface name
+#c
+#startm AD_COM_EXT6_CLASS_END 06
+AD_CLASS_END\
+#endm
 
 #ccccccccccccccccccccccccccc
 #c

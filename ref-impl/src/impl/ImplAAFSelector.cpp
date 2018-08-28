@@ -349,10 +349,27 @@ AAFRESULT
 		  if (tmpFound)
 			{
 			  *foundObj = tmpFound;
-			  if (tmpMinLen < rootLen)
-				*minLength = tmpMinLen;
+			  if (rootLen != AAF_UNKNOWN_LENGTH && tmpMinLen != AAF_UNKNOWN_LENGTH)
+			  {
+				if (tmpMinLen < rootLen)
+					*minLength = tmpMinLen;
+				else
+					*minLength = rootLen;
+			  }
 			  else
-				*minLength = rootLen;
+			  {
+				// One if the legths is unknown (-1)
+				if (tmpMinLen != AAF_UNKNOWN_LENGTH)
+				{
+					XASSERT(rootLen == AAF_UNKNOWN_LENGTH, AAFRESULT_INTERNAL_ERROR);
+					*minLength = tmpMinLen;
+				}
+				else
+				{
+					XASSERT(tmpMinLen == AAF_UNKNOWN_LENGTH, AAFRESULT_INTERNAL_ERROR);
+					*minLength = rootLen;
+				}
+			  }
 			}
 		  else
 			{

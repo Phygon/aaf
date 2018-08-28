@@ -41,6 +41,7 @@
 #pragma warning(disable:4786) // Gak !
 #endif
 
+#include "OMDataTypes.h"
 #include "OMContainerIterator.h"
 #include "OMRedBlackTree.h"
 

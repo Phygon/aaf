@@ -73,27 +73,27 @@ public:
     //          If this the first instance of an item identified
     //          by <p Key> <p k> in this <c OMRedBlackTree>, the result
     //          is true, otherwise the result is false.
-  bool insert(const Key k, Value v);
+  bool insert(const Key &k, const Value &v);
 
     // @cmember Find the item in this <c OMRedBlackTree> identified
     //          <p k>.  If the item is found it is returned in
     //          <p v> and the result is true. If the element is not
     //          found the result is false.
-  bool find(const Key k, Value& v) const;
+  bool find(const Key &k, Value& v) const;
 
     // @cmember Find the item in this <c OMRedBlackTree> identified
     //          <p k>.  If the item is found it is returned in
     //          <p v> and the result is true. If the element is not
     //          found the result is false.
-  bool find(const Key k, Value** v) const;
+  bool find(const Key &k, Value** v) const;
 
     // @cmember Does this <c OMRdBlackTree> contain an item
     //          identified by <p k>?
-  bool contains(const Key k) const;
+  bool contains(const Key &k) const;
 
     // @cmember Remove the item assciated with <p Key> k from this
     //          <c OMRedBlackTree>.
-  bool remove(const Key k);
+  bool remove(const Key &k);
 
     // @cmember Remove all items from this <c OMRedBlackTree>.
   virtual void clear(void);
@@ -128,9 +128,9 @@ private:
 
   struct Node;
 
-  bool insert(Node* n, Key k, Value v);
+  bool insert(Node* n, const Key &k, const Value &v);
 
-  Node* find(Key k, Node* x) const;
+  Node* find(const Key & k, Node* x) const;
 
   Node* predecessor(Node* x) const;
 

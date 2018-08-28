@@ -160,7 +160,9 @@ OMProperty* OMObjectReference::property(void) const
 OMStrongObjectReference::OMStrongObjectReference(void)
 : OMObjectReference(),
   _isLoaded(true),
-  _name(0)
+  _identification(nullOMUniqueObjectIdentification),
+  _hasLocalKey(false),
+  _localKey(0)
 {
   TRACE("OMStrongObjectReference::OMStrongObjectReference");
   POSTCONDITION("void", isVoid());
@@ -170,10 +172,28 @@ OMStrongObjectReference::OMStrongObjectReference(void)
   //   @parm The <c OMProperty> that contains this <c OMStrongObjectReference>.
   //   @parm The name of this <c OMStrongObjectReference>.
 OMStrongObjectReference::OMStrongObjectReference(OMProperty* property,
-                                                 const wchar_t* name)
+                                                 const OMUniqueObjectIdentification& id)
 : OMObjectReference(property),
   _isLoaded(true),
-  _name(saveWideString(name))
+  _identification(id),
+  _hasLocalKey(false),
+  _localKey(0)
+{
+  TRACE("OMStrongObjectReference::OMStrongObjectReference");
+}
+
+  // @mfunc Constructor.
+  //   @parm The <c OMProperty> that contains this <c OMStrongObjectReference>.
+  //   @parm The name of this <c OMStrongObjectReference>.
+  //   @parm The local key of this <c OMStrongObjectReference>.
+OMStrongObjectReference::OMStrongObjectReference(OMProperty* property,
+                                                 const OMUniqueObjectIdentification& id,
+                                                 OMUInt32 localKey)
+: OMObjectReference(property),
+  _isLoaded(true),
+  _identification(id),
+  _hasLocalKey(true),
+  _localKey(localKey)
 {
   TRACE("OMStrongObjectReference::OMStrongObjectReference");
 }
@@ -183,11 +203,13 @@ OMStrongObjectReference::OMStrongObjectReference(OMProperty* property,
   //   @parm The name of this <c OMStrongObjectReference>.
   //   @parm The state (loaded or not) of this <c OMStrongObjectReference>.
 OMStrongObjectReference::OMStrongObjectReference(OMProperty* property,
-                                                 const wchar_t* name,
+                                                 const OMUniqueObjectIdentification& id,
                                                  bool isLoaded)
 : OMObjectReference(property),
   _isLoaded(isLoaded),
-  _name(saveWideString(name))
+  _identification(id),
+  _hasLocalKey(false),
+  _localKey(0)
 {
   TRACE("OMStrongObjectReference::OMStrongObjectReference");
 }
@@ -198,22 +220,17 @@ OMStrongObjectReference::OMStrongObjectReference(
                                             const OMStrongObjectReference& rhs)
 : OMObjectReference(rhs),
   _isLoaded(rhs._isLoaded),
-  _name(0)
+  _identification(rhs._identification),
+  _hasLocalKey(rhs._hasLocalKey),
+  _localKey(rhs._localKey)
 {
   TRACE("OMStrongObjectReference::OMStrongObjectReference");
-
-  if (rhs._name != 0) {
-    _name = saveWideString(rhs._name);
-  }
 }
 
   // @mfunc Destructor.
 OMStrongObjectReference::~OMStrongObjectReference(void)
 {
   TRACE("OMStrongObjectReference::~OMStrongObjectReference");
-
-  delete [] _name;
-  _name = 0;
 }
 
   // @mfunc Is this <c OMStrongObjectReference> void ?
@@ -224,7 +241,8 @@ bool OMStrongObjectReference::isVoid(void) const
 {
   bool result = OMObjectReference::isVoid();
   if (result) {
-    if ((!_isLoaded) && (_name != 0)) {
+    if ((!_isLoaded) &&
+        (identification() != nullOMUniqueObjectIdentification)) {
       result = false;
     }
   }
@@ -241,13 +259,9 @@ OMStrongObjectReference::operator= (const OMStrongObjectReference& rhs)
 {
   OMObjectReference::operator=(rhs);
   _isLoaded = rhs._isLoaded;
-  delete [] _name;
-  _name = 0; // for BoundsChecker
-  if (rhs._name != 0) {
-    _name = saveWideString(rhs._name);
-  } else {
-    _name = 0;
-  }
+  _identification = rhs._identification;
+  _hasLocalKey = rhs._hasLocalKey;
+  _localKey = rhs._localKey;
   return *this;
 }
 
@@ -263,14 +277,21 @@ OMStrongObjectReference::operator== (const OMStrongObjectReference& rhs) const
   bool result = OMObjectReference::operator==(rhs);
   if (result) {
     if (_isLoaded == rhs._isLoaded) {
-      if ((_name != 0) && (rhs._name != 0)) {
-        if (compareWideString(_name, rhs._name) == 0) {
-          result = true;
+      if (identification() == rhs.identification()) {
+        if (hasLocalKey() == rhs.hasLocalKey()) {
+          if (hasLocalKey()) {
+            if (localKey() == rhs.localKey()) {
+              result = true;
+            } else {
+              result = false;
+            }
+          } else {
+            // No local key
+            result = true;
+          }
         } else {
           result = false;
         }
-      } else if ((_name == 0) && (rhs._name == 0)) {
-        result = true;
       } else {
         result = false;
       }
@@ -372,7 +393,6 @@ OMStorable* OMStrongObjectReference::getValue(void) const
   if (!isLoaded()) {
     nonConstThis->load();
   }
-  ASSERT("Loaded", isLoaded());
 
   OMStorable* result = _pointer;
 
@@ -404,19 +424,45 @@ OMStorable* OMStrongObjectReference::setValue(const OMStorable* value)
   // Attach the new object
   //
   if (newObject != 0) {
-    OMStorable* container = _property->propertySet()->container();
-    newObject->attach(container, _name);
+    newObject->attach(_property, *this);
   }
   setLoaded();
   POSTCONDITION("Element properly set", _pointer == newObject);
   return oldObject;
 }
 
-const wchar_t* OMStrongObjectReference::name(void) const
+OMUniqueObjectIdentification
+OMStrongObjectReference::identification(void) const
 {
-  TRACE("OMStrongObjectReference::name");
+  TRACE("OMStrongObjectReference::identification");
 
-  return _name;
+  return _identification;
+}
+
+  // @mfunc Does this <c OMStrongObjectReference> has local key ?
+  //        <c OMStrongObjectReference> has local key if it is
+  //        a part of a container such as vector or set.
+  //   @rdesc True if this <c OMStrongObjectReference> has local key,
+  //          false otherwise.
+  //   @this const
+bool OMStrongObjectReference::hasLocalKey(void) const
+{
+  TRACE("OMStrongObjectReference::hasLocalKey");
+  return  _hasLocalKey;
+}
+
+  // @mfunc The local key of this <c OMStrongObjectReference>.
+  //        The key is unique only within a given container instance
+  //        and is assigned to each element of the container in such
+  //        way as to be independent of the element's position within
+  //        the container.
+  //   @rdesc The local key of this <c OMStrongObjectReference>.
+  //   @this const
+OMUInt32 OMStrongObjectReference::localKey(void) const
+{
+  TRACE("OMStrongObjectReference::localKey");
+  PRECONDITION("Uses local key", hasLocalKey() == true);
+  return  _localKey;
 }
 
   // @mfunc Is this <c OMStrongObjectReference> in the loaded state. If false
@@ -461,27 +507,32 @@ void OMStrongObjectReference::load(void)
   OMStoredObject* store = containingObject->store();
   ASSERT("Valid store", store != 0);
 
-  OMStoredObject* subStorage = store->open(_name);
+  OMStoredObject* subStorage = 0;
+  if (hasLocalKey()) {
+    subStorage = store->open(_property, localKey());
+  } else {
+    subStorage = store->open(_property);
+  }
 
   // restore referenced object from the sub-storage
   //
   OMStorable* object = subStorage->restoreObject(*this);
-  ASSERT("Object properly restored", object != 0);
+  if (object != 0) {
+    // place a pointer to the newly restored object in this element
+    //
+    setValue(object);
 
-  // place a pointer to the newly restored object in this element
-  //
-  setValue(object);
+    setLoaded();
 
-  setLoaded();
+    // notify the client that the object has just been restored
+    //
+    ASSERT("Valid containing property", _property != 0);
+    OMFile* file = _property->propertySet()->container()->file();
+    ASSERT("Valid file", file != 0);
+    _pointer->onRestore(file->clientOnSaveContext());
+  }
 
-  // notify the client that the object has just been restored
-  //
-  ASSERT("Valid containing property", _property != 0);
-  OMFile* file = _property->propertySet()->container()->file();
-  ASSERT("Valid file", file != 0);
-  _pointer->onRestore(file->clientOnSaveContext());
-
-  POSTCONDITION("Property properly loaded", isLoaded());
+  POSTCONDITION("Property properly loaded", IMPLIES(object != 0, isLoaded()));
 }
 
 // class OMWeakObjectReference
@@ -807,6 +858,14 @@ const void*
 OMWeakObjectReference::identification(void) const
 {
   return _identification;
+}
+
+size_t OMWeakObjectReference::identificationSize(void) const
+{
+  TRACE("OMWeakObjectReference::identificationSize");
+  PRECONDITION("Valid identification",
+                          (_identification != 0) && (_identificationSize > 0));
+  return _identificationSize;
 }
 
 void

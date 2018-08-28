@@ -58,8 +58,7 @@
 ImplAAFRIFFChunk::ImplAAFRIFFChunk () :
 
   _chunkID(PID_RIFFChunk_ChunkID,	L"ChunkID"),
-  _chunkData(PID_RIFFChunk_ChunkData,	L"ChunkData"),
-  _chunkDataFilter(_chunkData.createFilter())
+  _chunkData(PID_RIFFChunk_ChunkData,	L"ChunkData")
 {
   // Add the properties into the property set.
   _persistentProperties.put(_chunkID.address());
@@ -74,8 +73,6 @@ ImplAAFRIFFChunk::ImplAAFRIFFChunk () :
 
 ImplAAFRIFFChunk::~ImplAAFRIFFChunk ()
 {
-    delete _chunkDataFilter;
-    _chunkDataFilter = NULL;
 }
 
 AAFRESULT STDMETHODCALLTYPE
@@ -140,7 +137,7 @@ AAFRESULT STDMETHODCALLTYPE
     }
 
 
-    OMUInt64  omSize = _chunkDataFilter->size();
+    OMUInt64  omSize = _chunkData.filter()->size();
 	*pLength = omSize;
 
 
@@ -161,7 +158,7 @@ AAFRESULT STDMETHODCALLTYPE
   	if (!persistent())
     	return AAFRESULT_OBJECT_NOT_PERSISTENT;
   
-  	_chunkDataFilter->write(buffer, bytes, *pBytesWritten);
+  	_chunkData.filter()->write(buffer, bytes, *pBytesWritten);
   	
   	if (0 < bytes && 0 == *pBytesWritten)
     	return AAFRESULT_CONTAINERWRITE;
@@ -184,7 +181,7 @@ AAFRESULT STDMETHODCALLTYPE
   if (!persistent())
     return AAFRESULT_OBJECT_NOT_PERSISTENT;
   
-  _chunkDataFilter->read(buffer, bytes, *pBytesRead);
+  _chunkData.filter()->read(buffer, bytes, *pBytesRead);
   if (0 < bytes && 0 == *pBytesRead)
     return AAFRESULT_END_OF_DATA;
 
@@ -207,7 +204,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRIFFChunk::SetPosition(
 
 
     OMUInt64  omPosition = offset;
-    _chunkDataFilter->setPosition( omPosition );
+    _chunkData.filter()->setPosition( omPosition );
 
 
     return AAFRESULT_SUCCESS;
@@ -232,7 +229,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFRIFFChunk::GetPosition(
     }
 
 
-    OMUInt64  omPosition = _chunkDataFilter->position();
+    OMUInt64  omPosition = _chunkData.filter()->position();
     *pOffset = omPosition;
 
 

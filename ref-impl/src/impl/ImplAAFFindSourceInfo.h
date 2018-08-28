@@ -49,6 +49,8 @@ class ImplAAFComponent;
 class ImplAAFOperationGroup;
 class ImplAAFPulldown;
 
+const aafUInt32 kDistinguishedChannelID = 0;
+
 class ImplAAFFindSourceInfo : public ImplAAFRoot
 {
 public:
@@ -63,6 +65,8 @@ protected:
 
   	ImplAAFMob		*_mob;
 	aafSlotID_t		_slotID;
+	bool			_hasChannelIDs;
+	aafUInt32		_channelID; /* 0 - is not a multichannel Mob Slot */
 	aafPosition_t	_position;
 	aafRational_t	_editRate;
 	aafLength_t		_length;
@@ -72,9 +76,15 @@ protected:
 public:
 
 	virtual AAFRESULT STDMETHODCALLTYPE
-		Init(ImplAAFMob *mob, aafSlotID_t slotID, aafPosition_t position,
-							aafRational_t editRate, aafLength_t length,
-							ImplAAFComponent *cpnt);
+		Init(	ImplAAFMob *mob,
+				aafSlotID_t slotID,
+				bool hasChannelIDs,
+				aafUInt32 channelID,
+				aafPosition_t position,
+				aafRational_t editRate,
+				aafLength_t length,
+				ImplAAFComponent *cpnt);
+
 	virtual AAFRESULT STDMETHODCALLTYPE
 		AddPulldown(ImplAAFPulldown *pdwn);
 	virtual AAFRESULT STDMETHODCALLTYPE
@@ -98,6 +108,8 @@ public:
 //		GetEnclosingOperationGroup(ImplAAFOperationGroup *pSourceRef);
 //	virtual AAFRESULT STDMETHODCALLTYPE
 //		GetEnclosingComponent(ImplAAFOperationGroup *pSourceRef);
+	virtual AAFRESULT STDMETHODCALLTYPE
+		GetMultichannelSourceReference(aafSourceRef_t *pSourceRef, aafBoolean_t* pHasChannelIDs, aafUInt32 *pChannelID);
 };
 
 #endif // ! __ImplAAFFindSourceInfo_h__

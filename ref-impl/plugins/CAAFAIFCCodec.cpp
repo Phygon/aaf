@@ -286,7 +286,7 @@ CAAFAIFCCodec::CAAFAIFCCodec (IUnknown * pControllingUnknown)
 	_sampleRate = defaultRate;
 	_bitsPerSample = defaultSampleWidth;
 	_numCh = defaultNumCh;
-	_bytesPerFrame = (defaultSampleWidth+7)/8;;
+	_bytesPerFrame = (defaultSampleWidth+7)/8;
 	_sampleFrames = 0;
 	_interleaveBuf = NULL;
 	_dataStartOffset = 0;
@@ -791,8 +791,8 @@ CAAFAIFCCodec::ReadBlocks (aafDeinterleave_t  inter,
 	aafUInt32		nbytes, fileBytes;
 	aafUInt32		n, xferSamples, sub;
 	aafUInt32		maxSamplesLeft;
-	aafUInt8		*start;
-	aafmMultiXfer_t *xfer;
+	aafUInt8		*start = NULL;
+	aafmMultiXfer_t *xfer = NULL;
 	aafmMultiResult_t *result = NULL;
 	aafUInt16		ch, xf;
 	aafUInt8		tmpBuf[256];

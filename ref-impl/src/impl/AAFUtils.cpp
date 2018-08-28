@@ -74,7 +74,7 @@
 
 aafBool	EqualAUID(const aafUID_t *uid1, const aafUID_t *uid2)
 {
-	return(memcmp((char *)uid1, (char *)uid2, sizeof(aafUID_t)) == 0 ? kAAFTrue : kAAFFalse);
+	return (*uid1 == *uid2) ? kAAFTrue : kAAFFalse;
 }
 
 aafBool	EqualMobID(aafMobID_constref mobID1, aafMobID_constref mobID2)
@@ -135,6 +135,62 @@ void AAFGetDateTime(aafTimeStamp_t *ts)
 
 
 
+static aafErr_t AAFConvertEditRateRoundingAutomatically(
+	aafRational_t srcRate,        /* IN - Source Edit Rate */
+	aafPosition_t srcPosition,    /* IN - Source Position */
+	aafRational_t destRate,       /* IN - Destination Edit Rate */
+	aafPosition_t *destPosition)  /* OUT - Destination Position */
+{
+	AAFRESULT result = AAFRESULT_SUCCESS;
+	const double srcRateDouble = FloatFromRational(srcRate);
+	const double destRateDouble = FloatFromRational(destRate);
+
+
+	//########## Rounding during rate conversion ##########
+
+	// When converting from audio samples to video frames, we make the rounding tolerance small enough to account
+	// for the fact that the result of the conversion is often not exactly on a frame boundary but should be within 
+	// a sample or two to be considered to be a full frame's worth of audio.  We can't use a higher tolerance because
+	// we may get files that truely do not have enough samples to cover a video frame.
+	// A typical conversion from audio samples to video frames comes out as n.999xxxx frames if it was intended to be
+	// frame-aligned.  There are some case where further rounding causes a slightly lower value (e.g. - n.998xxxx frames).
+	// If the remainder falls in this range, we allow the value to be rounded up to the next frame.
+	const double aafVideoRoundingTolerance = 0.002F;
+
+	// When converting from video frames to audio samples we may end up with a partial sample.  Since we cannot really
+	// capture a partial audio sample, we can round more aggressively than in the video case.  To match historical behavior
+	// for this case, we allow the value to be rounded-up as long as we have at least one half of a sample.
+	const double aafAudioRoundingTolerance = 0.5F;
+
+	//#####################################################
+
+
+	if (srcRateDouble == destRateDouble)
+	{
+		*destPosition = srcPosition;
+		result = AAFRESULT_SUCCESS;
+	}
+	else
+	{
+		double positionInSeconds = 0.0;
+		if (srcRateDouble != 0)
+			positionInSeconds = srcPosition / srcRateDouble;
+
+		// Rount up or down depending on whether we are converting to audio samples or video frames.
+		double roundingTolerance = aafVideoRoundingTolerance;
+		// Assume rates >= 1000 must be audio
+		if (destRateDouble >= 1000)
+			roundingTolerance = aafAudioRoundingTolerance;
+
+		const double destPositionDouble = positionInSeconds * destRateDouble +
+										  (positionInSeconds<0 ? -roundingTolerance : roundingTolerance);
+		*destPosition = static_cast<aafPosition_t>(destPositionDouble);
+		result = AAFRESULT_SUCCESS;
+	}
+
+	return result;
+}
+
 aafErr_t AAFConvertEditRate(
 	aafRational_t srcRate,        /* IN - Source Edit Rate */
 	aafPosition_t srcPosition,    /* IN - Source Position */
@@ -142,49 +198,58 @@ aafErr_t AAFConvertEditRate(
 	aafRounding_t howRound,	      /* IN - Rounding method (floor or ceiling) */
 	aafPosition_t *destPosition)  /* OUT - Destination Position */
 {
+	AAFRESULT		result = AAFRESULT_SUCCESS;
 	aafInt64		intPos, destPos, remainder;
 		
 	XPROTECT()
 	{
 		*destPosition = 0;
-		if ((howRound != kRoundCeiling) && (howRound != kRoundFloor))
+		if ((howRound != kRoundCeiling) && (howRound != kRoundFloor) && (howRound != kRoundAuto))
 		{
 			RAISE(AAFRESULT_INVALID_ROUNDING);
 		}
 
-		if(FloatFromRational(srcRate) != FloatFromRational(destRate))
+		// Conversion with automatic rounding is different enough to have a dedicated routine
+		if (howRound == kRoundAuto)
 		{
-			intPos = (srcRate.denominator * destRate.numerator) * srcPosition;
-			destPos = intPos / (srcRate.numerator * destRate.denominator);		// truncate to int
-			remainder = intPos % (srcRate.numerator * destRate.denominator);
+			result = AAFConvertEditRateRoundingAutomatically(srcRate, srcPosition, destRate, destPosition);
 		}
 		else
 		{
-	  		/* JeffB: (1 / 29.97) * 29.97 often doesn't == 1
-	  		 * (it seems to be .99999... on the 68K FPU)
-	  		 * The debugger says it's 1.0, but if(foo >= 1.0) fails.
-	  		 */
-	  		destPos = srcPosition;
-	  		remainder = 0;
-		}
+			if(FloatFromRational(srcRate) != FloatFromRational(destRate))
+			{
+				intPos = (srcRate.denominator * destRate.numerator) * srcPosition;
+				destPos = intPos / (srcRate.numerator * destRate.denominator);		// truncate to int
+				remainder = intPos % (srcRate.numerator * destRate.denominator);
+			}
+			else
+			{
+	  			/* JeffB: (1 / 29.97) * 29.97 often doesn't == 1
+	  			* (it seems to be .99999... on the 68K FPU)
+	  			* The debugger says it's 1.0, but if(foo >= 1.0) fails.
+	  			*/
+	  			destPos = srcPosition;
+	  			remainder = 0;
+			}
 
-		/* Usually used for lower edit rate to higher edit rate conversion - 
-		 * to return the first sample of the higher edit rate that contains a
-		 * sample of the lower edit rate. (i.e., video -> audio)
-		 */
-		if (howRound == kRoundFloor)
-		{
-			*destPosition = destPos;
-		}
-		/* Usually used for higher edit rate to lower edit rate conversion -
-		 * to return the sample of the lower edit rate that fully contains
-		 * the sample of the higher edit rate. (i.e., audio -> video)
-		 */
-		else if (howRound == kRoundCeiling)
-		{
-			*destPosition = destPos;
-			if(remainder != 0)
-				*destPosition++;
+			/* Usually used for lower edit rate to higher edit rate conversion - 
+			* to return the first sample of the higher edit rate that contains a
+			* sample of the lower edit rate. (i.e., video -> audio)
+			*/
+			if (howRound == kRoundFloor)
+			{
+				*destPosition = destPos;
+			}
+			/* Usually used for higher edit rate to lower edit rate conversion -
+			* to return the sample of the lower edit rate that fully contains
+			* the sample of the higher edit rate. (i.e., audio -> video)
+			*/
+			else if (howRound == kRoundCeiling)
+			{
+				*destPosition = destPos;
+				if(remainder != 0)
+					*destPosition++;
+			}
 		}
 	} /* XPROTECT */
 	XEXCEPT
@@ -192,7 +257,7 @@ aafErr_t AAFConvertEditRate(
 	}
 	XEND;
 
-	return(AAFRESULT_SUCCESS);
+	return(result);
 }
 
 /************************
@@ -480,13 +545,26 @@ typedef struct
  * Possible Errors:
  *		Standard errors (see top of file).
  *************************************************************************/
+
+static aafUInt32 TCGetNumFramesDroppedPerMinute(aafUInt32 fps)
+{
+	if (fps == 30)
+		return 2;
+	else if (fps == 60)
+		return 4;
+	else if (fps == 120)
+		return 8;
+	return 0;
+}
+
 static frameTbl_t GetFrameInfo(
 							   aafInt32 fps) /* IN - Frame Rate */
 {
 	frameTbl_t	result;
-	
-	result.dropFpMin = (60 * fps) - 2;
-	result.dropFpMin10 = (10*result.dropFpMin+2);
+	aafUInt32	diff = TCGetNumFramesDroppedPerMinute(fps);
+
+	result.dropFpMin = (60 * fps) - diff;
+	result.dropFpMin10 = (10 * result.dropFpMin + diff);
 	result.dropFpHour = 6 * result.dropFpMin10;
 
 	result.fpMinute = 60 * fps;
@@ -554,7 +632,7 @@ aafErr_t PvtOffsetToTimecode(
 		*frames = (aafInt16)(offset % frameRate);
 		if (frame_dropped)
 		  {
-			 (*frames) +=2;
+			 (*frames) += TCGetNumFramesDroppedPerMinute(frameRate);
 			 if (*frames >= frameRate)
 				{
 				  (*frames) -= frameRate;

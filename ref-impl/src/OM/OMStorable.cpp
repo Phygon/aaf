@@ -44,6 +44,7 @@
 #include "OMUtilities.h"
 #include "OMPropertyDefinition.h"
 #include "OMClassDefinition.h"
+#include "OMObjectReference.h"
 
 #include "OMAssertions.h"
 
@@ -51,8 +52,9 @@
 
 OMStorable::OMStorable(void)
 : _persistentProperties(),
-  _container(0),
-  _name(0),
+  _containingProperty(0),
+  _referenceHasLocalKey(false),
+  _referenceLocalKey(0),
   _store(0),
   _exists(false),
   _classFactory(0),
@@ -71,9 +73,6 @@ OMStorable::~OMStorable(void)
   // attempt to create a dangling strong reference.
   //
   PRECONDITION("Object not attached", !attached());
-
-  delete [] _name;
-  _name = 0;
 }
 
   // @mfunc Set the <c OMClassDefinition> defining this <c OMStorable>.
@@ -192,18 +191,23 @@ void OMStorable::restoreContents(void)
 }
 
   // @mfunc Attach this <c OMStorable>.
-  //   @parm The containining <c OMStorable>.
-  //   @parm The name to be given to this <c OMStorable>.
-void OMStorable::attach(const OMStorable* container, const wchar_t* name)
+  //   @parm The containining <c OMProperty>.
+  //   @parm The containining <c OMStrongObjectReference>.
+void OMStorable::attach(const OMProperty* containingProperty,
+                        const OMStrongObjectReference& containingReference)
 {
   TRACE("OMStorable::attach");
   // tjb PRECONDITION("Not attached", !attached());
-  PRECONDITION("Valid container", container != 0);
-  PRECONDITION("Valid container", container != this);
-  PRECONDITION("Valid name", validWideString(name));
+  PRECONDITION("Valid containing property", containingProperty != 0);
+  PRECONDITION("Valid containing property",
+                                      containingProperty->container() != this);
+  PRECONDITION("Valid containing reference",
+                         containingReference.property() == containingProperty);
 
-  _container = container;
-  setName(name);
+  _containingProperty = containingProperty;
+  if (containingReference.hasLocalKey()) {
+    setReferenceLocalKey(containingReference.localKey());
+  }
 
   POSTCONDITION("Attached", attached());
 }
@@ -214,11 +218,17 @@ void OMStorable::detach(void)
   TRACE("OMStorable::detach");
 
   if (_store != 0) {
+    // TODO: This and manipulation of _store and _exists below can be
+    // accomplished with a single call to OMStorable::close().
+    // Also, it is not entirely clear whether this recursive close()
+    // is really necessary.
     OMPropertySetIterator iterator(_persistentProperties, OMBefore);
     while (++iterator) {
       OMProperty* p = iterator.property();
       ASSERT("Valid property", p != 0);
-      p->detach();
+      if (!p->isOptional() || p->isPresent()) {
+        p->close();
+      }
     }
 
     // Once incremental saving (dirty bit) is implemented we'll need
@@ -230,33 +240,13 @@ void OMStorable::detach(void)
     _store = 0;
   }
 
-  _container = 0;
+  _containingProperty = 0;
 
-  delete [] _name;
-  _name = 0;
+  clearReferenceLocalKey();
+
   _exists = false;
 
   PRECONDITION("Detached", !attached());
-}
-
-  // @mfunc The name of this <c OMStorable>.
-  //   @rdesc The name of this <c OMStorable>.
-  //   @this const
-const wchar_t* OMStorable::name(void) const
-{
-  TRACE("OMStorable::name");
-  return _name;
-}
-
-  // @mfunc Give this <c OMStorable> a name.
-  //   @parm The name to be given to this <c OMStorable>.
-void OMStorable::setName(const wchar_t* name)
-{
-  TRACE("OMStorable::setName");
-  PRECONDITION("Valid name", validWideString(name));
-  delete [] _name;
-  _name = 0; // for BoundsChecker
-  _name = saveWideString(name);
 }
 
   // @mfunc The <c OMFile> in which this <c OMStorable> has a
@@ -338,11 +328,22 @@ OMStoredObject* OMStorable::store(void) const
 
   if (_store == 0) {
     ASSERT("Valid container", container() != 0);
+    ASSERT("Valid containing property ", containingProperty() != 0);
     OMStorable* nonConstThis = const_cast<OMStorable*>(this);
     if (_exists) {
-      nonConstThis->_store = container()->store()->open(name());
+      if (referenceHasLocalKey()) {
+        nonConstThis->_store = container()->store()->open(containingProperty(),
+                                                          referenceLocalKey());
     } else {
-      nonConstThis->_store = container()->store()->create(name());
+        nonConstThis->_store = container()->store()->open(containingProperty());
+      }
+    } else {
+      if (referenceHasLocalKey()) {
+        nonConstThis->_store = container()->store()->create(containingProperty(),
+                                                            referenceLocalKey());
+      } else {
+        nonConstThis->_store = container()->store()->create(containingProperty());
+      }
     }
   }
   POSTCONDITION("Valid store", _store != 0);
@@ -501,6 +502,11 @@ OMStorable* OMStorable::shallowCopy(const OMClassFactory* factory) const
       } else {
         pid = destinationId(object, source);
       }
+#if 1 // DMS1SUPPORT
+      if (pid == 0x6101) {
+        continue;
+      }
+#endif
       OMProperty* dest = object->propertySet()->get(pid);
       source->shallowCopyTo(dest);
     }
@@ -512,6 +518,14 @@ OMStorable* OMStorable::shallowCopy(const OMClassFactory* factory) const
 
 void OMStorable::deepCopyTo(OMStorable* destination,
                             void* clientContext) const
+{
+  TRACE("OMStorable::deepCopyTo");
+  deepCopyTo(destination, clientContext, false);
+}
+
+void OMStorable::deepCopyTo(OMStorable* destination,
+                            void* clientContext,
+                            bool deferStreamData) const
 {
   TRACE("OMStorable::deepCopyTo");
   OMPropertySetIterator iterator(_persistentProperties, OMBefore);
@@ -526,8 +540,13 @@ void OMStorable::deepCopyTo(OMStorable* destination,
       } else {
         pid = destinationId(destination, source);
       }
+#if 1 // DMS1SUPPORT
+      if (pid == 0x6101) {
+        continue;
+      }
+#endif
       OMProperty* dest = destination->propertySet()->get(pid);
-      source->deepCopyTo(dest, clientContext);
+      source->deepCopyTo(dest, clientContext, deferStreamData);
     }
   }
 }
@@ -589,7 +608,47 @@ void OMStorable::onCopy(void*) const
 
 const OMStorable* OMStorable::container(void) const
 {
-  return _container;
+  TRACE("OMStorable::container");
+  const OMStorable* result = 0;
+  if (containingProperty()) {
+    result = containingProperty()->propertySet()->container();
+  }
+  return result;
+}
+
+const OMProperty* OMStorable::containingProperty(void) const
+{
+  TRACE("OMStorable::containingProperty");
+  return _containingProperty;
+}
+
+bool OMStorable::referenceHasLocalKey(void) const
+{
+  TRACE("OMStorable::referenceHasLocalKey");
+  return _referenceHasLocalKey;
+}
+
+OMUInt32 OMStorable::referenceLocalKey(void) const
+{
+  TRACE("OMStorable::referenceLocalKey");
+  PRECONDITION("Reference has local key", referenceHasLocalKey());
+  return _referenceLocalKey;
+}
+
+void OMStorable::setReferenceLocalKey(OMUInt32 localKey)
+{
+  TRACE("OMStorable::setReferenceLocalKey");
+  _referenceHasLocalKey = true;
+  _referenceLocalKey = localKey;
+  POSTCONDITION("Reference has local key", referenceHasLocalKey());
+}
+
+void OMStorable::clearReferenceLocalKey(void)
+{
+  TRACE("OMStorable::clearReferenceLocalKey");
+  _referenceHasLocalKey = false;
+  _referenceLocalKey = 0;
+  POSTCONDITION("Reference has no local key", !referenceHasLocalKey());
 }
 
 OMPropertyId OMStorable::destinationId(const OMStorable* destination,

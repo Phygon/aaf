@@ -150,7 +150,7 @@ bool OMReferenceVectorIterator<ReferencedObject>::valid(void) const
   //   @rdesc The number of <p ReferencedObject>s
   //   @this const
 template <typename ReferencedObject>
-size_t OMReferenceVectorIterator<ReferencedObject>::count(void) const
+OMUInt32 OMReferenceVectorIterator<ReferencedObject>::count(void) const
 {
   return _iterator.count();
 }
@@ -288,7 +288,7 @@ OMReferenceVectorIterator<ReferencedObject>::clearObject(void)
   //   @rdesc The index of the current position.
   //   @this const
 template <typename ReferencedObject>
-size_t OMReferenceVectorIterator<ReferencedObject>::index(void) const
+OMUInt32 OMReferenceVectorIterator<ReferencedObject>::index(void) const
 {
   return _iterator.index();
 }

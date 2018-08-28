@@ -1,3 +1,6 @@
+#ifndef __AAFOperationCategories_h__
+#define __AAFOperationCategories_h__
+
 //=---------------------------------------------------------------------=
 //
 // $Id$ $Name$
@@ -34,3 +37,5 @@
 // Following are the strings of the well-known operation group categories in AAF.
 //
 const aafUID_t CATEGORY_Effect = L"Effect";
+
+#endif

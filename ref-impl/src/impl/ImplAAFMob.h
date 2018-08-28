@@ -538,32 +538,6 @@ public:
 		 ImplAAFMobSlot ** destSlot);  //@parm [out] The requested slot
 
 
-// trr: Does this method only work for AAFSourceMobs? If so we should probably move
-// it the AAFSourceMob.dod.
-  //****************
-  // OffsetToTimecode()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    OffsetToTimecode
-        (aafSlotID_t*  slotID,   //@parm [in,ref] Slot ID of the slot in the input mob
-		 aafPosition_t *  offset,   //@parm [in] Offset into the given slot
-         aafTimecode_t *  result);  //@parm [out] The resulting timecode
-
-
-// trr: Does this method only work for AAFSourceMobs? If so we should probably move
-// it the AAFSourceMob.dod.
-  //****************
-  // TimecodeToOffset()
-  //
-  virtual AAFRESULT STDMETHODCALLTYPE
-    TimecodeToOffset
-        (aafTimecode_t  timecode,   //@parm [in] The timecode value
-		 aafSlotID_t  slotID,   //@parm [in] Slot ID of slot in source mob
-         aafFrameOffset_t *  result);  //@parm [out] Resulting offset in source slot
-
-
-
-
   //****************
   // Copy()
   //
@@ -595,6 +569,17 @@ public:
          ImplAAFFile * destFile,   //@parm [in] Destination AAF File
 		 ImplAAFMob ** destMob);  //@parm [out] Destination Mob
 
+  //****************
+  // CloneExternalAdvanced()
+  //
+  virtual AAFRESULT STDMETHODCALLTYPE
+    CloneExternalAdvanced
+        (aafDepend_t  resolveDependencies,   //@parm [in] Whether to clone dependent mobs
+		 aafIncMedia_t  includeMedia,   //@parm [in] Whether to include media data
+		 aafBoolean_t deferStreams,   //@parm [in] Whether to defer copying media and metadata stream contents until destFile is saved
+		 ImplAAFFile * destFile,   //@parm [in] Destination AAF File
+		 ImplAAFMob ** destMob);  //@parm [out] Destination Mob
+
   // @commDeletes the entire Mob structure \(the MOBJ object and all its contained objects\)
   // and deletes the entry from the Header.
 
@@ -616,10 +601,12 @@ AAFRESULT
 
 	virtual AAFRESULT InternalSearchSource(	
     aafSlotID_t trackID,             /* IN */
+	aafUInt32 channelID,             /* IN */
 	aafPosition_t offset,             /* IN */
 	aafMobKind_t mobKind,             /* IN */
 	aafMediaCriteria_t *pMediaCrit,    /* IN */
 	aafOperationChoice_t *pOperationChoice,  /* IN */  /* NOTE: take this arg out? */
+	aafRounding_t editRateConversion,  /* IN */
 	ImplAAFFindSourceInfo **ppSourceInfo);  /* OUT */
 
 	virtual AAFRESULT MobFindLeaf(ImplAAFMobSlot *track,
@@ -640,11 +627,15 @@ AAFRESULT
 					 aafPosition_t *diffPos);
 
 	virtual AAFRESULT FindNextMob(ImplAAFMobSlot *track, 
+					 aafUInt32 channelID,
 					 ImplAAFSegment *segment,
 					 aafLength_t length,
 					 aafPosition_t diffPos,
+					 aafRounding_t editRateConversion,
 					 ImplAAFMob **retMob,
 					 aafSlotID_t *retTrackID,
+					 bool* retHasChannelIDs,
+					 aafUInt32 *retChannelID,
 					 aafPosition_t *retPos,
 					 ImplAAFPulldown **pulldownObj,
 					 aafInt32 *pulldownPhase,
@@ -652,11 +643,14 @@ AAFRESULT
 
 virtual AAFRESULT MobFindSource(
 					   aafSlotID_t trackID,
+					   bool hasChannelIDs,
+					   aafUInt32 channelID,  /* 0 - is not a multichannel Mob Slot */
 					   aafPosition_t offset, /* offset in referenced units */
 					   aafLength_t length,   /* expected length of clip */
 					   aafMobKind_t mobKind,
 					   aafMediaCriteria_t *mediaCrit,
 					   aafOperationChoice_t *operationChoice,
+					   aafRounding_t editRateConversion,
 					   ImplAAFFindSourceInfo *sourceInfo,
 					   aafBool *foundSource);
 
@@ -693,8 +687,6 @@ protected:
 
     OMStrongReferenceVectorProperty<ImplAAFTaggedValue> _attributes;
     OMFixedSizeProperty<aafUID_t> _usageCode;
-
-    aafClassID_t _clsid;
 };
 
 #endif // ! __ImplAAFMob_h__

@@ -89,7 +89,9 @@ extern "C" HRESULT CAAFTextClip_test()
 {
   HRESULT hr = S_OK;
   aafProductIdentification_t	ProductInfo = {0};
-  aafWChar * pFileName = L"AAFTextClipTest.aaf";
+  const size_t fileNameBufLen = 128;
+  aafWChar pFileName[ fileNameBufLen ] = L"";
+  GenerateTestFileName( productID.productName, fileKind, fileNameBufLen, pFileName );
 
   // Initialize the product info for this module test
   aafProductVersion_t v;

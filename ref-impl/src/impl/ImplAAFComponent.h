@@ -293,6 +293,16 @@ public:
 	// with the specified visitor.
 	virtual void Accept(AAFComponentVisitor& visitor);
 
+	// Type of MobSlot that owns this Component
+	enum MobSlotType
+	{
+		MobSlotType_Undefined,
+		MobSlotType_Timeline,
+		MobSlotType_Static,
+		MobSlotType_Event
+	};
+	void SetMobSlotType(MobSlotType type);
+	MobSlotType GetMobSlotType() const;
 
 private:
 	OMWeakReferenceProperty<OMUniqueObjectIdentification, ImplAAFDataDef>		_dataDef;
@@ -300,6 +310,8 @@ private:
     OMStrongReferenceVectorProperty<ImplAAFKLVData> _KLVData;
     OMStrongReferenceVectorProperty<ImplAAFTaggedValue> _userComments;
     OMStrongReferenceVectorProperty<ImplAAFTaggedValue> _attributes;
+
+	MobSlotType	_mobSlotType;
 
 };
 

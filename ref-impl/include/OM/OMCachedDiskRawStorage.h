@@ -165,6 +165,85 @@ public:
     //          representation.
   virtual void synchronize(void);
 
+  // Functions for accessing stream data within this <c OMCachedDiskRawStorage>
+
+    // @cmember Attempt to read the number of stream data bytes given by
+    //          <p byteCount> from offset <p position> in this
+    //          <c OMCachedDiskRawStorage> into the buffer at
+    //          address <p bytes>.
+    //          The actual number of bytes read is returned in <p bytesRead>.
+  virtual void streamReadAt(OMUInt64 position,
+                            OMByte* bytes,
+                            OMUInt32 byteCount,
+                            OMUInt32& bytesRead) const;
+
+    // @cmember Attempt to fill the vector of buffers given by <p buffers>
+    //          with stream data read from offset <p position> in
+    //          this <c OMCachedDiskRawStorage>. This is "read scatter".
+    //          The <p bufferCount> buffers are read in order until all have
+    //          been successfully read or an error is encountered. Once
+    //          an error has been encountered on one buffer no additional
+    //          buffers are read.
+    //          The number of bytes read is returned in <p bytesRead>.
+  virtual void streamReadAt(OMUInt64 position,
+                            OMIOBufferDescriptor* buffers,
+                            OMUInt32 bufferCount,
+                            OMUInt32& bytesRead) const;
+
+    // Asynchronous read - single buffer
+  virtual void streamReadAt(OMUInt64 position,
+                            OMByte* buffer,
+                            const OMUInt32 bytes,
+                            void* /* */ completion,
+                            const void* clientArgument) const;
+
+    // Asynchronous read - multiple buffers
+  virtual void streamReadAt(OMUInt64 position,
+                            OMIOBufferDescriptor* buffers,
+                            OMUInt32 bufferCount,
+                            void* /* */ completion,
+                            const void* clientArgument) const;
+
+    // @cmember Attempt to write the number of stream data bytes given by
+    //          <p byteCount> to offset  <p position> in this
+    //          <c OMCachedDiskRawStorage>
+    //          from the buffer at address <p bytes>.
+    //          The actual number of bytes written is returned in
+    //          <p bytesWritten>.
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMByte* bytes,
+                             OMUInt32 byteCount,
+                             OMUInt32& bytesWritten);
+
+    // @cmember Attempt to write the vector of buffers given by <p buffers>
+    //          to this <c OMCachedDiskRawStorage>. Stream data bytes
+    //          are written starting at offset <p position> in this
+    //          <c OMCachedDiskRawStorage>.
+    //          This is "write gather".
+    //          The <p bufferCount> buffers are written in order until all have
+    //          been successfully written or an error is encountered. Once
+    //          an error has been encountered on one buffer no additional
+    //          buffers are written.
+    //          The number of bytes written is returned in <p bytesWritten>.
+  virtual void streamWriteAt(OMUInt64 position,
+                             OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             OMUInt32& bytesWritten);
+
+    // Asynchronous write - single buffer
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMByte* buffer,
+                             const OMUInt32 bytes,
+                             void* /* */ completion,
+                             const void* clientArgument);
+
+    // Asynchronous write - multiple buffers
+  virtual void streamWriteAt(OMUInt64 position,
+                             const OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             void* /* */ completion,
+                             const void* clientArgument);
+
 private:
   // @access Private members.
 

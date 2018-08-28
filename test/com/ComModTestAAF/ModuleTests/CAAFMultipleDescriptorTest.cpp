@@ -99,7 +99,6 @@ static HRESULT CreateAAFFile(
 		checkResult(defs.cdSourceMob()->
 			CreateInstance(IID_IAAFSourceMob, 
 			(IUnknown **)&pSourceMob));
-
 		
 		// Initialize mob properties:
 		checkResult(pSourceMob->QueryInterface (IID_IAAFMob, (void **)&pMob));

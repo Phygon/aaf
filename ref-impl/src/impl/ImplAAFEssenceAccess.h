@@ -83,8 +83,8 @@ typedef struct
 
 typedef enum { kAAFCreated, kAAFAppended, kAAFReadOnly } aafOpenType_t;
 
-#include <vector>
-#include <iterator>
+//#include <vector>
+//#include <iterator>
 
 typedef struct _tagAccessor_t
 {
@@ -129,6 +129,9 @@ public:
   virtual AAFRESULT STDMETHODCALLTYPE
 	SetEssenceCodecFlavour(aafUID_t variety);
 
+  //****************
+  // Create()
+  //
   virtual AAFRESULT STDMETHODCALLTYPE
     Create
         (ImplAAFMasterMob *masterMob,

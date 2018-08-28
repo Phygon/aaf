@@ -51,8 +51,7 @@ ImplAAFPCMDescriptor::ImplAAFPCMDescriptor() :
     _peakFrames( PID_PCMDescriptor_PeakFrames, L"PeakFrames" ),
     _peakOfPeaksPosition( PID_PCMDescriptor_PeakOfPeaksPosition, L"PeakOfPeaksPosition" ),
     _peakEnvelopeTimestamp( PID_PCMDescriptor_PeakEnvelopeTimestamp, L"PeakEnvelopeTimestamp" ),
-    _peakEnvelopeData( PID_PCMDescriptor_PeakEnvelopeData, L"PeakEnvelopeData" ),
-    _peakEnvelopeDataFilter( _peakEnvelopeData.createFilter() )
+    _peakEnvelopeData( PID_PCMDescriptor_PeakEnvelopeData, L"PeakEnvelopeData" )
 {
     _persistentProperties.put( _blockAlign.address() );
     _persistentProperties.put( _sequenceOffset.address() );
@@ -79,8 +78,6 @@ ImplAAFPCMDescriptor::ImplAAFPCMDescriptor() :
 
 ImplAAFPCMDescriptor::~ImplAAFPCMDescriptor ()
 {
-    delete _peakEnvelopeDataFilter;
-    _peakEnvelopeDataFilter = 0;
 }
 
 
@@ -657,7 +654,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFPCMDescriptor::SetPeakEnvelopeDataPosition(
 
 
     OMUInt64  omPosition = position;
-    _peakEnvelopeDataFilter->setPosition( omPosition );
+    _peakEnvelopeData.filter()->setPosition( omPosition );
 
 
     return AAFRESULT_SUCCESS;
@@ -686,7 +683,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFPCMDescriptor::GetPeakEnvelopeDataPosition(
     }
 
 
-    OMUInt64  omPosition = _peakEnvelopeDataFilter->position();
+    OMUInt64  omPosition = _peakEnvelopeData.filter()->position();
     *pPosition = omPosition;
 
 
@@ -716,7 +713,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFPCMDescriptor::GetPeakEnvelopeDataSize(
     }
 
 
-    OMUInt64  omSize = _peakEnvelopeDataFilter->size();
+    OMUInt64  omSize = _peakEnvelopeData.filter()->size();
     *pSize = omSize;
 
 
@@ -755,7 +752,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFPCMDescriptor::WritePeakEnvelopeData(
 
     AAFRESULT  ar = AAFRESULT_SUCCESS;
 
-    _peakEnvelopeDataFilter->write( buffer, bytes, *pBytesWritten );
+    _peakEnvelopeData.filter()->write( buffer, bytes, *pBytesWritten );
     if( *pBytesWritten == 0 )
     {
         ar = AAFRESULT_CONTAINERWRITE;
@@ -800,7 +797,7 @@ AAFRESULT STDMETHODCALLTYPE ImplAAFPCMDescriptor::ReadPeakEnvelopeData(
 
     AAFRESULT  ar = AAFRESULT_SUCCESS;
 
-    _peakEnvelopeDataFilter->read( buffer, bytes, *pBytesRead );
+    _peakEnvelopeData.filter()->read( buffer, bytes, *pBytesRead );
     if( *pBytesRead == 0 )
     {
         ar = AAFRESULT_END_OF_DATA;
