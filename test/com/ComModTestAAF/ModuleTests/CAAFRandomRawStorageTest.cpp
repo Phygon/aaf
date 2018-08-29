@@ -404,7 +404,7 @@ static HRESULT localOpenFileMemStgRead
   if (FAILED (hr)) return hr;
 
   char cFileName[FILENAME_MAX];
-#ifdef _DEBUG
+#ifndef NDEBUG
   size_t status =
 #endif
   wcstombs(cFileName, pFileName, FILENAME_MAX);
@@ -452,7 +452,7 @@ public:
 	  _extent (0)
   { assert (pFileName);
     char cFileName[FILENAME_MAX];
-#ifdef _DEBUG
+#ifndef NDEBUG
 	size_t status =
 #endif
 	wcstombs(cFileName, pFileName, FILENAME_MAX);
@@ -588,7 +588,7 @@ public:
     GetSize (aafUInt64 * pSize)
     { if (! pSize) return AAFRESULT_NULL_PARAM;
 	  long int oldPosition = ftell(_file);
-#ifdef _DEBUG
+#ifndef NDEBUG
 	  long int seekStatus =
 #endif
 	  fseek(_file, 0, SEEK_END);
@@ -621,7 +621,7 @@ public:
 protected:
   void pvtSetPosition (aafUInt64 position)
   {
-#ifdef _DEBUG
+#ifndef NDEBUG
     int seekStatus =
 #endif
     fseek(_file, static_cast<long>(position), SEEK_SET);
@@ -967,7 +967,7 @@ localCloseFileMemStgWrite (const aafWChar * pFileName,
   if (FAILED (hr)) return hr;
 
   char cFileName[FILENAME_MAX];
-#ifdef _DEBUG
+#ifndef NDEBUG
   size_t status =
 #endif
   wcstombs(cFileName, pFileName, FILENAME_MAX);

@@ -676,7 +676,7 @@ static HRESULT ComprehensiveOpenTest(testMode_t /* mode */,
 	  RemoveTestFile(pBadVersionFileName);
 
 	  char cBadVersionFileName[FILENAME_MAX];
-#ifdef _DEBUG
+#ifndef NDEBUG
 	  size_t status =
 #endif
 	  wcstombs( cBadVersionFileName, pBadVersionFileName, FILENAME_MAX );

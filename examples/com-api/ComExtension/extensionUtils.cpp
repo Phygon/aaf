@@ -671,7 +671,7 @@ ostream& operator<< (ostream& s,
   char * cstring = new char [numChars+1];
   assert (cstring);
 
-#ifdef _DEBUG
+#ifndef NDEBUG
   size_t status =
 #endif
   wcstombs(cstring, wstring, numChars);
