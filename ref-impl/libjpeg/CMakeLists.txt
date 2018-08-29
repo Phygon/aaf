@@ -41,6 +41,8 @@ endif()
 # Makefile: ./AAFx86_64LinuxSDK/g++/ref-impl/<debug|>
 set(TARGET_DIR "${AAFSDK_TARGET_DIR}")
 
+project(libjpeg)
+
 add_library(libjpeg STATIC
     jcapimin.c
     jcapistd.c
@@ -94,7 +96,7 @@ target_include_directories(libjpeg PUBLIC
     ${AAFSDK_ROOT}/ref-impl/libjpeg
 )
 
-set_target_properties(libjpeg PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(libjpeg PROPERTIES LINKER_LANGUAGE C)
 
 set_target_properties(libjpeg PROPERTIES
     ARCHIVE_OUTPUT_DIRECTORY ${TARGET_DIR}
