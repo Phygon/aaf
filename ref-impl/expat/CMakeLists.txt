@@ -41,6 +41,8 @@ endif()
 # Makefile: ./AAFx86_64LinuxSDK/g++/ref-impl/<debug|>
 set(TARGET_DIR "${AAFSDK_TARGET_DIR}/RefImpl")
 
+project(expat)
+
 add_library(expat STATIC
     xmlparse.c
     xmlrole.c
