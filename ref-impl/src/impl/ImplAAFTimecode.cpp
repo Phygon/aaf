@@ -208,7 +208,8 @@ AAFRESULT STDMETHODCALLTYPE
 	XPROTECT()
 	{
 		CHECK(GetTimecode(&startTC));
-		CHECK(GetLength(&tcLen));
+		CHECK(GetOptionalLength(this, &tcLen));
+
 		
 		// Assume found at this point, so finish generating result
 		oldStart = pTimecode->startFrame - startTC.startFrame;

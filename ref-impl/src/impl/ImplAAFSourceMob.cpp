@@ -228,7 +228,7 @@ AAFRESULT STDMETHODCALLTYPE
 		pDictionary->ReleaseReference();
 		pDictionary = NULL;
 
-		CHECK(sub->Initialize (pDataDef, 0, sourceRef));
+		CHECK(sub->Initialize (pDataDef, sourceRef));
 		CHECK(AppendNewStaticSlot( sub, slotID, L"Static", 	&newSlot));
 		
 		newSlot->ReleaseReference();
@@ -426,7 +426,7 @@ AAFRESULT STDMETHODCALLTYPE
 	{
 		CHECK(FindTimecodeClip(startOffset, &timecodeClip, &tcStartPos,
 								&tcSlotLen));
-		CHECK(timecodeClip->GetLength(&tcLen));
+		CHECK(GetOptionalLength(timecodeClip, &tcLen));
 		CHECK(timecodeClip->GetTimecode(&timecode));
 		length = length64;
 		zeroLen = 0;
@@ -468,7 +468,7 @@ AAFRESULT STDMETHODCALLTYPE
 			for (sequLoop=0, sequPos = 0; sequLoop < numSegs; sequLoop++, sequPos += segLen)
 			{
 				CHECK(sequIter->NextOne(&subSegment));
-				CHECK(subSegment->GetLength(&segLen));
+				CHECK(GetOptionalLength(subSegment, &segLen));
 				/* Skip zero-length clips, sometimes found in MC files */
 				if (segLen == zeroLen)
 					continue;
@@ -483,7 +483,7 @@ AAFRESULT STDMETHODCALLTYPE
 		 			{
 						firstFillLen = pos;
 						firstFillLen -= sequPos;
-						CHECK(subSegment->GetLength(&oldFillLen));
+						CHECK(GetOptionalLength(subSegment, &oldFillLen));
 						endFillLen = oldFillLen;
 						endFillLen -= length;
 						endFillLen -= firstFillLen;
@@ -741,7 +741,7 @@ AAFRESULT STDMETHODCALLTYPE
 				for(n = 0; n < numSegments; n++)
 				{
 					CHECK(sequence->GetNthComponent (n, &subSeg));
-					CHECK(subSeg->GetLength(&foundLen));
+					CHECK(GetOptionalLength(subSeg, &foundLen));
 
 					if(foundLen != zero)
 					{
@@ -970,7 +970,7 @@ AAFRESULT ImplAAFSourceMob::FindTimecodeClip(
 		if(found != kAAFTrue)
 			RAISE(AAFRESULT_MISSING_TRACKID);
 		CHECK(slot->GetSegment(&seg));
-		CHECK(seg->GetLength(tcSlotLen));
+		CHECK(GetOptionalLength(seg, tcSlotLen));
 		CHECK(seg->OffsetToTimecodeClip(offset, result, &sequPos));
 		*tcStartPos = sequPos;
 		slot->ReleaseReference();

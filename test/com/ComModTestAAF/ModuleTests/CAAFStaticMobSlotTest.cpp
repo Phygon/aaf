@@ -142,28 +142,19 @@ static HRESULT CreateAAFFile(
 			sclp = NULL;
 		}
 
-		// Test unknown Length
+		// Test Length
 		{
-			checkResult(defs.cdSourceClip()->
-				CreateInstance(IID_IAAFSourceClip,
-				(IUnknown **)&sclp));
+			checkResult(defs.cdSourceClip()->CreateInstance(IID_IAAFSourceClip,	(IUnknown **)&sclp));
 			checkResult(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
 			checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
 			checkResult(sclp->QueryInterface(IID_IAAFSegment, (void **)&seg));
 
 			checkResult(defs.cdStaticMobSlot()->CreateInstance(IID_IAAFMobSlot,	(IUnknown **)&newSlot));
 
-			// Unknown Length is allowed when Component is unattached
-			checkResult(pComponent->SetLength(AAF_UNKNOWN_LENGTH));
-			// Component with Unknown Length can't be attached to StaticMobSlot
+			// Length is allowed when Component is unattached
+			checkResult(pComponent->SetLength(10));
+			// Component with Length can't be attached to StaticMobSlot
 			checkExpression((newSlot->SetSegment(seg) == AAFRESULT_INVALID_PARAM), AAFRESULT_TEST_FAILED);
-
-			// OK
-			checkResult(pComponent->SetLength(0));
-			checkResult(newSlot->SetSegment(seg));
-
-			// Unknown Length is not allowed when Component is attached to StaticMobSlot
-			checkExpression((pComponent->SetLength(AAF_UNKNOWN_LENGTH) == AAFRESULT_BAD_LENGTH), AAFRESULT_TEST_FAILED);
 
 			pComponent->Release();
 			pComponent = NULL;
@@ -173,6 +164,9 @@ static HRESULT CreateAAFFile(
 
 			seg->Release();
 			seg = NULL;
+
+			sclp->Release();
+			sclp = NULL;
 		}
 		
 		// Add the mob to the file.

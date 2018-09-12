@@ -71,6 +71,10 @@
 
 #include "OMUtilities.h"
 
+#ifndef __ImplAAFComponent_h__
+#include "ImplAAFComponent.h"
+#endif
+
 
 aafBool	EqualAUID(const aafUID_t *uid1, const aafUID_t *uid2)
 {
@@ -903,6 +907,19 @@ void wcsconvertFilepathtoURL(wchar_t *filepath, wchar_t *url)
 	delete [] tmp;
 }
 
+AAFRESULT GetOptionalLength(ImplAAFComponent* comp, aafLength_t* len)
+{
+	AAFRESULT hr = comp->GetLength(len);
+	if (hr == AAFRESULT_PROP_NOT_PRESENT)
+	{
+		*len = 0;
+		return AAFRESULT_SUCCESS;
+	}
+	else
+	{
+		return hr;
+	}
+}
 
 /*
 ;;; Local Variables: ***

@@ -45,6 +45,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFPropertyIDs.h"
 #include "ImplAAFTimecode.h"
+#include "AAFUtils.h"
 
 ImplAAFPulldown::ImplAAFPulldown ()
 : _inputSegment(        PID_Pulldown_InputSegment,          L"InputSegment"),
@@ -219,7 +220,7 @@ AAFRESULT STDMETHODCALLTYPE
 			RAISE(AAFRESULT_TIMECODE_NOT_FOUND);
 
 		CHECK(pdwnInput->GetTimecode(&startTC));
-		CHECK(pdwnInput->GetLength(&length));
+		CHECK(GetOptionalLength(pdwnInput, &length));
 		if((startTC.fps != pTimecode->fps) || (startTC.drop != pTimecode->drop))
 			RAISE(AAFRESULT_TIMECODE_NOT_FOUND);
 
@@ -513,7 +514,7 @@ AAFRESULT ImplAAFPulldown::TraverseToClip(aafLength_t length,
 	  *sclp = dynamic_cast<ImplAAFSourceClip*>((ImplAAFSegment*)_inputSegment);
 	  (*sclp)->AcquireReference();
 	  tmpLen = length;
-	  CHECK((*sclp)->GetLength(sclpLen));
+	  CHECK(GetOptionalLength((*sclp), sclpLen));
 	  //sdaigle (jan 18, 2001): changing reverse to "true"
 	  //since we are going back up the source chain...
 	  //reverse = kAAFFalse;

@@ -60,7 +60,6 @@ public:
   ImplAAFSourceClip ();
   virtual ~ImplAAFSourceClip ();
 
-
   //****************
   // Initialize()
   //
@@ -141,6 +140,9 @@ public:
 
 
 public:
+
+	virtual AAFRESULT STDMETHODCALLTYPE Initialize(ImplAAFDataDef * pDataDef,
+					const aafSourceRef_t & sourceRef);
 
 	virtual AAFRESULT TraverseToClip(aafLength_t length,
 					ImplAAFSourceClip **sclp,

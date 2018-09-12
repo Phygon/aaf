@@ -181,9 +181,19 @@ static void CheckTimecode(
     const aafTimecode_t& expectedTimecode)
 {
 	IAAFTimecodeSP pTimecode;
-	checkResult(pUnknown->QueryInterface(IID_IAAFTimecode, (void**)&pTimecode));
+	IAAFSequenceSP pSequence;
+	if (AAFRESULT_SUCCEEDED(pUnknown->QueryInterface(IID_IAAFSequence, (void**)&pSequence)))
+	{
+		IAAFComponentSP pComponent;
+		checkResult(pSequence->GetComponentAt(0, &pComponent));
+		checkResult(pComponent->QueryInterface(IID_IAAFTimecode, (void**)&pTimecode));
+	}
+	else
+	{
+		checkResult(pUnknown->QueryInterface(IID_IAAFTimecode, (void**)&pTimecode));
+	}
 
-	CheckComponentLength(pUnknown, expectedLength);
+	CheckComponentLength(pTimecode, expectedLength);
 
 	aafTimecode_t  timecode = {0, 0, 0};
 	checkResult(pTimecode->GetTimecode(&timecode));
@@ -198,9 +208,19 @@ static void CheckEdgecode(
     const aafEdgecode_t& expectedEdgecode)
 {
 	IAAFEdgecodeSP pEdgecode;
-	checkResult(pUnknown->QueryInterface(IID_IAAFEdgecode, (void**)&pEdgecode));
+	IAAFSequenceSP pSequence;
+	if (AAFRESULT_SUCCEEDED(pUnknown->QueryInterface(IID_IAAFSequence, (void**)&pSequence)))
+	{
+		IAAFComponentSP pComponent;
+		checkResult(pSequence->GetComponentAt(0, &pComponent));
+		checkResult(pComponent->QueryInterface(IID_IAAFEdgecode, (void**)&pEdgecode));
+	}
+	else
+	{
+		checkResult(pUnknown->QueryInterface(IID_IAAFEdgecode, (void**)&pEdgecode));
+	}
 
-	CheckComponentLength(pUnknown, expectedLength);
+	CheckComponentLength(pEdgecode, expectedLength);
 
 	aafEdgecode_t  edgecode = {0, 0, 0, {0}};
 	checkResult(pEdgecode->GetEdgecode(&edgecode));
@@ -1283,10 +1303,7 @@ static HRESULT CreateAAFFile(
 		  checkResult(pSourceMob->AddNilReference (test+1, 0, defs.ddkAAFSound(), audioRate));
 	  }
 
-// TODO: Disabled pending implementation of -1 length support in IAAFComponent (LEPO-3717) amd IAAFSequence (LEPO-3718)
-#if 0
 	  TestAppendEdgecodeSlot(pSourceMob);
-#endif
 
 	  //Add new edgecode slot
 	  checkResult(pSourceMob->AppendEdgecodeSlot(
@@ -1308,10 +1325,7 @@ static HRESULT CreateAAFFile(
 		  mobInfo.edgecodeSlot.edgecode.codeFormat,
 		  mobInfo.edgecodeSlot.edgecode.header));
 
-// TODO: Disabled pending implementation of -1 length support in IAAFComponent (LEPO-3717) amd IAAFSequence (LEPO-3718)
-#if 0
 	  TestAppendTimecodeSlot(pSourceMob);
-#endif
 
 	  //Add timecode slot
 	  checkResult(pSourceMob->AppendTimecodeSlot(

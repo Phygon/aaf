@@ -133,7 +133,7 @@ AAFRESULT STDMETHODCALLTYPE
 		
 		/* Verify that length of still frame is 1 */
 		oneLength = 1;
-		CHECK(stillFrame->GetLength (&stillLength));
+		CHECK(GetOptionalLength(stillFrame, &stillLength));
 		if (oneLength != stillLength)
 		{
 			RAISE(AAFRESULT_STILLFRAME_BADLENGTH);
@@ -575,8 +575,8 @@ AAFRESULT ImplAAFEssenceGroup::ValidateChoice(
 			RAISE(AAFRESULT_INVALID_DATADEF);
 		
 		/* Verify that length of choice matches length of group */
-		CHECK(GetLength (&groupLength));
-		CHECK(choice->GetLength (&newLength));
+		CHECK(GetOptionalLength(this, &groupLength));
+		CHECK(GetOptionalLength(choice, &newLength));
 		if (groupLength != newLength)
 		{
 			RAISE(AAFRESULT_BAD_LENGTH);

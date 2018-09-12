@@ -65,29 +65,8 @@ AAFRESULT STDMETHODCALLTYPE
 	aafLength_t length;
 	hr = pSegment->GetLength(&length);
 
-	// TODO: enable this check when rest of the code properly supports Components without Length
-#if 0
 	// Length property should not be set when Component is attached to StaticMobSlot
 	if (hr != AAFRESULT_PROP_NOT_PRESENT)
-	{
-		return AAFRESULT_INVALID_PARAM;
-	}
-#endif
-
-	// TODO: remove this check when rest of the code properly supports Components without Length
-#if 1
-	// Length property should not be set when Component is attached to StaticMobSlot, but
-	// while rest of the code doesn't properly support Components without Length
-	// at this point in time we can safely block only the unknown length
-	if (AAFRESULT_SUCCEEDED(hr) && (length == AAF_UNKNOWN_LENGTH))
-	{
-		return AAFRESULT_INVALID_PARAM;
-	}
-#endif
-
-	// TODO: remove this check when rest of the code properly supports Components without Length
-	// Temporary solution to forbid 
-	if (AAFRESULT_SUCCEEDED(hr) && (length == AAF_UNKNOWN_LENGTH))
 	{
 		return AAFRESULT_INVALID_PARAM;
 	}

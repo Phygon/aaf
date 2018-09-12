@@ -260,10 +260,6 @@ private:
    bool ContainsNonFillers() const;
    bool ContainsNonEvents() const;
 
-   // Call this when the length property is known to be optional.  It will
-   // set refLenght to zero and return success if the property is not present.
-   static AAFRESULT GetOptionalComponentLength( ImplAAFComponent* pComponent, aafLength_t& refLength );
-
 private:
 	OMStrongReferenceVectorProperty<ImplAAFComponent> _components;
 };

@@ -1160,7 +1160,7 @@ static HRESULT CreateAAFFile(
 
 
 		// PrependSlot
- 		checkResult(defs.cdStaticMobSlot()->
+ 		checkResult(defs.cdTimelineMobSlot()->
 					  CreateInstance(IID_IAAFMobSlot, 
 									 (IUnknown **)&mSlot));		
  		checkResult(defs.cdFiller()->
@@ -1190,7 +1190,7 @@ static HRESULT CreateAAFFile(
 		filler = NULL;
 
 		// AppendSlot
- 		checkResult(defs.cdStaticMobSlot()->
+ 		checkResult(defs.cdTimelineMobSlot()->
 					  CreateInstance(IID_IAAFMobSlot, 
 									 (IUnknown **)&mSlot));		
  		checkResult(defs.cdFiller()->
@@ -1236,7 +1236,7 @@ static HRESULT CreateAAFFile(
 		pComponent->Release();
 		pComponent = NULL;
 
- 		checkResult(defs.cdStaticMobSlot()->
+ 		checkResult(defs.cdTimelineMobSlot()->
 					  CreateInstance(IID_IAAFMobSlot, 
 									 (IUnknown **)&mSlot));		
 

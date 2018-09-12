@@ -38,6 +38,7 @@
 
 #include "aafErr.h"
 #include "AAFResult.h"
+#include "AAFUtils.h"
 
 #include "ImplAAFTimecode.h"
 #include "ImplAAFSequence.h"
@@ -105,7 +106,7 @@ AAFRESULT ImplAAFSegment::AccumulateLength( aafLength_t *length)
 	
 	XPROTECT()
 	  {
-		CHECK(GetLength(&len));
+		CHECK(GetOptionalLength(this, &len));
 		*length += len;
 	  }
 	XEXCEPT
@@ -136,7 +137,7 @@ AAFRESULT ImplAAFSegment::FindSubSegment(aafPosition_t offset,
 	
 	XPROTECT( )
 	{
-		CHECK(GetLength(&segLen));
+		CHECK(GetOptionalLength(this, &segLen));
 		begPos = 0;
 		zero = 0;
 		if (segLen != AAF_UNKNOWN_LENGTH)

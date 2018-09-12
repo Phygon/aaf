@@ -551,7 +551,7 @@ static HRESULT CreateAAFFile(
 		
 		//Create a concrete subclass of mob slot
 		IAAFMobSlotSP spMobSlot;
-		checkResult(defs.cdStaticMobSlot()->
+		checkResult(defs.cdTimelineMobSlot()->
 			CreateInstance(IID_IAAFMobSlot, 
 									   (IUnknown **)&spMobSlot));		
 		

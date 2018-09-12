@@ -91,8 +91,6 @@ AAFRESULT STDMETHODCALLTYPE
   SetSourceMobSlotID( sourceRef.sourceSlotID );
   _startTime = sourceRef.startTime;
 
-
-
   return AAFRESULT_SUCCESS;
 }
 
@@ -320,6 +318,21 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+AAFRESULT STDMETHODCALLTYPE
+ImplAAFSourceClip::Initialize(ImplAAFDataDef * pDataDef,
+	const aafSourceRef_t & sourceRef)
+{
+	if (!pDataDef)
+		return AAFRESULT_NULL_PARAM;
+
+	SetDataDef(pDataDef);
+	SetSourceID(sourceRef.sourceID);
+	SetSourceMobSlotID(sourceRef.sourceSlotID);
+	_startTime = sourceRef.startTime;
+
+	return AAFRESULT_SUCCESS;
+}
+
 
 AAFRESULT ImplAAFSourceClip::TraverseToClip(aafLength_t length,
 											ImplAAFSourceClip **sclp,
@@ -333,7 +346,7 @@ AAFRESULT ImplAAFSourceClip::TraverseToClip(aafLength_t length,
 		*sclp = this;
 		// We are returning a reference to this object so bump the ref count
 		AcquireReference();
-		CHECK((*sclp)->GetLength(sclpLen));
+		CHECK(GetOptionalLength((*sclp), sclpLen));
 		if (length != AAF_UNKNOWN_LENGTH && *sclpLen != AAF_UNKNOWN_LENGTH)
 		{
 			if (length < *sclpLen)

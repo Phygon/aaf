@@ -196,7 +196,7 @@ AAFRESULT STDMETHODCALLTYPE
 			pDictionary->ReleaseReference();
 			pDictionary = NULL;
 
-			CHECK(pSrcClip->Initialize(pDataDef, slotLength, ref));
+			CHECK(pSrcClip->Initialize(pDataDef, ref));
 			CHECK(AppendNewStaticSlot(pSrcClip, masterSlotID, pSlotName, 
 										&pNewStaticSlot));
 
@@ -1071,12 +1071,20 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 		for (loop = 1; loop <= numSlots; loop++)
 		{
 			CHECK(slotIter->NextOne(&slot));
+			// do not update length  when segment is attached to StaticMobSlot
+			if (dynamic_cast<ImplAAFStaticMobSlot*>(slot))
+			{
+				slot->ReleaseReference();
+				slot = NULL;
+				continue;
+			}
+
 			CHECK(slot->GetSegment(&seg));
 			fileSeq = dynamic_cast<ImplAAFSequence*>(seg);
+			// Segment is not a Sequence
 			if (fileSeq == NULL) 
 			{
-				// If it's not a Sequence, make sure it's
-				// a SourceClip.
+				// If it's not a Sequence, make sure it's a SourceClip.
 				sourceClip = dynamic_cast<ImplAAFSourceClip *>(seg);
 				if (sourceClip != NULL)
 				{
@@ -1084,17 +1092,19 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 					CHECK(fileMob->CountSlots(&fileNumSlots));
 					if(fileNumSlots >= 1)
 					{
-						CHECK(fileMob->GetSlots (&fileSlotIter));
+						CHECK(fileMob->GetSlots(&fileSlotIter));
 						CHECK(fileSlotIter->NextOne(&fileSlot));
 						CHECK(fileSlot->GetSegment(&fileSeg));
-						CHECK(fileSeg->GetLength(&endPos));
+						CHECK(GetOptionalLength(fileSeg, &endPos));
 						fileSeg->ReleaseReference();
 						fileSeg = NULL;
 						fileSlotIter->ReleaseReference();
 						fileSlotIter = NULL;
 					}
 					else
+					{
 						fileSlot = NULL;
+					}
 					fileMob->ReleaseReference();
 					fileMob = NULL;
 					CHECK(slot->ConvertToMyRate(endPos, fileSlot, &endPos));
@@ -1103,6 +1113,7 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 						fileSlot->ReleaseReference();
 						fileSlot = NULL;
 					}
+					
 					CHECK(seg->SetLength(endPos));
 				}
 
@@ -1110,10 +1121,14 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 				slot = NULL; 
 				seg->ReleaseReference();
 				seg = NULL;
-			} else {
+			}
+			// Segment is a Sequence
+			else
+			{
 				CHECK(fileSeq->CountComponents(&numComponents));
 				endPos = 0;
-				for (aafUInt32 i = 0 ; i < numComponents ; i++) {
+				for (aafUInt32 i = 0 ; i < numComponents ; i++)
+				{
 					ImplAAFComponent* pComponent = 0;
 					CHECK(fileSeq->GetComponentAt(i, &pComponent));
 					fileClip = dynamic_cast<ImplAAFSourceClip*>(pComponent);
@@ -1125,14 +1140,16 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 							CHECK(fileMob->GetSlots (&fileSlotIter));
 							CHECK(fileSlotIter->NextOne(&fileSlot));
 							CHECK(fileSlot->GetSegment(&fileSeg));
-							CHECK(fileSeg->GetLength(&tmpPos));
+							CHECK(GetOptionalLength(fileSeg, &tmpPos));
 							fileSeg->ReleaseReference();
 							fileSeg = NULL;
 							fileSlotIter->ReleaseReference();
 							fileSlotIter = NULL;
 						}
 						else
+						{ 
 							fileSlot = NULL;
+						}
 						fileMob->ReleaseReference();
 						fileMob = NULL;
 						CHECK(slot->ConvertToMyRate(tmpPos, fileSlot, &tmpPos));
@@ -1145,7 +1162,7 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 						endPos += tmpPos;
 
 					} else {
-						CHECK(pComponent->GetLength(&tmpPos));
+						CHECK(GetOptionalLength(pComponent, &tmpPos));
 						endPos += tmpPos;
 					}
 					pComponent->ReleaseReference();

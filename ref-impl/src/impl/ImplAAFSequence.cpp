@@ -741,7 +741,7 @@ AAFRESULT ImplAAFSequence::FindSubSegment(aafPosition_t offset,
 
 	XPROTECT( )
 	{
-		CHECK(GetLength(&segLen));
+		CHECK(GetOptionalLength(this, &segLen));
 		begPos = 0;
 		zero = 0;
 		if (segLen != AAF_UNKNOWN_LENGTH)
@@ -760,7 +760,7 @@ AAFRESULT ImplAAFSequence::FindSubSegment(aafPosition_t offset,
 				for (aafUInt32 i = 0 ; *found != kAAFTrue && i < n ; i++) 
 				{
 					CHECK(GetComponentAt(i, (ImplAAFComponent**)&seg));
-					CHECK(seg->GetLength(&segLen));
+					CHECK(GetOptionalLength(seg, &segLen));
 					endPos += segLen;
 					if (begPos <= offset &&
 						offset < endPos)
@@ -788,7 +788,7 @@ AAFRESULT ImplAAFSequence::FindSubSegment(aafPosition_t offset,
 				if (n > 0)
 				{
 					CHECK(GetComponentAt(0, (ImplAAFComponent**)&seg));
-					CHECK(seg->GetLength(&segLen));
+					CHECK(GetOptionalLength(seg, &segLen));
 					if (segLen == 0)
 					{
 						*found = kAAFTrue;
@@ -820,7 +820,7 @@ AAFRESULT ImplAAFSequence::FindSubSegment(aafPosition_t offset,
 				for (aafUInt32 i = 0 ; *found != kAAFTrue && i < n ; i++) 
 				{
 					CHECK(GetComponentAt(i, (ImplAAFComponent**)&seg));
-					CHECK(seg->GetLength(&segLen));
+					CHECK(GetOptionalLength(seg, &segLen));
 					if (segLen != AAF_UNKNOWN_LENGTH)
 					{
 						endPos += segLen;
@@ -961,7 +961,7 @@ AAFRESULT ImplAAFSequence::GetMinimumBounds(aafPosition_t rootPos, aafLength_t r
 							&found));
 		if (found)
 		{
-			CHECK(GetOptionalComponentLength(subseg, subsegLen));
+			CHECK(GetOptionalLength(subseg, &subsegLen));
 
 			// TODO:
 			// The existing implementations of GetMinimumBounds() in ImplAAFComponent,
@@ -1091,7 +1091,7 @@ AAFRESULT ImplAAFSequence::TraverseToClip(aafLength_t length,
 
 		*sclp = p_src_clip;
 
-		CHECK((*sclp)->GetLength(sclpLen));
+		CHECK(GetOptionalLength((*sclp), sclpLen));
 		if (length != AAF_UNKNOWN_LENGTH && *sclpLen != AAF_UNKNOWN_LENGTH)
 		{
 			if (length < *sclpLen)
@@ -1273,35 +1273,6 @@ bool ImplAAFSequence::ContainsNonEvents() const
 	return foundNonEvent;
 }
 
-// This is static.
-AAFRESULT ImplAAFSequence::GetOptionalComponentLength( ImplAAFComponent* pComponent, aafLength_t& refLength )
-{
-	AAFRESULT status;
-	aafLength_t length = 0;
-
-	if (pComponent)
-	{
-		status = pComponent->GetLength(&length);
-
-		// Convert this to success
-		if (AAFRESULT_PROP_NOT_PRESENT == status) {
-			refLength = 0;
-			status = AAFRESULT_SUCCESS;
-		}
-
-		if (AAFRESULT_SUCCESS == status) {
-			refLength = length;
-		}
-	}
-	else
-	{
-		status = AAFRESULT_NULL_PARAM;
-	}
-
-	return status;
-}
-
-
 // ImplAAFSequence private - Event sematics
 
 AAFRESULT ImplAAFSequence::CheckTypeSemantics( ImplAAFEvent* pEvent )
@@ -1471,7 +1442,7 @@ AAFRESULT ImplAAFSequence::UpdateSequenceLength()
 	}
 
 	aafLength_t lastLength = 0;
-	status = GetOptionalComponentLength(GetLastComponent(), lastLength);
+	status = GetOptionalLength(GetLastComponent(), &lastLength);
 	if (status != AAFRESULT_SUCCESS)
 		return status;
 
@@ -1576,7 +1547,7 @@ AAFRESULT ImplAAFSequence::UpdateSequenceLengthOnInsert( ImplAAFEvent* pEvent, a
 	}
 
 	aafLength_t lengthNext;
-	status = GetOptionalComponentLength( pEvent, lengthNext );
+	status = GetOptionalLength( pEvent, &lengthNext );
 	if ( AAFRESULT_SUCCESS != status ) {
 		return status;
 	}
@@ -1608,7 +1579,7 @@ AAFRESULT ImplAAFSequence::UpdateSequenceLengthOnInsert( ImplAAFEvent* pEvent, a
 		}
 
 		aafLength_t seqLength;
-		status = GetOptionalComponentLength( this, seqLength );
+		status = GetOptionalLength( this, &seqLength );
 		if ( AAFRESULT_SUCCESS != status ) {
 			return status;
 		}

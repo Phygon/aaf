@@ -925,7 +925,7 @@ AAFRESULT STDMETHODCALLTYPE
 
 			// make a sequence
 			CHECK(pSrcClip->GetSourceReference(&ref));
-			CHECK(pSrcClip->GetLength(&len));
+			CHECK(GetOptionalLength(pSrcClip, &len));
 			
 			HRESULT getFadeHR = pSrcClip->GetFade(&fadeIn, &fadeInType, &fadeInPresent, &fadeOut, &fadeOutType, &fadeOutPresent);
 			if ( getFadeHR != AAFRESULT_PROP_NOT_PRESENT ) {
@@ -1404,8 +1404,7 @@ ImplAAFEssenceAccess::MultiAppend (ImplAAFMasterMob *masterMob,
 					
 					// make a sequence
 					CHECK(pSrcClip->GetSourceReference(&ref));
-					CHECK(pSrcClip->GetLength(&len));
-
+					CHECK(GetOptionalLength(pSrcClip, &len));
 					HRESULT getFadeHR = pSrcClip->GetFade(&fadeIn, &fadeInType, &fadeInPresent, &fadeOut, &fadeOutType, &fadeOutPresent);
 					if ( getFadeHR != AAFRESULT_PROP_NOT_PRESENT ) {
 					  CHECK( getFadeHR );
@@ -1738,7 +1737,8 @@ AAFRESULT STDMETHODCALLTYPE
 		ImplAAFDataDefSP pDataDef;
 		CHECK(seg->GetDataDef(&pDataDef));
 		CHECK(pDataDef->GetAUID(&mediaKind));
-		CHECK(seg->GetLength(&masterMobLength));
+		CHECK(GetOptionalLength(seg, &masterMobLength));
+
 		seg->ReleaseReference();
 		seg = NULL;
 
@@ -2228,7 +2228,7 @@ AAFRESULT STDMETHODCALLTYPE
 		ImplAAFDataDefSP pDataDef;
 		CHECK(seg->GetDataDef(&pDataDef));
 		CHECK(pDataDef->GetAUID(&mediaKind));
-		CHECK(seg->GetLength(&masterMobLength));
+		CHECK(GetOptionalLength(seg, &masterMobLength));
 		seg->ReleaseReference();
 		seg = NULL;
 

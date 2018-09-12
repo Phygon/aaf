@@ -127,12 +127,12 @@ static HRESULT CreateAAFFile(
 			checkResult(sclp->QueryInterface (IID_IAAFSegment, (void **)&seg));
 			
 			// Create a concrete subclass of MobSlot
-			checkResult(defs.cdStaticMobSlot()->
+			checkResult(defs.cdTimelineMobSlot()->
 						CreateInstance(IID_IAAFMobSlot, 
 									   (IUnknown **)&newSlot));		
 			
 			checkResult(newSlot->SetSegment(seg));
-			checkResult(newSlot->SetSlotID(test+1));
+			checkResult(newSlot->SetSlotID(test + 1));;
 			checkResult(newSlot->SetPhysicalNum(test+2));
 			checkResult(newSlot->SetName(slotNames[test]));
 			checkResult(pMob->AppendSlot (newSlot));

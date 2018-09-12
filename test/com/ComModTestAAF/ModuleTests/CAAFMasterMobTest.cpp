@@ -476,18 +476,14 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 				pSeg->Release();
 				pSeg = NULL;
 
-				// TODO: Enable the tape name for -1 length test once SearchSource() is updated to support search across components of unknown (-1) length.
-				if (length != AAF_UNKNOWN_LENGTH)
+				checkResult(pMasterMob->GetTapeNameBufLen(slotID, &bufSize));
+				if (bufSize)
 				{
-					checkResult(pMasterMob->GetTapeNameBufLen(slotID, &bufSize));
-					if (bufSize)
-					{
-						pTapeName = new aafWChar [bufSize];
-						checkExpression(NULL != pTapeName, E_OUTOFMEMORY);
+					pTapeName = new aafWChar [bufSize];
+					checkExpression(NULL != pTapeName, E_OUTOFMEMORY);
 
-						checkResult(pMasterMob->GetTapeName(slotID, pTapeName, bufSize));
-						delete [] pTapeName;
-					}
+					checkResult(pMasterMob->GetTapeName(slotID, pTapeName, bufSize));
+					delete [] pTapeName;
 				}
 
 				checkResult(pMasterMob->GetNumRepresentations(slotID, &numReps));

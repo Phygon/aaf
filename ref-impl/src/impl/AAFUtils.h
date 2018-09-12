@@ -43,6 +43,7 @@
 
 class ImplAAFFile;
 class ImplAAFObject;
+class ImplAAFComponent;
 
 #include "OMExceptions.h"
 #include "OMUtilities.h"
@@ -282,6 +283,10 @@ void wcsconvertFilepathtoURL(wchar_t *filepath, wchar_t *url);
 #else
 #define CHECK_CLIENT_IMPLEMENTED_QI(pUnknown, IID)
 #endif
+
+// Call this when the length property is known to be optional. It will
+// set len to zero and return success if the property is not present.
+AAFRESULT GetOptionalLength(ImplAAFComponent* comp, aafLength_t* len);
 
 
 /************************************************************************

@@ -53,6 +53,7 @@
 #include "OMAssertions.h"
 #include "AAFResult.h"
 #include "aafErr.h"
+#include "AAFUtils.h"
 #include "ImplAAFSmartPointer.h"
 typedef ImplAAFSmartPointer<ImplAAFDictionary> ImplAAFDictionarySP;
 typedef ImplAAFSmartPointer<ImplAAFDataDef>    ImplAAFDataDefSP;
@@ -124,8 +125,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFComponent::SetLength (const aafLength_t & length)
 {
     AAFRESULT aafError = AAFRESULT_SUCCESS;
-	// TODO: do not allow to assign Length when Component is attached to StaticMobSlot
-	if (length >= 0 || (length == AAF_UNKNOWN_LENGTH && _mobSlotType != MobSlotType_Static))
+	if ((length >= 0 || length == AAF_UNKNOWN_LENGTH) && _mobSlotType != MobSlotType_Static)
 		_length = length;
 	else
 		aafError = AAFRESULT_BAD_LENGTH;
@@ -364,8 +364,7 @@ AAFRESULT ImplAAFComponent::SetNewProps(
 	if (! pDataDef)
 	  return AAFRESULT_NULL_PARAM;
 
-	// TODO: do not allow to assign Length when Component is attached to StaticMobSlot
-	if (length >= 0 || (length == AAF_UNKNOWN_LENGTH && _mobSlotType != MobSlotType_Static))
+	if ((length >= 0 || length == AAF_UNKNOWN_LENGTH) && _mobSlotType != MobSlotType_Static)
 	{
 		_length = length;
 		_dataDef = pDataDef;
@@ -407,7 +406,7 @@ AAFRESULT ImplAAFComponent::GetMinimumBounds(aafPosition_t rootPos, aafLength_t 
 		*foundTransition = kAAFFalse;
 		*found = this;
 		AcquireReference(); // We are returning a reference so bump the reference count!
-		CHECK(GetLength(&tmpMinLen));
+		CHECK(GetOptionalLength(this, &tmpMinLen));
 		if (rootLen != AAF_UNKNOWN_LENGTH && tmpMinLen != AAF_UNKNOWN_LENGTH)
 		{
 			if (tmpMinLen < rootLen)

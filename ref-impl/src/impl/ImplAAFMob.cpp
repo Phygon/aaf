@@ -1727,7 +1727,7 @@ AAFRESULT ImplAAFMob::InternalSearchSource(
 		/* Find segment at offset */
 		CHECK(FindSlotBySlotID (trackID,  &track));
 		CHECK(track->FindSegment(offset, pMediaCrit, &rootObj, &srcRate, &diffPos));
-		CHECK(rootObj->GetLength(&cpntLen));
+		CHECK(GetOptionalLength(rootObj, &cpntLen));
 		CHECK(sourceInfo->SetComponent(rootObj));
 		
 		/*** Find leaf object in this track that points to the next mob ***/
@@ -2155,7 +2155,7 @@ AAFRESULT ImplAAFMob::MobFindSource(
 		/* Verify that track and position are valid */
 		CHECK(FindSlotBySlotID (trackID,  &track));
 		CHECK(track->FindSegment(offset, mediaCrit, &rootObj, &srcRate, &diffPos));
-		CHECK(rootObj->GetLength(&tmpLength));
+		CHECK(GetOptionalLength(rootObj, &tmpLength));
 		if (tmpLength == AAF_UNKNOWN_LENGTH)
 		{
 			tmpLength = length;
