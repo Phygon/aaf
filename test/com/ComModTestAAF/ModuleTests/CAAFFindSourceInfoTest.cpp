@@ -141,6 +141,24 @@ static const 	aafMobID_t	TEST3_Source_MobID =
 const aafLength_t TEST3_KnownLength = 465;
 
 
+static const 	aafMobID_t	TEST4_Master_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0xb77f2c9c, 0x70bb, 0x4026, {0xac, 0xf6, 0x71, 0xfb, 0x96, 0x3d, 0x82, 0xd0}}};
+
+static const 	aafMobID_t	TEST4_File_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x8a9e483d, 0x3264, 0x45a0, {0x9e, 0x3c, 0x8a, 0x5b, 0xd4, 0xd2, 0xeb, 0x47}}};
+
+static const 	aafMobID_t	TEST4_Source_MobID =
+{{0x06, 0x0c, 0x2b, 0x34, 0x02, 0x05, 0x11, 0x01, 0x01, 0x00, 0x10, 0x00},
+0x13, 0x00, 0x00, 0x00,
+{0x7456da8c, 0x359c, 0x4e95, {0xbc, 0x69, 0x95, 0x47, 0x73, 0x3, 0x2, 0x18}}};
+
+const aafLength_t TEST4_Length = 55;
+
+
 // convenient error handlers.
 inline void checkResult(HRESULT r)
 {
@@ -560,7 +578,7 @@ static HRESULT CreateTestMobChain3(
 			(IUnknown **)&pMMob));
 		checkResult(pMMob->SetMobID(TEST3_Master_MobID));
 		checkResult(pMMob->QueryInterface(IID_IAAFMasterMob, (void**)&pMasterMob));
-		
+
 		const aafRational_t editRate = {48000, 1};
 		aafSlotID_t slotID = 0;
 
@@ -728,6 +746,126 @@ static HRESULT CreateTestMobChain3(
 	return hr;
 }
 
+static HRESULT CreateTestMobChain4(
+	IAAFHeader* pHeader)
+{
+	HRESULT			hr = S_OK;
+
+	try
+	{
+		IAAFSmartPointer<IAAFDictionary>  pDictionary;
+		checkResult(pHeader->GetDictionary(&pDictionary));
+		
+		CAAFBuiltinDefs defs (pDictionary);
+		
+		// Create a Physical Source Mob
+		IAAFSmartPointer<IAAFMob>		pSMob;
+		checkResult(defs.cdSourceMob()->
+			CreateInstance(IID_IAAFMob, 
+			(IUnknown **)&pSMob));
+		checkResult(pSMob->SetMobID(TEST4_Source_MobID));
+		IAAFSmartPointer<IAAFSourceMob>		pSourceMob;
+		checkResult(pSMob->QueryInterface(IID_IAAFSourceMob, (void**)&pSourceMob));
+
+		IAAFSmartPointer<IAAFImportDescriptor> pImportDescriptor;
+		checkResult(defs.cdImportDescriptor()->
+			CreateInstance(IID_IAAFImportDescriptor, 
+			(IUnknown **)&pImportDescriptor));
+		checkResult(pImportDescriptor->Initialize());
+		IAAFSmartPointer<IAAFEssenceDescriptor> pDescriptor;
+		checkResult(pImportDescriptor->QueryInterface(IID_IAAFEssenceDescriptor, (void**)&pDescriptor));
+		checkResult(pSourceMob->SetEssenceDescriptor(pDescriptor));
+
+		// Create a File Source Mob
+		IAAFSmartPointer<IAAFMob>		pFMob;
+		checkResult(defs.cdSourceMob()->
+			CreateInstance(IID_IAAFMob, 
+			(IUnknown **)&pFMob));
+		checkResult(pFMob->SetMobID(TEST4_File_MobID));
+		IAAFSmartPointer<IAAFSourceMob>		pFileMob;
+		checkResult(pFMob->QueryInterface(IID_IAAFSourceMob, (void**)&pFileMob));
+
+		IAAFSmartPointer<IAAFAIFCDescriptor> pAIFCDescriptor;
+		checkResult(defs.cdAIFCDescriptor()->
+			CreateInstance(IID_IAAFAIFCDescriptor, 
+			(IUnknown **)&pAIFCDescriptor));	
+		checkResult(pAIFCDescriptor->SetSummary(5, (unsigned char*)"TEST"));
+		checkResult(pAIFCDescriptor->QueryInterface(IID_IAAFEssenceDescriptor, (void**)&pDescriptor));
+		checkResult(pFileMob->SetEssenceDescriptor(pDescriptor));
+
+		// Create a Master Mob
+		IAAFSmartPointer<IAAFMob>		pMMob;
+		checkResult(defs.cdMasterMob()->
+			CreateInstance(IID_IAAFMob, 
+			(IUnknown **)&pMMob));
+		checkResult(pMMob->SetMobID(TEST4_Master_MobID));
+		IAAFSmartPointer<IAAFMasterMob>		pMasterMob;
+		checkResult(pMMob->QueryInterface(IID_IAAFMasterMob, (void**)&pMasterMob));
+		
+		const aafRational_t editRate = {48000, 1};
+		const aafSlotID_t slotID = 1;
+
+		// Add Physical Source Mob Slot
+		checkResult(pSourceMob->AddNilReference(slotID, TEST4_Length, defs.ddPicture(), editRate));
+
+		// Add File Source Mob Slot
+		const aafSourceRef_t physicalSourceRef = {TEST4_Source_MobID, slotID, 0};
+		checkResult(pFileMob->NewPhysSourceRef(editRate, slotID, defs.ddSound(), physicalSourceRef, TEST4_Length));
+
+		//
+		// Add Master Source Mob Slot
+		//
+
+		// Create SourceClip as a Choice in EssenceGroup
+		IAAFSmartPointer<IAAFSourceClip>   pSourceClip1;
+		checkResult(defs.cdSourceClip()->CreateInstance(IID_IAAFSourceClip, (IUnknown **)&pSourceClip1));
+		aafSourceRef_t sourceRef1 = {TEST4_File_MobID, slotID, 25};
+		checkResult(pSourceClip1->Initialize(defs.ddSound(), TEST4_Length, sourceRef1));
+
+		// Create another SourceClip as a Choice in EssenceGroup.
+		// (This is one is fake as it references non-existing slot but that's sufficient for purposes of this test.)
+		IAAFSmartPointer<IAAFSourceClip>   pSourceClip2;
+		checkResult(defs.cdSourceClip()->CreateInstance(IID_IAAFSourceClip, (IUnknown **)&pSourceClip2));
+		aafSourceRef_t sourceRef2 = {TEST4_File_MobID, slotID+1, 25};
+		checkResult(pSourceClip2->Initialize(defs.ddSound(), TEST4_Length, sourceRef2));
+
+		// Create EssenceGroup
+		IAAFSmartPointer<IAAFEssenceGroup> pEssenceGroup;
+		checkResult(defs.cdEssenceGroup()->CreateInstance(IID_IAAFEssenceGroup, (IUnknown **)&pEssenceGroup));
+		IAAFSmartPointer<IAAFComponent> pEssenceGroupComponent;
+		checkResult(pEssenceGroup->QueryInterface(IID_IAAFComponent, (void**)&pEssenceGroupComponent));
+		checkResult(pEssenceGroupComponent->SetDataDef(defs.ddSound()));
+		checkResult(pEssenceGroupComponent->SetLength(TEST4_Length));
+
+		// Add Choices to the EssenceGroup
+		IAAFSmartPointer<IAAFSegment> pChoice1;
+		checkResult(pSourceClip1->QueryInterface(IID_IAAFSegment, (void**)&pChoice1));
+		checkResult(pEssenceGroup->AppendChoice(pChoice1));
+		IAAFSmartPointer<IAAFSegment> pChoice2;
+		checkResult(pSourceClip2->QueryInterface(IID_IAAFSegment, (void**)&pChoice2));
+		checkResult(pEssenceGroup->AppendChoice(pChoice2));
+
+		// Add Master Mob Slot with the EssenceGroup as the Segment
+		IAAFSmartPointer<IAAFMob> pMob;
+		checkResult(pMasterMob->QueryInterface(IID_IAAFMob, (void**)&pMob));
+		IAAFSmartPointer<IAAFSegment>	pEssenceGroupSegment;
+		checkResult(pEssenceGroup->QueryInterface(IID_IAAFSegment, (void**)&pEssenceGroupSegment));
+		IAAFSmartPointer<IAAFTimelineMobSlot>	pSlot;
+		checkResult(pMob->AppendNewTimelineSlot(editRate, pEssenceGroupSegment, slotID, L"TEST", 0, &pSlot));
+
+		// Add mobs to the file
+		checkResult(pHeader->AddMob(pSMob));
+		checkResult(pHeader->AddMob(pFMob));
+		checkResult(pHeader->AddMob(pMMob));
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+	
+	return hr;
+}
+
 static HRESULT CreateAAFFile(
     aafWChar * pFileName,
     aafUID_constref fileKind,
@@ -756,6 +894,7 @@ static HRESULT CreateAAFFile(
 		checkResult(CreateTestMobChain1(pHeader));
 		checkResult(CreateTestMobChain2(pHeader));
 		checkResult(CreateTestMobChain3(pHeader));
+		checkResult(CreateTestMobChain4(pHeader));
 	}
 	catch (HRESULT& rResult)
 	{
@@ -1149,6 +1288,91 @@ static HRESULT ValidateTestMobChain3(IAAFHeader* pHeader)
 	return hr;
 }
 
+static HRESULT ValidateTestMobChain4(IAAFHeader* pHeader)
+{
+	IAAFSmartPointer<IEnumAAFMobs>	pMobIter;
+	IAAFSmartPointer<IAAFMob>		pMob;
+	IAAFSmartPointer<IAAFMasterMob>		pMasterMob;
+	IAAFSmartPointer<IEnumAAFMobSlots>	pSlotIter;
+	IAAFSmartPointer<IAAFMobSlot>		pSlot;
+	IAAFSmartPointer<IAAFSearchSource>  pSearchSource;
+	IAAFSmartPointer<IAAFFindSourceInfo>  pSourceInfo;
+	struct
+	{
+		aafPosition_t offset;
+		AAFRESULT status;
+		aafPosition_t start;
+		aafLength_t length;
+	} expectedResults[][2] = {
+		// Slot 1
+		{
+			{0,						S_OK,							25,						TEST4_Length},
+			{TEST4_Length+100,		AAFRESULT_TRAVERSAL_NOT_POSS,	0,						TEST4_Length},
+		},
+	};
+
+	HRESULT			hr = S_OK;
+	
+	try
+	{
+		// Do not fail the test if the mob not found. It most likely means
+		// that the file being validated comes from an earlier versin of
+		// the test. Even if there's an issue with getting a mob it is not
+		// the purpose of this test to detect such issues.
+		if (AAFRESULT_SUCCEEDED(pHeader->LookupMob(TEST4_Master_MobID, &pMob)))
+		{
+			const size_t expectedSlotCount = sizeof(expectedResults) / sizeof(expectedResults[0]);
+
+			checkResult( pMob->QueryInterface(IID_IAAFSearchSource, (void**)&pSearchSource) );
+			checkResult(pMob->GetSlots(&pSlotIter));
+			while (AAFRESULT_SUCCEEDED(pSlotIter->NextOne(&pSlot)))
+			{
+				aafSlotID_t slotID = 0;
+				checkResult(pSlot->GetSlotID(&slotID));
+				if (slotID-1 > expectedSlotCount)
+				{
+					// Slot from the future
+					continue;
+				}
+
+				const size_t count = sizeof(expectedResults[0]) / sizeof(expectedResults[0][0]);
+				for (size_t i=0; i<count; i++)
+				{
+					const aafPosition_t offset = expectedResults[slotID-1][i].offset;
+					const HRESULT expectedStatus = expectedResults[slotID-1][i].status;
+					const aafLength_t expectedStart = expectedResults[slotID-1][i].start;
+					const aafLength_t expectedLength = expectedResults[slotID-1][i].length;
+					HRESULT status = pSearchSource->SearchSource(
+						slotID,
+						offset,
+						kAAFPhysicalMob,
+						NULL, //don't care about Media Criteria
+						NULL, //don't care about operation choice
+						&pSourceInfo);
+					checkExpression(status == expectedStatus, AAFRESULT_TEST_FAILED);
+					if (expectedStatus == S_OK)
+					{
+						aafSourceRef_t sourceRef;
+						checkResult(pSourceInfo->GetSourceReference(&sourceRef));
+						checkExpression(sourceRef.sourceID == TEST4_Source_MobID, AAFRESULT_TEST_FAILED);
+						checkExpression(sourceRef.sourceSlotID == slotID, AAFRESULT_TEST_FAILED);
+						checkExpression(sourceRef.startTime == expectedStart, AAFRESULT_TEST_FAILED);
+						aafLength_t length = -233;
+						checkResult(pSourceInfo->GetLength(&length));
+						checkExpression(length == expectedLength, AAFRESULT_TEST_FAILED);
+					}
+				}
+			}
+		}
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+	
+	return hr;
+}
+
 static HRESULT ReadAAFFile(aafWChar* pFileName)
 {
 	IAAFFile*		pFile = NULL;
@@ -1169,6 +1393,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
         //checkResult(ValidateTestMobChain1(pHeader));
         checkResult(ValidateTestMobChain2(pHeader));
         checkResult(ValidateTestMobChain3(pHeader));
+        checkResult(ValidateTestMobChain4(pHeader));
 	}
 	catch (HRESULT& rResult)
 	{

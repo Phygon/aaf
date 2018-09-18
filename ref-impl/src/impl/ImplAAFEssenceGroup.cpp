@@ -628,7 +628,6 @@ AAFRESULT GetSegmentSelectInfo(ImplAAFSegment* segment, aafSelectInfo_t* selectI
 	ImplAAFSourceClip		*sclp = NULL;
 	ImplAAFComponent		*sequenceComponent = NULL;
 	ImplAAFMob				*mob = NULL;
-	ImplAAFEssenceAccess	*access = NULL;
 
 	XPROTECT()
 	{
@@ -642,17 +641,20 @@ AAFRESULT GetSegmentSelectInfo(ImplAAFSegment* segment, aafSelectInfo_t* selectI
 		{
 			ImplAAFSequence* sequence = dynamic_cast<ImplAAFSequence*>(segment);
 
-			// Attempt to find first source clip
-			aafUInt32 count = 0;
-			CHECK(sequence->CountComponents(&count));
-			for(aafUInt32 i = 0; i < count; i++)
+			if(sequence)
 			{
-				CHECK(sequence->GetComponentAt(i, &sequenceComponent));
-				sclp = dynamic_cast<ImplAAFSourceClip*>(sequenceComponent);
-				if(sclp != NULL)
-					break;
-				sequenceComponent->ReleaseReference();
-				sequenceComponent = NULL;
+				// Attempt to find first source clip
+				aafUInt32 count = 0;
+				CHECK(sequence->CountComponents(&count));
+				for(aafUInt32 i = 0; i < count; i++)
+				{
+					CHECK(sequence->GetComponentAt(i, &sequenceComponent));
+					sclp = dynamic_cast<ImplAAFSourceClip*>(sequenceComponent);
+					if(sclp != NULL)
+						break;
+					sequenceComponent->ReleaseReference();
+					sequenceComponent = NULL;
+				}
 			}
 		}
 
@@ -663,17 +665,20 @@ AAFRESULT GetSegmentSelectInfo(ImplAAFSegment* segment, aafSelectInfo_t* selectI
 			if(fileMob == NULL)
 				RAISE(AAFRESULT_INCONSISTANCY);
 
-			access = (ImplAAFEssenceAccess *)CreateImpl (CLSID_AAFEssenceAccess);
-			CHECK(access->GetSelectInfo (fileMob, selectInfo))
+			// Default to 'do not know' values, which used to be in an old
+			// implementation of ImplAAFEssenceAccess::GetSelectInfo().
+			// TODO: Implement proper mechanism for deriving essence
+			// selection criteria.
+			selectInfo->hwAssisted = 0;
+			selectInfo->isNative = 0;
+			selectInfo->willHandleMDES = 0;
+			selectInfo->relativeLoss = 0;
+			selectInfo->avgBitsPerSec = 0;
+			selectInfo->hwAssisted = 0;
+			selectInfo->isNative = 0;
+			selectInfo->willHandleMDES = 0;
+			selectInfo->avgBitsPerSec = 0;
 
-			//sdaigle: Don't forget to release objects not used anymore.
-			if( access )
-			{
-				access->ReleaseReference();
-				access = NULL;
-			}
-
-			//sdaigle: Don't forget to release objects not used anymore.
 			if( mob )
 			{
 				mob->ReleaseReference();
@@ -699,11 +704,6 @@ AAFRESULT GetSegmentSelectInfo(ImplAAFSegment* segment, aafSelectInfo_t* selectI
 		{
 			sequenceComponent->ReleaseReference();
 			sequenceComponent = NULL;
-		}
-		if( access )
-		{
-			access->ReleaseReference();
-			access = NULL;
 		}
 		if( mob )
 		{

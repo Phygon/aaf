@@ -2586,6 +2586,8 @@ AAFRESULT ImplAAFEssenceAccess::SetEssenceDestination(
 // Sets which flavour of the codec ID is to be used.
 AAFRESULT ImplAAFEssenceAccess::SetEssenceCodecFlavour(aafUID_t flavour)
 {
+	aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
+
 	IAAFEssenceCodec2	*codec2 = NULL;
 	HRESULT hr = _codec->QueryInterface(IID_IAAFEssenceCodec2, (void **)&codec2);
 
@@ -2662,6 +2664,7 @@ AAFRESULT STDMETHODCALLTYPE
 	aafAssert(buffer != NULL, _mainFile, AAFRESULT_BADDATAADDRESS);
 	aafAssert((_openType == kAAFCreated) ||
 		  (_openType == kAAFAppended), _mainFile, AAFRESULT_MEDIA_OPENMODE);
+	aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
 	
   XPROTECT()
   {
@@ -2769,6 +2772,8 @@ AAFRESULT STDMETHODCALLTYPE
 	ImplAAFPluginManager *plugins = NULL;
 
 	aafAssert(numCh != NULL, _mainFile, AAFRESULT_NULL_PARAM);
+	aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
+
 	XPROTECT()
 	{
 		plugins = ImplAAFContext::GetInstance()->GetPluginManager();
@@ -2829,8 +2834,8 @@ AAFRESULT STDMETHODCALLTYPE
 	IUnknown				*iUnk = NULL;
 	IAAFSourceMob			*iFileMob = NULL;
 
-	if (NULL == fileMob || NULL == pSelectInfo)
-    return (AAFRESULT_NULL_PARAM);
+	aafAssert(NULL == fileMob || NULL == pSelectInfo, _mainFile, AAFRESULT_NULL_PARAM);
+	aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
 
 	XPROTECT()
 	{
@@ -2869,6 +2874,7 @@ AAFRESULT STDMETHODCALLTYPE
 {
 	aafAssert(pMediaKind != NULL, main, AAFRESULT_NULL_PARAM);
 	aafAssert(maxSize != NULL, main, AAFRESULT_NULL_PARAM);
+	aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
 
 	XPROTECT()
 	{
@@ -3198,6 +3204,8 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceAccess::GetFileFormat(ImplAAFEssenceFormat * opsTemplate,
          ImplAAFEssenceFormat ** opsResult)
 {
+	aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
+
 	IAAFEssenceFormat	*iFormat = NULL, *iResultFormat = NULL;
 	IUnknown			*iUnknown = NULL;
     IAAFRoot *			iObj = NULL;
@@ -3249,6 +3257,8 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceAccess::GetFileFormatParameterList (ImplAAFEssenceFormat **opsResult)
 {
+	aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
+
 	IAAFEssenceFormat	*iResultFormat = NULL;
     IAAFRoot *			iObj = NULL;
     ImplAAFRoot *		arg;
@@ -3281,6 +3291,8 @@ AAFRESULT STDMETHODCALLTYPE
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceAccess::PutFileFormat (ImplAAFEssenceFormat *ops)
 {
+	aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
+
 	IAAFEssenceFormat	*iFormat = NULL;
 	IUnknown			*iUnknown;
 
@@ -3329,13 +3341,14 @@ AAFRESULT STDMETHODCALLTYPE
                            ImplAAFSourceMob *mob,
                            aafBool*result)
 {
+	aafAssert(mob != NULL, _mainFile, AAFRESULT_NULL_PARAM);
+	aafAssert(result != NULL, _mainFile, AAFRESULT_NULL_PARAM);
+	aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
+
 	ImplAAFDictionary		*dict = NULL;	
 	ImplAAFPluginDef	*desc = NULL;
 	aafUID_t				descID;
 
-	if(result == NULL)
-		return AAFRESULT_NULL_PARAM;
-	
 	*result = kAAFFalse;
 	XPROTECT()
 	{
@@ -3376,6 +3389,8 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFEssenceAccess::GetCodecName (aafUInt32 namelen,
                            wchar_t *  name)
 {
+	aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
+
 //	IAAFDefObject	*def = NULL;
 	
 	XPROTECT()
@@ -3564,6 +3579,8 @@ ImplAAFEssenceAccess::CreateContainerDef (ImplAAFHeader *head)
 AAFRESULT
 ImplAAFEssenceAccess::CreateCodecDef (ImplAAFHeader *head, const aafUID_t & codecID, IAAFPluginDef **ppPluginDesc)
 {
+	aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
+
 	IAAFPlugin					*plug = NULL;
 	ImplAAFCodecDef				*codecImpl = NULL;
 	IAAFDefObject				*def = NULL;
@@ -3919,6 +3936,8 @@ ImplAAFEssenceAccess::CreateFileMobEx (ImplAAFHeader *       newHead,
 									 aafEnumEssenceTypes  Essencetype,
 									 ImplAAFSourceMob **   result)
 {
+	aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
+
 	ImplAAFDictionary	*dict = NULL;
 	ImplAAFContainerDef	*container = NULL;
 	ImplAAFCodecDef		*codecDef = NULL;
@@ -4044,6 +4063,8 @@ ImplAAFEssenceAccess::CreateFileMobEx (ImplAAFHeader *       newHead,
 //
 AAFRESULT ImplAAFEssenceAccess::InstallEssenceAccessIntoCodec()
 {
+  aafAssert(_codec != NULL, _mainFile, AAFRESULT_INTERNAL_ERROR);
+
   AAFRESULT rc = AAFRESULT_SUCCESS;
   IUnknown *iUnk;
   IAAFEssenceAccess *iAccess = NULL;
