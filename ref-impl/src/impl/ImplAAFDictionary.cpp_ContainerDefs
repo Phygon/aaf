@@ -85,6 +85,11 @@ InitContainerDefinition (
   L"");
 
 InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_PictureOnly_Bogus, 
+  L"ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_PictureOnly_Bogus", 
+  L"");
+
+InitContainerDefinition (
   kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_DefinedTemplate, 
   L"ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_DefinedTemplate", 
   L"");
@@ -97,6 +102,11 @@ InitContainerDefinition (
 InitContainerDefinition (
   kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly, 
   L"ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly_Bogus, 
+  L"ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly_Bogus", 
   L"");
 
 InitContainerDefinition (
@@ -115,6 +125,11 @@ InitContainerDefinition (
   L"");
 
 InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_PictureOnly_Bogus, 
+  L"ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_PictureOnly_Bogus", 
+  L"");
+
+InitContainerDefinition (
   kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_DefinedTemplate, 
   L"ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_DefinedTemplate", 
   L"");
@@ -127,6 +142,11 @@ InitContainerDefinition (
 InitContainerDefinition (
   kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly, 
   L"ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly_Bogus, 
+  L"ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly_Bogus", 
   L"");
 
 InitContainerDefinition (
@@ -145,6 +165,11 @@ InitContainerDefinition (
   L"");
 
 InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_PictureOnly_Bogus, 
+  L"ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_PictureOnly_Bogus", 
+  L"");
+
+InitContainerDefinition (
   kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_DefinedTemplate, 
   L"ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_DefinedTemplate", 
   L"");
@@ -157,6 +182,11 @@ InitContainerDefinition (
 InitContainerDefinition (
   kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly, 
   L"ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly_Bogus, 
+  L"ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly_Bogus", 
   L"");
 
 InitContainerDefinition (
@@ -217,6 +247,11 @@ InitContainerDefinition (
 InitContainerDefinition (
   kAAFContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps, 
   L"ContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps_Bogus, 
+  L"ContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps_Bogus", 
   L"");
 
 InitContainerDefinition (
@@ -300,13 +335,33 @@ InitContainerDefinition (
   L"");
 
 InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Clipwrapped_DVbased_UndefinedSource_Bogus, 
+  L"ContainerDef_MXFGC_Clipwrapped_DVbased_UndefinedSource_Bogus", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_MPEGES_AudioStream0_SID_Node, 
+  L"ContainerDef_MXFGC_MPEGES_AudioStream0_SID_Node", 
+  L"");
+
+InitContainerDefinition (
   kAAFContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID, 
   L"ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID", 
   L"");
 
 InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID_Bogus, 
+  L"ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID_Bogus", 
+  L"");
+
+InitContainerDefinition (
   kAAFContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID, 
   L"ContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID_Bogus, 
+  L"ContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID_Bogus", 
   L"");
 
 InitContainerDefinition (
@@ -395,8 +450,18 @@ InitContainerDefinition (
   L"");
 
 InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Framewrapped_Alaw_Audio_Bogus, 
+  L"ContainerDef_MXFGC_Framewrapped_Alaw_Audio_Bogus", 
+  L"");
+
+InitContainerDefinition (
   kAAFContainerDef_MXFGC_Clipwrapped_Alaw_Audio, 
   L"ContainerDef_MXFGC_Clipwrapped_Alaw_Audio", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Clipwrapped_Alaw_Audio_Bogus, 
+  L"ContainerDef_MXFGC_Clipwrapped_Alaw_Audio_Bogus", 
   L"");
 
 InitContainerDefinition (
@@ -405,8 +470,163 @@ InitContainerDefinition (
   L"");
 
 InitContainerDefinition (
-  kAAFContainerDef_MXFGC_Clipwrapped_AVCbytestream_VideoStream0_SID, 
-  L"ContainerDef_MXFGC_Clipwrapped_AVCbytestream_VideoStream0_SID", 
+  kAAFContainerDef_MXFGC_Customwrapped_Alaw_Audio_Bogus, 
+  L"ContainerDef_MXFGC_Customwrapped_Alaw_Audio_Bogus", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_JPEG2000_FU_Framewrapped_Undefined_Interlace_Picture_Element, 
+  L"ContainerDef_MXFGC_JPEG2000_FU_Framewrapped_Undefined_Interlace_Picture_Element", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_JPEG2000_Cn_Clipwrapped_Picture_Element, 
+  L"ContainerDef_MXFGC_JPEG2000_Cn_Clipwrapped_Picture_Element", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_JPEG2000_I1_Interlaced_Frame_1_field_KLV, 
+  L"ContainerDef_MXFGC_JPEG2000_I1_Interlaced_Frame_1_field_KLV", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_JPEG2000_I2_Interlaced_Frame_2_fields_KLV, 
+  L"ContainerDef_MXFGC_JPEG2000_I2_Interlaced_Frame_2_fields_KLV", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_JPEG2000_F1_Fieldwrapped_Picture_Element, 
+  L"ContainerDef_MXFGC_JPEG2000_F1_Fieldwrapped_Picture_Element", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_JPEG2000_P1_Framewrapped_Picture_Element, 
+  L"ContainerDef_MXFGC_JPEG2000_P1_Framewrapped_Picture_Element", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Generic_VBI_Data_Mapping_Undefined_Payload, 
+  L"ContainerDef_MXFGC_Generic_VBI_Data_Mapping_Undefined_Payload", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload, 
+  L"ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload_Bogus, 
+  L"ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload_Bogus", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Framewrapped_AVCNALUnitStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_Framewrapped_AVCNALUnitStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID_Bogus, 
+  L"ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID_Bogus", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomStripewrapped_AVCNALUnitStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomStripewrapped_AVCNALUnitStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomPESwrapped_AVCNALUnitStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomPESwrapped_AVCNALUnitStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCNALUnitStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCNALUnitStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomSplicewrapped_AVCNALUnitStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomSplicewrapped_AVCNALUnitStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomClosedGOPwrapped_AVCNALUnitStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCNALUnitStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomSlavewrapped_AVCNALUnitStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomSlavewrapped_AVCNALUnitStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Fieldwrapped_AVCNALUnitStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_Fieldwrapped_AVCNALUnitStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCNALUnitStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCNALUnitStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Framewrapped_AVCByteStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_Framewrapped_AVCByteStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID_Bogus, 
+  L"ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID_Bogus", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomStripewrapped_AVCByteStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomStripewrapped_AVCByteStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomPESwrapped_AVCByteStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomPESwrapped_AVCByteStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCByteStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCByteStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomSplicewrapped_AVCByteStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomSplicewrapped_AVCByteStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomClosedGOPwrapped_AVCByteStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCByteStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomSlavewrapped_AVCByteStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomSlavewrapped_AVCByteStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_Fieldwrapped_AVCByteStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_Fieldwrapped_AVCByteStream_VideoStream0_SID", 
+  L"");
+
+InitContainerDefinition (
+  kAAFContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCByteStream_VideoStream0_SID, 
+  L"ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCByteStream_VideoStream0_SID", 
   L"");
 
 InitContainerDefinition (

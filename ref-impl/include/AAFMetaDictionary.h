@@ -12456,6 +12456,26 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
         0x0201, 0x017F,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
   AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_PictureOnly_Bogus,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_PictureOnly_Bogus,"",""), 
+      // {0D010301-0201-017F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.01.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x017F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_PictureOnly_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0201-017F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.01.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x017F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_PictureOnly_Bogus,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_PictureOnly_Bogus,"",""), 
+      // {0D010301-0201-017F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.01.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x017F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_DefinedTemplate,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_DefinedTemplate,"",""), 
       // {0D010301-0201-0201-060E-2B3404010101}
       // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.02.01
@@ -12515,6 +12535,26 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
       AAF_LITERAL_AUID(0x0D010301,
         0x0201, 0x027F,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly_Bogus,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly_Bogus,"",""), 
+      // {0D010301-0201-027F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.02.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x027F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0201-027F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.02.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x027F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly_Bogus,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly_Bogus,"",""), 
+      // {0D010301-0201-027F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.02.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x027F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
   AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_DefinedTemplate,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_DefinedTemplate,"",""), 
       // {0D010301-0201-0301-060E-2B3404010101}
@@ -12576,6 +12616,26 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
         0x0201, 0x037F,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
   AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_PictureOnly_Bogus,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_PictureOnly_Bogus,"",""), 
+      // {0D010301-0201-037F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.03.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x037F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_PictureOnly_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0201-037F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.03.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x037F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_PictureOnly_Bogus,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_PictureOnly_Bogus,"",""), 
+      // {0D010301-0201-037F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.03.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x037F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_DefinedTemplate,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_DefinedTemplate,"",""), 
       // {0D010301-0201-0401-060E-2B3404010101}
       // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.04.01
@@ -12635,6 +12695,26 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
       AAF_LITERAL_AUID(0x0D010301,
         0x0201, 0x047F,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly_Bogus,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly_Bogus,"",""), 
+      // {0D010301-0201-047F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.04.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x047F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0201-047F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.04.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x047F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly_Bogus,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly_Bogus,"",""), 
+      // {0D010301-0201-047F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.04.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x047F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
   AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_DefinedTemplate,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_DefinedTemplate,"",""), 
       // {0D010301-0201-0501-060E-2B3404010101}
@@ -12696,6 +12776,26 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
         0x0201, 0x057F,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
   AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_PictureOnly_Bogus,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_PictureOnly_Bogus,"",""), 
+      // {0D010301-0201-057F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.05.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x057F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_PictureOnly_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0201-057F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.05.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x057F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_PictureOnly_Bogus,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_PictureOnly_Bogus,"",""), 
+      // {0D010301-0201-057F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.05.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x057F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_DefinedTemplate,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_DefinedTemplate,"",""), 
       // {0D010301-0201-0601-060E-2B3404010101}
       // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.06.01
@@ -12755,6 +12855,26 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
       AAF_LITERAL_AUID(0x0D010301,
         0x0201, 0x067F,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly_Bogus,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly_Bogus,"",""), 
+      // {0D010301-0201-067F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.06.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x067F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0201-067F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.06.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x067F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly_Bogus,ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly_Bogus,"",""), 
+      // {0D010301-0201-067F-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.01.06.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0201, 0x067F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
   AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_IECDV_525x5994I_25Mbps,ContainerDef_MXFGC_Framewrapped_IECDV_525x5994I_25Mbps,"",""), 
       // {0D010301-0202-0101-060E-2B3404010101}
@@ -12995,6 +13115,26 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
       AAF_LITERAL_AUID(0x0D010301,
         0x0202, 0x4002,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps_Bogus,ContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps_Bogus,"",""), 
+      // {0D010301-0202-4002-060E-2B3404010102}
+      // 06.0E.2B.34.04.01.01.02.0D.01.03.01.02.02.40.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0202, 0x4002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0202-4002-060E-2B3404010102}
+      // 06.0E.2B.34.04.01.01.02.0D.01.03.01.02.02.40.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0202, 0x4002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps_Bogus,ContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps_Bogus,"",""), 
+      // {0D010301-0202-4002-060E-2B3404010102}
+      // 06.0E.2B.34.04.01.01.02.0D.01.03.01.02.02.40.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0202, 0x4002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
   AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_DVbased_625x50I_25Mbps,ContainerDef_MXFGC_Framewrapped_DVbased_625x50I_25Mbps,"",""), 
       // {0D010301-0202-4101-060E-2B3404010101}
@@ -13316,6 +13456,46 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
         0x0202, 0x7F02,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
   AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_DVbased_UndefinedSource_Bogus,ContainerDef_MXFGC_Clipwrapped_DVbased_UndefinedSource_Bogus,"",""), 
+      // {0D010301-0202-7F02-060E-2B3404010102}
+      // 06.0E.2B.34.04.01.01.02.0D.01.03.01.02.02.7F.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0202, 0x7F02,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Clipwrapped_DVbased_UndefinedSource_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0202-7F02-060E-2B3404010102}
+      // 06.0E.2B.34.04.01.01.02.0D.01.03.01.02.02.7F.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0202, 0x7F02,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_DVbased_UndefinedSource_Bogus,ContainerDef_MXFGC_Clipwrapped_DVbased_UndefinedSource_Bogus,"",""), 
+      // {0D010301-0202-7F02-060E-2B3404010102}
+      // 06.0E.2B.34.04.01.01.02.0D.01.03.01.02.02.7F.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0202, 0x7F02,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_MPEGES_AudioStream0_SID_Node,ContainerDef_MXFGC_MPEGES_AudioStream0_SID_Node,"",""), 
+      // {0D010301-0204-4000-060E-2B3404010102}
+      // 06.0E.2B.34.04.01.01.02.0D.01.03.01.02.04.40.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0204, 0x4000,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_MPEGES_AudioStream0_SID_Node")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0204-4000-060E-2B3404010102}
+      // 06.0E.2B.34.04.01.01.02.0D.01.03.01.02.04.40.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0204, 0x4000,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_MPEGES_AudioStream0_SID_Node,ContainerDef_MXFGC_MPEGES_AudioStream0_SID_Node,"",""), 
+      // {0D010301-0204-4000-060E-2B3404010102}
+      // 06.0E.2B.34.04.01.01.02.0D.01.03.01.02.04.40.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0204, 0x4000,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
+  AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID,ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID,"",""), 
       // {0D010301-0204-6001-060E-2B3404010102}
       // 06.0E.2B.34.04.01.01.02.0D.01.03.01.02.04.60.01
@@ -13336,6 +13516,26 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
         0x0204, 0x6001,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
   AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID_Bogus,ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID_Bogus,"",""), 
+      // {0D010301-0204-6001-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.04.60.01
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0204, 0x6001,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0204-6001-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.04.60.01
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0204, 0x6001,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID_Bogus,ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID_Bogus,"",""), 
+      // {0D010301-0204-6001-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.04.60.01
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0204, 0x6001,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID,ContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID,"",""), 
       // {0D010301-0204-6107-060E-2B3404010102}
       // 06.0E.2B.34.04.01.01.02.0D.01.03.01.02.04.61.07
@@ -13355,6 +13555,26 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
       AAF_LITERAL_AUID(0x0D010301,
         0x0204, 0x6107,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x02))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID_Bogus,ContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID_Bogus,"",""), 
+      // {0D010301-0204-6107-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.04.61.07
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0204, 0x6107,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0204-6107-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.04.61.07
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0204, 0x6107,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID_Bogus,ContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID_Bogus,"",""), 
+      // {0D010301-0204-6107-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.04.61.07
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0204, 0x6107,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
   AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_Uncompressed_525x5994I_720_422,ContainerDef_MXFGC_Framewrapped_Uncompressed_525x5994I_720_422,"",""), 
       // {0D010301-0205-0101-060E-2B3404010101}
@@ -13696,6 +13916,26 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
         0x020A, 0x0100,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x03))
   AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_Alaw_Audio_Bogus,ContainerDef_MXFGC_Framewrapped_Alaw_Audio_Bogus,"",""), 
+      // {0D010301-020A-0100-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.0A.01.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020A, 0x0100,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Framewrapped_Alaw_Audio_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020A-0100-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.0A.01.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020A, 0x0100,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_Alaw_Audio_Bogus,ContainerDef_MXFGC_Framewrapped_Alaw_Audio_Bogus,"",""), 
+      // {0D010301-020A-0100-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.0A.01.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020A, 0x0100,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_Alaw_Audio,ContainerDef_MXFGC_Clipwrapped_Alaw_Audio,"",""), 
       // {0D010301-020A-0200-060E-2B3404010103}
       // 06.0E.2B.34.04.01.01.03.0D.01.03.01.02.0A.02.00
@@ -13715,6 +13955,26 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
       AAF_LITERAL_AUID(0x0D010301,
         0x020A, 0x0200,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x03))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_Alaw_Audio_Bogus,ContainerDef_MXFGC_Clipwrapped_Alaw_Audio_Bogus,"",""), 
+      // {0D010301-020A-0200-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.0A.02.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020A, 0x0200,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Clipwrapped_Alaw_Audio_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020A-0200-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.0A.02.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020A, 0x0200,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_Alaw_Audio_Bogus,ContainerDef_MXFGC_Clipwrapped_Alaw_Audio_Bogus,"",""), 
+      // {0D010301-020A-0200-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.0A.02.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020A, 0x0200,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
   AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Customwrapped_Alaw_Audio,ContainerDef_MXFGC_Customwrapped_Alaw_Audio,"",""), 
       // {0D010301-020A-0300-060E-2B3404010103}
@@ -13736,24 +13996,644 @@ AAF_INSTANCE_GROUP(ContainerDefinitionInstances, ContainerDefinition)
         0x020A, 0x0300,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x03))
   AAF_INSTANCE_SEPARATOR()
-  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_AVCbytestream_VideoStream0_SID,ContainerDef_MXFGC_Clipwrapped_AVCbytestream_VideoStream0_SID,"",""), 
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Customwrapped_Alaw_Audio_Bogus,ContainerDef_MXFGC_Customwrapped_Alaw_Audio_Bogus,"",""), 
+      // {0D010301-020A-0300-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.0A.03.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020A, 0x0300,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Customwrapped_Alaw_Audio_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020A-0300-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.0A.03.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020A, 0x0300,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Customwrapped_Alaw_Audio_Bogus,ContainerDef_MXFGC_Customwrapped_Alaw_Audio_Bogus,"",""), 
+      // {0D010301-020A-0300-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.0A.03.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020A, 0x0300,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_JPEG2000_FU_Framewrapped_Undefined_Interlace_Picture_Element,ContainerDef_MXFGC_JPEG2000_FU_Framewrapped_Undefined_Interlace_Picture_Element,"",""), 
+      // {0D010301-020C-0100-060E-2B3404010107}
+      // 06.0E.2B.34.04.01.01.07.0D.01.03.01.02.0C.01.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0100,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x07), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_JPEG2000_FU_Framewrapped_Undefined_Interlace_Picture_Element")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020C-0100-060E-2B3404010107}
+      // 06.0E.2B.34.04.01.01.07.0D.01.03.01.02.0C.01.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0100,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x07))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_JPEG2000_FU_Framewrapped_Undefined_Interlace_Picture_Element,ContainerDef_MXFGC_JPEG2000_FU_Framewrapped_Undefined_Interlace_Picture_Element,"",""), 
+      // {0D010301-020C-0100-060E-2B3404010107}
+      // 06.0E.2B.34.04.01.01.07.0D.01.03.01.02.0C.01.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0100,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x07))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_JPEG2000_Cn_Clipwrapped_Picture_Element,ContainerDef_MXFGC_JPEG2000_Cn_Clipwrapped_Picture_Element,"",""), 
+      // {0D010301-020C-0200-060E-2B3404010107}
+      // 06.0E.2B.34.04.01.01.07.0D.01.03.01.02.0C.02.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0200,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x07), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_JPEG2000_Cn_Clipwrapped_Picture_Element")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020C-0200-060E-2B3404010107}
+      // 06.0E.2B.34.04.01.01.07.0D.01.03.01.02.0C.02.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0200,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x07))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_JPEG2000_Cn_Clipwrapped_Picture_Element,ContainerDef_MXFGC_JPEG2000_Cn_Clipwrapped_Picture_Element,"",""), 
+      // {0D010301-020C-0200-060E-2B3404010107}
+      // 06.0E.2B.34.04.01.01.07.0D.01.03.01.02.0C.02.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0200,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x07))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_JPEG2000_I1_Interlaced_Frame_1_field_KLV,ContainerDef_MXFGC_JPEG2000_I1_Interlaced_Frame_1_field_KLV,"",""), 
+      // {0D010301-020C-0300-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0C.03.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0300,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_JPEG2000_I1_Interlaced_Frame_1_field_KLV")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020C-0300-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0C.03.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0300,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_JPEG2000_I1_Interlaced_Frame_1_field_KLV,ContainerDef_MXFGC_JPEG2000_I1_Interlaced_Frame_1_field_KLV,"",""), 
+      // {0D010301-020C-0300-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0C.03.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0300,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_JPEG2000_I2_Interlaced_Frame_2_fields_KLV,ContainerDef_MXFGC_JPEG2000_I2_Interlaced_Frame_2_fields_KLV,"",""), 
+      // {0D010301-020C-0400-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0C.04.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0400,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_JPEG2000_I2_Interlaced_Frame_2_fields_KLV")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020C-0400-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0C.04.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0400,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_JPEG2000_I2_Interlaced_Frame_2_fields_KLV,ContainerDef_MXFGC_JPEG2000_I2_Interlaced_Frame_2_fields_KLV,"",""), 
+      // {0D010301-020C-0400-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0C.04.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0400,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_JPEG2000_F1_Fieldwrapped_Picture_Element,ContainerDef_MXFGC_JPEG2000_F1_Fieldwrapped_Picture_Element,"",""), 
+      // {0D010301-020C-0500-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0C.05.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0500,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_JPEG2000_F1_Fieldwrapped_Picture_Element")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020C-0500-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0C.05.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0500,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_JPEG2000_F1_Fieldwrapped_Picture_Element,ContainerDef_MXFGC_JPEG2000_F1_Fieldwrapped_Picture_Element,"",""), 
+      // {0D010301-020C-0500-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0C.05.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0500,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_JPEG2000_P1_Framewrapped_Picture_Element,ContainerDef_MXFGC_JPEG2000_P1_Framewrapped_Picture_Element,"",""), 
+      // {0D010301-020C-0600-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0C.06.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0600,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_JPEG2000_P1_Framewrapped_Picture_Element")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020C-0600-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0C.06.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0600,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_JPEG2000_P1_Framewrapped_Picture_Element,ContainerDef_MXFGC_JPEG2000_P1_Framewrapped_Picture_Element,"",""), 
+      // {0D010301-020C-0600-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0C.06.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020C, 0x0600,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Generic_VBI_Data_Mapping_Undefined_Payload,ContainerDef_MXFGC_Generic_VBI_Data_Mapping_Undefined_Payload,"",""), 
+      // {0D010301-020D-0000-060E-2B3404010109}
+      // 06.0E.2B.34.04.01.01.09.0D.01.03.01.02.0D.00.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020D, 0x0000,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x09), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Generic_VBI_Data_Mapping_Undefined_Payload")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020D-0000-060E-2B3404010109}
+      // 06.0E.2B.34.04.01.01.09.0D.01.03.01.02.0D.00.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020D, 0x0000,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x09))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Generic_VBI_Data_Mapping_Undefined_Payload,ContainerDef_MXFGC_Generic_VBI_Data_Mapping_Undefined_Payload,"",""), 
+      // {0D010301-020D-0000-060E-2B3404010109}
+      // 06.0E.2B.34.04.01.01.09.0D.01.03.01.02.0D.00.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020D, 0x0000,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x09))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload,ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload,"",""), 
+      // {0D010301-020E-0000-060E-2B3404010109}
+      // 06.0E.2B.34.04.01.01.09.0D.01.03.01.02.0E.00.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020E, 0x0000,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x09), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020E-0000-060E-2B3404010109}
+      // 06.0E.2B.34.04.01.01.09.0D.01.03.01.02.0E.00.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020E, 0x0000,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x09))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload,ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload,"",""), 
+      // {0D010301-020E-0000-060E-2B3404010109}
+      // 06.0E.2B.34.04.01.01.09.0D.01.03.01.02.0E.00.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020E, 0x0000,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x09))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload_Bogus,ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload_Bogus,"",""), 
+      // {0D010301-020E-0000-060E-2B3404010107}
+      // 06.0E.2B.34.04.01.01.07.0D.01.03.01.02.0E.00.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020E, 0x0000,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x07), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020E-0000-060E-2B3404010107}
+      // 06.0E.2B.34.04.01.01.07.0D.01.03.01.02.0E.00.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020E, 0x0000,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x07))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload_Bogus,ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload_Bogus,"",""), 
+      // {0D010301-020E-0000-060E-2B3404010107}
+      // 06.0E.2B.34.04.01.01.07.0D.01.03.01.02.0E.00.00
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020E, 0x0000,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x07))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_Framewrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6001-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.01
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6001,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Framewrapped_AVCNALUnitStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020F-6001-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.01
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6001,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_Framewrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6001-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.01
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6001,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6002-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020F-6002-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6002-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID_Bogus,ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID_Bogus,"",""), 
+      // {0D010301-020F-6002-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.0F.60.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020F-6002-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.0F.60.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID_Bogus,ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID_Bogus,"",""), 
+      // {0D010301-020F-6002-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.0F.60.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomStripewrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomStripewrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6003-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.03
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6003,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomStripewrapped_AVCNALUnitStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020F-6003-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.03
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6003,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomStripewrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomStripewrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6003-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.03
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6003,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomPESwrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomPESwrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6004-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.04
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6004,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomPESwrapped_AVCNALUnitStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020F-6004-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.04
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6004,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomPESwrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomPESwrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6004-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.04
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6004,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6005-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.05
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6005,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCNALUnitStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020F-6005-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.05
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6005,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6005-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.05
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6005,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomSplicewrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomSplicewrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6006-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.06
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6006,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomSplicewrapped_AVCNALUnitStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020F-6006-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.06
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6006,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomSplicewrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomSplicewrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6006-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.06
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6006,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6007-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.07
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6007,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCNALUnitStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020F-6007-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.07
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6007,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6007-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.07
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6007,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomSlavewrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomSlavewrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6008-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.08
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6008,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomSlavewrapped_AVCNALUnitStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020F-6008-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.08
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6008,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomSlavewrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomSlavewrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6008-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.08
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6008,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Fieldwrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_Fieldwrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6009-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0F.60.09
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6009,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Fieldwrapped_AVCNALUnitStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020F-6009-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0F.60.09
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6009,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Fieldwrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_Fieldwrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-6009-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.0F.60.09
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x6009,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-607F-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x607F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCNALUnitStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-020F-607F-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x607F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCNALUnitStream_VideoStream0_SID,ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCNALUnitStream_VideoStream0_SID,"",""), 
+      // {0D010301-020F-607F-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.0F.60.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x020F, 0x607F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_Framewrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6001-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.01
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6001,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Framewrapped_AVCByteStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0210-6001-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.01
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6001,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_Framewrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6001-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.01
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6001,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID,"",""), 
       // {0D010301-0210-6002-060E-2B340401010A}
       // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.02
       AAF_LITERAL_AUID(0x0D010301,
         0x0210, 0x6002,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
-    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Clipwrapped_AVCbytestream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID")
     AAF_INSTANCE_PROPERTY(Identification, AUID, 
       // {0D010301-0210-6002-060E-2B340401010A}
       // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.02
       AAF_LITERAL_AUID(0x0D010301,
         0x0210, 0x6002,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
-  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_AVCbytestream_VideoStream0_SID,ContainerDef_MXFGC_Clipwrapped_AVCbytestream_VideoStream0_SID,"",""), 
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID,"",""), 
       // {0D010301-0210-6002-060E-2B340401010A}
       // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.02
       AAF_LITERAL_AUID(0x0D010301,
         0x0210, 0x6002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID_Bogus,ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID_Bogus,"",""), 
+      // {0D010301-0210-6002-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.10.60.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID_Bogus")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0210-6002-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.10.60.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID_Bogus,ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID_Bogus,"",""), 
+      // {0D010301-0210-6002-060E-2B3404010101}
+      // 06.0E.2B.34.04.01.01.01.0D.01.03.01.02.10.60.02
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6002,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomStripewrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomStripewrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6003-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.03
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6003,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomStripewrapped_AVCByteStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0210-6003-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.03
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6003,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomStripewrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomStripewrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6003-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.03
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6003,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomPESwrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomPESwrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6004-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.04
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6004,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomPESwrapped_AVCByteStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0210-6004-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.04
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6004,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomPESwrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomPESwrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6004-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.04
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6004,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6005-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.05
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6005,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCByteStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0210-6005-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.05
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6005,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6005-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.05
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6005,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomSplicewrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomSplicewrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6006-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.06
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6006,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomSplicewrapped_AVCByteStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0210-6006-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.06
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6006,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomSplicewrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomSplicewrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6006-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.06
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6006,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6007-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.07
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6007,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCByteStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0210-6007-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.07
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6007,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6007-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.07
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6007,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomSlavewrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomSlavewrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6008-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.08
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6008,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomSlavewrapped_AVCByteStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0210-6008-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.08
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6008,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomSlavewrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomSlavewrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6008-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.08
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6008,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Fieldwrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_Fieldwrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6009-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.10.60.09
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6009,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_Fieldwrapped_AVCByteStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0210-6009-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.10.60.09
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6009,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Fieldwrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_Fieldwrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-6009-060E-2B340401010D}
+      // 06.0E.2B.34.04.01.01.0D.0D.01.03.01.02.10.60.09
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x6009,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0D))
+  AAF_INSTANCE_SEPARATOR()
+  AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-607F-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x607F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A), "")
+    AAF_INSTANCE_PROPERTY(Name, String, "ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCByteStream_VideoStream0_SID")
+    AAF_INSTANCE_PROPERTY(Identification, AUID, 
+      // {0D010301-0210-607F-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x607F,
+        0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
+  AAF_INSTANCE_END(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCByteStream_VideoStream0_SID,ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCByteStream_VideoStream0_SID,"",""), 
+      // {0D010301-0210-607F-060E-2B340401010A}
+      // 06.0E.2B.34.04.01.01.0A.0D.01.03.01.02.10.60.7F
+      AAF_LITERAL_AUID(0x0D010301,
+        0x0210, 0x607F,
         0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A))
   AAF_INSTANCE_SEPARATOR()
   AAF_INSTANCE(ContainerDefinition, AAF_SYMBOL(ContainerDef_MXFGC_Framewrapped_VC3,ContainerDef_MXFGC_Framewrapped_VC3,"",""), 

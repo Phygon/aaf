@@ -96,6 +96,12 @@ const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_Pict
 {0x0d010301, 0x0201, 0x017f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x02}};
 
 
+//{0d010301-0201-017f-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.01.01.7f
+const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_PictureOnly_Bogus =
+{0x0d010301, 0x0201, 0x017f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
 //{0d010301-0201-0201-060e-2b3404010101}
 //06.0e.2b.34.04.01.01.01.0d.01.03.01.02.01.02.01
 const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_DefinedTemplate =
@@ -112,6 +118,12 @@ const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_Ex
 //06.0e.2b.34.04.01.01.02.0d.01.03.01.02.01.02.7f
 const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly =
 {0x0d010301, 0x0201, 0x027f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x02}};
+
+
+//{0d010301-0201-027f-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.01.02.7f
+const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly_Bogus =
+{0x0d010301, 0x0201, 0x027f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
 
 
 //{0d010301-0201-0301-060e-2b3404010101}
@@ -132,6 +144,12 @@ const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_Pict
 {0x0d010301, 0x0201, 0x037f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x02}};
 
 
+//{0d010301-0201-037f-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.01.03.7f
+const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_PictureOnly_Bogus =
+{0x0d010301, 0x0201, 0x037f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
 //{0d010301-0201-0401-060e-2b3404010101}
 //06.0e.2b.34.04.01.01.01.0d.01.03.01.02.01.04.01
 const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_DefinedTemplate =
@@ -148,6 +166,12 @@ const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_Ex
 //06.0e.2b.34.04.01.01.02.0d.01.03.01.02.01.04.7f
 const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly =
 {0x0d010301, 0x0201, 0x047f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x02}};
+
+
+//{0d010301-0201-047f-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.01.04.7f
+const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly_Bogus =
+{0x0d010301, 0x0201, 0x047f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
 
 
 //{0d010301-0201-0501-060e-2b3404010101}
@@ -168,6 +192,12 @@ const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_Pict
 {0x0d010301, 0x0201, 0x057f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x02}};
 
 
+//{0d010301-0201-057f-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.01.05.7f
+const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_PictureOnly_Bogus =
+{0x0d010301, 0x0201, 0x057f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
 //{0d010301-0201-0601-060e-2b3404010101}
 //06.0e.2b.34.04.01.01.01.0d.01.03.01.02.01.06.01
 const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_DefinedTemplate =
@@ -184,6 +214,12 @@ const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_Ex
 //06.0e.2b.34.04.01.01.02.0d.01.03.01.02.01.06.7f
 const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly =
 {0x0d010301, 0x0201, 0x067f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x02}};
+
+
+//{0d010301-0201-067f-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.01.06.7f
+const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly_Bogus =
+{0x0d010301, 0x0201, 0x067f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
 
 
 //{0d010301-0202-0101-060e-2b3404010101}
@@ -256,6 +292,12 @@ const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_DVbased_525x5994I_25Mbps =
 //06.0e.2b.34.04.01.01.01.0d.01.03.01.02.02.40.02
 const aafUID_t kAAFContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps =
 {0x0d010301, 0x0202, 0x4002, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
+//{0d010301-0202-4002-060e-2b3404010102}
+//06.0e.2b.34.04.01.01.02.0d.01.03.01.02.02.40.02
+const aafUID_t kAAFContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps_Bogus =
+{0x0d010301, 0x0202, 0x4002, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x02}};
 
 
 //{0d010301-0202-4101-060e-2b3404010101}
@@ -354,16 +396,40 @@ const aafUID_t kAAFContainerDef_MXFGC_Clipwrapped_DVbased_UndefinedSource =
 {0x0d010301, 0x0202, 0x7f02, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
 
 
+//{0d010301-0202-7f02-060e-2b3404010102}
+//06.0e.2b.34.04.01.01.02.0d.01.03.01.02.02.7f.02
+const aafUID_t kAAFContainerDef_MXFGC_Clipwrapped_DVbased_UndefinedSource_Bogus =
+{0x0d010301, 0x0202, 0x7f02, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x02}};
+
+
+//{0d010301-0204-4000-060e-2b3404010102}
+//06.0e.2b.34.04.01.01.02.0d.01.03.01.02.04.40.00
+const aafUID_t kAAFContainerDef_MXFGC_MPEGES_AudioStream0_SID_Node =
+{0x0d010301, 0x0204, 0x4000, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x02}};
+
+
 //{0d010301-0204-6001-060e-2b3404010102}
 //06.0e.2b.34.04.01.01.02.0d.01.03.01.02.04.60.01
 const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID =
 {0x0d010301, 0x0204, 0x6001, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x02}};
 
 
+//{0d010301-0204-6001-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.04.60.01
+const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID_Bogus =
+{0x0d010301, 0x0204, 0x6001, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
 //{0d010301-0204-6107-060e-2b3404010102}
 //06.0e.2b.34.04.01.01.02.0d.01.03.01.02.04.61.07
 const aafUID_t kAAFContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID =
 {0x0d010301, 0x0204, 0x6107, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x02}};
+
+
+//{0d010301-0204-6107-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.04.61.07
+const aafUID_t kAAFContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID_Bogus =
+{0x0d010301, 0x0204, 0x6107, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
 
 
 //{0d010301-0205-0101-060e-2b3404010101}
@@ -468,10 +534,22 @@ const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_Alaw_Audio =
 {0x0d010301, 0x020a, 0x0100, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x03}};
 
 
+//{0d010301-020a-0100-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.0a.01.00
+const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_Alaw_Audio_Bogus =
+{0x0d010301, 0x020a, 0x0100, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
 //{0d010301-020a-0200-060e-2b3404010103}
 //06.0e.2b.34.04.01.01.03.0d.01.03.01.02.0a.02.00
 const aafUID_t kAAFContainerDef_MXFGC_Clipwrapped_Alaw_Audio =
 {0x0d010301, 0x020a, 0x0200, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x03}};
+
+
+//{0d010301-020a-0200-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.0a.02.00
+const aafUID_t kAAFContainerDef_MXFGC_Clipwrapped_Alaw_Audio_Bogus =
+{0x0d010301, 0x020a, 0x0200, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
 
 
 //{0d010301-020a-0300-060e-2b3404010103}
@@ -480,10 +558,196 @@ const aafUID_t kAAFContainerDef_MXFGC_Customwrapped_Alaw_Audio =
 {0x0d010301, 0x020a, 0x0300, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x03}};
 
 
+//{0d010301-020a-0300-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.0a.03.00
+const aafUID_t kAAFContainerDef_MXFGC_Customwrapped_Alaw_Audio_Bogus =
+{0x0d010301, 0x020a, 0x0300, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
+//{0d010301-020c-0100-060e-2b3404010107}
+//06.0e.2b.34.04.01.01.07.0d.01.03.01.02.0c.01.00
+const aafUID_t kAAFContainerDef_MXFGC_JPEG2000_FU_Framewrapped_Undefined_Interlace_Picture_Element =
+{0x0d010301, 0x020c, 0x0100, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x07}};
+
+
+//{0d010301-020c-0200-060e-2b3404010107}
+//06.0e.2b.34.04.01.01.07.0d.01.03.01.02.0c.02.00
+const aafUID_t kAAFContainerDef_MXFGC_JPEG2000_Cn_Clipwrapped_Picture_Element =
+{0x0d010301, 0x020c, 0x0200, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x07}};
+
+
+//{0d010301-020c-0300-060e-2b340401010d}
+//06.0e.2b.34.04.01.01.0d.0d.01.03.01.02.0c.03.00
+const aafUID_t kAAFContainerDef_MXFGC_JPEG2000_I1_Interlaced_Frame_1_field_KLV =
+{0x0d010301, 0x020c, 0x0300, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d}};
+
+
+//{0d010301-020c-0400-060e-2b340401010d}
+//06.0e.2b.34.04.01.01.0d.0d.01.03.01.02.0c.04.00
+const aafUID_t kAAFContainerDef_MXFGC_JPEG2000_I2_Interlaced_Frame_2_fields_KLV =
+{0x0d010301, 0x020c, 0x0400, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d}};
+
+
+//{0d010301-020c-0500-060e-2b340401010d}
+//06.0e.2b.34.04.01.01.0d.0d.01.03.01.02.0c.05.00
+const aafUID_t kAAFContainerDef_MXFGC_JPEG2000_F1_Fieldwrapped_Picture_Element =
+{0x0d010301, 0x020c, 0x0500, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d}};
+
+
+//{0d010301-020c-0600-060e-2b340401010d}
+//06.0e.2b.34.04.01.01.0d.0d.01.03.01.02.0c.06.00
+const aafUID_t kAAFContainerDef_MXFGC_JPEG2000_P1_Framewrapped_Picture_Element =
+{0x0d010301, 0x020c, 0x0600, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d}};
+
+
+//{0d010301-020d-0000-060e-2b3404010109}
+//06.0e.2b.34.04.01.01.09.0d.01.03.01.02.0d.00.00
+const aafUID_t kAAFContainerDef_MXFGC_Generic_VBI_Data_Mapping_Undefined_Payload =
+{0x0d010301, 0x020d, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x09}};
+
+
+//{0d010301-020e-0000-060e-2b3404010109}
+//06.0e.2b.34.04.01.01.09.0d.01.03.01.02.0e.00.00
+const aafUID_t kAAFContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload =
+{0x0d010301, 0x020e, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x09}};
+
+
+//{0d010301-020e-0000-060e-2b3404010107}
+//06.0e.2b.34.04.01.01.07.0d.01.03.01.02.0e.00.00
+const aafUID_t kAAFContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload_Bogus =
+{0x0d010301, 0x020e, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x07}};
+
+
+//{0d010301-020f-6001-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.0f.60.01
+const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_AVCNALUnitStream_VideoStream0_SID =
+{0x0d010301, 0x020f, 0x6001, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-020f-6002-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.0f.60.02
+const aafUID_t kAAFContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID =
+{0x0d010301, 0x020f, 0x6002, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-020f-6002-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.0f.60.02
+const aafUID_t kAAFContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID_Bogus =
+{0x0d010301, 0x020f, 0x6002, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
+//{0d010301-020f-6003-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.0f.60.03
+const aafUID_t kAAFContainerDef_MXFGC_CustomStripewrapped_AVCNALUnitStream_VideoStream0_SID =
+{0x0d010301, 0x020f, 0x6003, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-020f-6004-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.0f.60.04
+const aafUID_t kAAFContainerDef_MXFGC_CustomPESwrapped_AVCNALUnitStream_VideoStream0_SID =
+{0x0d010301, 0x020f, 0x6004, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-020f-6005-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.0f.60.05
+const aafUID_t kAAFContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCNALUnitStream_VideoStream0_SID =
+{0x0d010301, 0x020f, 0x6005, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-020f-6006-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.0f.60.06
+const aafUID_t kAAFContainerDef_MXFGC_CustomSplicewrapped_AVCNALUnitStream_VideoStream0_SID =
+{0x0d010301, 0x020f, 0x6006, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-020f-6007-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.0f.60.07
+const aafUID_t kAAFContainerDef_MXFGC_CustomClosedGOPwrapped_AVCNALUnitStream_VideoStream0_SID =
+{0x0d010301, 0x020f, 0x6007, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-020f-6008-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.0f.60.08
+const aafUID_t kAAFContainerDef_MXFGC_CustomSlavewrapped_AVCNALUnitStream_VideoStream0_SID =
+{0x0d010301, 0x020f, 0x6008, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-020f-6009-060e-2b340401010d}
+//06.0e.2b.34.04.01.01.0d.0d.01.03.01.02.0f.60.09
+const aafUID_t kAAFContainerDef_MXFGC_Fieldwrapped_AVCNALUnitStream_VideoStream0_SID =
+{0x0d010301, 0x020f, 0x6009, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d}};
+
+
+//{0d010301-020f-607f-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.0f.60.7f
+const aafUID_t kAAFContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCNALUnitStream_VideoStream0_SID =
+{0x0d010301, 0x020f, 0x607f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-0210-6001-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.10.60.01
+const aafUID_t kAAFContainerDef_MXFGC_Framewrapped_AVCByteStream_VideoStream0_SID =
+{0x0d010301, 0x0210, 0x6001, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
 //{0d010301-0210-6002-060e-2b340401010a}
 //06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.10.60.02
-const aafUID_t kAAFContainerDef_MXFGC_Clipwrapped_AVCbytestream_VideoStream0_SID =
+const aafUID_t kAAFContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID =
 {0x0d010301, 0x0210, 0x6002, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-0210-6002-060e-2b3404010101}
+//06.0e.2b.34.04.01.01.01.0d.01.03.01.02.10.60.02
+const aafUID_t kAAFContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID_Bogus =
+{0x0d010301, 0x0210, 0x6002, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x01}};
+
+
+//{0d010301-0210-6003-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.10.60.03
+const aafUID_t kAAFContainerDef_MXFGC_CustomStripewrapped_AVCByteStream_VideoStream0_SID =
+{0x0d010301, 0x0210, 0x6003, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-0210-6004-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.10.60.04
+const aafUID_t kAAFContainerDef_MXFGC_CustomPESwrapped_AVCByteStream_VideoStream0_SID =
+{0x0d010301, 0x0210, 0x6004, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-0210-6005-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.10.60.05
+const aafUID_t kAAFContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCByteStream_VideoStream0_SID =
+{0x0d010301, 0x0210, 0x6005, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-0210-6006-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.10.60.06
+const aafUID_t kAAFContainerDef_MXFGC_CustomSplicewrapped_AVCByteStream_VideoStream0_SID =
+{0x0d010301, 0x0210, 0x6006, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-0210-6007-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.10.60.07
+const aafUID_t kAAFContainerDef_MXFGC_CustomClosedGOPwrapped_AVCByteStream_VideoStream0_SID =
+{0x0d010301, 0x0210, 0x6007, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-0210-6008-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.10.60.08
+const aafUID_t kAAFContainerDef_MXFGC_CustomSlavewrapped_AVCByteStream_VideoStream0_SID =
+{0x0d010301, 0x0210, 0x6008, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
+
+
+//{0d010301-0210-6009-060e-2b340401010d}
+//06.0e.2b.34.04.01.01.0d.0d.01.03.01.02.10.60.09
+const aafUID_t kAAFContainerDef_MXFGC_Fieldwrapped_AVCByteStream_VideoStream0_SID =
+{0x0d010301, 0x0210, 0x6009, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0d}};
+
+
+//{0d010301-0210-607f-060e-2b340401010a}
+//06.0e.2b.34.04.01.01.0a.0d.01.03.01.02.10.60.7f
+const aafUID_t kAAFContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCByteStream_VideoStream0_SID =
+{0x0d010301, 0x0210, 0x607f, {0x06, 0x0e, 0x2b, 0x34, 0x04, 0x01, 0x01, 0x0a}};
 
 
 //{0d010301-0211-0100-060e-2b340401010a}
