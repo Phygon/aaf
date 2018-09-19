@@ -73,9 +73,6 @@
   typedef void *LPVOID;
   typedef char *LPSTR;
   typedef const char *LPCSTR;
-  typedef unsigned short WCHAR;
-  typedef WCHAR TCHAR;
-  typedef WCHAR *LPWSTR;
 
   typedef struct tagGUID
   {

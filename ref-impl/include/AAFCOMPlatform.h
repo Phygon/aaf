@@ -70,23 +70,6 @@
     #define END_INTERFACE
 #  endif
 
-  // Stolen from wintype.h (from vc++ 6.0)
-#  define WINAPI
-
-  // Stolen from winbase.h (from vc++ 6.0)
-#  define WINBASEAPI
-
-  WINBASEAPI
-  DWORD
-  WINAPI
-  GetModuleFileNameW(
-      HMODULE hModule,
-      LPWSTR lpFilename,
-      DWORD nSize
-      );
- 
-# define GetModuleFileName  GetModuleFileNameW
-
 #else
 #error Unknown operating system
 
