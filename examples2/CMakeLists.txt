@@ -33,10 +33,6 @@
 
 cmake_minimum_required(VERSION 3.0.2)
 
-if(NOT (APPLE OR WIN32))
-    return()
-endif()
-
 add_subdirectory(axDump)
 add_subdirectory(axExample)
 add_subdirectory(axFileGen)

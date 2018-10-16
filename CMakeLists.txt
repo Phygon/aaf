@@ -76,7 +76,7 @@ add_custom_target(Everything)
 add_dependencies(Everything
     MakeSDK
     MakeSDKExamples
-    #MakeSDKExamples2
+    MakeSDKExamples2
     MakeSDKTests
-    #MakeSDKUtilities
+    MakeSDKUtilities
 )

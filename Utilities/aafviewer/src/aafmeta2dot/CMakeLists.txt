@@ -37,10 +37,6 @@ if(NOT DEFINED AAFSDK_ROOT)
     message(FATAL_ERROR "'AAFSDK_ROOT' must be set. Run a build from the top-level CMakeLists.txt script.")
 endif()
 
-if(NOT (APPLE OR WIN32))
-    return()
-endif()
-
 # MSVC: ./AAFWinSDK/<vsXX>/Utilities/aafviewer/aafmeta2dot/<Win32|x64>/<Debug|Release>/
 set(TARGET_DIR "${AAFSDK_TARGET_DIR}/Utilities/aafviewer/aafmeta2dot")
 
@@ -93,9 +89,9 @@ target_include_directories(aafmeta2dot PRIVATE
 )
 
 target_link_libraries(aafmeta2dot PRIVATE
+    axLib
     AAFIID
     AAFLIB
-    axLib
 )
 
 set_target_properties(aafmeta2dot PROPERTIES

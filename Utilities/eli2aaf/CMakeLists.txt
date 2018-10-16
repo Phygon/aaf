@@ -37,10 +37,6 @@ if(NOT DEFINED AAFSDK_ROOT)
     message(FATAL_ERROR "'AAFSDK_ROOT' must be set. Run a build from the top-level CMakeLists.txt script.")
 endif()
 
-if(NOT (APPLE OR WIN32))
-    return()
-endif()
-
 # MSVC: ./AAFWinSDK/<vsXX>/Utilities/eli2aaf/<Win32|x64>/<Debug|Release>/
 # Makefile: ./AAFx86_64LinuxSDK/g++/bin/<debug|>
 set(TARGET_DIR "${AAFSDK_TARGET_DIR}/Utilities/eli2aaf")

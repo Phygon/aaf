@@ -33,10 +33,6 @@
 
 cmake_minimum_required(VERSION 3.0.2)
 
-if(NOT (APPLE OR WIN32))
-    return()
-endif()
-
 add_subdirectory(aafdump)
 add_subdirectory(aafembed)
 add_subdirectory(aafextract)
@@ -53,7 +49,7 @@ add_dependencies(MakeSDKUtilities
     MakeSDK
     aaf2dot
     #aafdump
-    aafembed
+    #aafembed
     aafextract
     aaffmtconv
     aafmeta2dot

@@ -48,6 +48,7 @@
 #include <exception>
 
 #include <ctype.h>
+#include <stdio.h>
 
 using namespace std;
 
