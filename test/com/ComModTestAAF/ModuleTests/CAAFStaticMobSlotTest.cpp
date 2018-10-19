@@ -142,19 +142,50 @@ static HRESULT CreateAAFFile(
 			sclp = NULL;
 		}
 
-		// Test Length
+		// Test attaching Component with Length
 		{
 			checkResult(defs.cdSourceClip()->CreateInstance(IID_IAAFSourceClip,	(IUnknown **)&sclp));
 			checkResult(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
 			checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
 			checkResult(sclp->QueryInterface(IID_IAAFSegment, (void **)&seg));
 
+			// New slot won't be saved in the file.
 			checkResult(defs.cdStaticMobSlot()->CreateInstance(IID_IAAFMobSlot,	(IUnknown **)&newSlot));
 
 			// Length is allowed when Component is unattached
 			checkResult(pComponent->SetLength(10));
-			// Component with Length can't be attached to StaticMobSlot
-			checkExpression((newSlot->SetSegment(seg) == AAFRESULT_INVALID_PARAM), AAFRESULT_TEST_FAILED);
+
+			// Although forbidden by the specification, Component with Length can be attached to StaticMobSlot
+			checkResult(newSlot->SetSegment(seg));
+
+			pComponent->Release();
+			pComponent = NULL;
+
+			newSlot->Release();
+			newSlot = NULL;
+
+			seg->Release();
+			seg = NULL;
+
+			sclp->Release();
+			sclp = NULL;
+		}
+
+		// Test setting Length on attached Component
+		{
+			checkResult(defs.cdSourceClip()->CreateInstance(IID_IAAFSourceClip,	(IUnknown **)&sclp));
+			checkResult(sclp->QueryInterface(IID_IAAFComponent, (void **)&pComponent));
+			checkResult(pComponent->SetDataDef(defs.ddkAAFPicture()));
+			checkResult(sclp->QueryInterface(IID_IAAFSegment, (void **)&seg));
+
+			// New slot won't be saved in the file.
+			checkResult(defs.cdStaticMobSlot()->CreateInstance(IID_IAAFMobSlot,	(IUnknown **)&newSlot));
+
+			// Component without Length can be attached to StaticMobSlot
+			checkResult(newSlot->SetSegment(seg));
+
+			// Although forbidden by the specification, Length can be set in Component in StaticMobSlot
+			checkResult(pComponent->SetLength(10));
 
 			pComponent->Release();
 			pComponent = NULL;

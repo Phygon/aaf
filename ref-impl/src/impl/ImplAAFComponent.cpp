@@ -124,11 +124,16 @@ ImplAAFComponent::~ImplAAFComponent ()
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFComponent::SetLength (const aafLength_t & length)
 {
-    AAFRESULT aafError = AAFRESULT_SUCCESS;
-	if ((length >= 0 || length == AAF_UNKNOWN_LENGTH) && _mobSlotType != MobSlotType_Static)
-		_length = length;
+	// TODO: The spec does not allow Components with Length in Static
+	// Mob Slots but to maintain forward compatiblity with existing
+	// clients this call allows setting Length on Components regardless
+	// of the type of their parent Slots.
+
+	AAFRESULT aafError = AAFRESULT_SUCCESS;
+	if ( length < 0 && length != AAF_UNKNOWN_LENGTH)
+	  aafError = AAFRESULT_BAD_LENGTH;
 	else
-		aafError = AAFRESULT_BAD_LENGTH;
+	  _length = length;
 	return aafError;
 }
 
@@ -152,7 +157,7 @@ AAFRESULT STDMETHODCALLTYPE
 	  return AAFRESULT_NULL_PARAM;
 	}
 
-  if (! _length.isPresent())
+  if (!_length.isPresent())
 	{
 	  return AAFRESULT_PROP_NOT_PRESENT;
 	}
@@ -364,16 +369,20 @@ AAFRESULT ImplAAFComponent::SetNewProps(
 	if (! pDataDef)
 	  return AAFRESULT_NULL_PARAM;
 
-	if ((length >= 0 || length == AAF_UNKNOWN_LENGTH) && _mobSlotType != MobSlotType_Static)
-	{
-		_length = length;
-		_dataDef = pDataDef;
-	}
-	else
-	{
-		aafError = AAFRESULT_BAD_LENGTH;
-	}
+	// TODO: The spec does not allow Components with Length in Static
+	// Mob Slots but to maintain forward compatiblity with existing
+	// clients this call allows setting Length on Components regardless
+	// of the type of their parent Slots.
 
+	if ( length < 0 && length != AAF_UNKNOWN_LENGTH )
+	  {
+	  aafError = AAFRESULT_BAD_LENGTH;
+	  }
+	else
+	  {
+		_length	= length;
+		_dataDef = pDataDef;
+	  }
 	return aafError;
 }
 

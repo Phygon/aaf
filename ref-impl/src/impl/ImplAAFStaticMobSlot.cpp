@@ -57,21 +57,11 @@ ImplAAFStaticMobSlot::~ImplAAFStaticMobSlot ()
 AAFRESULT STDMETHODCALLTYPE
     ImplAAFStaticMobSlot::SetSegment (ImplAAFSegment* pSegment)
 {
-	if (pSegment == NULL)
-		return AAFRESULT_NULL_PARAM;
+	// TODO: The spec does not allow Components with Length in Static
+	// Mob Slots but to maintain forward compatiblity with existing
+	// clients this call allows to attaching Components with Length.
 
-	AAFRESULT hr = AAFRESULT_SUCCESS;
-
-	aafLength_t length;
-	hr = pSegment->GetLength(&length);
-
-	// Length property should not be set when Component is attached to StaticMobSlot
-	if (hr != AAFRESULT_PROP_NOT_PRESENT)
-	{
-		return AAFRESULT_INVALID_PARAM;
-	}
-
-	hr = ImplAAFMobSlot::SetSegment(pSegment);
+	AAFRESULT hr = ImplAAFMobSlot::SetSegment(pSegment);
 	if (AAFRESULT_SUCCEEDED(hr))
 	{
 		// Specify type of the containing MobSlot

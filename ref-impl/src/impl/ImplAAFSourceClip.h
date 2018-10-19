@@ -141,6 +141,7 @@ public:
 
 public:
 
+	// Initialize SourceClip without Length property.
 	virtual AAFRESULT STDMETHODCALLTYPE Initialize(ImplAAFDataDef * pDataDef,
 					const aafSourceRef_t & sourceRef);
 

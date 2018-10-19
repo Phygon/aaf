@@ -196,7 +196,12 @@ AAFRESULT STDMETHODCALLTYPE
 			pDictionary->ReleaseReference();
 			pDictionary = NULL;
 
-			CHECK(pSrcClip->Initialize(pDataDef, ref));
+			// TODO: The spec does not allow Components with Length in Static
+			// Mob Slots. However, older versions of AAF SDK assume in many
+			// places the Length property is always present. To maintain
+			// forward compatiblity with legacy SDKs Source Clip here gets
+			// a Length.
+			CHECK(pSrcClip->Initialize(pDataDef, slotLength, ref));
 			CHECK(AppendNewStaticSlot(pSrcClip, masterSlotID, pSlotName, 
 										&pNewStaticSlot));
 
@@ -1071,14 +1076,6 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 		for (loop = 1; loop <= numSlots; loop++)
 		{
 			CHECK(slotIter->NextOne(&slot));
-			// do not update length  when segment is attached to StaticMobSlot
-			if (dynamic_cast<ImplAAFStaticMobSlot*>(slot))
-			{
-				slot->ReleaseReference();
-				slot = NULL;
-				continue;
-			}
-
 			CHECK(slot->GetSegment(&seg));
 			fileSeq = dynamic_cast<ImplAAFSequence*>(seg);
 			// Segment is not a Sequence
@@ -1114,6 +1111,11 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 						fileSlot = NULL;
 					}
 					
+					// TODO: The spec does not allow Components with Length in Static
+					// Mob Slots. However, older versions of AAF SDK assume in many
+					// places the Length property is always present. To maintain
+					// forward compatiblity with legacy SDKs Segment here gets
+					// a Length.
 					CHECK(seg->SetLength(endPos));
 				}
 
@@ -1158,6 +1160,7 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 							fileSlot->ReleaseReference();
 							fileSlot = NULL;
 						}
+						// See Length TODO comments below.
 						CHECK(((ImplAAFSegment*)fileClip)->SetLength(tmpPos));
 						endPos += tmpPos;
 
@@ -1170,6 +1173,11 @@ AAFRESULT ImplAAFMasterMob::ReconcileMobLength(void)
 				}
 				slot->ReleaseReference();
 				slot = NULL; 
+				// TODO: The spec does not allow Components with Length in Static
+				// Mob Slots. However, older versions of AAF SDK assume in many
+				// places the Length property is always present. To maintain
+				// forward compatiblity with legacy SDKs Segment here gets
+				// a Length.
 				CHECK(seg->SetLength(endPos));
 				seg->ReleaseReference();
 				seg = NULL;

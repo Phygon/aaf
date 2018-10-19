@@ -228,7 +228,12 @@ AAFRESULT STDMETHODCALLTYPE
 		pDictionary->ReleaseReference();
 		pDictionary = NULL;
 
-		CHECK(sub->Initialize (pDataDef, sourceRef));
+		// TODO: The spec does not allow Components with Length in Static
+		// Mob Slots. However, older versions of AAF SDK assume in many
+		// places the Length property is always present. To maintain
+		// forward compatiblity with legacy SDKs Source Clip here gets
+		// a Length.
+		CHECK(sub->Initialize (pDataDef, 0, sourceRef));
 		CHECK(AppendNewStaticSlot( sub, slotID, L"Static", 	&newSlot));
 		
 		newSlot->ReleaseReference();

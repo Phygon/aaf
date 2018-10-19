@@ -318,6 +318,19 @@ AAFRESULT STDMETHODCALLTYPE
 }
 
 
+/*************************************************************************
+ * Function: Initialize()
+ *
+ * 		Initialize SourceClip without Length property.
+ *
+ * Argument Notes:
+ *
+ * ReturnValue:
+ *		Error code.
+ *
+ * Possible Errors:
+ *		Standard errors.
+ *************************************************************************/
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFSourceClip::Initialize(ImplAAFDataDef * pDataDef,
 	const aafSourceRef_t & sourceRef)
