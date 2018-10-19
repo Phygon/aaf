@@ -15250,20 +15250,20 @@ AAF_INSTANCE_GROUP(PluginDefinitionInstances, PluginDefinition)
         0xE793, 0x11D2,
         0x80, 0x9E, 0x00, 0x60, 0x08, 0x14, 0x3E, 0x6F))
   AAF_INSTANCE_SEPARATOR()
-  AAF_INSTANCE(PluginDefinition, AAF_SYMBOL(PluginCategory_Codec,PluginCategory_Codec,"kAAFPluginNoCategory",""), 
+  AAF_INSTANCE(PluginDefinition, AAF_SYMBOL(PluginCategory_None,PluginCategory_None,"kAAFPluginNoCategory","Used for \"don't care\" when enumerating loaded plugins"), 
       // {56905E0B-537D-11D4-A36C-009027DFCA6A}
       // A3.6C.00.90.27.DF.CA.6A.56.90.5E.0B.53.7D.11.D4
       AAF_LITERAL_AUID(0x56905E0B,
         0x537D, 0x11D4,
         0xA3, 0x6C, 0x00, 0x90, 0x27, 0xDF, 0xCA, 0x6A), "")
-    AAF_INSTANCE_PROPERTY(Name, String, "PluginCategory_Codec")
+    AAF_INSTANCE_PROPERTY(Name, String, "PluginCategory_None")
     AAF_INSTANCE_PROPERTY(Identification, AUID, 
       // {56905E0B-537D-11D4-A36C-009027DFCA6A}
       // A3.6C.00.90.27.DF.CA.6A.56.90.5E.0B.53.7D.11.D4
       AAF_LITERAL_AUID(0x56905E0B,
         0x537D, 0x11D4,
         0xA3, 0x6C, 0x00, 0x90, 0x27, 0xDF, 0xCA, 0x6A))
-  AAF_INSTANCE_END(PluginDefinition, AAF_SYMBOL(PluginCategory_Codec,PluginCategory_Codec,"kAAFPluginNoCategory",""), 
+  AAF_INSTANCE_END(PluginDefinition, AAF_SYMBOL(PluginCategory_None,PluginCategory_None,"kAAFPluginNoCategory","Used for \"don't care\" when enumerating loaded plugins"), 
       // {56905E0B-537D-11D4-A36C-009027DFCA6A}
       // A3.6C.00.90.27.DF.CA.6A.56.90.5E.0B.53.7D.11.D4
       AAF_LITERAL_AUID(0x56905E0B,

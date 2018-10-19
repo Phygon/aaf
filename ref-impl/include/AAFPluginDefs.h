@@ -62,7 +62,7 @@ const aafUID_t kAAFPluginAPI_EssenceAccess =
 
 //{56905e0b-537d-11d4-a36c-009027dfca6a}
 //a3.6c.00.90.27.df.ca.6a.56.90.5e.0b.53.7d.11.d4
-const aafUID_t kAAFPluginCategory_Codec =
+const aafUID_t kAAFPluginCategory_None =
 {0x56905e0b, 0x537d, 0x11d4, {0xa3, 0x6c, 0x00, 0x90, 0x27, 0xdf, 0xca, 0x6a}};
 
 
@@ -72,6 +72,6 @@ const aafUID_t kAAFPluginCategory_Codec =
 const aafUID_t kAAFPlatformIndependant = kAAFPlatform_Independent;
 const aafUID_t kAAFNoEngine = kAAFEngine_None;
 const aafUID_t kAAFEssencePluginAPI = kAAFPluginAPI_EssenceAccess;
-const aafUID_t kAAFPluginNoCategory = kAAFPluginCategory_Codec;
+const aafUID_t kAAFPluginNoCategory = kAAFPluginCategory_None;
 
 #endif // ! __PluginDefinition_h__
