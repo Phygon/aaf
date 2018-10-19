@@ -31,6 +31,27 @@
 #
 ###############################################################################
 
+#
+# Generate built-in metadata dictionary from ref-impl/include/AAFMetaDictionary.h.
+#
+# Usage:
+#
+#   Linux:
+#       mkdir out
+#       cd out
+#       cmake -G "Unix Makefiles" ..
+#       cmake --build .
+#   Windows:
+#       mkdir out
+#       cd out
+#       cmake -G "Visual Studio 12 2013 Win64" ..
+#       cmake --build .
+#   macOS:
+#       mkdir out
+#       cd out
+#       cmake -G "Xcode" ..
+#       cmake --build .
+
 cmake_minimum_required (VERSION 3.0.2 FATAL_ERROR)
 
 project(HeaderGen)
@@ -41,6 +62,7 @@ list(APPEND CMAKE_MODULE_PATH "${AAFSDK_ROOT}/build")
 set(OUT_BINARIES_DIR ${CURRENT_DIR_ABS}/bin)
 set(OUT_HEADERS_DIR ${CURRENT_DIR_ABS}/include)
 set(INSTALL_HEADERS_DIR ${CURRENT_DIR_ABS}/../../ref-impl/include)
+set(INSTALL_BUILTINS_DIR ${CURRENT_DIR_ABS}/../../ref-impl/src/impl)
 
 # path to generated/modified AAFMetaDictionary.h file to use
 set(AAFMETADICT_PATH ${INSTALL_HEADERS_DIR}/AAFMetaDictionary.h)
@@ -57,6 +79,7 @@ set(TARGETNAME classDefUid)
 set(OUTPUTNAME AAFClassDefUIDs.h)
 add_executable(${TARGETNAME} $<TARGET_OBJECTS:headerGenUtils> classDefUid.cpp headerGenUtils.h ${AAFMETADICT_PATH})
 set_target_properties(${TARGETNAME} PROPERTIES OUTPUT_NAME "${TARGETNAME}")
+set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUT_BINARIES_DIR})
 set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUT_BINARIES_DIR})
 add_custom_command(TARGET ${TARGETNAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUT_HEADERS_DIR}/
@@ -70,6 +93,7 @@ set(TARGETNAME extEnumUid)
 set(OUTPUTNAME AAFExtEnum.h)
 add_executable(${TARGETNAME} $<TARGET_OBJECTS:headerGenUtils> extEnumUid.cpp headerGenUtils.h ${AAFMETADICT_PATH})
 set_target_properties(${TARGETNAME} PROPERTIES OUTPUT_NAME "${TARGETNAME}")
+set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUT_BINARIES_DIR})
 set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUT_BINARIES_DIR})
 add_custom_command(TARGET ${TARGETNAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUT_HEADERS_DIR}/
@@ -83,6 +107,7 @@ set(TARGETNAME propertyDefUid)
 set(OUTPUTNAME AAFPropertyDefs.h)
 add_executable(${TARGETNAME} $<TARGET_OBJECTS:headerGenUtils> propertyDefUid.cpp headerGenUtils.h ${AAFMETADICT_PATH})
 set_target_properties(${TARGETNAME} PROPERTIES OUTPUT_NAME "${TARGETNAME}")
+set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUT_BINARIES_DIR})
 set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUT_BINARIES_DIR})
 add_custom_command(TARGET ${TARGETNAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUT_HEADERS_DIR}/
@@ -96,6 +121,7 @@ set(TARGETNAME propertyId)
 set(OUTPUTNAME AAFPropertyIDs.h)
 add_executable(${TARGETNAME} $<TARGET_OBJECTS:headerGenUtils> propertyId.cpp headerGenUtils.h ${AAFMETADICT_PATH})
 set_target_properties(${TARGETNAME} PROPERTIES OUTPUT_NAME "${TARGETNAME}")
+set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUT_BINARIES_DIR})
 set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUT_BINARIES_DIR})
 add_custom_command(TARGET ${TARGETNAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUT_HEADERS_DIR}/
@@ -109,6 +135,7 @@ set(TARGETNAME storedObjectUid)
 set(OUTPUTNAME AAFStoredObjectIDs.h)
 add_executable(${TARGETNAME} $<TARGET_OBJECTS:headerGenUtils> storedObjectUid.cpp headerGenUtils.h ${AAFMETADICT_PATH})
 set_target_properties(${TARGETNAME} PROPERTIES OUTPUT_NAME "${TARGETNAME}")
+set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUT_BINARIES_DIR})
 set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUT_BINARIES_DIR})
 add_custom_command(TARGET ${TARGETNAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUT_HEADERS_DIR}/
@@ -122,6 +149,7 @@ set(TARGETNAME typeDefUid)
 set(OUTPUTNAME AAFTypeDefUIDs.h)
 add_executable(${TARGETNAME} $<TARGET_OBJECTS:headerGenUtils> typeDefUid.cpp headerGenUtils.h ${AAFMETADICT_PATH})
 set_target_properties(${TARGETNAME} PROPERTIES OUTPUT_NAME "${TARGETNAME}")
+set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUT_BINARIES_DIR})
 set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUT_BINARIES_DIR})
 add_custom_command(TARGET ${TARGETNAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUT_HEADERS_DIR}/
@@ -134,6 +162,7 @@ add_custom_command(TARGET ${TARGETNAME} POST_BUILD
 set(TARGETNAME genDefInstances)
 add_executable(${TARGETNAME} $<TARGET_OBJECTS:headerGenUtils> genDefInstances.cpp headerGenUtils.h ${AAFMETADICT_PATH})
 set_target_properties(${TARGETNAME} PROPERTIES OUTPUT_NAME "${TARGETNAME}")
+set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUT_BINARIES_DIR})
 set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUT_BINARIES_DIR})
 add_custom_command(TARGET ${TARGETNAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUT_HEADERS_DIR}/
@@ -162,11 +191,26 @@ add_custom_command(TARGET ${TARGETNAME} POST_BUILD
     COMMENT "Generating definition headers..."
 )
 
+# genDefInstBuiltins
+set(TARGETNAME genDefInstBuiltins)
+add_executable(${TARGETNAME} $<TARGET_OBJECTS:headerGenUtils> genDefInstBuiltins.cpp headerGenUtils.h ${AAFMETADICT_PATH})
+set_target_properties(${TARGETNAME} PROPERTIES OUTPUT_NAME "${TARGETNAME}")
+set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUT_BINARIES_DIR})
+set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUT_BINARIES_DIR})
+add_custom_command(TARGET ${TARGETNAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${OUT_HEADERS_DIR}/
+    COMMAND ${OUT_BINARIES_DIR}/${TARGETNAME} DataDefinition kAAF > ${OUT_HEADERS_DIR}/ImplAAFDictionary.cpp_DataDefs
+    COMMAND ${OUT_BINARIES_DIR}/${TARGETNAME} ContainerDefinition kAAF > ${OUT_HEADERS_DIR}/ImplAAFDictionary.cpp_ContainerDefs
+    COMMAND ${CMAKE_COMMAND} -E copy ${OUT_HEADERS_DIR}/ImplAAFDictionary.cpp_DataDefs ${INSTALL_BUILTINS_DIR}/ImplAAFDictionary.cpp_DataDefs
+    COMMAND ${CMAKE_COMMAND} -E copy ${OUT_HEADERS_DIR}/ImplAAFDictionary.cpp_ContainerDefs ${INSTALL_BUILTINS_DIR}/ImplAAFDictionary.cpp_ContainerDefs
+)
+
 # result
 set(TARGETNAME result)
 set(OUTPUTNAME AAFResult.h)
 add_executable(${TARGETNAME} $<TARGET_OBJECTS:headerGenUtils> result.cpp headerGenUtils.h ../../ref-impl/include/AAFMetaResult.h)
 set_target_properties(${TARGETNAME} PROPERTIES OUTPUT_NAME "${TARGETNAME}")
+set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_DEBUG ${OUT_BINARIES_DIR})
 set_target_properties(${TARGETNAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY_RELEASE ${OUT_BINARIES_DIR})
 add_custom_command(TARGET ${TARGETNAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${OUT_HEADERS_DIR}/
