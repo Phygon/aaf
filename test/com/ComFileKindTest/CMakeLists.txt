@@ -73,3 +73,6 @@ set_target_properties(ComFileKindTest PROPERTIES
 add_dependencies(ComFileKindTest
     MakeSDK
 )
+
+add_test(NAME ComFileKindTest COMMAND ComFileKindTest -d)
+set_property(TEST ComFileKindTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")

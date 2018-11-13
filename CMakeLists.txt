@@ -58,6 +58,8 @@ set(AAFSDK_OUT_DIR "${AAFSDK_ROOT}/out" CACHE STRING "Path to AAFSDK output dire
 
 project(AAF-SDK LANGUAGES CXX)
 
+enable_testing()
+
 include(pdefs)
 include(cdefs)
 include(common)

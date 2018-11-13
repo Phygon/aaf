@@ -57,3 +57,6 @@ set_target_properties(OpenExistingModify PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_DEBUG ${TARGET_DIR}
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${TARGET_DIR}
 )
+
+add_test(NAME OpenExistingModify COMMAND OpenExistingModify)
+set_property(TEST OpenExistingModify PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")

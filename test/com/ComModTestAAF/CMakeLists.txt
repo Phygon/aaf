@@ -91,3 +91,8 @@ add_custom_command(TARGET ComModTestAAF POST_BUILD
 add_dependencies(ComModTestAAF
     MakeSDK
 )
+
+add_test(NAME ComModTestAAF COMMAND ComModTestAAF)
+add_test(NAME ComModTestAAF-XML COMMAND ComModTestAAF -e XML -s AAFRandomRawStorage)
+set_property(TEST ComModTestAAF PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/:$ENV{LD_LIBRARY_PATH}")
+set_property(TEST ComModTestAAF-XML PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/:$ENV{LD_LIBRARY_PATH}")

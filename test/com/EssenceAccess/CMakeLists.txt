@@ -69,3 +69,6 @@ set_target_properties(EssenceAccess PROPERTIES
 add_dependencies(EssenceAccess
     MakeSDK
 )
+
+add_test(NAME EssenceAccess COMMAND EssenceAccess 100)
+set_property(TEST EssenceAccess PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")

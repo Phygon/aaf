@@ -37,30 +37,37 @@ if(NOT DEFINED AAFSDK_ROOT)
     message(FATAL_ERROR "'AAFSDK_ROOT' must be set. Run a build from the top-level CMakeLists.txt script.")
 endif()
 
+# MSVC: ./AAFWinSDK/<vsXX>/<Win32|x64>/<Debug|Release>/Test
+set(TARGET_DIR "${AAFSDK_TARGET_DIR}/Test")
+
+add_executable(MetaModelVerification
+    MetaModelVerification.cpp
+    MetaModelVerification.h
+    ResultCodes.h
+)
+
 if(WIN32)
-
-    # MSVC: ./AAFWinSDK/<vsXX>/<Win32|x64>/<Debug|Release>/Test
-    set(TARGET_DIR "${AAFSDK_TARGET_DIR}/Test")
-
-    add_executable(MetaModelVerification
-        MetaModelVerification.cpp
-        MetaModelVerification.h
-        ResultCodes.h
+    target_link_libraries(MetaModelVerification PRIVATE
+        AAFIID
+        AAFLIB
+        winmm.lib
     )
-
+else()
     target_link_libraries(MetaModelVerification PRIVATE
         AAFIID
         AAFLIB
     )
-
-    set_target_properties(MetaModelVerification PROPERTIES
-        VERSION ${AAFSDK_VERSION_STRING}
-    )
-
-    set_target_properties(MetaModelVerification PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${TARGET_DIR}
-        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${TARGET_DIR}
-        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${TARGET_DIR}
-    )
-
 endif()
+
+set_target_properties(MetaModelVerification PROPERTIES
+    VERSION ${AAFSDK_VERSION_STRING}
+)
+
+set_target_properties(MetaModelVerification PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY ${TARGET_DIR}
+    RUNTIME_OUTPUT_DIRECTORY_DEBUG ${TARGET_DIR}
+    RUNTIME_OUTPUT_DIRECTORY_RELEASE ${TARGET_DIR}
+)
+
+add_test(NAME MetaModelVerification COMMAND MetaModelVerification)
+set_property(TEST MetaModelVerification PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
