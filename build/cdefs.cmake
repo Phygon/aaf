@@ -63,4 +63,8 @@ elseif(UNIX)
     )
     # -fPIC is necessary when building object code to be used in a shared library
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    if(NOT CMAKE_C_COMPILE_OBJECT)
+        set(CMAKE_C_COMPILE_OBJECT
+	    "<CMAKE_C_COMPILER> <DEFINES> <INCLUDES> <FLAGS> -o <OBJECT> -c <SOURCE>")
+    endif()
 endif()

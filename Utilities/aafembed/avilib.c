@@ -52,6 +52,7 @@ typedef unsigned long ssize_t;
 #pragma warning(disable:4761)
 
 #else // All-posix
+#include <strings.h>
 #include <unistd.h>
 #define AAFCONSTINT64(i)    (i##LL)
 #define AAFCONSTUINT64(i)   (i##ULL)

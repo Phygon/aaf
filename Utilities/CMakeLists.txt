@@ -49,7 +49,7 @@ add_dependencies(MakeSDKUtilities
     MakeSDK
     aaf2dot
     #aafdump
-    #aafembed
+    aafembed
     aafextract
     aaffmtconv
     aafmeta2dot
