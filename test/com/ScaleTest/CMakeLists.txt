@@ -59,4 +59,6 @@ set_target_properties(ScaleTest PROPERTIES
 )
 
 add_test(NAME ScaleTest COMMAND ScaleTest -q -d)
-set_property(TEST ScaleTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+if(UNIX)
+    set_property(TEST ScaleTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+endif()

@@ -71,4 +71,6 @@ add_dependencies(EssenceAccess
 )
 
 add_test(NAME EssenceAccess COMMAND EssenceAccess 100)
-set_property(TEST EssenceAccess PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+if(UNIX)
+    set_property(TEST EssenceAccess PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+endif()

@@ -59,4 +59,6 @@ set_target_properties(ResultToTextTest PROPERTIES
 )
 
 add_test(NAME ResultToTextTest COMMAND ResultToTextTest)
-set_property(TEST ResultToTextTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+if(UNIX)
+    set_property(TEST ResultToTextTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+endif()

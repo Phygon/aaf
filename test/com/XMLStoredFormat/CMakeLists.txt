@@ -82,4 +82,6 @@ set_target_properties(XMLStoredFormat PROPERTIES
 )
 
 add_test(NAME XMLStoredFormat COMMAND XMLStoredFormat WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-set_property(TEST XMLStoredFormat PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+if(UNIX)
+    set_property(TEST XMLStoredFormat PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+endif()

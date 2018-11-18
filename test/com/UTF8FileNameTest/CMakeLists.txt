@@ -62,4 +62,6 @@ set_target_properties(UTF8FileNameTest PROPERTIES
 )
 
 add_test(NAME UTF8FileNameTest COMMAND UTF8FileNameTest)
-set_property(TEST UTF8FileNameTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+if(UNIX)
+    set_property(TEST UTF8FileNameTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+endif()

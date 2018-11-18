@@ -71,4 +71,6 @@ add_dependencies(CreateSequence
 )
 
 add_test(NAME CreateSequence COMMAND CreateSequence 2000)
-set_property(TEST CreateSequence PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+if(UNIX)
+    set_property(TEST CreateSequence PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+endif()

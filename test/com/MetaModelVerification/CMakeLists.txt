@@ -70,4 +70,6 @@ set_target_properties(MetaModelVerification PROPERTIES
 )
 
 add_test(NAME MetaModelVerification COMMAND MetaModelVerification)
-set_property(TEST MetaModelVerification PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+if(UNIX)
+    set_property(TEST MetaModelVerification PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+endif()
