@@ -63,12 +63,16 @@ if(WIN32)
 
     add_test(NAME ScaleTest_Debug
              CONFIGURATIONS Debug
+             WORKING_DIRECTORY ${TARGET_DIR_DEBUG}
              COMMAND ${TARGET_COMMAND_DEBUG} -q -d)
 
     add_test(NAME ScaleTest_Release
              CONFIGURATIONS Release
+             WORKING_DIRECTORY ${TARGET_DIR_RELEASE}
              COMMAND ${TARGET_COMMAND_RELEASE} -q -d)
 else()
-    add_test(NAME ScaleTest COMMAND ScaleTest -q -d)
+    add_test(NAME ScaleTest
+             WORKING_DIRECTORY ${TARGET_DIR}
+             COMMAND ScaleTest -q -d)
     set_property(TEST ScaleTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()

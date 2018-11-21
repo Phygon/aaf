@@ -63,12 +63,16 @@ if(WIN32)
 
     add_test(NAME ResultToTextTest_Debug
              CONFIGURATIONS Debug
+             WORKING_DIRECTORY ${TARGET_DIR_DEBUG}
              COMMAND ${TARGET_COMMAND_DEBUG})
 
     add_test(NAME ResultToTextTest_Release
              CONFIGURATIONS Release
+             WORKING_DIRECTORY ${TARGET_DIR_RELEASE}
              COMMAND ${TARGET_COMMAND_RELEASE})
 else()
-    add_test(NAME ResultToTextTest COMMAND ResultToTextTest)
+    add_test(NAME ResultToTextTest
+             WORKING_DIRECTORY ${TARGET_DIR}
+             COMMAND ResultToTextTest)
     set_property(TEST ResultToTextTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()

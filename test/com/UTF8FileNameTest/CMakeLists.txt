@@ -66,12 +66,16 @@ if(WIN32)
 
     add_test(NAME UTF8FileNameTest_Debug
              CONFIGURATIONS Debug
+             WORKING_DIRECTORY ${TARGET_DIR_DEBUG}
              COMMAND ${TARGET_COMMAND_DEBUG})
 
     add_test(NAME UTF8FileNameTest_Release
              CONFIGURATIONS Release
+             WORKING_DIRECTORY ${TARGET_DIR_RELEASE}
              COMMAND ${TARGET_COMMAND_RELEASE})
 else()
-    add_test(NAME UTF8FileNameTest COMMAND UTF8FileNameTest)
+    add_test(NAME UTF8FileNameTest
+             WORKING_DIRECTORY ${TARGET_DIR}
+             COMMAND UTF8FileNameTest)
     set_property(TEST UTF8FileNameTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()

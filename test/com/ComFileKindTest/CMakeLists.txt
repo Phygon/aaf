@@ -79,12 +79,16 @@ if(WIN32)
 
     add_test(NAME ComFileKindTest_Debug
              CONFIGURATIONS Debug
+             WORKING_DIRECTORY ${TARGET_DIR_DEBUG}
              COMMAND ${TARGET_COMMAND_DEBUG} -d)
 
     add_test(NAME ComFileKindTest_Release
              CONFIGURATIONS Release
+             WORKING_DIRECTORY ${TARGET_DIR_RELEASE}
              COMMAND ${TARGET_COMMAND_RELEASE} -d)
 else()
-    add_test(NAME ComFileKindTest COMMAND ComFileKindTest -d)
+    add_test(NAME ComFileKindTest
+             WORKING_DIRECTORY ${TARGET_DIR}
+             COMMAND ComFileKindTest -d)
     set_property(TEST ComFileKindTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()

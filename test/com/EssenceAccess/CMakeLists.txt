@@ -75,12 +75,16 @@ if(WIN32)
 
     add_test(NAME EssenceAccess_Debug
              CONFIGURATIONS Debug
+             WORKING_DIRECTORY ${TARGET_DIR_DEBUG}
              COMMAND ${TARGET_COMMAND_DEBUG} 100)
 
     add_test(NAME EssenceAccess_Release
              CONFIGURATIONS Release
+             WORKING_DIRECTORY ${TARGET_DIR_RELEASE}
              COMMAND ${TARGET_COMMAND_RELEASE} 100)
 else()
-    add_test(NAME EssenceAccess COMMAND EssenceAccess 100)
+    add_test(NAME EssenceAccess
+             WORKING_DIRECTORY ${TARGET_DIR}
+             COMMAND EssenceAccess 100)
     set_property(TEST EssenceAccess PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()

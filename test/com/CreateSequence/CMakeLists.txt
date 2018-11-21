@@ -75,12 +75,16 @@ if(WIN32)
 
     add_test(NAME CreateSequence_Debug
              CONFIGURATIONS Debug
+             WORKING_DIRECTORY ${TARGET_DIR_DEBUG}
              COMMAND ${TARGET_COMMAND_DEBUG} 2000)
 
     add_test(NAME CreateSequence_Release
              CONFIGURATIONS Release
+             WORKING_DIRECTORY ${TARGET_DIR_RELEASE}
              COMMAND ${TARGET_COMMAND_RELEASE} 2000)
 else()
-    add_test(NAME CreateSequence COMMAND CreateSequence 2000)
+    add_test(NAME CreateSequence
+             WORKING_DIRECTORY ${TARGET_DIR}
+             COMMAND CreateSequence 2000)
     set_property(TEST CreateSequence PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()
