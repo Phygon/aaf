@@ -45,7 +45,7 @@ add_dependencies(MakeSDKTests
     CreateSequence
     EssenceAccess
     MakeSDK
-    #MetaModelVerification
+    MetaModelVerification
     MultiGenTest
     OpenExistingModify
     ResultToTextTest
