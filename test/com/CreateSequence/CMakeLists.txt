@@ -70,7 +70,17 @@ add_dependencies(CreateSequence
     MakeSDK
 )
 
-add_test(NAME CreateSequence COMMAND CreateSequence 2000)
-if(UNIX)
-    set_property(TEST CreateSequence PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+if(WIN32)
+    SET_WIN32_TEST_VARS(${TARGET_DIR} $<TARGET_FILE_NAME:CreateSequence>)
+
+    add_test(NAME CreateSequence_Debug
+             CONFIGURATIONS Debug
+             COMMAND ${TARGET_COMMAND_DEBUG} 2000)
+
+    add_test(NAME CreateSequence_Release
+             CONFIGURATIONS Release
+             COMMAND ${TARGET_COMMAND_RELEASE} 2000)
+else()
+    add_test(NAME CreateSequence COMMAND CreateSequence 2000)
+    set_property(TEST CreateSequence PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()

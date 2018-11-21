@@ -92,9 +92,33 @@ add_dependencies(ComModTestAAF
     MakeSDK
 )
 
-add_test(NAME ComModTestAAF COMMAND ComModTestAAF)
-add_test(NAME ComModTestAAF-XML COMMAND ComModTestAAF -e XML -s AAFRandomRawStorage)
-if(UNIX)
-    set_property(TEST ComModTestAAF PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/:$ENV{LD_LIBRARY_PATH}")
-    set_property(TEST ComModTestAAF-XML PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/:$ENV{LD_LIBRARY_PATH}")
+if(WIN32)
+    SET_WIN32_TEST_VARS(${TARGET_DIR} $<TARGET_FILE_NAME:ComModTestAAF>)
+
+    add_test(NAME ComModTestAAF_Debug
+             CONFIGURATIONS Debug
+             WORKING_DIRECTORY ${TARGET_DIR_DEBUG}
+             COMMAND ${TARGET_COMMAND_DEBUG})
+    add_test(NAME ComModTestAAF-XML_Debug
+             CONFIGURATIONS Debug
+             WORKING_DIRECTORY ${TARGET_DIR_DEBUG}
+             COMMAND ${TARGET_COMMAND_DEBUG} -e XML -s AAFRandomRawStorage)
+
+    add_test(NAME ComModTestAAF_Release
+             CONFIGURATIONS Release
+             WORKING_DIRECTORY ${TARGET_DIR_RELEASE}
+             COMMAND ${TARGET_COMMAND_RELEASE})
+    add_test(NAME ComModTestAAF-XML_Release
+             CONFIGURATIONS Release
+             WORKING_DIRECTORY ${TARGET_DIR_RELEASE}
+             COMMAND ${TARGET_COMMAND_RELEASE} -e XML -s AAFRandomRawStorage)
+else()
+    add_test(NAME ComModTestAAF
+             WORKING_DIRECTORY ${TARGET_DIR}
+             COMMAND ComModTestAAF)
+    add_test(NAME ComModTestAAF-XML
+             WORKING_DIRECTORY ${TARGET_DIR}
+             COMMAND ComModTestAAF -e XML -s AAFRandomRawStorage)
+    set_property(TEST ComModTestAAF PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
+    set_property(TEST ComModTestAAF-XML PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()

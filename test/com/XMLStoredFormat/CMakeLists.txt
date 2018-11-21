@@ -87,9 +87,21 @@ add_custom_command(TARGET XMLStoredFormat POST_BUILD
         ${TARGET_DIR}/input
 )
 
-add_test(NAME XMLStoredFormat
-         WORKING_DIRECTORY ${TARGET_DIR}
-         COMMAND XMLStoredFormat)
-if(UNIX)
+if(WIN32)
+    SET_WIN32_TEST_VARS(${TARGET_DIR} $<TARGET_FILE_NAME:XMLStoredFormat>)
+
+    add_test(NAME XMLStoredFormat_Debug
+             CONFIGURATIONS Debug
+             WORKING_DIRECTORY ${TARGET_DIR_DEBUG}
+             COMMAND ${TARGET_COMMAND_DEBUG})
+
+    add_test(NAME XMLStoredFormat_Release
+             CONFIGURATIONS Release
+             WORKING_DIRECTORY ${TARGET_DIR_RELEASE}
+             COMMAND ${TARGET_COMMAND_RELEASE})
+else()
+    add_test(NAME XMLStoredFormat
+             WORKING_DIRECTORY ${TARGET_DIR}
+             COMMAND XMLStoredFormat)
     set_property(TEST XMLStoredFormat PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()

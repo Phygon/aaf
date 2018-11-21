@@ -72,3 +72,16 @@ endif()
 
 set(AAFSDK_TARGET_DIR "${AAFSDK_OUT_DIR}/target/${PLATFORM}-${ARCH}/${CONFIGURATION}" CACHE INTERNAL "Path to target directory" FORCE)
 set(AAFSDK_SHARED_DIR "${AAFSDK_OUT_DIR}/shared" CACHE INTERNAL "Path to public headers" FORCE)
+
+if(WIN32)
+    # This is a workaround to cmake/ctest not substituting the configuration name in the executable path
+    # when the cmake generator supports multiple configurations on Windows.
+    # The substitution is done manually and test targets will be created explicitly for Debug
+    # and Release configurations using the TARGET_DIR_DEBUG/RELEASE and TARGET_COMMAND_DEBUG/RELEASE variables
+    macro(SET_WIN32_TEST_VARS target_dir target_file_name)
+        string(REPLACE "\$(Configuration)" "Debug" TARGET_DIR_DEBUG ${target_dir})
+        set(TARGET_COMMAND_DEBUG ${TARGET_DIR_DEBUG}/${target_file_name})
+        string(REPLACE "\$(Configuration)" "Release" TARGET_DIR_RELEASE ${target_dir})
+        set(TARGET_COMMAND_RELEASE ${TARGET_DIR_RELEASE}/${target_file_name})
+    endmacro(SET_WIN32_TEST_VARS)
+endif()

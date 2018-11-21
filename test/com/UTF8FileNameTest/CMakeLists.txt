@@ -61,7 +61,17 @@ set_target_properties(UTF8FileNameTest PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${TARGET_DIR}
 )
 
-add_test(NAME UTF8FileNameTest COMMAND UTF8FileNameTest)
-if(UNIX)
-    set_property(TEST UTF8FileNameTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+if(WIN32)
+    SET_WIN32_TEST_VARS(${TARGET_DIR} $<TARGET_FILE_NAME:UTF8FileNameTest>)
+
+    add_test(NAME UTF8FileNameTest_Debug
+             CONFIGURATIONS Debug
+             COMMAND ${TARGET_COMMAND_DEBUG})
+
+    add_test(NAME UTF8FileNameTest_Release
+             CONFIGURATIONS Release
+             COMMAND ${TARGET_COMMAND_RELEASE})
+else()
+    add_test(NAME UTF8FileNameTest COMMAND UTF8FileNameTest)
+    set_property(TEST UTF8FileNameTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()

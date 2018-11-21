@@ -70,7 +70,17 @@ add_dependencies(EssenceAccess
     MakeSDK
 )
 
-add_test(NAME EssenceAccess COMMAND EssenceAccess 100)
-if(UNIX)
-    set_property(TEST EssenceAccess PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+if(WIN32)
+    SET_WIN32_TEST_VARS(${TARGET_DIR} $<TARGET_FILE_NAME:EssenceAccess>)
+
+    add_test(NAME EssenceAccess_Debug
+             CONFIGURATIONS Debug
+             COMMAND ${TARGET_COMMAND_DEBUG} 100)
+
+    add_test(NAME EssenceAccess_Release
+             CONFIGURATIONS Release
+             COMMAND ${TARGET_COMMAND_RELEASE} 100)
+else()
+    add_test(NAME EssenceAccess COMMAND EssenceAccess 100)
+    set_property(TEST EssenceAccess PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()

@@ -58,7 +58,17 @@ set_target_properties(ScaleTest PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${TARGET_DIR}
 )
 
-add_test(NAME ScaleTest COMMAND ScaleTest -q -d)
-if(UNIX)
-    set_property(TEST ScaleTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+if(WIN32)
+    SET_WIN32_TEST_VARS(${TARGET_DIR} $<TARGET_FILE_NAME:ScaleTest>)
+
+    add_test(NAME ScaleTest_Debug
+             CONFIGURATIONS Debug
+             COMMAND ${TARGET_COMMAND_DEBUG} -q -d)
+
+    add_test(NAME ScaleTest_Release
+             CONFIGURATIONS Release
+             COMMAND ${TARGET_COMMAND_RELEASE} -q -d)
+else()
+    add_test(NAME ScaleTest COMMAND ScaleTest -q -d)
+    set_property(TEST ScaleTest PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()

@@ -69,7 +69,17 @@ set_target_properties(MetaModelVerification PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY_RELEASE ${TARGET_DIR}
 )
 
-add_test(NAME MetaModelVerification COMMAND MetaModelVerification)
-if(UNIX)
-    set_property(TEST MetaModelVerification PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl/")
+if(WIN32)
+    SET_WIN32_TEST_VARS(${TARGET_DIR} $<TARGET_FILE_NAME:MetaModelVerification>)
+
+    add_test(NAME MetaModelVerification_Debug
+             CONFIGURATIONS Debug
+             COMMAND ${TARGET_COMMAND_DEBUG})
+
+    add_test(NAME MetaModelVerification_Release
+             CONFIGURATIONS Release
+             COMMAND ${TARGET_COMMAND_RELEASE})
+else()
+    add_test(NAME MetaModelVerification COMMAND MetaModelVerification)
+    set_property(TEST MetaModelVerification PROPERTY ENVIRONMENT "LD_LIBRARY_PATH=${AAFSDK_TARGET_DIR}/RefImpl:$ENV{LD_LIBRARY_PATH}")
 endif()
