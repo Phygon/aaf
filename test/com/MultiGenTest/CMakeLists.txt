@@ -88,3 +88,34 @@ set_target_properties(MultiGenTest PROPERTIES
 add_dependencies(MultiGenTest
     MakeSDK
 )
+
+
+if(WIN32)
+    SET_WIN32_TEST_VARS(${TARGET_DIR} $<TARGET_FILE_NAME:MultiGenTest>)
+
+    add_test(NAME MultiGenTest_Debug
+             CONFIGURATIONS Debug
+             WORKING_DIRECTORY ${TARGET_DIR_DEBUG}
+             COMMAND ${CMAKE_COMMAND}
+                -DEXECUTABLE=${TARGET_COMMAND_DEBUG}
+                -DLIBRARY=${TARGET_DIR_DEBUG}/$<TARGET_FILE_NAME:comapi>
+                -DFILEKIND=M4KBinary
+                -P ${CMAKE_CURRENT_SOURCE_DIR}/RunMultiGenTest.cmake)
+
+    add_test(NAME MultiGenTest_Release
+             CONFIGURATIONS Release
+             WORKING_DIRECTORY ${TARGET_DIR_RELEASE}
+             COMMAND ${CMAKE_COMMAND}
+                -DEXECUTABLE=${TARGET_COMMAND_RELEASE}
+                -DLIBRARY=${TARGET_DIR_RELEASE}/$<TARGET_FILE_NAME:comapi>
+                -DFILEKIND=M4KBinary
+                -P ${CMAKE_CURRENT_SOURCE_DIR}/RunMultiGenTest.cmake)
+else()
+    add_test(NAME MultiGenTest
+             WORKING_DIRECTORY ${TARGET_DIR}
+             COMMAND ${CMAKE_COMMAND}
+                -DEXECUTABLE=$<TARGET_FILE:MultiGenTest>
+                -DLIBRARY=$<TARGET_FILE:comapi>
+                -DFILEKIND=S4KBinary
+                -P ${CMAKE_CURRENT_SOURCE_DIR}/RunMultiGenTest.cmake)
+endif()
