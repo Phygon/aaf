@@ -71,9 +71,13 @@ typedef IAAFSmartPointer<IAAFMob2>					IAAFMob2SP;
 typedef IAAFSmartPointer<IAAFMob3>					IAAFMob3SP;
 typedef IAAFSmartPointer<IAAFMobSlot>				IAAFMobSlotSP;
 typedef IAAFSmartPointer<IAAFFile>					IAAFFileSP;
+typedef IAAFSmartPointer<IAAFObject>				IAAFObjectSP;
 typedef IAAFSmartPointer<IAAFOperationGroup>		IAAFOperationGroupSP;
 typedef IAAFSmartPointer<IAAFOperationDef>		    IAAFOperationDefSP;
 typedef IAAFSmartPointer<IAAFPlainEssenceData>		IAAFPlainEssenceDataSP;
+typedef IAAFSmartPointer<IAAFPlainStreamData>		IAAFPlainStreamDataSP;
+typedef IAAFSmartPointer<IAAFPropertyDef>			IAAFPropertyDefSP;
+typedef IAAFSmartPointer<IAAFPropertyValue>			IAAFPropertyValueSP;
 typedef IAAFSmartPointer<IAAFSegment>		        IAAFSegmentSP;
 typedef IAAFSmartPointer<IAAFSequence>		        IAAFSequenceSP;
 typedef IAAFSmartPointer<IAAFSoundDescriptor>		IAAFSoundDescriptorSP;
@@ -81,6 +85,7 @@ typedef IAAFSmartPointer<IAAFSourceClip>			IAAFSourceClipSP;
 typedef IAAFSmartPointer<IAAFSourceReference>		IAAFSourceReferenceSP;
 typedef IAAFSmartPointer<IAAFSourceMob>				IAAFSourceMobSP;
 typedef IAAFSmartPointer<IAAFTimelineMobSlot>		IAAFTimelineMobSlotSP;
+typedef IAAFSmartPointer<IAAFTypeDefStream3>		IAAFTypeDefStream3SP;
 
 
 
@@ -88,6 +93,9 @@ typedef IAAFSmartPointer<IAAFTimelineMobSlot>		IAAFTimelineMobSlotSP;
 const aafUID_t kClassID_ConcreteEvent = 
 { 0xe6ab4ee8, 0x33f2, 0x4bea, { 0xa5, 0xac, 0xa2, 0x80, 0xb9, 0x31, 0x46, 0xe9 } };
 
+// {6D48195D-643B-4191-B374-733FA23F7EEC}
+const aafUID_t kPropID_MasterMob_TestDataStream =
+{ 0x6d48195d, 0x643b, 0x4191, { 0xb3, 0x74, 0x73, 0x3f, 0xa2, 0x3f, 0x7e, 0xec } };
 
 static const aafWChar *slotNames[10] = { L"SLOT1", L"SLOT2", L"SLOT3", L"SLOT4",
                                          L"SLOT5", L"SLOT6", L"SLOT7",  L"SLOTSTATIC" , L"SLOTEVENT"  };
@@ -189,6 +197,12 @@ static const aafMobID_t MOBTestID14 =
 { { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
 	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
 	{ 0xfa121def, 0x16f2, 0x4117, { 0x8d, 0x06, 0xd9, 0xb3, 0x56, 0x30, 0xd8, 0xf1 } } };
+
+// {79CFA71B-A7DC-408F-B96C-6D88D3979454}
+static const aafMobID_t MOBTestID15 = 
+{ { 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x01, 0x01, 0x01,
+	 0x01, 0x01, 0x04, 0x02 }, 0x13, 0x00, 0x00, 0x00,
+	{ 0x79cfa71b, 0xa7dc, 0x408f, { 0xb9, 0x6c, 0x6d, 0x88, 0xd3, 0x97, 0x94, 0x54 } } };
 
 // {C92063EB-FEA6-4fb3-8EB5-A120CB21E3C4}
 static const aafMobID_t MOBTestID_Static = 
@@ -751,6 +765,111 @@ static HRESULT CreateEmptyClip(
 	return hr;
 }
 
+static HRESULT RegisterDataStreamProperty(
+	IAAFDictionary* pDictionary,
+	IAAFPropertyDef** pPropDef)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFClassDefSP pClassDef;
+		checkResult(pDictionary->LookupClassDef(AUID_AAFMasterMob, &pClassDef));
+
+		IAAFTypeDefSP pTypeDef;
+		checkResult(pDictionary->LookupTypeDef(kAAFTypeID_Stream, &pTypeDef));
+
+		checkResult(pClassDef->RegisterOptionalPropertyDef(kPropID_MasterMob_TestDataStream, L"TestDataStream", pTypeDef, pPropDef));
+
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+static HRESULT CreateDataStream(
+	IAAFHeader* pHeader,
+	const aafMobID_t masterMobID,
+	aafDataBuffer_t data,
+	aafUInt32 dataSize)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFDictionarySP pDictionary;
+		checkResult(pHeader->GetDictionary(&pDictionary));
+		CAAFBuiltinDefs defs(pDictionary);
+
+		IAAFPropertyDefSP pPropDef;
+		checkResult(RegisterDataStreamProperty(pDictionary, &pPropDef));
+		IAAFTypeDefSP pTypeDef;
+		checkResult(pPropDef->GetTypeDef(&pTypeDef));
+
+		// Create MasterMob to hold the Essence Group
+		IAAFMobSP pMob;
+		checkResult(defs.cdMasterMob()->CreateInstance(IID_IAAFMob, (IUnknown **)&pMob));
+		checkResult(pMob->SetMobID(masterMobID));
+		checkResult(pHeader->AddMob(pMob));
+
+		// A Data Stream proprty value should be created _after_ the object
+		// is attached to the file (i.e. AdddMob() above) becase the stream 
+		IAAFObjectSP pMobObject;
+		checkResult(pMob->QueryInterface(IID_IAAFObject, (void**)&pMobObject));
+		IAAFPropertyValueSP pPropValue;
+		checkResult(pMobObject->CreateOptionalPropertyValue(pPropDef, &pPropValue));
+
+		IAAFTypeDefStream3SP pTypeDefStream;
+		checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefStream3, (void**)&pTypeDefStream));
+		IAAFPlainStreamDataSP pPlainStreamData;
+		checkResult(pTypeDefStream->GetPlainStreamData(0, &pPlainStreamData));
+		checkResult(pPlainStreamData->Write(pPropValue, dataSize, data));
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
+static HRESULT ReadDataStream(IAAFHeader* pHeader, const aafMobID_t masterMobID, aafDataBuffer_t buffer, aafUInt32 bufferSize, aafUInt32* pBytesRead)
+{
+	HRESULT hr = S_OK;
+
+	try
+	{
+		IAAFMobSP pMob;
+		checkResult(pHeader->LookupMob(masterMobID, &pMob));
+
+		IAAFObjectSP pMobObject;
+		checkResult(pMob->QueryInterface(IID_IAAFObject, (void**)&pMobObject));
+		IAAFClassDefSP pClassDef;
+		checkResult(pMobObject->GetDefinition(&pClassDef));
+		IAAFPropertyDefSP pPropDef;
+		checkResult(pClassDef->LookupPropertyDef(kPropID_MasterMob_TestDataStream, &pPropDef));
+		IAAFTypeDefSP pTypeDef;
+		checkResult(pPropDef->GetTypeDef(&pTypeDef));
+		IAAFPropertyValueSP pPropValue;
+		checkResult(pMobObject->GetPropertyValue(pPropDef, &pPropValue));
+
+		IAAFTypeDefStream3SP pTypeDefStream;
+		checkResult(pTypeDef->QueryInterface(IID_IAAFTypeDefStream3, (void**)&pTypeDefStream));
+		IAAFPlainStreamDataSP pPlainStreamData;
+		checkResult(pTypeDefStream->GetPlainStreamData(0, &pPlainStreamData));
+		checkResult(pPlainStreamData->Read(pPropValue, bufferSize, buffer, pBytesRead));
+	}
+	catch (HRESULT& rResult)
+	{
+		hr = rResult;
+	}
+
+	return hr;
+}
+
 static HRESULT CreateClonedAAFFile(
     aafWChar * pFileName,
     aafUID_constref fileKind,
@@ -838,6 +957,7 @@ static HRESULT CreateClonedAAFFile(
 				checkResult(CreateEssenceGroup(pHeader, MOBTestID10, MOBTestID9, MOBTestID11));
 				checkResult(CreateEmptyClip(pHeader, MOBTestID14));
 				checkResult(CreateComposition(pHeader, MOBTestID12, MOBTestID10, MOBTestID13, MOBTestID14));
+				checkResult(CreateDataStream(pHeader, MOBTestID15, (aafDataBuffer_t)KLVsmiley, sizeof(KLVsmiley)));
 				checkResult(pSrcFile->Save());
 				checkResult(pSrcFile->Close());
 				// Reopen the closed source file
@@ -861,21 +981,17 @@ static HRESULT CreateClonedAAFFile(
 					checkResult(pDestFile->Save());
 				}
 
-				// Clone from saved and closed file while deferring copying of stream contents.
+				// Clone from saved and closed file while deferring copying of stream contents (essence and index streams).
 				{
 					IAAFMobSP pMob;
 					checkResult(pHeader->LookupMob(MOBTestID8, &pMob));
 					// TODO: Fix CloneExternalAdvanced() to support deferred
 					// copying of the media.
 					//
-					// TODO: Add a test case for CloneExternalAdvanced() to
-					// test deferred copying of stream properties other than
-					// essence and index stream properties.
-					//
 					// This call is disabled because it currently doesn't
 					// support cloning with media when deferred stream copying
 					// is enabled.
-#if 0				
+#if 0
 					IAAFMob3SP pMob3;
 					if (AAFRESULT_SUCCEEDED(pMob->QueryInterface(IID_IAAFMob3, (void**)&pMob3)))
 					{
@@ -888,6 +1004,25 @@ static HRESULT CreateClonedAAFFile(
 						// Fall back to the original method if the toolkit version doesn't implement IAAFMob3
 						IAAFMobSP pClonedMob;
 						checkResult(pMob->CloneExternal(kAAFNoFollowDepend, kAAFIncludeMedia, pDestFile, &pClonedMob));
+					}
+					checkResult(pDestFile->Save());
+				}
+
+				// Clone from saved and closed file while deferring copying of stream contents (data streams other than essence and index).
+				{
+					IAAFMobSP pMob;
+					checkResult(pHeader->LookupMob(MOBTestID15, &pMob));
+					IAAFMob3SP pMob3;
+					if (AAFRESULT_SUCCEEDED(pMob->QueryInterface(IID_IAAFMob3, (void**)&pMob3)))
+					{
+						IAAFMobSP pClonedMob;
+						checkResult(pMob3->CloneExternalAdvanced(kAAFNoFollowDepend, kAAFNoIncludeMedia, kAAFTrue, pDestFile, &pClonedMob));
+					}
+					else
+					{
+						// Fall back to the original method if the toolkit version doesn't implement IAAFMob3
+						IAAFMobSP pClonedMob;
+						checkResult(pMob->CloneExternal(kAAFNoFollowDepend, kAAFNoIncludeMedia, pDestFile, &pClonedMob));
 					}
 					checkResult(pDestFile->Save());
 				}
@@ -974,6 +1109,12 @@ static HRESULT ReadClonedAAFFile(aafWChar * pFileName)
 		checkExpression(MobExists(pHeader, MOBTestID12), AAFRESULT_TEST_FAILED);
 		checkExpression(MobExists(pHeader, MOBTestID13), AAFRESULT_TEST_FAILED);
 		checkExpression(MobExists(pHeader, MOBTestID14), AAFRESULT_TEST_FAILED);
+
+		memset(buffer, 0, sizeof(buffer));
+		bytesRead = 0;
+		checkResult(ReadDataStream(pHeader, MOBTestID15, buffer, sizeof(buffer), &bytesRead));
+		checkExpression(bytesRead == sizeof(KLVsmiley), AAFRESULT_TEST_FAILED);
+		checkExpression(memcmp(buffer, KLVsmiley, bytesRead) == 0, AAFRESULT_TEST_FAILED);
 
 		// The following 2 tests currently fail due to known bugs.
 		// For test cases see CreateClonedAAFFile() and how streams
