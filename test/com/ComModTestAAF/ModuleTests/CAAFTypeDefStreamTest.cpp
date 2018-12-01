@@ -591,6 +591,28 @@ static void Test_EssenceStreamRead(
   CheckExpression(bytesRead == sizeof(sTestCharacter), AAFRESULT_TEST_FAILED);
   CheckExpression(0 == memcmp(characterTest, sTestCharacter, bytesRead),
                   AAFRESULT_TEST_FAILED);
+
+  // Read beyond the end of the stream:
+  // For simplicity this test reads the entire stream and veryfies only a part
+  // of its contents.
+  CheckResult(pTypeDefStream->SetPosition(pStreamPropertyValue, 0));
+  aafInt64 streamSize = 0;
+  CheckResult(pTypeDefStream->GetSize(pStreamPropertyValue, &streamSize));
+  const aafInt64 readSize = streamSize + 500;
+  CheckExpression(streamSize < readSize, AAFRESULT_TEST_FAILED);
+  char* pBuffer = new char[readSize];
+  bytesRead = 0;
+  CheckResult(pTypeDefStream->Read(pStreamPropertyValue,
+                                    readSize,
+                                    reinterpret_cast<aafMemPtr_t>(pBuffer),
+                                    &bytesRead));
+  CheckExpression(bytesRead == streamSize, AAFRESULT_TEST_FAILED);
+  // Check only the beginning of the retrieved stream contents (we know it
+  // starts with sSmiley).
+  CheckExpression(0 == memcmp(pBuffer, sSmiley, sizeof(sSmiley)),
+                  AAFRESULT_TEST_FAILED);
+  delete [] pBuffer;
+  pBuffer = NULL;
 }
 
 class TestStreamAccess : public IAAFStreamAccess 

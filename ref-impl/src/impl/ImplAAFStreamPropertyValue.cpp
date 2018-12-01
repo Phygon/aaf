@@ -172,7 +172,6 @@ AAFRESULT STDMETHODCALLTYPE
   if (0 < dataSize && 0 == *bytesRead)
     return AAFRESULT_END_OF_DATA;
   
-  ASSERTU(dataSize == *bytesRead);  
   return AAFRESULT_SUCCESS;
 }
 
@@ -743,7 +742,6 @@ AAFRESULT STDMETHODCALLTYPE
   if (0 < dataSize && 0 == *bytesRead)
     return AAFRESULT_END_OF_DATA;
   
-  ASSERTU(dataSize == *bytesRead);  
   return AAFRESULT_SUCCESS;
 }
 
