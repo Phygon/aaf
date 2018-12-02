@@ -627,6 +627,20 @@ OMXMLStorage::isKnownExtEnumElement(OMUniqueObjectIdentification elementOf,
     return isKnown;
 }
 
+const wchar_t* 
+OMXMLStorage::getRecordMemberSymbol(const OMUniqueObjectIdentification& typeId,
+    OMUInt32 index) const
+{
+    const wchar_t* symbol = 0;
+    const OMSymbolspace* symbolspace = getSymbolspaceForMetaDef(typeId);
+    if (symbolspace)
+    {
+        symbol = symbolspace->getRecordMemberSymbol(typeId, index);
+    }
+
+    return symbol;
+}
+
 bool 
 OMXMLStorage::isBaselineSymbolspace(OMSymbolspace* symbolspace) const
 {

@@ -128,6 +128,7 @@ public:
     OMSymbolspace* getSymbolspaceForMetaDef(OMUniqueObjectIdentification id) const;
     bool isKnownExtEnumElement(OMUniqueObjectIdentification elementOf,
         OMUniqueObjectIdentification value) const;
+    const wchar_t* getRecordMemberSymbol(const OMUniqueObjectIdentification& id, OMUInt32 index) const;
     bool isBaselineSymbolspace(OMSymbolspace* symbolspace) const;
         
     const wchar_t* getDataStreamNotationName(OMUniqueObjectIdentification typeId);

@@ -1021,6 +1021,19 @@ boolToString(bool value, wchar_t* str)
 {
     if (value)
     {
+        wcscpy(str, L"True");
+    }
+    else
+    {
+        wcscpy(str, L"False");
+    }
+}
+
+void
+boolToXsdString(bool value, wchar_t* str)
+{
+    if (value)
+    {
         wcscpy(str, L"true");
     }
     else
@@ -1458,7 +1471,15 @@ boolFromString(const wchar_t* str, bool& value)
 {
     TRACE("::boolFromString");
 
-    if (wcscmp(str, L"true") == 0)
+    if (wcscmp(str, L"True") == 0)
+    {
+        value = true;
+    }
+    else if (wcscmp(str, L"False") == 0)
+    {
+        value = false;
+    }
+    else if (wcscmp(str, L"true") == 0)
     {
         value = true;
     }

@@ -148,12 +148,14 @@ public:
     OMUniqueObjectIdentification getDefId(const wchar_t* symbol) const;
     bool isKnownExtEnumElement(OMUniqueObjectIdentification elementOf, 
         OMUniqueObjectIdentification value) const;
+    const wchar_t* getRecordMemberSymbol(const OMUniqueObjectIdentification& id, OMUInt32 index) const;
     
     void addClassDef(OMClassDefinition* classDef);
     void addTypeDef(OMType* typeDef);
     void addPropertyDef(OMClassDefinition* classDef, OMPropertyDefinition* propertyDef);
     void addExtEnumElement(OMUniqueObjectIdentification id, const wchar_t* name,
         OMUniqueObjectIdentification value);
+    void addRecordMember(const OMUniqueObjectIdentification& id, const wchar_t* symbol);
     
     void save();
     void restore(OMDictionary* dictionary);
@@ -302,6 +304,8 @@ private:
         OMUniqueObjectIdentification _value;
     };
     OMSet<ExtEnumId, ExtEnumElement*> _extEnumElements;
+
+    OMSet<OMUniqueObjectIdentification, OMVector<OMWString> > _recordMembers;
 
     struct RegisterPropertyPair
     {

@@ -104,6 +104,7 @@ void timeStampToString(const OMByte* internalBytes, wchar_t* str);
 void timeStructToString(const OMByte* internalBytes, wchar_t* str);
 void dateStructToString(const OMByte* internalBytes, wchar_t* str);
 void boolToString(bool value, wchar_t* str);
+void boolToXsdString(bool value, wchar_t* str);
 void rationalToString(const OMByte* internalBytes, wchar_t* str);
 void versionTypeToString(const OMByte* internalBytes, wchar_t* str);
 

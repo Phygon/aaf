@@ -144,6 +144,8 @@ static const OMPropertyId PropLocalID_Header_IdentificationList = 0x3B06;
 static const OMPropertyId PropLocalID_Identification_GenerationAUID = 0x3C09;
 static const OMPropertyId PropLocalID_DefinitionObject_Identification = 0x1B01;
 static const OMPropertyId PropLocalID_Parameter_Definition = 0x4C01;
+static const OMPropertyId PropLocalID_Package_PackageID = 0x4401;
+static const OMPropertyId PropLocalID_EssenceData_LinkedPackageID = 0x2701;
 
 // global attribute names
 static const wchar_t* UniqueId_AttrName = L"uid";
@@ -891,17 +893,27 @@ OMXMLStoredObject::save(const OMStrongReferenceSet& set)
     {
         OMStrongReferenceSetElement& element = iterator.value();
 
-        // Forward the DefinitionObject::Identification to the object
-        // so that it can be written as the value of the aaf:uid attribute
+        // Forward the DefinitionObject::Identification, Package::PackageID
+        // and EssenceData::LinkedPackageID to the object so that it can be
+        // written as the value of the aaf:uid attribute.
         // Handle special case of OperationGroup::Parameters set where the key
         // is defined to be the DefinitionObject::Identification property and 
-        // this id must not be forwarded
+        // this id must not be forwarded.
         if (set.keyPropertyId() == PropLocalID_DefinitionObject_Identification &&
             set.definition()->identification() != PropID_OperationGroup_Parameters)
         {
             OMUniqueObjectIdentification id =
                 *(reinterpret_cast<OMUniqueObjectIdentification*>(element.identification()));
             wchar_t* idStr = saveAUID(id, DICT_DEF);
+            _store->forwardObjectSetId(idStr);
+            delete [] idStr;
+        }
+        else if (set.keyPropertyId() == PropLocalID_Package_PackageID ||
+                 set.keyPropertyId() == PropLocalID_EssenceData_LinkedPackageID)
+        {
+            OMUniqueMaterialIdentification id =
+                *(reinterpret_cast<OMUniqueMaterialIdentification*>(element.identification()));
+            wchar_t* idStr = saveMobID(id);
             _store->forwardObjectSetId(idStr);
             delete [] idStr;
         }
@@ -1389,10 +1401,11 @@ OMXMLStoredObject::restore(OMStrongReferenceSet& set,
     {
         wchar_t* name = elementName(setName, setId, localKey);
 
-        OMByte* key = 0;
+        OMByteArray key;
 
-        // DefinitionObjects will have a aaf:uid attribute
-        // Read it so that we can compare it with the DefinitionObject::Identification
+        // DefinitionObjects, Packages and EssenceData will have a aaf:uid attribute
+        // Read it so that we can compare it with the DefinitionObject::Identification,
+        // Package::PackageID or EssenceData::LinkedPackageID.
         const wchar_t* nmspace;
         const wchar_t* localName;
         const OMList<OMXMLAttribute*>* attrs;
@@ -1401,9 +1414,7 @@ OMXMLStoredObject::restore(OMStrongReferenceSet& set,
                                  getBaselineURI(), UniqueId_AttrName);
         if (idAttr != 0)
         {
-            key = new OMByte[sizeof(OMUniqueObjectIdentification)];
-            OMUniqueObjectIdentification id = restoreAUID(idAttr->getValue(), DICT_DEF);
-            memcpy(key, reinterpret_cast<void*>(&id), sizeof(OMUniqueObjectIdentification));
+            restoreUniqueIdentifier(key, idAttr->getValue(), DICT_DEF);
         }
 
         // restore the object using a dummy (key and keySize not yet known)
@@ -1440,9 +1451,9 @@ OMXMLStoredObject::restore(OMStrongReferenceSet& set,
         }
         OMByte* bits = new OMByte[size];
         keyProperty->getBits(bits, size);
-        if (key != 0)
+        if (key.size() != 0)
         {
-            if (memcmp(key, bits, size) != 0)
+            if (memcmp(key.bytes(), bits, size) != 0)
             {
                 throw OMException("Key property value does not match aaf:uid attribute value");
             }
@@ -1450,19 +1461,18 @@ OMXMLStoredObject::restore(OMStrongReferenceSet& set,
         }
         else
         {
-            key = bits;
+            key.append(bits, size);
         }
         
         // insert the element into the set
 #if 1 // HACK: Compile against new OMStrongReference classes.
-        OMStrongReferenceSetElement element(&set, nullOMUniqueObjectIdentification, localKey, key, keySize);
+        OMStrongReferenceSetElement element(&set, nullOMUniqueObjectIdentification, localKey, key.bytes(), keySize);
 #else
         OMStrongReferenceSetElement element(&set, name, localKey, key, keySize);
 #endif
-        element.setValue(key, storable);
-        set.insert(key, element);
+        element.setValue(key.bytes(), storable);
+        set.insert(key.bytes(), element);
         
-        delete [] key;
         delete [] name;
         
         localKey++;
@@ -1993,7 +2003,7 @@ OMXMLStoredObject::saveRecord(const OMByte* internalBytes, OMUInt32 internalSize
     {
         const OMUniqueObjectIdentification id = 
             *(reinterpret_cast<const OMUniqueObjectIdentification*>(internalBytes));
-        wchar_t* idStr = saveAUID(id, ANY);
+        wchar_t* idStr = saveAUID(id, NON_DEF);
         if (isElementContent)
         {
             getWriter()->writeElementContent(idStr, wcslen(idStr));
@@ -2122,7 +2132,11 @@ OMXMLStoredObject::saveRecord(const OMByte* internalBytes, OMUInt32 internalSize
         const OMByte* memberBytes = unpaddedIternalBytes;
         for (OMUInt32 i = 0; i < count; i++)
         {
-            const wchar_t* name = type->memberName(i);
+            const wchar_t* name = _store->getRecordMemberSymbol(type->identification(), i);
+            if (!name)
+            {
+                name = type->memberName(i);
+            }
             const OMType* memberType = type->memberType(i);
             
             getWriter()->writeElementStart(symbolspace, name);
@@ -2471,21 +2485,21 @@ OMXMLStoredObject::restoreExtensions(OMDictionary* dictionary)
             OMWString symbolspace;
             while (getReader()->nextElement())
             {
-                if (getReader()->elementEquals(getBaselineURI(), L"Symbolspace"))
+                if (getReader()->elementEquals(getBaselineURI(), L"SchemeURI"))
                 {
                     const wchar_t* data;
                     OMUInt32 length;
                     getReader()->next();
                     if (getReader()->getEventType() != OMXMLReader::CHARACTERS)
                     {
-                        throw OMException("Empty string is invalid Extension::Symbolspace "
+                        throw OMException("Empty string is invalid Extension::SchemeURI "
                             "value");
                     }
                     getReader()->getCharacters(data, length);
                     symbolspace = data;
                     getReader()->moveToEndElement();
                 }
-                else if (getReader()->elementEquals(getBaselineURI(), L"Definitions"))
+                else if (getReader()->elementEquals(getBaselineURI(), L"MetaDefinitions"))
                 {
                     while (getReader()->nextElement())
                     {
@@ -3155,7 +3169,11 @@ OMXMLStoredObject::restoreRecord(OMByteArray& bytes, const OMList<OMXMLAttribute
         OMUInt32 count = type->memberCount();
         for (OMUInt32 i = 0; i < count; i++)
         {
-            const wchar_t* memberName = type->memberName(i);
+            const wchar_t* memberName = _store->getRecordMemberSymbol(type->identification(), i);
+            if (!memberName)
+            {
+                memberName = type->memberName(i);
+            }
             const OMType* memberType = type->memberType(i);
 
             if (!getReader()->nextElement())
@@ -3696,6 +3714,23 @@ OMXMLStoredObject::restoreMobID(const wchar_t* idStr)
     }
     
     return id;
+}
+
+void 
+OMXMLStoredObject::restoreUniqueIdentifier(OMByteArray& bytes, const wchar_t* idStr, AUIDTargetType targetType)
+{
+    TRACE("OMXMLStoredObject::restoreUniqueIdentifier");
+
+    if (isUMIDURI(idStr))
+    {
+        OMUniqueMaterialIdentification id = restoreMobID(idStr);
+        bytes.append(reinterpret_cast<OMByte*>(&id), sizeof(id));
+    }
+    else
+    {
+        OMUniqueObjectIdentification id = restoreAUID(idStr, targetType);
+        bytes.append(reinterpret_cast<OMByte*>(&id), sizeof(id));
+    }
 }
 
 wchar_t* 

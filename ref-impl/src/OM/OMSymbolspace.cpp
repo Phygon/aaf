@@ -100,7 +100,7 @@ static const OMPropertyId typeDefsTargetPath[3] = {0x0001, 0x0004, 0x0000};
 
 
 const wchar_t* OMSymbolspace::_baselineURI = 
-    L"http://www.aafassociation.org/aafx/v1.1/20090617";
+    L"http://www.smpte-ra.org/schemas/2001-2/2013/aaf";
 const OMUniqueObjectIdentification OMSymbolspace::_baselineId =
 {0x696aa72c, 0x7c41, 0x4fa7, {0x84, 0x99, 0x30, 0xfe, 0x83, 0xe3, 0xdb, 0x12}};
 const wchar_t* OMSymbolspace::_baselineVersion = L"1.1";
@@ -709,6 +709,24 @@ OMSymbolspace::isKnownExtEnumElement(OMUniqueObjectIdentification elementOf,
     return _extEnumElements.contains(ExtEnumId(elementOf, value));
 }
 
+const wchar_t* 
+OMSymbolspace::getRecordMemberSymbol(const OMUniqueObjectIdentification& typeId, OMUInt32 index) const
+{
+    TRACE("OMSymbolspace::getRecordMemeberSymbol");
+    
+    OMVector<OMWString>* memberSymbols = 0;
+    if (_recordMembers.find(typeId, &memberSymbols))
+    {
+        if (index >= memberSymbols->count())
+        {
+            throw OMException("Invalid member index");
+        }
+        return memberSymbols->getAt(index).c_str();
+    }
+    
+    return 0;
+}
+
 void 
 OMSymbolspace::addClassDef(OMClassDefinition* classDef)
 {
@@ -758,6 +776,25 @@ OMSymbolspace::addExtEnumElement(OMUniqueObjectIdentification elementOf,
 }
 
 void 
+OMSymbolspace::addRecordMember(const OMUniqueObjectIdentification& typeId,
+    const wchar_t* name)
+{
+    OMVector<OMWString>* memberNames;
+    if (!_recordMembers.find(typeId, &memberNames))
+    {
+	if (!getMetaDefSymbol(typeId))
+	{
+		throw OMException("Record type is not in the Symbolspace");
+	}
+	OMVector<OMWString> names;
+	_recordMembers.append(typeId, names);
+	_recordMembers.find(typeId, &memberNames);
+    }
+
+	memberNames->append(OMWString(name));
+}
+
+void 
 OMSymbolspace::save()
 {
     TRACE("OMSymbolspace::save");
@@ -767,11 +804,11 @@ OMSymbolspace::save()
 
     wchar_t idUri[XML_MAX_AUID_URI_SIZE];
     auidToURI(_id, idUri);
-    getWriter()->writeElementStart(getBaselineURI(), L"Identification");
+    getWriter()->writeElementStart(getBaselineURI(), L"SchemeID");
     getWriter()->writeElementContent(idUri, wcslen(idUri));
     getWriter()->writeElementEnd();
 
-    getWriter()->writeElementStart(getBaselineURI(), L"Symbolspace");
+    getWriter()->writeElementStart(getBaselineURI(), L"SchemeURI");
     getWriter()->writeElementContent(_uri, wcslen(_uri));
     getWriter()->writeElementEnd();
 
@@ -794,7 +831,7 @@ OMSymbolspace::save()
     if (_classDefs.count() > 0 || _typeDefs.count() > 0 || _propertyDefs.count() > 0 ||
         _extEnumElements.count() > 0)
     {
-        getWriter()->writeElementStart(getBaselineURI(), L"Definitions");
+        getWriter()->writeElementStart(getBaselineURI(), L"MetaDefinitions");
 
         OMUInt32 i;
         for (i = 0; i<_classDefs.count(); i++)
@@ -849,28 +886,28 @@ OMSymbolspace::restore(OMDictionary* dictionary)
         const OMList<OMXMLAttribute*>* attrs;
         getReader()->getStartElement(nmspace, localName, attrs);
         
-        if (getReader()->elementEquals(getBaselineURI(), L"Identification"))
+        if (getReader()->elementEquals(getBaselineURI(), L"SchemeID"))
         {
             const wchar_t* data;
             OMUInt32 length;
             getReader()->next();
             if (getReader()->getEventType() != OMXMLReader::CHARACTERS)
             {
-                throw OMException("Empty string is invalid Extension Identification "
+                throw OMException("Empty string is invalid Extension SchemeID "
                     "value");
             }
             getReader()->getCharacters(data, length);
             uriToAUID(data, &id);
             getReader()->moveToEndElement();
         }
-        else if (getReader()->elementEquals(getBaselineURI(), L"Symbolspace"))
+        else if (getReader()->elementEquals(getBaselineURI(), L"SchemeURI"))
         {
             const wchar_t* data;
             OMUInt32 length;
             getReader()->next();
             if (getReader()->getEventType() != OMXMLReader::CHARACTERS)
             {
-                throw OMException("Empty string is invalid Extension Symbolspace "
+                throw OMException("Empty string is invalid Extension SchemeURI "
                     "value");
             }
             getReader()->getCharacters(data, length);
@@ -901,7 +938,7 @@ OMSymbolspace::restore(OMDictionary* dictionary)
             }
             getReader()->moveToEndElement();
         }
-        else if (getReader()->elementEquals(getBaselineURI(), L"Definitions"))
+        else if (getReader()->elementEquals(getBaselineURI(), L"MetaDefinitions"))
         {
             while (getReader()->nextElement())
             {
@@ -1321,7 +1358,7 @@ OMSymbolspace::saveClassDef(OMClassDefinition* classDef)
     }
 
     wchar_t boolStr[XML_MAX_BOOL_STRING_SIZE];
-    boolToString(classDef->omIsConcrete(), boolStr);
+    boolToXsdString(classDef->omIsConcrete(), boolStr);
     getWriter()->writeElementStart(getBaselineURI(), L"IsConcrete");
     getWriter()->writeElementContent(boolStr, wcslen(boolStr));
     getWriter()->writeElementEnd();
@@ -1384,14 +1421,14 @@ OMSymbolspace::savePropertyDef(OMClassDefinition* ownerClassDef, OMPropertyDefin
     getWriter()->writeElementEnd();
     
     wchar_t boolStr[XML_MAX_BOOL_STRING_SIZE];
-    boolToString(propertyDef->isOptional(), boolStr);
+    boolToXsdString(propertyDef->isOptional(), boolStr);
     getWriter()->writeElementStart(getBaselineURI(), L"IsOptional");
     getWriter()->writeElementContent(boolStr, wcslen(boolStr));
     getWriter()->writeElementEnd();
 
     if (propertyDef->isUniqueIdentifier())
     {
-        boolToString(true, boolStr);
+        boolToXsdString(true, boolStr);
         getWriter()->writeElementStart(getBaselineURI(), L"IsUniqueIdentifier");
         getWriter()->writeElementContent(boolStr, wcslen(boolStr));
         getWriter()->writeElementEnd();
@@ -1700,7 +1737,7 @@ OMSymbolspace::saveIntegerTypeDef(const OMIntegerType* typeDef)
     getWriter()->writeElementEnd();
     
     wchar_t boolStr[XML_MAX_BOOL_STRING_SIZE];
-    boolToString(typeDef->isSigned(), boolStr);
+    boolToXsdString(typeDef->isSigned(), boolStr);
     getWriter()->writeElementStart(getBaselineURI(), L"IsSigned");
     getWriter()->writeElementContent(boolStr, wcslen(boolStr));
     getWriter()->writeElementEnd();
@@ -3316,13 +3353,23 @@ OMSymbolspace::ExtEnumId::operator<(const ExtEnumId& rhs) const
     elementOf = id; \
 }
 
-
 #define ADD_EXT_ENUM_VALUE(VALUE) \
 { \
     const OMUniqueObjectIdentification value = VALUE; \
     ss->addExtEnumElement(elementOf, 0, value); \
 }
 
+#define SET_RECORD_ID(MEMBEROF) \
+{ \
+    const OMUniqueObjectIdentification id = MEMBEROF; \
+    memberOf = id; \
+}
+
+#define ADD_RECORD_MEMBER(SYMBOL) \
+{ \
+    const wchar_t* symbol = SYMBOL; \
+    ss->addRecordMember(memberOf, symbol); \
+}
 
 
 OMSymbolspace* 
@@ -6747,6 +6794,27 @@ OMSymbolspace::createBaselineSymbolspace(OMXMLStorage* store)
         LITERAL_AUID(0x04010101, 0x0202, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01));
     ADD_EXT_ENUM_VALUE(
         LITERAL_AUID(0x04010101, 0x0203, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01));
+
+    //
+    // Records
+    //
+    
+    OMUniqueObjectIdentification memberOf;
+    
+    // ProductVersionType
+    SET_RECORD_ID(
+        LITERAL_AUID(0x03010200, 0x0000, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x04, 0x01, 0x01));
+    ADD_RECORD_MEMBER(L"Major");
+    ADD_RECORD_MEMBER(L"Minor");
+    ADD_RECORD_MEMBER(L"Tertiary");
+    ADD_RECORD_MEMBER(L"PatchLevel");
+    ADD_RECORD_MEMBER(L"BuildType");
+
+    // VersionType
+    SET_RECORD_ID(
+        LITERAL_AUID(0x03010300, 0x0000, 0x0000, 0x06, 0x0E, 0x2B, 0x34, 0x01, 0x04, 0x01, 0x01));
+    ADD_RECORD_MEMBER(L"VersionMajor");
+    ADD_RECORD_MEMBER(L"VersionMinor");
 
     return ss;
 }
