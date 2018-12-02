@@ -59,6 +59,7 @@ using namespace std;
 #include "ModuleTest.h"
 #include "AAFDefUIDs.h"
 #include "AAFContainerDefs.h"
+#include "AAFExtEnum.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -164,7 +165,8 @@ static HRESULT CreateAAFFile(
 							L"PluginDesc1",
 							L"Plugin Descriptor 1 description"));
 	checkResult(pd1->SetDefinitionObjectID(kTestPluginDescID1));
-		checkResult (pDictionary->RegisterPluginDef (pd1));
+	checkResult (pd1->SetCategoryClass(kAAFPluginCategory_Effect));
+	checkResult (pDictionary->RegisterPluginDef (pd1));
 
 	IAAFPluginDescriptorSP pd2;
 	checkResult (defs.cdPluginDef()->
@@ -174,6 +176,7 @@ static HRESULT CreateAAFFile(
 							L"PluginDesc2",
 							L"Plugin Descriptor 2 description"));
 	checkResult(pd2->SetDefinitionObjectID(kTestPluginDescID2));
+	checkResult (pd2->SetCategoryClass(kAAFPluginCategory_Codec));
 	checkResult (pDictionary->RegisterPluginDef (pd2));
 
 	IAAFPluginDescriptorSP pd3;
@@ -184,6 +187,7 @@ static HRESULT CreateAAFFile(
 							L"PluginDesc3",
 							L"Plugin Descriptor 3 description"));
 	checkResult(pd3->SetDefinitionObjectID(kTestPluginDescID3));
+	checkResult (pd3->SetCategoryClass(kAAFPluginCategory_Interpolation));
 	checkResult (pDictionary->RegisterPluginDef (pd3));
   }
   catch (HRESULT& rResult)

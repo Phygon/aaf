@@ -635,7 +635,7 @@ void CAAFTypeDefSet_Register(IAAFHeader * pHeader, IAAFDictionary* pDictionary)
       IAAFClassDefSP pHeaderClass;
       checkResult(pDictionary->LookupClassDef(AUID_AAFHeader, &pHeaderClass));
       IAAFPropertyDefSP pMyWeakRerenceSetPropertyDef;
-      checkResult(pHeaderClass->RegisterOptionalPropertyDef(kMyWeakRefSetData.id, kMyWeakRefSetData.name, pTempType, &pMyWeakRerenceSetPropertyDef));
+      checkResult(pHeaderClass->RegisterOptionalPropertyDef(kMyWeakRefSetPropData.id, kMyWeakRefSetPropData.name, pTempType, &pMyWeakRerenceSetPropertyDef));
     }
 
 #ifndef NO_REFERENCE_TO_MOB_TEST
@@ -679,7 +679,7 @@ void CAAFTypeDefSet_Register(IAAFHeader * pHeader, IAAFDictionary* pDictionary)
       IAAFClassDefSP pHeaderClass;
       checkResult(pDictionary->LookupClassDef(AUID_AAFHeader, &pHeaderClass));
       IAAFPropertyDefSP pMyMobWeakRerenceSetPropertyDef;
-      checkResult(pHeaderClass->RegisterOptionalPropertyDef(kMyMobWeakRefSetPropData.id, kMyWeakRefSetPropData.name, pTempType, &pMyMobWeakRerenceSetPropertyDef));
+      checkResult(pHeaderClass->RegisterOptionalPropertyDef(kMyMobWeakRefSetPropData.id, kMyMobWeakRefSetPropData.name, pTempType, &pMyMobWeakRerenceSetPropertyDef));
     }
 #endif
   }  
@@ -881,7 +881,7 @@ void CAAFTypeDefSet_Write(IAAFHeader* pHeader, IAAFDictionary* pDictionary)
       IAAFPropertyValueSP pMyWeakDefinitionsValue;
       IAAFTypeDefObjectRefSP pMyWeakElementType;
       CAAFTypeDefSet_GetDefinitionsSet(pHeaderObject,
-                                       kMyWeakRefSetData.id,
+                                       kMyWeakRefSetPropData.id,
                                        true, /*createOptional*/
                                        &pMyWeakDefinitionsSet,
                                        &pMyWeakElementType,
@@ -1111,7 +1111,7 @@ void CAAFTypeDefSet_Read(IAAFHeader* pHeader, IAAFDictionary* pDictionary)
         IAAFPropertyValueSP pMyWeakDefinitionsValue;
         IAAFTypeDefObjectRefSP pMyWeakElementType;
         CAAFTypeDefSet_GetDefinitionsSet(pHeaderObject,
-                                         kMyWeakRefSetData.id,
+                                         kMyWeakRefSetPropData.id,
                                          false, /*!createOptional*/
                                          &pMyWeakDefinitionsSet,
                                          &pMyWeakElementType,

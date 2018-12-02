@@ -331,6 +331,10 @@ private:
         bool isElementContent);
     void saveString(const OMByte* internalBytes, OMUInt32 internalSize, const OMStringType* type,
         bool isElementContent);
+    void saveWcharString(const OMByte* internalBytes, OMUInt32 internalSize, const OMStringType* type,
+        bool isElementContent);
+    void saveCharString(const OMByte* internalBytes, OMUInt32 internalSize, const OMStringType* type,
+        bool isElementContent);
     void saveSet(const OMByte* internalBytes, OMUInt32 internalSize, const OMSetType* type,
         bool isElementContent);
     void saveVariableArray(const OMByte* internalBytes, OMUInt32 internalSize, const OMVaryingArrayType* type,
@@ -380,11 +384,15 @@ private:
     OMUniqueObjectIdentification restoreAUID(const wchar_t* idStr, AUIDTargetType targetType);
     wchar_t* saveAUID(OMUniqueObjectIdentification id, AUIDTargetType targetType);
     
-    
+    OMUniqueMaterialIdentification restoreMobID(const wchar_t* idStr);
+    wchar_t* saveMobID(const OMUniqueMaterialIdentification& id);
+
+    void restoreUniqueIdentifier(OMByteArray& bytes, const wchar_t* idStr, AUIDTargetType targetType);
+
     const OMType* baseType(const OMType* type);
     
     void restoreWeakRef(OMFile* file, const OMType* type,
-        OMUniqueObjectIdentification& id, OMPropertyTag& tag);
+        OMByteArray& bytes, OMPropertyTag& tag);
     void saveWeakRef(const void* identificationBits, const OMWeakObjectReferenceType* weakRefType);
     
     OMUniqueObjectIdentification getExtensionSymbolspaceId(OMFile& file);

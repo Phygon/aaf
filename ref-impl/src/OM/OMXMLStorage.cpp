@@ -492,16 +492,16 @@ OMXMLStorage::getMetaDefId(const wchar_t* symbolspaceURI, const wchar_t* symbol)
     return result;
 }
 
-OMPropertyId 
-OMXMLStorage::getPropertyDefId(const wchar_t* symbolspaceURI, const wchar_t* symbol) const
+bool 
+OMXMLStorage::getPropertyDefId(const wchar_t* symbolspaceURI, const wchar_t* symbol, OMPropertyId& localId) const
 {
     TRACE("OMXMLStorage::getPropertyDefId");
     
-    OMPropertyId result = 0x0000;
+    bool result = false;
     OMSymbolspace* symbolspace;
     if (_symbolspaces.find(symbolspaceURI, symbolspace))
     {
-        result = symbolspace->getPropertyDefId(symbol); 
+        result = symbolspace->getPropertyDefId(symbol, localId); 
     }
     
     return result;
@@ -703,19 +703,9 @@ OMXMLStorage::getDataStreamEntityValue(void* ref)
     wchar_t* documentUri = new wchar_t[utf8StrLen(_storage->fileName()) * 3 + 9]; 
     wcsconvertFilepathtoURI(_storage->fileName(), documentUri);
 
-    // remove the file suffix and the path
+    // remove the path
     wchar_t* startPtr = documentUri + wcslen(documentUri);
     wchar_t* endPtr = startPtr;
-    while (endPtr != documentUri && 
-        *endPtr != L'.' && *endPtr != '/' && *endPtr != ':')
-    {
-        endPtr--;
-    }
-    if (*endPtr == L'.')
-    {
-        *endPtr = L'\0';
-        startPtr = endPtr;
-    }
     while (startPtr != documentUri && 
         *startPtr != '/' && *startPtr != ':')
     {

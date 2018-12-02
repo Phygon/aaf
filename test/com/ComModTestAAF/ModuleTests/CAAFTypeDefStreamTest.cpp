@@ -360,8 +360,9 @@ static void Test_GetTypeDefStream(
                                        (void **)ppTypeDefStream));
 }
 
-static void Test_EssenceStreamWrite(
-  CAAFBuiltinDefs & defs,
+// Assumes the stream has no byte order set yet.
+static void Test_SetEssenceStreamByteOrder(
+  CAAFBuiltinDefs & /*defs*/,
   IAAFPropertyValue *pStreamPropertyValue)
 {
   IAAFPlainStreamDataSP pTypeDefStream;
@@ -385,6 +386,22 @@ static void Test_EssenceStreamWrite(
   CheckExpression(kAAFFalse == hasByteOrder, AAFRESULT_TEST_FAILED);
   // Set the byte order of the stream to big endian...
   CheckResult(pTypeDefStream->SetStoredByteOrder(pStreamPropertyValue, kAAFByteOrderBig));
+  CheckResult(pTypeDefStream->HasStoredByteOrder(pStreamPropertyValue, &hasByteOrder));
+  CheckExpression(kAAFTrue == hasByteOrder, AAFRESULT_TEST_FAILED);
+  CheckResult(pTypeDefStream->GetStoredByteOrder(pStreamPropertyValue, &byteOrder));
+  CheckExpression(kAAFByteOrderBig == byteOrder, AAFRESULT_TEST_FAILED);
+}
+
+static void Test_EssenceStreamWrite(
+  CAAFBuiltinDefs & defs,
+  IAAFPropertyValue *pStreamPropertyValue)
+{
+  IAAFPlainStreamDataSP pTypeDefStream;
+  Test_GetTypeDefStream(pStreamPropertyValue, &pTypeDefStream);
+
+  // Ensure the stream already has byte order initialized.
+  aafBoolean_t hasByteOrder;
+  eAAFByteOrder_t byteOrder;
   CheckResult(pTypeDefStream->HasStoredByteOrder(pStreamPropertyValue, &hasByteOrder));
   CheckExpression(kAAFTrue == hasByteOrder, AAFRESULT_TEST_FAILED);
   CheckResult(pTypeDefStream->GetStoredByteOrder(pStreamPropertyValue, &byteOrder));
@@ -755,6 +772,7 @@ static void Test_EssenceStreamPullWrite(
 	CheckResult(pStreamPropertyValue->GetType(&pTypeDef));
 	CheckResult(pTypeDef->QueryInterface(IID_IAAFTypeDefStream3,
                                          (void **)&pTypeDefStream3));
+	Test_SetEssenceStreamByteOrder(defs, pStreamPropertyValue);
 
 	CheckResult(TestStreamAccess::Create(defs, &cb));
 	CheckResult(pTypeDefStream3->SetCallback(pStreamPropertyValue, cb,
@@ -1149,12 +1167,14 @@ void CAAFTypeDefStream_create (
                                      &pSampleIndexPropertyValue);
 
     // Test the required property
+    Test_SetEssenceStreamByteOrder(defs, pDataPropertyValue);
     Test_EssenceStreamWrite(defs, pDataPropertyValue);
     Test_EssenceStreamRead(defs, pDataPropertyValue);
 
     if (pSampleIndexPropertyValue)
     {
     // Test the optional property
+      Test_SetEssenceStreamByteOrder(defs, pSampleIndexPropertyValue);
       Test_EssenceStreamWrite(defs, pSampleIndexPropertyValue);
       Test_EssenceStreamRead(defs, pSampleIndexPropertyValue);
     }
@@ -1201,6 +1221,7 @@ void CAAFTypeDefStream_create (
                                      &pSampleIndexPropertyValue3);
 
     Test_KLVStreamParametersOnWrite(defs, pDataPropertyValue3);
+    Test_SetEssenceStreamByteOrder(defs, pDataPropertyValue3);
     Test_EssenceStreamWrite(defs, pDataPropertyValue3);
     Test_KLVStreamParametersOnRead(defs, pDataPropertyValue3);
     Test_EssenceStreamRead(defs, pDataPropertyValue3);

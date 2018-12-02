@@ -55,6 +55,7 @@ using namespace std;
 #include "AAFDataDefs.h"
 #include "AAFDefUIDs.h"
 #include "AAFClassDefUIDs.h"
+#include "AAFExtEnum.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -115,7 +116,7 @@ static HRESULT CreateAAFFile(
   IAAFClassDef *pClassDef = NULL;
   IAAFNetworkLocator *pNetLoc = NULL;
   IAAFLocator		*pLoc = NULL;
-  aafUID_t			category = AUID_AAFDefObject, manufacturer = MANUF_JEFFS_PLUGINS;
+  aafUID_t			category = kAAFPluginCategory_Codec, manufacturer = MANUF_JEFFS_PLUGINS;
   bool				bFileOpen = false;
   aafUInt32			numLocators;
 	HRESULT			hr = S_OK;
@@ -320,7 +321,7 @@ static HRESULT ReadAAFFile(aafWChar* pFileName)
 	aafPluginAPI_t	testAPI;
 	aafEngine_t		testEngine;
 	aafVersionType_t testMinVersion, testMaxVersion;
-  aafUID_t			category = AUID_AAFDefinitionObject, manufacturer = MANUF_JEFFS_PLUGINS;
+	aafUID_t			category = kAAFPluginCategory_Codec, manufacturer = MANUF_JEFFS_PLUGINS;
 
 	try
 	{

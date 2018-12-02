@@ -49,6 +49,7 @@ using namespace std;
 #include "AAFDefUIDs.h"
 #include "AAFTypeDefUIDs.h"
 #include "AAFClassDefUIDs.h"
+#include "AAFExtEnum.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -537,6 +538,14 @@ static HRESULT RegisterDefs (IAAFDictionary * pDict)
 				  /* SP for def to register */     IAAFPluginDefSP,
 				  /* reg method on pDict */        RegisterPluginDef);
   
+  // Complete initialization of the PluginDefinition by setting
+  // PluginCategory to a valid PluginCategoryType value.
+  // TODO: Extend the IAAFPluginDef interface to add an Initialize method
+  // that takes plugin category ID.
+  IAAFPluginDefSP pPluginDef;
+  checkResult (pDict->LookupPluginDef(kTestPluginDefID, &pPluginDef));
+  checkResult (pPluginDef->SetCategoryClass(kAAFPluginCategory_Codec));
+
   return AAFRESULT_SUCCESS;
 }
 

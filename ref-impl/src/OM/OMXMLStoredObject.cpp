@@ -118,6 +118,8 @@ static const OMUniqueObjectIdentification TypeID_VersionType =
     {0x03010300, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
 static const OMUniqueObjectIdentification TypeID_Rational =
     {0x03010100, 0x0000, 0x0000, {0x06, 0x0e, 0x2b, 0x34, 0x01, 0x04, 0x01, 0x01}};
+static const OMUniqueObjectIdentification TypeID_Char =
+    {0x01100300, 0x0000, 0x0000, {0x06, 0x0E, 0x2B, 0x34, 0x01, 0x04, 0x01, 0x01}};
 
 // property definition identifications
 static const OMUniqueObjectIdentification PropID_MetaDefinition_Identification =
@@ -133,7 +135,9 @@ static const OMUniqueObjectIdentification PropID_Header_Dictionary =
 static const OMPropertyId PropLocalID_Root_MetaDictionary = 0x0001;
 static const OMPropertyId PropLocalID_Root_Header = 0x0002;
 static const OMPropertyId PropLocalID_MetaDictionary_ClassDefinitions = 0x0003;
+static const OMPropertyId PropLocalID_ContentStorage_Packages = 0x1901;
 static const OMPropertyId PropLocalID_Header_ByteOrder = 0x3B01;
+static const OMPropertyId PropLocalID_Header_Content = 0x3B03;
 static const OMPropertyId PropLocalID_Header_Dictionary = 0x3B04;
 static const OMPropertyId PropLocalID_Header_Version = 0x3B05;
 static const OMPropertyId PropLocalID_Header_IdentificationList = 0x3B06;
@@ -640,6 +644,7 @@ OMXMLStoredObject::save(OMFile& file)
             getWriter()->writeElementEnd();
         }
         
+        file.clientRoot()->onSave(file.clientOnSaveContext());
         file.clientRoot()->save();
         
         getWriter()->writeDocumentEnd();
@@ -1177,10 +1182,20 @@ OMXMLStoredObject::restore(OMPropertySet& properties)
             const wchar_t* localName;
             const OMList<OMXMLAttribute*>* attrs;
             getReader()->getStartElement(nmspace, localName, attrs);
-            OMPropertyId localId = _store->getPropertyDefId(nmspace, localName);
-            if (localId == 0)
+            OMPropertyId localId = 0x0000;
+            if (!_store->getPropertyDefId(nmspace, localName, localId))
             {
                 throw OMException("Unknown property encountered");
+            }
+            if (localId == 0x0000)
+            {
+                // Use the restored property definition to resolve dynamic propery ID
+                const OMUniqueObjectIdentification propertyId = _store->getMetaDefId(nmspace, localName);
+                localId = properties.container()->definition()->propertyDefinition(propertyId)->localIdentification();
+                if (localId == 0x0000)
+                {
+                    throw OMException("Unresolved dynamic property ID");
+                }
             }
             OMProperty* property = properties.get(localId);
             if (property->propertyId() == PropLocalID_Header_ByteOrder)
@@ -1461,16 +1476,21 @@ OMXMLStoredObject::restore(OMWeakReference& singleton,
 {
     TRACE("OMXMLStoredObject::restore(OMWeakReference)");
 
-    // TODO: only works for  OMUniqueObjectIdentification
-    ASSERT("Supported weak reference key size", singleton.keySize() == sizeof(OMUniqueObjectIdentification));
+    // TODO: only works for  OMUniqueObjectIdentification and OMUniqueMaterialIdentification
+    ASSERT("Supported weak reference key size", singleton.keySize() == sizeof(OMUniqueObjectIdentification) ||
+                                                singleton.keySize() == sizeof(OMUniqueMaterialIdentification));
     
-    OMUniqueObjectIdentification id;
+    OMByteArray identification;
     OMPropertyTag tag;
     restoreWeakRef(singleton.propertySet()->container()->file(), 
-        singleton.definition()->type(), id, tag);
-    
+        singleton.definition()->type(), identification, tag);
+    if (singleton.keySize() != identification.size())
+    {
+        throw OMException("Unsupported weak reference identification");
+    }
+
     singleton.setTargetTag(tag);
-    singleton.setIdentificationBits(static_cast<void*>(&id), sizeof(OMUniqueObjectIdentification));
+    singleton.setIdentificationBits(identification.bytes(), identification.size());
 
     getReader()->moveToEndElement();
 }
@@ -1481,20 +1501,25 @@ OMXMLStoredObject::restore(OMWeakReferenceVector& vector,
 {
     TRACE("OMXMLStoredObject::restore(OMWeakReferenceVector)");
 
-    // TODO: only works for  OMUniqueObjectIdentification
-    ASSERT("Supported weak reference key size", vector.keySize() == sizeof(OMUniqueObjectIdentification));
+    // TODO: only works for  OMUniqueObjectIdentification and OMUniqueMaterialIdentification
+    ASSERT("Supported weak reference key size", vector.keySize() == sizeof(OMUniqueObjectIdentification) ||
+                                                vector.keySize() == sizeof(OMUniqueMaterialIdentification));
     
     OMUInt32 index = 0;
     OMList<OMWeakReferenceVectorElement> elements;
     while (getReader()->nextElement())
     {
-        OMUniqueObjectIdentification id;
+        OMByteArray identification;
         OMPropertyTag tag;
         restoreWeakRef(vector.propertySet()->container()->file(), 
-            vector.definition()->type(), id, tag);
+            vector.definition()->type(), identification, tag);
+        if (vector.keySize() != identification.size())
+        {
+            throw OMException("Unsupported weak reference identification");
+        }
         
-        OMWeakReferenceVectorElement element(&vector, static_cast<void*>(&id), 
-            sizeof(OMUniqueObjectIdentification), tag);
+        OMWeakReferenceVectorElement element(&vector, identification.bytes(), 
+            identification.size(), tag);
         element.restore();
         elements.append(element);
 
@@ -1525,19 +1550,20 @@ OMXMLStoredObject::restore(OMWeakReferenceSet& set,
     TRACE("OMXMLStoredObject::restore(OMWeakReferenceSet)");
 
     // TODO: only works for  OMUniqueObjectIdentification
-    ASSERT("Supported weak reference key size", set.keySize() == sizeof(OMUniqueObjectIdentification));
+    ASSERT("Supported weak reference key size", set.keySize() == sizeof(OMUniqueObjectIdentification) ||
+                                                set.keySize() == sizeof(OMUniqueMaterialIdentification));
     
     while (getReader()->nextElement())
     {
-        OMUniqueObjectIdentification id;
+        OMByteArray identification;
         OMPropertyTag tag;
         restoreWeakRef(set.propertySet()->container()->file(), set.definition()->type(),
-            id, tag);
+            identification, tag);
             
-        OMWeakReferenceSetElement element(&set, static_cast<void*>(&id), 
-            sizeof(OMUniqueObjectIdentification), tag);
+        OMWeakReferenceSetElement element(&set, identification.bytes(), 
+            identification.size(), tag);
         element.restore();
-        set.insert(&id, element);
+        set.insert(identification.bytes(), element);
 
         getReader()->moveToEndElement();
     }
@@ -2067,9 +2093,33 @@ OMXMLStoredObject::saveRecord(const OMByte* internalBytes, OMUInt32 internalSize
         {
             ASSERT("Record type definition registered in MetaDictionary and Symbolspace", false);
         }
-                    
-        const OMByte* memberBytes = internalBytes;
+
+        // HACK?: saveSimpleValue() and related subroutines work with
+        // internal (in-memory) represenation. However, size occupied
+        // by a record member doesn't always match the size reported by
+        // the member's internalSize() due to padding.
+        // The following loop externalizes the record members to get rid
+        // of padding, then internalizes each externalized member to build
+        // record reresenation without padding.
+        OMByte* unpaddedIternalBytes = new OMByte[type->internalSize()];
+
+        OMByte* externalBytes = new OMByte[type->externalSize()];
+        type->externalize(internalBytes, internalSize, externalBytes, type->externalSize(), hostByteOrder());
+
+        const OMByte* memberExternalBytes = externalBytes;
+        OMByte* memberUnpaddedInternalBytes = unpaddedIternalBytes;
         OMUInt32 count = type->memberCount();
+        for (OMUInt32 i = 0; i < count; i++)
+        {
+            const OMType* memberType = type->memberType(i);
+            memberType->internalize(memberExternalBytes, memberType->externalSize(),
+                                    memberUnpaddedInternalBytes, memberType->internalSize(),
+                                    hostByteOrder());
+            memberUnpaddedInternalBytes += memberType->internalSize();
+            memberExternalBytes += memberType->externalSize();
+        }
+
+        const OMByte* memberBytes = unpaddedIternalBytes;
         for (OMUInt32 i = 0; i < count; i++)
         {
             const wchar_t* name = type->memberName(i);
@@ -2082,6 +2132,11 @@ OMXMLStoredObject::saveRecord(const OMByte* internalBytes, OMUInt32 internalSize
             
             memberBytes += memberType->internalSize();
         }
+
+        delete [] externalBytes;
+        externalBytes = 0;
+        delete [] unpaddedIternalBytes;
+        unpaddedIternalBytes = 0;
     }
 }
 
@@ -2128,6 +2183,23 @@ OMXMLStoredObject::saveString(const OMByte* internalBytes, OMUInt32 internalSize
     const OMStringType* type, bool isElementContent)
 {
     TRACE("OMXMLStoredObject::saveString");
+
+    TypeCategoryVisitor category(type);
+    if (category.getElement() == CHARACTER_CAT && type->elementType()->identification() == TypeID_Char)
+    {
+        return saveCharString(internalBytes, internalSize, type, isElementContent);
+    }
+    else
+    {
+        return saveWcharString(internalBytes, internalSize, type, isElementContent);
+    }
+}
+
+void 
+OMXMLStoredObject::saveWcharString(const OMByte* internalBytes, OMUInt32 internalSize, 
+    const OMStringType* type, bool isElementContent)
+{
+    TRACE("OMXMLStoredObject::saveWcharString");
     TypeCategoryVisitor category(type);
     
     if (category.getElement() == CHARACTER_CAT)
@@ -2196,6 +2268,57 @@ OMXMLStoredObject::saveString(const OMByte* internalBytes, OMUInt32 internalSize
             }
             saveSimpleValue(bytesPtr, elementInternalSize, elementType, true);
             bytesPtr += elementInternalSize;
+        }
+    }
+    else
+    {
+        throw OMException("Invalid element type for string type");
+    }
+}
+
+void 
+OMXMLStoredObject::saveCharString(const OMByte* internalBytes, OMUInt32 internalSize, 
+    const OMStringType* type, bool isElementContent)
+{
+    TRACE("OMXMLStoredObject::saveCharString");
+    TypeCategoryVisitor category(type);
+    
+    if (category.getElement() == CHARACTER_CAT)
+    {
+        OMByteArray modifiedBytes; 
+        const char* str = reinterpret_cast<const char*>(internalBytes);
+        OMUInt32 size = internalSize / sizeof(char);
+        OMUInt32 len = 0;
+        while (len < size && str[len] != L'\0')
+        {
+            len++;
+        }
+        if (len == size)
+        {
+            const char n = '\0';
+            modifiedBytes.append(internalBytes, internalSize);
+            modifiedBytes.append(reinterpret_cast<const OMByte*>(&n), sizeof(char));
+            str = reinterpret_cast<const char*>(modifiedBytes.bytes());
+            printf("Invalid string value encountered ('%ls') - string was not null terminated\n", str);
+        }
+        if (len > 0)
+        {
+            {
+                const char* utf8Str = iso8859toUTF8(str);
+                const wchar_t* utf16Str = utf8ToUTF16(utf8Str);
+                if (isElementContent)
+                {
+                    getWriter()->writeElementContent(utf16Str, wcslen(utf16Str)); 
+                }
+                else
+                {
+                    getWriter()->writeAttributeContent(utf16Str);
+                }
+                delete [] utf16Str;
+                utf16Str = 0;
+                delete [] utf8Str;
+                utf8Str = 0;
+            }
         }
     }
     else
@@ -3028,6 +3151,7 @@ OMXMLStoredObject::restoreRecord(OMByteArray& bytes, const OMList<OMXMLAttribute
     }
     else
     {
+        OMByteArray unpaddedBytes;
         OMUInt32 count = type->memberCount();
         for (OMUInt32 i = 0; i < count; i++)
         {
@@ -3048,8 +3172,39 @@ OMXMLStoredObject::restoreRecord(OMByteArray& bytes, const OMList<OMXMLAttribute
                 throw OMException("Invalid record value - unexpected member");
             }
             
-            restoreSimpleValue(bytes, attrs, 0, memberType);
+            restoreSimpleValue(unpaddedBytes, attrs, 0, memberType);
         }            
+
+        // HACK?: restoreSimpleValue() and related subroutines work with
+        // internal (in-memory) represenation. However, size occupied
+        // by a record member doesn't always match the size reported by
+        // the member's internalSize() due to padding.
+        // The following loop externalizes the each record member to build
+        // external representation of the record and then internalizes the
+        // externalized record to build internal reresenation with proper
+        // padding.
+        const OMByte* unpaddedInternalBytes = unpaddedBytes.bytes();
+        OMByteArray externalBytes;
+        for (OMUInt32 i = 0; i < count; i++)
+        {
+            const OMType* memberType = type->memberType(i);
+
+            OMByte* memberExternalBytes = new OMByte[memberType->externalSize()];
+            memberType->externalize(unpaddedInternalBytes, memberType->internalSize(),
+                                    memberExternalBytes, memberType->externalSize(),
+                                    hostByteOrder());
+            externalBytes.append(memberExternalBytes, memberType->externalSize());
+            delete [] memberExternalBytes;
+            memberExternalBytes = 0;
+            unpaddedInternalBytes += memberType->internalSize();
+        }
+        OMByte* internalBytes = new OMByte[type->internalSize()];
+        type->internalize(externalBytes.bytes(), externalBytes.size(),
+                          internalBytes, type->internalSize(),
+                          hostByteOrder());
+        bytes.append(internalBytes, type->internalSize());
+        delete [] internalBytes;
+        internalBytes = 0;
 
         if (isElementContent)
         {
@@ -3148,8 +3303,27 @@ OMXMLStoredObject::restoreString(OMByteArray& bytes, const OMList<OMXMLAttribute
                 tmp = unescapeString(data);
                 s = tmp;
             }
-            bytes.append(reinterpret_cast<const OMByte*>(s), 
-                (wcslen(s) + 1) * sizeof(wchar_t));
+            if (type->elementType()->identification() == TypeID_Char)
+            {
+                const char* utf8str = utf16ToUTF8(s);
+                if (utf8str)
+                {
+                    const char* isostr = utf8ToISO8859(utf8str);
+                    if (isostr)
+                    {
+                        bytes.append(reinterpret_cast<const OMByte*>(isostr), (strlen(isostr) + 1));
+                        delete [] isostr;
+                        isostr = 0;
+                    }
+                    delete [] utf8str;
+                    utf8str = 0;
+                }
+            }
+            else
+            {
+                bytes.append(reinterpret_cast<const OMByte*>(s), 
+                    (wcslen(s) + 1) * sizeof(wchar_t));
+            }
             if (isEscaped)
             {
                 delete [] tmp;
@@ -3283,7 +3457,7 @@ OMXMLStoredObject::baseType(const OMType* type)
 
 void
 OMXMLStoredObject::restoreWeakRef(OMFile* file, const OMType* type,
-    OMUniqueObjectIdentification& id, OMPropertyTag& tag)
+    OMByteArray& bytes, OMPropertyTag& tag)
 {
     TRACE("OMXMLStoredObject::restoreWeakRef");
 
@@ -3316,8 +3490,9 @@ OMXMLStoredObject::restoreWeakRef(OMFile* file, const OMType* type,
 
     // restore the id
     // Pdn: Note that only weak references to objects identified by 
-    // OMUniqueObjectIdentification is supported; this limitation
-    // needs to be removed here and in the existing SS code
+    // OMUniqueObjectIdentification or OMUniqueMaterialIdentification
+    // is supported; this limitation needs to be removed here and
+    // in the existing SS code
     getReader()->next();
     if (getReader()->getEventType() == OMXMLReader::CHARACTERS)
     {
@@ -3330,15 +3505,45 @@ OMXMLStoredObject::restoreWeakRef(OMFile* file, const OMType* type,
         }
         if (targetPath[0] == PropLocalID_Root_MetaDictionary)
         {
-            id = restoreAUID(data, METADICT_DEF);
+            const OMUniqueObjectIdentification id = restoreAUID(data, METADICT_DEF);
+   
+            // make sure that referenced MetaDictionary definitions are registered
+            if (targetPath[0] == PropLocalID_Root_MetaDictionary)
+            {
+                if (targetPath[1] == PropLocalID_MetaDictionary_ClassDefinitions)
+                {
+                    if (!file->dictionary()->registerClassDef(id))
+                    {
+                        throw OMException("Unknown ClassDefinition: failed to register "
+                            "weak referenced ClassDefinition");
+                    }
+                }
+                else // TypeDefinitions
+                {
+                    if (!file->dictionary()->registerTypeDef(id))
+                    {
+                        throw OMException("Unknown TypeDefinition: failed to register "
+                            "weak referenced TypeDefinition");
+                    }
+                }
+            }
+
+            bytes.append(reinterpret_cast<const OMByte*>(&id), sizeof(id));
         }
         else if (targetPath[0] == PropLocalID_Root_Header && targetPath[1] == PropLocalID_Header_Dictionary)
         {
-            id = restoreAUID(data, DICT_DEF);
+            const OMUniqueObjectIdentification id = restoreAUID(data, DICT_DEF);
+            bytes.append(reinterpret_cast<const OMByte*>(&id), sizeof(id));
+        }
+        else if (targetPath[0] == PropLocalID_Root_Header && targetPath[1] == PropLocalID_Header_Content && targetPath[2] == PropLocalID_ContentStorage_Packages)
+        {
+            const OMUniqueMaterialIdentification mobId = restoreMobID(data);
+            bytes.append(reinterpret_cast<const OMByte*>(&mobId), sizeof(mobId));
         }
         else
         {
-            id = restoreAUID(data, NON_DEF);
+            const OMUniqueObjectIdentification id = restoreAUID(data, NON_DEF);
+            bytes.append(reinterpret_cast<const OMByte*>(&id), sizeof(id));
         }
     }
     else
@@ -3346,28 +3551,6 @@ OMXMLStoredObject::restoreWeakRef(OMFile* file, const OMType* type,
         throw OMException("Missing weak reference value");
     }
     getReader()->moveToEndElement();
-
-
-    // also make sure that referenced MetaDictionary definitions are registered
-    if (targetPath[0] == PropLocalID_Root_MetaDictionary)
-    {
-        if (targetPath[1] == PropLocalID_MetaDictionary_ClassDefinitions)
-        {
-            if (!file->dictionary()->registerClassDef(id))
-            {
-                throw OMException("Unknown ClassDefinition: failed to register "
-                    "weak referenced ClassDefinition");
-            }
-        }
-        else // TypeDefinitions
-        {
-            if (!file->dictionary()->registerTypeDef(id))
-            {
-                throw OMException("Unknown TypeDefinition: failed to register "
-                    "weak referenced TypeDefinition");
-            }
-        }
-    }
 }
 
 void 
@@ -3387,6 +3570,11 @@ OMXMLStoredObject::saveWeakRef(const void* identificationBits, const OMWeakObjec
     else if (targetPath[0] == PropLocalID_Root_Header && targetPath[1] == PropLocalID_Header_Dictionary)
     {
         idStr = saveAUID(id, DICT_DEF);
+    }
+    else if (targetPath[0] == PropLocalID_Root_Header && targetPath[1] == PropLocalID_Header_Content && targetPath[2] == PropLocalID_ContentStorage_Packages)
+    {
+        OMUniqueMaterialIdentification mobId = *(static_cast<const OMUniqueMaterialIdentification*>(identificationBits));
+        idStr = saveMobID(mobId);
     }
     else
     {
@@ -3490,7 +3678,37 @@ OMXMLStoredObject::saveAUID(OMUniqueObjectIdentification id, AUIDTargetType targ
     
     return idStr;
 }
+
+OMUniqueMaterialIdentification
+OMXMLStoredObject::restoreMobID(const wchar_t* idStr)
+{
+    TRACE("OMXMLStoredObject::restoreMobID");
     
+    OMUniqueMaterialIdentification id = OMConstant<OMUniqueMaterialIdentification>::null;
+    if (isUMIDURI(idStr))
+    {
+        uriToMobId(idStr, &id);
+    }
+
+    if (id == OMConstant<OMUniqueMaterialIdentification>::null)
+    {
+        throw OMException("Could not retrieve packaage id from symbol");
+    }
+    
+    return id;
+}
+
+wchar_t* 
+OMXMLStoredObject::saveMobID(const OMUniqueMaterialIdentification& id)
+{
+    TRACE("OMXMLStoredObject::saveMobID");
+    
+    wchar_t* idStr = new wchar_t[XML_MAX_MOBID_URI_SIZE];
+    mobIdToURI(id, idStr);
+    
+    return idStr;
+}
+
 OMUniqueObjectIdentification
 OMXMLStoredObject::getExtensionSymbolspaceId(OMFile& file)
 {

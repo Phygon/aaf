@@ -455,6 +455,69 @@ utf16ToUTF8(char* u8str, const wchar_t* u16str, OMUInt32 u8Size)
     }
 }
 
+char* 
+iso8859toUTF8(const char* isostr)
+{
+    TRACE("::iso8859toUTF8");
+
+    size_t u8MaxLen = strlen((const char*)isostr) * 2;
+    unsigned char* u8str = new unsigned char[u8MaxLen + 1];
+
+    const unsigned char* isostrPtr = (const unsigned char*)isostr;
+    unsigned char* u8strPtr = u8str;
+    while (*isostrPtr != '\0')
+    {
+        if (*isostrPtr < 128)
+        {
+            *u8strPtr++ = *isostrPtr++;
+        }
+        else
+        {
+            *u8strPtr++ = 0xC0 | (*isostrPtr >> 6);
+            *u8strPtr++ = 0xBF & (*isostrPtr++);
+        }
+    }
+    *u8strPtr = '\0';
+
+    return (char*)u8str;
+}
+
+char* 
+utf8ToISO8859(const char* utf8str)
+{
+    TRACE("::utf8ToISO8859");
+
+    size_t isoMaxLen = strlen((const char*)utf8str);
+    unsigned char* isostr = new unsigned char[isoMaxLen + 1];
+
+    const unsigned char* utf8strPtr = (const unsigned char*)utf8str;
+    unsigned char* isostrPtr = isostr;
+    while (*utf8strPtr != '\0')
+    {
+        if (*utf8strPtr < 128)
+        {
+            // 7-bit codepoints are encoded as 0xxxxxxx and fit into 1 byte
+            *isostrPtr++ = *utf8strPtr++;
+        }
+        else if (utf8strPtr[0] >= 0xC2 && utf8strPtr[0] <= 0xDF &&
+                 utf8strPtr[1] >= 0x80 && utf8strPtr[1] <= 0xBF)
+        {
+            // 11-bit codepoints are encoded as 110xxxxx 10xxxxxx and fit into 1 byte
+            //*isostrPtr++ = (*(utf8strPtr++) & 0x03) << 6 | (*(utf8strPtr++) & 0x3F);
+            *isostrPtr = (*(utf8strPtr++) & 0x03) << 6;
+            *isostrPtr++ |= (*(utf8strPtr++) & 0x3F);
+        }
+        else
+        {
+            delete [] isostrPtr;
+            return 0;
+        }
+    }
+    *isostrPtr = '\0';
+
+    return (char*)isostr;
+}
+
 bool
 isValidCodePoint(OMUInt32 code)
 {

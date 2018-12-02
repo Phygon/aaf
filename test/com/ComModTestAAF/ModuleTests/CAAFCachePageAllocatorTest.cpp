@@ -32,10 +32,15 @@
 //=---------------------------------------------------------------------=
 
 #include "AAF.h"
+#include "AAFFileKinds.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
 
-#include<stdio.h>
+
+#include <iostream>
+using namespace std;
+
+#include <stdio.h>
 #include <assert.h>
 #include <string.h>
 
@@ -221,8 +226,16 @@ HRESULT CAAFCachePageAllocator_test(testMode_t /* mode */,
     pAllocator = 0;
     pCachedRawStorage->Release();
     pCachedRawStorage = 0;
+
+    if (encoding == kAAFFileKind_AafXmlText)
+    {
+      cout << "Raw storage interfaces are not supported for XML encoding." << endl;
+      hr = AAFRESULT_NOT_IMPLEMENTED;
+    }
+
     return hr;
   }
+
   hr = pFile->Open();
   if (!AAFRESULT_SUCCEEDED(hr)) {
     pRawStorage->Release();

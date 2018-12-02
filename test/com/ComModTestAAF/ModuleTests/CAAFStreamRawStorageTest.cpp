@@ -1443,5 +1443,11 @@ extern "C" HRESULT CAAFStreamRawStorage_test(
 		hr = AAFRESULT_TEST_FAILED;
 	}
 
+	if (AAFRESULT_FAILED(hr) && fileKind == kAAFFileKind_AafXmlText)
+	{
+		cout << "Raw storage interfaces are not supported for XML encoding." << endl;
+		hr = AAFRESULT_NOT_IMPLEMENTED;
+	}
+
 	return hr;
 }

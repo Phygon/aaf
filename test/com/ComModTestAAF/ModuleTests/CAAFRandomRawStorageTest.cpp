@@ -1327,6 +1327,11 @@ HRESULT CAAFRandomRawStorage_test(
 				{
 				  hr = AAFRESULT_TEST_PARTIAL_SUCCESS;
 				}
+			  else if (fileKind == kAAFFileKind_AafXmlText)
+				{
+				  cout << "Raw storage interfaces are not supported for XML encoding." << endl;
+				  hr = AAFRESULT_NOT_IMPLEMENTED;
+				}
 			  else
 				{
 				  hr = subtest_result;

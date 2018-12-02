@@ -287,8 +287,8 @@ static HRESULT WriteRecord (
 	  IAAFTypeDef* tdr16pMemberTypes[] =
 	  {pTempTd,
 	   pTempTd};
-	  aafWChar xpos[] = L"X Position";
-	  aafWChar ypos[] = L"Y Position";
+	  aafWChar xpos[] = L"XPosition";
+	  aafWChar ypos[] = L"YPosition";
 	  aafString_t tdr16pMemberNames[] =
 	  {xpos,
 	   ypos};

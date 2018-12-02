@@ -80,6 +80,8 @@ wchar_t* utf8ToUTF16(const char* u8str);
 void utf8ToUTF16(wchar_t* u16str, const char* u8str, OMUInt32 u16Size);
 char* utf16ToUTF8(const wchar_t* u16str);
 void utf16ToUTF8(char* u8str, const wchar_t* u16str, OMUInt32 u8Size);
+char* utf8ToISO8859(const char* utf8str);
+char* iso8859toUTF8(const char* isostr);
 bool isValidCodePoint(OMUInt32 code);
 void codePointToUTF16(OMUInt32 code, wchar_t** u16Str);
 OMUInt32 codePoint(const char* u8Code);

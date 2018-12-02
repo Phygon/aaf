@@ -194,6 +194,18 @@ HRESULT CAAFGetFileBits_test(
 	{
 	  hr = GetFileBitsTest (fileKind, productID);
 	}
+  catch (AAFRESULT e)
+	{
+	  if (e == AAFRESULT_INVALID_PARAM && fileKind == kAAFFileKind_AafXmlText)
+	  {
+	    cout << "Raw storage interfaces are not supported for XML encoding." << endl;
+	    hr = AAFRESULT_NOT_IMPLEMENTED;
+	  }
+	  else
+	  {
+	      hr = AAFRESULT_TEST_FAILED;
+	  }
+	}
   catch (...)
 	{
 	  cerr << "CAAFGetFileBitsTest_test...Caught general C++"

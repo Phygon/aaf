@@ -32,6 +32,7 @@
 //=---------------------------------------------------------------------=
 
 #include "AAF.h"
+#include "AAFFileKinds.h"
 #include "AAFResult.h"
 #include "ModuleTest.h"
 #include "AAFStoredObjectIDs.h"
@@ -323,7 +324,7 @@ static HRESULT createZeroString(IAAFDictionary* const pDict, IAAFFillerSP& spFil
 
 
 static HRESULT verifyContents (IAAFHeader* const pHeader, IAAFDictionary* const pDict,
-							   const aafBoolean_t bMinimalTesting)
+							   const aafBoolean_t bAllowForAddedTerminator, const aafBoolean_t bMinimalTesting)
 							   
 {
 	//CAAFBuiltinDefs defs (pDict);
@@ -400,8 +401,10 @@ static HRESULT verifyContents (IAAFHeader* const pHeader, IAAFDictionary* const 
 	//IAAFTypeDefString::GetCount()
 	aafUInt32 check_count = 0;
 	checkResult(spSTR->GetCount(spPropVal, &check_count));
-	checkExpression( check_count == TEST_STR_COUNT, AAFRESULT_TEST_FAILED );	
-	
+	if (bAllowForAddedTerminator)
+		checkExpression( check_count == TEST_STR_COUNT || check_count == (TEST_STR_COUNT+1), AAFRESULT_TEST_FAILED );	
+	else
+		checkExpression( check_count == TEST_STR_COUNT, AAFRESULT_TEST_FAILED );	
 	//IAAFTypeDefString::GetType()
 	IAAFTypeDefSP spTestType;
 	checkResult(spSTR->GetType(&spTestType));
@@ -569,7 +572,9 @@ static HRESULT CreateAAFFile(
 		//////////////////// done /!!!!!!!!!!!!!!!!!!!!!!
 		
 		//Verify results right away (during this creation process) ....
-		checkResult(verifyContents (pHeader, pDict, kAAFFalse));  //True => minimal testing, False => full testing 
+		const aafBoolean_t allowForAddedStringTeminator = (fileKind == kAAFFileKind_AafXmlText ? kAAFTrue : kAAFFalse);
+		const aafBoolean_t minimalTesting = kAAFFalse;
+		checkResult(verifyContents (pHeader, pDict, allowForAddedStringTeminator, minimalTesting));
 		
 	}
 	catch (HRESULT & rResult)
@@ -601,6 +606,11 @@ static HRESULT  ReadAAFFile(aafWChar *  pFileName )
 	
 	try
 	{
+		// Get the file encoding
+		aafUID_t fileKind;
+		aafBool isAAFFile = kAAFFalse;
+		checkResult(AAFFileIsAAFFile(pFileName, &fileKind, &isAAFFile));
+
 		// Open the file
 		checkResult(AAFFileOpenExistingRead(pFileName, 0, &pFile));
 		bFileOpen = kAAFTrue;
@@ -611,7 +621,9 @@ static HRESULT  ReadAAFFile(aafWChar *  pFileName )
 		assert (pDict);
 		
 		// Read the mob, slots, etc  to verify the contents ...
-		checkResult(verifyContents (pHeader, pDict, kAAFFalse));  //False => NOT minimal testing; i.e. test everything 
+		const aafBoolean_t allowForAddedStringTeminator = (fileKind == kAAFFileKind_AafXmlText ? kAAFTrue : kAAFFalse);
+		const aafBoolean_t minimalTesting = kAAFFalse;
+		checkResult(verifyContents (pHeader, pDict, allowForAddedStringTeminator, minimalTesting));
 		
 		
 	}//try

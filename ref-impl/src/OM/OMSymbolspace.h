@@ -143,7 +143,7 @@ public:
     
     const wchar_t* getMetaDefSymbol(OMUniqueObjectIdentification id) const;
     OMUniqueObjectIdentification getMetaDefId(const wchar_t* symbol) const;
-    OMPropertyId getPropertyDefId(const wchar_t* symbol) const;
+    bool getPropertyDefId(const wchar_t* symbol, OMPropertyId& localId) const;
     const wchar_t* getDefSymbol(OMUniqueObjectIdentification id);
     OMUniqueObjectIdentification getDefId(const wchar_t* symbol) const;
     bool isKnownExtEnumElement(OMUniqueObjectIdentification elementOf, 

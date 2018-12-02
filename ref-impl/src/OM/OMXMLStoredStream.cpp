@@ -92,12 +92,22 @@ void OMXMLStoredStream::read(OMByte* data,
   //   @parm The vector of buffers into which the bytes are to be read.
   //   @parm The count of buffers.
   //   @parm The actual number of bytes that were read.
-void OMXMLStoredStream::read(OMIOBufferDescriptor* /* buffers */,
-                             OMUInt32 /* bufferCount */,
-                             OMUInt32& /* bytesRead */) const
+void OMXMLStoredStream::read(OMIOBufferDescriptor* buffers,
+                             OMUInt32 bufferCount,
+                             OMUInt32& bytesRead) const
 {
   TRACE("OMXMLStoredStream::read");
-  ASSERT("Unimplemented code not reached", false);
+
+  OMUInt32 totalBytesRead = 0;
+  for (OMUInt32 i = 0; i < bufferCount; i++) {
+    OMUInt32 readCount;
+    read(buffers[i]._buffer, buffers[i]._bufferSize, readCount);
+    totalBytesRead = totalBytesRead + readCount;
+    if (readCount != buffers[i]._bufferSize) {
+      break;
+    }
+  }
+  bytesRead = totalBytesRead;
 }
 
   // Asynchronous read - single buffer
@@ -166,12 +176,22 @@ void OMXMLStoredStream::write(const OMByte* data,
   //   @parm The vector of buffers from which the bytes are to be written.
   //   @parm The count of buffers.
   //   @parm The actual number of bytes that were written.
-void OMXMLStoredStream::write(OMIOBufferDescriptor* /* buffers */,
-                              OMUInt32 /* bufferCount */,
-                              OMUInt32& /* bytesWritten */)
+void OMXMLStoredStream::write(OMIOBufferDescriptor* buffers,
+                              OMUInt32 bufferCount,
+                              OMUInt32& bytesWritten)
 {
   TRACE("OMXMLStoredStream::write");
-  ASSERT("Unimplemented code not reached", false);
+
+  OMUInt32 totalBytesWritten = 0;
+  for (OMUInt32 i = 0; i < bufferCount; i++) {
+    OMUInt32 writeCount;
+    write(buffers[i]._buffer, buffers[i]._bufferSize, writeCount);
+    totalBytesWritten = totalBytesWritten + writeCount;
+    if (writeCount != buffers[i]._bufferSize) {
+      break;
+    }
+  }
+  bytesWritten = totalBytesWritten;
 }
 
   // Asynchronous write - single buffer

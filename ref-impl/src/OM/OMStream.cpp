@@ -154,6 +154,7 @@ private:
 #include <limits.h>
 #include <errno.h>
 #include <sys/types.h>
+#include <unistd.h>
 
   // @class Wrappers for ISO FILE*s.
   //   @cauthor Tim Bingham | tjb | Avid Technology, Inc.
@@ -990,8 +991,16 @@ void OMISOStream::setSize(OMUInt64 newSize)
 
     ASSERT("Size properly changed", size() == newSize);
     setPosition(oldPosition); // Restore position
+  } else if (newSize < currentSize) {
+    // Truncate the file
+    //
+    OMUInt64 savedPosition = position();
+    if (ftruncate(fileno(_file), newSize) != 0) {
+      setPosition(savedPosition);
+      throw OMException("ftruncate() failed.");
+    }
+    setPosition(savedPosition);
   }
-  // else no ISO way to truncate the file in place
 }
 
 OMUInt64 OMISOStream::position(void) const
