@@ -313,7 +313,7 @@ static HRESULT ReadAAFFile(aafWChar * pFileName,
 				pRawStorage,
 				kAAFFileExistence_existing,
 				kAAFFileAccess_read,
-				pFileKind,
+				NULL,
 				0,
 				0,
 				&pFile));

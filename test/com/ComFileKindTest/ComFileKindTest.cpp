@@ -312,7 +312,7 @@ static HRESULT OpenAAFFile(const aafUID_t *written_kind, aafWChar * pFileName)
 									pRawStorage,
 									kAAFFileExistence_existing,
 									kAAFFileAccess_read,
-									filekind[j].kind,
+									NULL,
 									0,
 									0,
 									&pFile);

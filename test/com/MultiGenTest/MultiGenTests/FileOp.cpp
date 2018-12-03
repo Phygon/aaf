@@ -123,12 +123,17 @@ IAAFSmartPointer<IAAFFile> CreateFileOfKind( const std::string& fileName,
 					  existence,
 					  access,
 					  &spRawStorage) );
-  
+
+  const aafUID_t *pFileKind = NULL;
+  if (existence != kAAFFileExistence_existing) {
+    pFileKind = &fileKind;
+  }
+
   IAAFSmartPointer<IAAFFile> spFile;
   CHECK_HRESULT( AAFCreateAAFFileOnRawStorage( spRawStorage,
 					       existence,
 					       access,
-					       &fileKind,
+					       pFileKind,
 					       0,
 					       &prodId,
 					       &spFile));
