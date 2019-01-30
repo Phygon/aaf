@@ -7,14 +7,14 @@
 <!ENTITY stream_2 SYSTEM "axExample_stream2" NDATA DataStream_0>
 <!ENTITY stream_3 SYSTEM "axExample_stream3" NDATA DataStream_0>
 ]>
-<AAF xmlns="http://www.aafassociation.org/aafx/v1.1/20090617" xmlns:aaf="http://www.aafassociation.org/aafx/v1.1/20090617" xmlns:this="urn:uuid:5aa56821-69de-11d2-b6bc-fcab70ff7331" version="1.1">
+<AAF xmlns="http://www.smpte-ra.org/schemas/2001-2/2013/aaf" xmlns:aaf="http://www.smpte-ra.org/schemas/2001-2/2013/aaf" xmlns:this="urn:uuid:5aa56821-69de-11d2-b6bc-fcab70ff7331" version="1.1">
   <Extensions>
     <Extension>
-      <Identification>urn:uuid:5aa56821-69de-11d2-b6bc-fcab70ff7331</Identification>
-      <Symbolspace>urn:uuid:5aa56821-69de-11d2-b6bc-fcab70ff7331</Symbolspace>
+      <SchemeID>urn:uuid:5aa56821-69de-11d2-b6bc-fcab70ff7331</SchemeID>
+      <SchemeURI>urn:uuid:5aa56821-69de-11d2-b6bc-fcab70ff7331</SchemeURI>
       <PreferredPrefix>this</PreferredPrefix>
       <Description>AAF file default extension symbolspace</Description>
-      <Definitions>
+      <MetaDefinitions>
         <PropertyDefinition>
           <Identification>urn:uuid:ce2aca4d-51ab-11d3-a024-006094eb75cb</Identification>
           <Symbol>ResolutionID</Symbol>
@@ -65,7 +65,7 @@
           <LocalIdentification>0xfffb</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
-      </Definitions>
+      </MetaDefinitions>
     </Extension>
   </Extensions>
   <Preface>
@@ -1012,21 +1012,21 @@
         <GenerationID>urn:uuid:5aa56821-69de-11d2-b6bc-fcab70ff7331</GenerationID>
         <ApplicationPlatform>Unix</ApplicationPlatform>
         <ToolkitVersion>
-          <major>1</major>
-          <minor>0</minor>
-          <tertiary>2</tertiary>
-          <patchLevel>0</patchLevel>
-          <type>VersionReleased</type>
+          <Major>1</Major>
+          <Minor>0</Minor>
+          <Tertiary>2</Tertiary>
+          <PatchLevel>0</PatchLevel>
+          <BuildType>VersionReleased</BuildType>
         </ToolkitVersion>
         <FileModificationDate>2004-07-29T10:26:52.00Z</FileModificationDate>
         <ApplicationProductID>urn:uuid:684074c2-02da-41db-b6fc-995b46234b19</ApplicationProductID>
         <ApplicationVersionString>3.141592654</ApplicationVersionString>
         <ApplicationVersion>
-          <major>3</major>
-          <minor>5</minor>
-          <tertiary>7</tertiary>
-          <patchLevel>11</patchLevel>
-          <type>VersionPrivateBuild</type>
+          <Major>3</Major>
+          <Minor>5</Minor>
+          <Tertiary>7</Tertiary>
+          <PatchLevel>11</PatchLevel>
+          <BuildType>VersionPrivateBuild</BuildType>
         </ApplicationVersion>
         <ApplicationName>AAF SDK Examples</ApplicationName>
         <ApplicationSupplierName>AAF Association Inc.</ApplicationSupplierName>

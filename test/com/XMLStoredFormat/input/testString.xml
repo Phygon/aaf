@@ -11,15 +11,15 @@ d) string of integers
     decimal, hexadecimal
     
 -->
-<AAF xmlns="http://www.aafassociation.org/aafx/v1.1/20090617" 
-    xmlns:aaf="http://www.aafassociation.org/aafx/v1.1/20090617"
+<AAF xmlns="http://www.smpte-ra.org/schemas/2001-2/2013/aaf"
+    xmlns:aaf="http://www.smpte-ra.org/schemas/2001-2/2013/aaf"
     xmlns:this="urn:uuid:8b6886f6-c6ac-4a5a-8158-309a238c1a08"
     version="1.1">
   <Extensions>
     <Extension>
-        <Identification>urn:uuid:8b6886f6-c6ac-4a5a-8158-309a238c1a08</Identification>
-        <Symbolspace>urn:uuid:8b6886f6-c6ac-4a5a-8158-309a238c1a08</Symbolspace>
-        <Definitions>
+        <SchemeID>urn:uuid:8b6886f6-c6ac-4a5a-8158-309a238c1a08</SchemeID>
+        <SchemeURI>urn:uuid:8b6886f6-c6ac-4a5a-8158-309a238c1a08</SchemeURI>
+        <MetaDefinitions>
             <PropertyDefinition>
                 <Identification>urn:uuid:00000000-0000-0000-8000-000000000000</Identification>
                 <Symbol>EmptyString</Symbol>
@@ -62,7 +62,7 @@ d) string of integers
                 <Name>UInt8String</Name>
                 <ElementType>UInt8</ElementType>
             </TypeDefinitionString>
-        </Definitions>
+        </MetaDefinitions>
     </Extension>
   </Extensions>
   <Preface>
@@ -119,21 +119,21 @@ d) string of integers
         <ApplicationSupplierName>AAF Association</ApplicationSupplierName>
         <ApplicationName>AAF-X Test</ApplicationName>
         <ApplicationVersion>
-          <major>0</major>
-          <minor>1</minor>
-          <tertiary>0</tertiary>
-          <patchLevel>0</patchLevel>
-          <type>VersionUnknown</type>
+          <Major>0</Major>
+          <Minor>1</Minor>
+          <Tertiary>0</Tertiary>
+          <PatchLevel>0</PatchLevel>
+          <BuildType>VersionUnknown</BuildType>
         </ApplicationVersion>
         <ApplicationVersionString>Unknown version</ApplicationVersionString>
         <ApplicationProductID>urn:uuid:d3ec8680-1e79-48f9-9941-0a10a16886af</ApplicationProductID>
         <FileModificationDate>2005-06-02T10:00:00.00Z</FileModificationDate>
         <ToolkitVersion>
-          <major>1</major>
-          <minor>1</minor>
-          <tertiary>0</tertiary>
-          <patchLevel>0</patchLevel>
-          <type>VersionBeta</type>
+          <Major>1</Major>
+          <Minor>1</Minor>
+          <Tertiary>0</Tertiary>
+          <PatchLevel>0</PatchLevel>
+          <BuildType>VersionBeta</BuildType>
         </ToolkitVersion>
         <ApplicationPlatform>AAFSDK (Linux)</ApplicationPlatform>
         <GenerationID>urn:uuid:8b6886f6-c6ac-4a5a-8158-309a238c1a08</GenerationID>
