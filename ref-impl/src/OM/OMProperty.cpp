@@ -148,6 +148,20 @@ const wchar_t* OMProperty::name(void) const
   TRACE("OMProperty::name");
 
   const wchar_t* result = definition()->name();
+
+  // TODO: There exist files created outside AAF SDK that include metadata
+  // dictionary with property names that do not match names in the SDK's
+  // built-in dictionary. Since the SDK now relies on the dictionary
+  // definitions to get property names the code that looks up property by
+  // name no longer works for files with bad dictionaries.
+  //
+  // The following is a workaround to fix up the name of Header:Dictionary
+  // property incorrectly labeled as "Dictionaries" in non-AAF SDK files. 
+  if (_propertyId == 0x3b04 &&
+      compareWideString(result, L"Dictionaries") == 0) {
+    result = L"Dictionary";
+  }
+
   POSTCONDITION("Valid name", validWideString(result));
   return result;
 }
