@@ -270,7 +270,7 @@ target_compile_definitions(Impl PRIVATE
 if(NOT AAF_NO_STRUCTURED_STORAGE)
     target_compile_definitions(Impl PRIVATE OM_STRUCTURED_STORAGE)
     if(WIN32)
-        target_compile_definitions(Impl PRIVATE OM_USE_WINDOWS_SS OM_USE_STORAGE_EX)
+        target_compile_definitions(Impl PRIVATE OM_USE_SCHEMASOFT_SS OM_USE_WINDOWS_SS OM_USE_STORAGE_EX)
     else()
         target_compile_definitions(Impl PRIVATE OM_USE_SCHEMASOFT_SS)
     endif()

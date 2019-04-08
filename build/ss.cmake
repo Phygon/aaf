@@ -48,8 +48,12 @@ elseif(UNIX)
     set(SS_LIB_PATH ${AAFSDK_ROOT}/AAFx86_64LinuxSDK/g++/sss-impl/libSSRW2C.a)
     #set(SS_LIB_PATH ${AAFSDK_ROOT}/AAFi686LinuxSDK/g++/sss-impl/libSSRW2C.a)
 elseif(MSVC)
-    unset(SS_LIB_PATH)
-    # OM_USE_WINDOWS_SS
+    # Required with OM_USE_SCHEMASOFT_SS
+	if (CMAKE_CL_64)
+		set(SS_LIB_PATH ${AAFSDK_ROOT}/AAFWinSDK/vs10/sss-impl/x64/ssrw_c.lib)
+	else()
+		set(SS_LIB_PATH ${AAFSDK_ROOT}/AAFWinSDK/vs10/sss-impl/Win32/ssrw_c.lib)
+	endif()
 endif()
 
 add_library(ss INTERFACE)

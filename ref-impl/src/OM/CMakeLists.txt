@@ -153,7 +153,7 @@ target_include_directories(OM PUBLIC
 target_include_directories(OM PRIVATE
     ${AAFSDK_ROOT}/ref-impl/include
     ${AAFSDK_ROOT}/ref-impl/include/ref-api
-    ${AAFSDK_ROOT}/ss-impl/ref
+    # Required with OM_USE_SCHEMASOFT_SS
     ${AAFSDK_ROOT}/sss-impl/include
     # AAF-XML stored format support requires the expat library which is bundled with the AAF SDK.
     ${AAFSDK_ROOT}/ref-impl/expat
@@ -168,7 +168,7 @@ target_compile_definitions(OM PUBLIC
 if(NOT AAF_NO_STRUCTURED_STORAGE)
     target_compile_definitions(OM PUBLIC OM_STRUCTURED_STORAGE)
     if(WIN32)
-        target_compile_definitions(OM PUBLIC OM_USE_WINDOWS_SS OM_USE_STORAGE_EX)
+        target_compile_definitions(OM PUBLIC OM_USE_SCHEMASOFT_SS OM_USE_WINDOWS_SS OM_USE_STORAGE_EX)
     else()
         target_compile_definitions(OM PUBLIC OM_USE_SCHEMASOFT_SS)
     endif()
