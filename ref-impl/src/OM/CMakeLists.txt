@@ -155,6 +155,8 @@ target_include_directories(OM PRIVATE
     ${AAFSDK_ROOT}/ref-impl/include/ref-api
     # Required with OM_USE_SCHEMASOFT_SS
     ${AAFSDK_ROOT}/sss-impl/include
+    # HACK (see OMStructuredStorage.h): Required with OM_USE_SCHEMASOFT_SS and OM_USE_GSF_SS
+    ${AAFSDK_ROOT}/ss-impl/ref
     # AAF-XML stored format support requires the expat library which is bundled with the AAF SDK.
     ${AAFSDK_ROOT}/ref-impl/expat
 )
