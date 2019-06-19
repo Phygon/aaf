@@ -41,11 +41,16 @@
 #include "aafErr.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFContainerDefs.h"
+#include "AAFTypeDefUIDs.h"
 
 #include <errno.h>
 #include <wchar.h>
 
 const aafUID_t  EXAMPLE_FILE_PLUGIN =	{ 0x914B3AD1, 0xEDE7, 0x11d2, { 0x80, 0x9F, 0x00, 0x60, 0x08, 0x14, 0x3e, 0x6f } };
+
+
+// {DA6A034C-3F04-4B55-BD0A-43F1230E5813}
+const aafUID_t kPluginCategory_Unknown = { 0xda6a034c, 0x3f04, 0x4b55, { 0xbd, 0x0a, 0x43, 0xf1, 0x23, 0x0e, 0x58, 0x13 } };
 
 
 // CLSID for AAFEssenceFileStream 
@@ -144,6 +149,45 @@ HRESULT CAAFEssenceFileContainer::CheckExistingStreams(
 }
 
 
+HRESULT CAAFEssenceFileContainer::RegisterUnknownPluginCategory(IAAFDictionary * dict)
+{
+  IAAFTypeDef *ptd = NULL;
+  IAAFTypeDefExtEnum *ptde = NULL;
+
+  if(dict == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	XPROTECT()
+	{
+		CHECK(dict->LookupTypeDef(kAAFTypeID_PluginCategoryType, &ptd));
+		CHECK (ptd->QueryInterface(IID_IAAFTypeDefExtEnum, (void **)&ptde));
+		// Remove once appropriate standard ID is available
+		CHECK(ptde->AppendElement(kPluginCategory_Unknown, L"AAFPluginCategoryUnknown"));
+
+		ptd->Release();
+		ptd=NULL;
+		ptde->Release();
+		ptde=NULL;
+	}
+	XEXCEPT
+	{
+		if(ptd != NULL)
+		  {
+			ptd->Release();
+			ptd = 0;
+		  }
+		if (ptde)
+		  {
+			ptde->Release();
+			ptde = 0;
+		  }
+	}
+	XEND
+
+	return AAFRESULT_SUCCESS;
+}
+
+
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceFileContainer::CountDefinitions (aafUInt32 *pDefCount)
 {
@@ -232,6 +276,8 @@ HRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
+		CHECK(RegisterUnknownPluginCategory(dict));
+
 	    CHECK(dict->LookupClassDef(AUID_AAFPluginDef, &pcd));
 		CHECK(pcd->CreateInstance(IID_IAAFPluginDef, 
 								  (IUnknown **)&desc));
@@ -241,7 +287,7 @@ HRESULT STDMETHODCALLTYPE
 		desc->AddRef();
 		CHECK(desc->Initialize(EXAMPLE_FILE_PLUGIN, L"Essence File Container", L"Handles non-container files."));
 
-		CHECK(desc->SetCategoryClass(AUID_AAFDefObject));
+		CHECK(desc->SetCategoryClass(kPluginCategory_Unknown)); // Replace with appropriate standard ID once it's available
 		CHECK(desc->SetPluginVersionString(manufRev));
 		CHECK(dict->LookupClassDef(AUID_AAFNetworkLocator, &pcd));
 		CHECK(pcd->CreateInstance(IID_IAAFLocator, 

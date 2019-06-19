@@ -46,6 +46,7 @@
 #include "AAFCompressionDefs.h"
 #include "AAFTypeDefUIDs.h"
 #include "AAFStoredObjectIDs.h"
+#include "AAFExtEnum.h"
 
 
 // {0DB382D1-3BAC-11d3-BFD6-00104BC9156D}
@@ -591,7 +592,7 @@ HRESULT STDMETHODCALLTYPE
 		checkResult(desc->Initialize(AVID_JPEG_PLUGIN,
 		                       const_cast<wchar_t *>(kDisplayName),
 		                       const_cast<wchar_t *>(kDescription)));
-		checkResult(desc->SetCategoryClass(AUID_AAFCodecDef));
+		checkResult(desc->SetCategoryClass(kAAFPluginCategory_Codec));
 		checkResult(desc->SetPluginVersionString(kManufRev));
 		checkResult(desc->SetManufacturerID(MANUF_AVID_PLUGINS));
 		checkResult(desc->SetPluginManufacturerName(kManufName));

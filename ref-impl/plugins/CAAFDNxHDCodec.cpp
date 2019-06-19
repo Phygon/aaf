@@ -51,6 +51,7 @@
 #include "AAFCompressionDefs.h"
 #include "AAFContainerDefs.h"
 #include "AAFTypeDefUIDs.h"
+#include "AAFExtEnum.h"
 
 #include "utf8.h"
 
@@ -572,7 +573,7 @@ HRESULT STDMETHODCALLTYPE
 		checkResult(desc->Initialize(AVID_DNxHD_PLUGIN,
 		                       const_cast<wchar_t *>(kDisplayName),
 		                       const_cast<wchar_t *>(kDescription)));
-		checkResult(desc->SetCategoryClass(AUID_AAFDefObject));
+		checkResult(desc->SetCategoryClass(kAAFPluginCategory_Codec));
 		checkResult(desc->SetPluginVersionString(kManufRev));
 		checkResult(desc->SetManufacturerID(MANUF_AVID_PLUGINS));
 		checkResult(desc->SetPluginManufacturerName(kManufName));

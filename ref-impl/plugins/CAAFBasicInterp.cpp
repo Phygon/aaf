@@ -45,6 +45,7 @@
 #include "AAFRational.h"
 #include "AAFInterpolatorDefs.h"
 #include "AAFTypeDefUIDs.h"
+#include "AAFExtEnum.h"
 
 const aafProductVersion_t AAFPluginImplementationVersion = {1, 0, 0, 1, kAAFVersionBeta};
 
@@ -144,7 +145,7 @@ HRESULT STDMETHODCALLTYPE
 		*descPtr = desc;
 		desc->AddRef();
 		CHECK(desc->Initialize(BASIC_INTERP_PLUGIN, L"Example interpolators", L"Handles step and linear interpolation."));
-		CHECK(desc->SetCategoryClass(AUID_AAFInterpolationDefinition));
+		CHECK(desc->SetCategoryClass(kAAFPluginCategory_Interpolation));
 		CHECK(desc->SetPluginVersionString(manufRev));
 		classDef->Release();
 		classDef = NULL;

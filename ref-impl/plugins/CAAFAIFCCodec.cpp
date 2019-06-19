@@ -44,6 +44,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFCodecDefs.h"
 #include "AAFEssenceFormats.h"
+#include "AAFExtEnum.h"
 
 #define STD_HDRSIZE_NODATA		256			// Make sure that the buffer is big enough
 
@@ -218,7 +219,7 @@ CAAFAIFCCodec::CreateDescriptor (IAAFDictionary *dict, IAAFPluginDef **descPtr)
 		desc->AddRef();
 		CHECK(desc->Initialize(JEFFS_AIFC_PLUGIN, L"Example AIFC Codec", L"Handles AIFC data."));
 		
-		CHECK(desc->SetCategoryClass(AUID_AAFCodecDef));
+		CHECK(desc->SetCategoryClass(kAAFPluginCategory_Codec));
 		CHECK(desc->SetPluginVersionString(manufRev));
 		CHECK(dict->LookupClassDef(AUID_AAFNetworkLocator, &pcd));
 		CHECK(pcd->CreateInstance(IID_IAAFLocator, 

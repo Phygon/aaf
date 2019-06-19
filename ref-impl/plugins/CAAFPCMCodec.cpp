@@ -51,6 +51,7 @@
 #include "AAFCodecDefs.h"
 #include "AAFContainerDefs.h"
 #include "AAFEssenceFormats.h"
+#include "AAFExtEnum.h"
 
 
 const aafUID_t NULL_UID = { 0, 0, 0, { 0, 0, 0, 0, 0, 0, 0, 0 } };
@@ -388,7 +389,7 @@ HRESULT STDMETHODCALLTYPE
 		desc->AddRef();
 		CHECK(desc->Initialize(AAFSDK_PCM_PLUGIN, L"Example PCM Codec", L"Handles PCM data."));
 
-		CHECK(desc->SetCategoryClass(AUID_AAFCodecDef));
+		CHECK(desc->SetCategoryClass(kAAFPluginCategory_Codec));
 		CHECK(desc->SetPluginVersionString(manufRev));
 		CHECK(dict->LookupClassDef(AUID_AAFNetworkLocator, &pcd));
 		CHECK(pcd->CreateInstance(IID_IAAFLocator, 

@@ -44,6 +44,7 @@
 #include "AAFStoredObjectIDs.h"
 #include "AAFCodecDefs.h"
 #include "AAFEssenceFormats.h"
+#include "AAFExtEnum.h"
 
 
 #define HEADER_BUFSIZE			2000			// Big enough to hold ANY single-entry coding history
@@ -214,7 +215,7 @@ HRESULT STDMETHODCALLTYPE
 		desc->AddRef();
 		CHECK(desc->Initialize(JEFFS_WAVE_PLUGIN, L"Example WAVE Codec", L"Handles RIFF WAVE data."));
 
-		CHECK(desc->SetCategoryClass(AUID_AAFCodecDef));
+		CHECK(desc->SetCategoryClass(kAAFPluginCategory_Codec));
 		CHECK(desc->SetPluginVersionString(manufRev));
 		CHECK(dict->LookupClassDef(AUID_AAFNetworkLocator, &pcd));
 		CHECK(pcd->CreateInstance(IID_IAAFLocator, 
