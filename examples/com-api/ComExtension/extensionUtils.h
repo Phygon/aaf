@@ -80,6 +80,17 @@ static const aafUID_t kPosition_Actor  =
 
 //********
 //
+// PluginCategory extended element values 
+//
+//  	Class, 
+// {0D8375CE-5E82-43A8-81CF-0A709DCDA1A3}
+static const aafUID_t kPluginCategory_Class =
+{ 0x0d8375ce, 0x5e82, 0x43a8, { 0x81, 0xcf, 0x0a, 0x70, 0x9d, 0xcd, 0xa1, 0xa3 } };
+
+
+
+//********
+//
 // TypeID for Strong Reference to PersonnelResource
 // {5F72AD73-703D-11d3-8449-00600832ACB8}
 static const aafUID_t kTypeID_PersonnelResourceStrongReference = 
@@ -229,6 +240,7 @@ void AdminMobGetNthPersonnel (IAAFDictionary * pDict,
 // Create and registration functions.
 //
 void CreateAndRegisterPositionEnum (IAAFDictionary * pDict);
+void RegisterPluginCategoryElements (IAAFDictionary * pDict);
 void CreateAndRegisterPersonnelResource (IAAFDictionary * pDict);
 void CreateAndRegisterPersonnelResourceReference(IAAFDictionary * pDict);
 void CreateAndRegisterPersonnelResourceReferenceVector(IAAFDictionary * pDict);

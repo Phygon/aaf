@@ -197,6 +197,14 @@ HRESULT extensionWritePlugin (const aafCharacter * filename)
     // Ask the plugins to register and initialize all necessary defintions.
     check (pPluginManager->CreateInstance(CLSID_AAFAdminMob, NULL, IID_IAAFClassExtension, (void **)&pClassExtension));
     check (pClassExtension->RegisterDefinitions(pDict));
+	IAAFPlugin* pPlugin;
+	check (pClassExtension->QueryInterface(IID_IAAFPlugin, (void **)&pPlugin));
+	aafUID_t id;
+	pPlugin->GetPluginDescriptorID(&id);
+
+	IAAFPluginDef* pPluginDef;
+	pPlugin->CreateDescriptor(pDict, &pPluginDef);
+
     pClassExtension->Release();
     pClassExtension = NULL;
       

@@ -1097,6 +1097,41 @@ void CreateAndRegisterPositionEnum (IAAFDictionary * pDict)
 
 
 //
+// Add PlugiCategoryType element to describe class extension plugins.
+//
+void RegisterPluginCategoryElements (IAAFDictionary * pDict)
+{
+  assert (pDict);
+
+  IAAFTypeDef *ptd = NULL;
+  IAAFTypeDefExtEnum *ptde = NULL;
+
+  try
+  {
+    check (pDict->LookupTypeDef(kAAFTypeID_PluginCategoryType, &ptd));
+    check (ptd->QueryInterface(IID_IAAFTypeDefExtEnum, (void **)&ptde));
+	// Remove once appropriate standard ID is available
+    check (ptde->AppendElement(kPluginCategory_Class, L"AAFPluginCategoryClass"));
+
+	ptd->Release();
+    ptd=NULL;
+    ptde->Release();
+    ptde=NULL;
+  }
+  catch (...)
+  {
+    // cleanup after error...
+    if (ptd)
+      ptd->Release();
+    if (ptde)
+      ptde->Release();
+
+    throw;
+  }
+}
+
+
+//
 // Creates a class definition to describe PersonnelResource objects,
 // and registers it in the dictionary.
 //

@@ -400,7 +400,7 @@ HRESULT STDMETHODCALLTYPE
 		checkResult(desc->Initialize(AVID_PERSONNELMOB_PLUGIN,
 		                       const_cast<wchar_t *>(kAdminMobDisplayName),
 		                       const_cast<wchar_t *>(kAdminMobDescription)));
-		checkResult(desc->SetCategoryClass(AUID_AAFDefObject));
+		checkResult(desc->SetCategoryClass(kPluginCategory_Class)); // Replace with appropriate standard ID once it's available
 		checkResult(desc->SetPluginVersionString(kManufRev));
 		checkResult(desc->SetManufacturerID(MANUF_AVID_PLUGINS));
 		checkResult(desc->SetPluginManufacturerName(kManufName));
@@ -476,7 +476,11 @@ HRESULT STDMETHODCALLTYPE
     // dictionary.
     CreateAndRegisterPositionEnum (pDictionary);
 
-    // Create a class definition describing PesonnelResource objects and
+    // Add element to the PluginCategoryType extensible enumeration
+    // describing this plugin's category.
+    RegisterPluginCategoryElements (pDictionary);
+
+	// Create a class definition describing PesonnelResource objects and
     // register it in the dictionary.
     CreateAndRegisterPersonnelResource (pDictionary);
 

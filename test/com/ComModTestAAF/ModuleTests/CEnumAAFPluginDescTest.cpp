@@ -56,6 +56,7 @@ using namespace std;
 #include "AAFDefUIDs.h"
 #include "AAFClassDefUIDs.h"
 #include "AAFCodecDefs.h"
+#include "AAFExtEnum.h"
 
 #include "CAAFBuiltinDefs.h"
 
@@ -105,7 +106,7 @@ static HRESULT CreateAAFFile(
   IAAFPluginDef *pDesc;
   IAAFNetworkLocator *pNetLoc, *pNetLoc2;
   IAAFLocator		*pLoc, *pLoc2;
-  aafUID_t			category = AUID_AAFDefObject, manufacturer = ID_MANUFACTURER;
+  aafUID_t			category = kAAFPluginCategory_Codec, manufacturer = ID_MANUFACTURER;
   bool				bFileOpen = false;
   aafUID_t			*uidPtr, uid;
 	HRESULT			hr = S_OK;

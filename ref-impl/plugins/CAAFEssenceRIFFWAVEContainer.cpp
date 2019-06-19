@@ -44,12 +44,16 @@
 #include "aafErr.h"
 #include "AAFStoredObjectIDs.h"
 #include "AAFContainerDefs.h"
+#include "AAFTypeDefUIDs.h"
 
 #include <errno.h>
 #include <wchar.h>
 
 const CLSID CLSID_AAFEssenceRIFFWAVEContainer = { 0x914c18d0, 0x39f2, 0x4734, { 0xb0, 0xe7, 0x31, 0x34, 0x30, 0x9d, 0x0d, 0xb4 } };
 const aafUID_t  EXAMPLE_FILE_PLUGIN =	{ 0x4b48d234, 0xd5e6, 0x4e10, { 0xb5, 0xdf, 0x97, 0x82, 0xce, 0x64, 0xc7, 0x5f } };
+const aafUID_t kPluginCategory_Unknown = { 0xda6a034c, 0x3f04, 0x4b55, { 0xbd, 0x0a, 0x43, 0xf1, 0x23, 0x0e, 0x58, 0x13 } };
+
+
 
 // convenient error handlers.
 inline void checkResult(HRESULT r)
@@ -162,6 +166,45 @@ HRESULT CAAFEssenceRIFFWAVEContainer::CheckExistingStreams(
 }
 
 
+HRESULT CAAFEssenceRIFFWAVEContainer::RegisterUnknownPluginCategory(IAAFDictionary * dict)
+{
+  IAAFTypeDef *ptd = NULL;
+  IAAFTypeDefExtEnum *ptde = NULL;
+
+  if(dict == NULL)
+		return AAFRESULT_NULL_PARAM;
+
+	XPROTECT()
+	{
+		CHECK(dict->LookupTypeDef(kAAFTypeID_PluginCategoryType, &ptd));
+		CHECK (ptd->QueryInterface(IID_IAAFTypeDefExtEnum, (void **)&ptde));
+		// Remove once appropriate standard ID is available
+		CHECK(ptde->AppendElement(kPluginCategory_Unknown, L"AAFPluginCategoryUnknown"));
+
+		ptd->Release();
+		ptd=NULL;
+		ptde->Release();
+		ptde=NULL;
+	}
+	XEXCEPT
+	{
+		if(ptd != NULL)
+		  {
+			ptd->Release();
+			ptd = 0;
+		  }
+		if (ptde)
+		  {
+			ptde->Release();
+			ptde = 0;
+		  }
+	}
+	XEND
+
+	return AAFRESULT_SUCCESS;
+}
+
+
 HRESULT STDMETHODCALLTYPE
     CAAFEssenceRIFFWAVEContainer::CountDefinitions (aafUInt32 *pDefCount)
 {
@@ -260,7 +303,9 @@ HRESULT STDMETHODCALLTYPE
 	
 	XPROTECT()
 	{
-	    CHECK(dict->LookupClassDef(AUID_AAFPluginDef, &pcd));
+		CHECK(RegisterUnknownPluginCategory(dict));
+
+		CHECK(dict->LookupClassDef(AUID_AAFPluginDef, &pcd));
 		CHECK(pcd->CreateInstance(IID_IAAFPluginDef, 
 								  (IUnknown **)&desc));
 		pcd->Release();
@@ -269,7 +314,7 @@ HRESULT STDMETHODCALLTYPE
 		desc->AddRef();
 		CHECK(desc->Initialize(EXAMPLE_FILE_PLUGIN, L"Essence File Container", L"Handles non-container files."));
 
-		CHECK(desc->SetCategoryClass(AUID_AAFDefObject));
+		CHECK(desc->SetCategoryClass(kPluginCategory_Unknown)); // Replace with appropriate standard ID once it's available
 		CHECK(desc->SetPluginVersionString(manufRev));
 		CHECK(dict->LookupClassDef(AUID_AAFNetworkLocator, &pcd));
 		CHECK(pcd->CreateInstance(IID_IAAFLocator, 

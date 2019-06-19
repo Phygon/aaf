@@ -697,7 +697,7 @@ HRESULT STDMETHODCALLTYPE
 		checkResult(desc->Initialize(AVID_PERSONNELRESOURCE_PLUGIN,
 		                       const_cast<wchar_t *>(kPersonnelResourceDisplayName),
 		                       const_cast<wchar_t *>(kPersonnelResourceDescription)));
-		checkResult(desc->SetCategoryClass(AUID_AAFDefObject));
+		checkResult(desc->SetCategoryClass(kPluginCategory_Class)); // Replace with appropriate standard ID once it's available
 		checkResult(desc->SetPluginVersionString(kManufRev));
 		checkResult(desc->SetManufacturerID(MANUF_AVID_PLUGINS));
 		checkResult(desc->SetPluginManufacturerName(kManufName));
@@ -773,6 +773,10 @@ HRESULT STDMETHODCALLTYPE
     // Register the extensible enumeration describing Position in the
     // dictionary.
     CreateAndRegisterPositionEnum (pDictionary);
+
+    // Add element to the PluginCategoryType extensible enumeration
+    // describing this plugin's category.
+    RegisterPluginCategoryElements (pDictionary);
 
     // Create a class definition describing PesonnelResource objects and
     // register it in the dictionary.

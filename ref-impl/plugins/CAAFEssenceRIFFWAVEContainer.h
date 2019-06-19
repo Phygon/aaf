@@ -145,6 +145,8 @@ public:
   // path and mode.
   HRESULT CheckExistingStreams(const wchar_t *pwcPath, FileStreamMode streamMode);
 
+  // Add PlugiCategoryType element to describe unknown plugin category
+  HRESULT RegisterUnknownPluginCategory(IAAFDictionary* dict);
 
 private:
   // List of all open file streams...
