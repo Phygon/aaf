@@ -893,12 +893,6 @@ ImplAAFFile::CreateAAFFileOnRawStorage
   if (modeFlags & AAF_FILE_MODE_LAZY_LOADING)
       loadMode = OMFile::lazyLoad;
 
-  if(existence == kAAFFileExistence_existing && pFileKind != NULL)
-    return AAFRESULT_INVALID_PARAM;
-
-  if(existence == kAAFFileExistence_new && pFileKind == NULL)
-    return AAFRESULT_NULL_PARAM;
-
   AAFRESULT hr;
   aafBoolean_t b = kAAFFalse;
   switch (access)
