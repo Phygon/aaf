@@ -2313,7 +2313,7 @@ OMXMLStoredObject::saveCharString(const OMByte* internalBytes, OMUInt32 internal
             modifiedBytes.append(internalBytes, internalSize);
             modifiedBytes.append(reinterpret_cast<const OMByte*>(&n), sizeof(char));
             str = reinterpret_cast<const char*>(modifiedBytes.bytes());
-            printf("Invalid string value encountered ('%ls') - string was not null terminated\n", str);
+            printf("Invalid string value encountered ('%s') - string was not null terminated\n", str);
         }
         if (len > 0)
         {
