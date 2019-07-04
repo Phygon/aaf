@@ -995,6 +995,9 @@ void OMISOStream::setSize(OMUInt64 newSize)
     // Truncate the file
     //
     OMUInt64 savedPosition = position();
+    // the C stream buffer needs to be synchronized/flushed because ftruncate
+    // uses the low-level descriptor
+    synchronize();
     if (ftruncate(fileno(_file), newSize) != 0) {
       setPosition(savedPosition);
       throw OMException("ftruncate() failed.");
