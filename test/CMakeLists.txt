@@ -55,8 +55,7 @@ add_dependencies(MakeSDKTests
 )
 
 if(WIN32)
-    set(TEST_TARGET_DIR "${AAFSDK_TARGET_DIR}/Test")
-    target_copy_files(MakeSDKTests "${AAFSDK_TARGET_DIR}/RefImpl" "${TEST_TARGET_DIR}" "AAFCOAPI.dll;AAFCOAPI.pdb")
-    target_copy_files(MakeSDKTests "${AAFSDK_TARGET_DIR}/RefImpl/aafext" "${TEST_TARGET_DIR}/aafext" "AAFPGAPI.dll;AAFPGAPI.pdb")
-    target_copy_files(MakeSDKTests "${AAFSDK_TARGET_DIR}/RefImpl/aafext" "${TEST_TARGET_DIR}/aafext" "AAFINTP.dll;AAFINTP.pdb")
+    target_copy_files(MakeSDKTests "${AAFSDK_TARGET_DIR}/RefImpl" "${AAFSDK_TARGET_DIR}/Test" "AAFCOAPI.dll;$<$<CONFIG:Debug>:AAFCOAPI.pdb>")
+    target_copy_files(MakeSDKTests "${AAFSDK_TARGET_DIR}/RefImpl/aafext" "${AAFSDK_TARGET_DIR}/Test/aafext" "AAFPGAPI.dll;$<$<CONFIG:Debug>:AAFPGAPI.pdb>")
+    target_copy_files(MakeSDKTests "${AAFSDK_TARGET_DIR}/RefImpl/aafext" "${AAFSDK_TARGET_DIR}/Test/aafext" "AAFINTP.dll;$<$<CONFIG:Debug>:AAFINTP.pdb>")
 endif()
