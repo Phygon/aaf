@@ -1,14 +1,16 @@
-Building AAF-SDK using CMake
+Building and Testing AAF-SDK using CMake
 
 Navigate to the AAF SDK root directory and run:
 
 Linux:
 
+Replace <CONFIG> below with either Debug or Release.
+
 $ mkdir -p out/build
 $ cd out/build
-$ cmake -G "Unix Makefiles" -DPLATFORM=gcc48 -DARCH=x86_64 ../..
-$ cmake --build . --config Debug
-$ cmake --build . --config Release
+$ cmake -G "Unix Makefiles" -DPLATFORM=gcc48 -DARCH=x86_64 -DCMAKE_BUILD_TYPE=<CONFIG> ../..
+$ cmake --build .
+$ ctest
 
 MacOS:
 
@@ -19,7 +21,10 @@ $ cmake --build .
 
 Windows:
 
+Replace <CONFIG> below with either Debug or Release.
+
 > mkdir out\build
 > cd out\build
 > cmake -G "Visual Studio 12 2013 Win64" -DPLATFORM=vc12 -DARCH=x64 ..\..
-> cmake --build .
+> cmake --build . --config <CONFIG>
+> ctest -C <CONFIG>
