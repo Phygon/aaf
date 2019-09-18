@@ -6417,7 +6417,7 @@ OMSymbolspace::createBaselineSymbolspace(OMXMLStorage* store)
         L"ContainerDef_MXFGC_Framewrapped_AVCByteStream_VideoStream0_SID");
     ADD_DEF_SYMBOL_ID(
         LITERAL_AUID(0x0D010301, 0x0210, 0x6002, 0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x0A),
-        L"ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID");
+        L"ContainerDef_MXFGC_Clipwrapped_AVCbytestream_VideoStream0_SID");
     ADD_DEF_SYMBOL_ID(
         LITERAL_AUID(0x0D010301, 0x0210, 0x6002, 0x06, 0x0E, 0x2B, 0x34, 0x04, 0x01, 0x01, 0x01),
         L"ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID_Bogus");
