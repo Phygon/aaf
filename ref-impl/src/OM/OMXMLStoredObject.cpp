@@ -3273,17 +3273,24 @@ OMXMLStoredObject::restoreSet(OMByteArray& bytes, const OMList<OMXMLAttribute*>*
 
 void 
 OMXMLStoredObject::restoreString(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
-    const wchar_t* str, const OMStringType* type) // note: restoring string array result in type == 0
+    const wchar_t* str, const OMStringType* type)
 {
     TRACE("OMXMLStoredObject::restoreString");
+    PRECONDITION("Valid type", type != 0);
+
+    return restoreString(bytes, attributes, str, type, type->elementType());
+    }
+
+void 
+OMXMLStoredObject::restoreString(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+    const wchar_t* str, const OMType* /*type*/, const OMType* elementType)
+{
+    TRACE("OMXMLStoredObject::restoreString");
+    PRECONDITION("Valid element type", elementType != 0);
 
     bool isElementContent = (attributes != 0 && str == 0);
-    TypeCategory elementCat = UNKNOWN_CAT;
-    if (type != 0)
-    {
-        elementCat = TypeCategoryVisitor(type).getElement();
-    }
-    if (type == 0 || elementCat == CHARACTER_CAT)
+    TypeCategory elementCat = TypeCategoryVisitor(elementType).get();
+    if (elementCat == CHARACTER_CAT)
     {
         bool isEscaped = false;
         if (attributes != 0)
@@ -3321,7 +3328,7 @@ OMXMLStoredObject::restoreString(OMByteArray& bytes, const OMList<OMXMLAttribute
                 tmp = unescapeString(data);
                 s = tmp;
             }
-            if (type->elementType()->identification() == TypeID_Char)
+            if (elementType->identification() == TypeID_Char)
             {
                 const char* utf8str = utf16ToUTF8(s);
                 if (utf8str)
@@ -3350,7 +3357,6 @@ OMXMLStoredObject::restoreString(OMByteArray& bytes, const OMList<OMXMLAttribute
     }        
     else if (elementCat == INTEGER_CAT)
     {
-        OMType* elementType = type->elementType();
         OMUInt32 elementInternalSize = elementType->internalSize();
         getReader()->next();
         if (getReader()->getEventType() == OMXMLReader::CHARACTERS)
@@ -3426,7 +3432,7 @@ OMXMLStoredObject::restoreVariableArray(OMByteArray& bytes, const OMList<OMXMLAt
             const wchar_t* localName;
             const OMList<OMXMLAttribute*>* attrs;
             getReader()->getStartElement(nmspace, localName, attrs);
-            restoreString(bytes, attrs, 0, 0);
+            restoreString(bytes, attrs, 0, type, type->elementType());
         }
         getReader()->moveToEndElement();
     }

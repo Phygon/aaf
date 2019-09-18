@@ -371,6 +371,8 @@ private:
         const wchar_t* str, const OMSetType* type);
     void restoreString(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
         const wchar_t* str, const OMStringType* type);
+    void restoreString(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
+        const wchar_t* str, const OMType* type, const OMType* elementType);
     void restoreVariableArray(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,
         const wchar_t* str, const OMVaryingArrayType* type);
 
