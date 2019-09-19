@@ -121,7 +121,7 @@ void ImplAAFTypeDefRecord::pvtInitInternalSizes (void) const
 	  hr = pNonConstThis->GetMemberType (i, &ptd);
 	  ASSERTU (AAFRESULT_SUCCEEDED (hr));
 	  ASSERTU (ptd);
-	  _internalSizes[i] = ptd->PropValSize ();
+	  _internalSizes[i] = ptd->NativeSize ();
 	}
 }
 
@@ -1218,19 +1218,13 @@ void ImplAAFTypeDefRecord::externalize(const OMByte* internalBytes,
 OMUInt32 ImplAAFTypeDefRecord::internalSize(const OMByte* /*externalBytes*/,
 											OMUInt32 /*externalBytesSize*/) const
 {
-  if (IsRegistered ())
-	return NativeSize ();
-  else
-	return PropValSize ();
+  return NativeSize ();
 }
 
 
 OMUInt32 ImplAAFTypeDefRecord::internalSize(void) const
 {
-  if (IsRegistered ())
-	return NativeSize ();
-  else
-	return PropValSize ();
+  return NativeSize ();
 }
 
 void ImplAAFTypeDefRecord::internalize(const OMByte* externalBytes,
@@ -1418,8 +1412,32 @@ aafBool ImplAAFTypeDefRecord::IsRegistered (void) const
 OMUInt32 ImplAAFTypeDefRecord::NativeSize (void) const
 {
   ((ImplAAFTypeDefRecord*)this)->AttemptBuiltinRegistration ();
-  ASSERTU (IsRegistered());
-  return _registeredSize;
+
+  aafUInt32 size = 0;
+  if (IsRegistered())
+	{
+	  size = _registeredSize;
+	}
+  else
+	{
+	  pvtInitInternalSizes ();
+	  aafUInt32 count = 0;
+	  ARESULT (AAFRESULT hr) GetCount(&count);
+	  ASSERTU (AAFRESULT_SUCCEEDED (hr));
+	  for (aafUInt32 i=0; i<count; i++)
+		{
+		  size += _internalSizes[i];
+		}
+
+	  if (! _defaultRegistrationUsed && (! IsRegistered ()))
+		{
+		  // cast away const-ness
+		  ((ImplAAFTypeDefRecord*)this)->
+			_defaultRegistrationUsed = kAAFTrue;
+		}
+	}
+
+  return size;
 }
 
 
