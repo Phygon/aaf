@@ -479,10 +479,24 @@ static HRESULT verifyContents (IAAFHeader* const pHeader, IAAFDictionary* const 
 		IAAFTypeDefStringSP spZeroTypeString;
 		checkResult(spZeroType->QueryInterface(IID_IAAFTypeDefString, (void**)&spZeroTypeString));
 
+		aafUInt32 size = 9;
+		checkResult(spZeroTypeString->GetCount(spZeroPropVal, &size));
+		checkExpression(size == 0 || size == 1, AAFRESULT_TEST_FAILED);
+
 		aafCharacter strValue[] = {L'Y', L'\0'};
 		checkResult(spZeroTypeString->GetElements(spZeroPropVal, (aafMemPtr_t)strValue, sizeof(strValue)));
-		// Check that zero elements were returned
-		checkExpression(wcscmp(strValue, L"Y") == 0, AAFRESULT_TEST_FAILED);
+		if (size == 0)
+		{
+			// Check that zero elements were returned
+			checkExpression(wcscmp(strValue, L"Y") == 0, AAFRESULT_TEST_FAILED);
+		}
+		else
+		{
+			// XML-encoded files do not store string NULL-terminator but
+			// when restored the implementation always adds one at the end
+			// and returns it from GetElements(). 
+			checkExpression(wcscmp(strValue, L"") == 0, AAFRESULT_TEST_FAILED);
+		}
 	}
 
 
