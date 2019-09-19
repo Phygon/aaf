@@ -195,7 +195,7 @@
           <Description/>
           <Type>Int32</Type>
           <MemberOf>PictureDescriptor</MemberOf>
-          <LocalIdentification>0xffed</LocalIdentification>
+          <LocalIdentification>0xffec</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -205,7 +205,7 @@
           <Description/>
           <Type>Int32</Type>
           <MemberOf>PictureDescriptor</MemberOf>
-          <LocalIdentification>0xffec</LocalIdentification>
+          <LocalIdentification>0xffeb</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -215,7 +215,7 @@
           <Description/>
           <Type>Int32</Type>
           <MemberOf>PictureDescriptor</MemberOf>
-          <LocalIdentification>0xffeb</LocalIdentification>
+          <LocalIdentification>0xffea</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -225,7 +225,7 @@
           <Description/>
           <Type>Int32</Type>
           <MemberOf>PictureDescriptor</MemberOf>
-          <LocalIdentification>0xffea</LocalIdentification>
+          <LocalIdentification>0xffe9</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -235,7 +235,7 @@
           <Description/>
           <Type>UInt16</Type>
           <MemberOf>PictureDescriptor</MemberOf>
-          <LocalIdentification>0xffe9</LocalIdentification>
+          <LocalIdentification>0xffe8</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -245,7 +245,7 @@
           <Description/>
           <Type>Int32</Type>
           <MemberOf>PictureDescriptor</MemberOf>
-          <LocalIdentification>0xffe8</LocalIdentification>
+          <LocalIdentification>0xffe7</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -255,7 +255,7 @@
           <Description/>
           <Type>Int32</Type>
           <MemberOf>CDCIDescriptor</MemberOf>
-          <LocalIdentification>0xffe7</LocalIdentification>
+          <LocalIdentification>0xffe6</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -265,7 +265,7 @@
           <Description/>
           <Type>Int32</Type>
           <MemberOf>TapeDescriptor</MemberOf>
-          <LocalIdentification>0xffe6</LocalIdentification>
+          <LocalIdentification>0xffe5</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -275,7 +275,7 @@
           <Description/>
           <Type>TaggedValueStrongReferenceVector</Type>
           <MemberOf>Package</MemberOf>
-          <LocalIdentification>0xffe5</LocalIdentification>
+          <LocalIdentification>0xffe4</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -285,7 +285,7 @@
           <Description/>
           <Type>Int32</Type>
           <MemberOf>Package</MemberOf>
-          <LocalIdentification>0xffe4</LocalIdentification>
+          <LocalIdentification>0xffe3</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -295,7 +295,7 @@
           <Description/>
           <Type>Boolean</Type>
           <MemberOf>Package</MemberOf>
-          <LocalIdentification>0xffe3</LocalIdentification>
+          <LocalIdentification>0xffe2</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -305,7 +305,7 @@
           <Description/>
           <Type>TaggedValueStrongReferenceVector</Type>
           <MemberOf>TimelineTrack</MemberOf>
-          <LocalIdentification>0xffe2</LocalIdentification>
+          <LocalIdentification>0xffe1</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -315,7 +315,7 @@
           <Description/>
           <Type>Int16</Type>
           <MemberOf>VaryingValue</MemberOf>
-          <LocalIdentification>0xffe1</LocalIdentification>
+          <LocalIdentification>0xffe0</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -325,7 +325,7 @@
           <Description/>
           <Type>AUID</Type>
           <MemberOf>VaryingValue</MemberOf>
-          <LocalIdentification>0xffe0</LocalIdentification>
+          <LocalIdentification>0xffdf</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -335,7 +335,7 @@
           <Description/>
           <Type>urn:uuid:e05ec23d-edfa-49ed-b60a-b74344841bba AvidStrongReference</Type>
           <MemberOf>TaggedValue</MemberOf>
-          <LocalIdentification>0xffdf</LocalIdentification>
+          <LocalIdentification>0xffde</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -345,7 +345,7 @@
           <Description/>
           <Type>UInt32</Type>
           <MemberOf>TaggedValue</MemberOf>
-          <LocalIdentification>0xffde</LocalIdentification>
+          <LocalIdentification>0xffdd</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <PropertyDefinition>
@@ -355,7 +355,7 @@
           <Description/>
           <Type>TaggedValueStrongReferenceVector</Type>
           <MemberOf>TaggedValue</MemberOf>
-          <LocalIdentification>0xffdd</LocalIdentification>
+          <LocalIdentification>0xffdc</LocalIdentification>
           <IsOptional>true</IsOptional>
         </PropertyDefinition>
         <TypeDefinitionStrongObjectReference>
@@ -395,6 +395,61 @@
           <Name>AvidBagOfBits</Name>
           <ElementType>UInt8</ElementType>
         </TypeDefinitionVariableArray>
+        <ExtendibleEnumerationElement>
+          <ElementOf>TransferCharacteristicType</ElementOf>
+          <Name>TransferCharacteristic_SMPTE_DCDM</Name>
+          <Value>urn:smpte:ul:060e2b34.04010108.04010101.01070000</Value>
+        </ExtendibleEnumerationElement>
+        <ExtendibleEnumerationElement>
+          <ElementOf>TransferCharacteristicType</ElementOf>
+          <Name>TransferCharacteristic_IEC6196624_xvYCC</Name>
+          <Value>urn:smpte:ul:060e2b34.0401010d.04010101.01080000</Value>
+        </ExtendibleEnumerationElement>
+        <ExtendibleEnumerationElement>
+          <ElementOf>TransferCharacteristicType</ElementOf>
+          <Name>TransferCharacteristic_ITU2020</Name>
+          <Value>urn:smpte:ul:060e2b34.0401010e.04010101.01090000</Value>
+        </ExtendibleEnumerationElement>
+        <ExtendibleEnumerationElement>
+          <ElementOf>TransferCharacteristicType</ElementOf>
+          <Name>TransferCharacteristic_SMPTEST2084</Name>
+          <Value>urn:smpte:ul:060e2b34.0401010d.04010101.010a0000</Value>
+        </ExtendibleEnumerationElement>
+        <ExtendibleEnumerationElement>
+          <ElementOf>TransferCharacteristicType</ElementOf>
+          <Name>TransferCharacteristic_HLG_OETF</Name>
+          <Value>urn:smpte:ul:060e2b34.0401010d.04010101.010b0000</Value>
+        </ExtendibleEnumerationElement>
+        <ExtendibleEnumerationElement>
+          <ElementOf>ColorPrimariesType</ElementOf>
+          <Name>ColorPrimaries_ITU2020</Name>
+          <Value>urn:smpte:ul:060e2b34.0401010d.04010101.03040000</Value>
+        </ExtendibleEnumerationElement>
+        <ExtendibleEnumerationElement>
+          <ElementOf>ColorPrimariesType</ElementOf>
+          <Name>ColorPrimaries_SMPTE_DCDM</Name>
+          <Value>urn:smpte:ul:060e2b34.0401010d.04010101.03050000</Value>
+        </ExtendibleEnumerationElement>
+        <ExtendibleEnumerationElement>
+          <ElementOf>ColorPrimariesType</ElementOf>
+          <Name>ColorPrimaries_P3D65</Name>
+          <Value>urn:smpte:ul:060e2b34.0401010d.04010101.03060000</Value>
+        </ExtendibleEnumerationElement>
+        <ExtendibleEnumerationElement>
+          <ElementOf>CodingEquationsType</ElementOf>
+          <Name>CodingEquations_YCgCo</Name>
+          <Value>urn:smpte:ul:060e2b34.0401010d.04010101.02040000</Value>
+        </ExtendibleEnumerationElement>
+        <ExtendibleEnumerationElement>
+          <ElementOf>CodingEquationsType</ElementOf>
+          <Name>CodingEquations_GBR</Name>
+          <Value>urn:smpte:ul:060e2b34.0401010d.04010101.02050000</Value>
+        </ExtendibleEnumerationElement>
+        <ExtendibleEnumerationElement>
+          <ElementOf>CodingEquationsType</ElementOf>
+          <Name>CodingEquations_ITU2020_NCL</Name>
+          <Value>urn:smpte:ul:060e2b34.0401010d.04010101.02060000</Value>
+        </ExtendibleEnumerationElement>
       </MetaDefinitions>
     </Extension>
   </Extensions>
@@ -462,30 +517,60 @@
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_ExtendedTemplate</DefinitionObjectName>
           </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_PictureOnly_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.0201017f</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_PictureOnly_Bogus</DefinitionObjectName>
+          </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_PictureOnly">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010102.0d010301.0201017f</DefinitionObjectIdentification>
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_50Mbps_PictureOnly</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.0201027f</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly_Bogus</DefinitionObjectName>
           </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010102.0d010301.0201027f</DefinitionObjectIdentification>
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_50Mbps_PictureOnly</DefinitionObjectName>
           </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_PictureOnly_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.0201037f</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_PictureOnly_Bogus</DefinitionObjectName>
+          </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_PictureOnly">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010102.0d010301.0201037f</DefinitionObjectIdentification>
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_40Mbps_PictureOnly</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.0201047f</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly_Bogus</DefinitionObjectName>
           </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010102.0d010301.0201047f</DefinitionObjectIdentification>
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_40Mbps_PictureOnly</DefinitionObjectName>
           </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_PictureOnly_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.0201057f</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_PictureOnly_Bogus</DefinitionObjectName>
+          </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_PictureOnly">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010102.0d010301.0201057f</DefinitionObjectIdentification>
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_SMPTE_D10_625x50I_30Mbps_PictureOnly</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.0201067f</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly_Bogus</DefinitionObjectName>
           </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_SMPTE_D10_525x5994I_30Mbps_PictureOnly">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010102.0d010301.0201067f</DefinitionObjectIdentification>
@@ -592,6 +677,11 @@
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps</DefinitionObjectName>
           </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010102.0d010301.02024002</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Clipwrapped_DVbased_525x5994I_25Mbps_Bogus</DefinitionObjectName>
+          </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Clipwrapped_DVbased_625x50I_25Mbps">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.02024102</DefinitionObjectIdentification>
             <DefinitionObjectDescription/>
@@ -632,10 +722,30 @@
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Clipwrapped_DVbased_UndefinedSource</DefinitionObjectName>
           </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Clipwrapped_DVbased_UndefinedSource_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010102.0d010301.02027f02</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Clipwrapped_DVbased_UndefinedSource_Bogus</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_MPEGES_AudioStream0_SID_Node">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010102.0d010301.02044000</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_MPEGES_AudioStream0_SID_Node</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.02046001</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID_Bogus</DefinitionObjectName>
+          </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010102.0d010301.02046001</DefinitionObjectIdentification>
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_MPEGES_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.02046107</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID_Bogus</DefinitionObjectName>
           </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomClosedGOPwrapped_MPEGES_VideoStream1_SID">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010102.0d010301.02046107</DefinitionObjectIdentification>
@@ -722,25 +832,190 @@
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Clipwrapped_AES3_audio_data</DefinitionObjectName>
           </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_Alaw_Audio_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.020a0100</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_Alaw_Audio_Bogus</DefinitionObjectName>
+          </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_Alaw_Audio">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010103.0d010301.020a0100</DefinitionObjectIdentification>
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_Alaw_Audio</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Clipwrapped_Alaw_Audio_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.020a0200</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Clipwrapped_Alaw_Audio_Bogus</DefinitionObjectName>
           </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Clipwrapped_Alaw_Audio">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010103.0d010301.020a0200</DefinitionObjectIdentification>
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Clipwrapped_Alaw_Audio</DefinitionObjectName>
           </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Customwrapped_Alaw_Audio_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.020a0300</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Customwrapped_Alaw_Audio_Bogus</DefinitionObjectName>
+          </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Customwrapped_Alaw_Audio">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010103.0d010301.020a0300</DefinitionObjectIdentification>
             <DefinitionObjectDescription/>
             <DefinitionObjectName>ContainerDef_MXFGC_Customwrapped_Alaw_Audio</DefinitionObjectName>
           </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_JPEG2000_FU_Framewrapped_Undefined_Interlace_Picture_Element">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010107.0d010301.020c0100</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_JPEG2000_FU_Framewrapped_Undefined_Interlace_Picture_Element</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_JPEG2000_Cn_Clipwrapped_Picture_Element">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010107.0d010301.020c0200</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_JPEG2000_Cn_Clipwrapped_Picture_Element</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_JPEG2000_I1_Interlaced_Frame_1_field_KLV">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010d.0d010301.020c0300</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_JPEG2000_I1_Interlaced_Frame_1_field_KLV</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_JPEG2000_I2_Interlaced_Frame_2_fields_KLV">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010d.0d010301.020c0400</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_JPEG2000_I2_Interlaced_Frame_2_fields_KLV</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_JPEG2000_F1_Fieldwrapped_Picture_Element">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010d.0d010301.020c0500</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_JPEG2000_F1_Fieldwrapped_Picture_Element</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_JPEG2000_P1_Framewrapped_Picture_Element">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010d.0d010301.020c0600</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_JPEG2000_P1_Framewrapped_Picture_Element</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Generic_VBI_Data_Mapping_Undefined_Payload">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010109.0d010301.020d0000</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Generic_VBI_Data_Mapping_Undefined_Payload</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010107.0d010301.020e0000</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload_Bogus</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010109.0d010301.020e0000</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Generic_ANC_Data_Mapping_Undefined_Payload</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_AVCNALUnitStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.020f6001</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_AVCNALUnitStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.020f6002</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID_Bogus</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.020f6002</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Clipwrapped_AVCNALUnitStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomStripewrapped_AVCNALUnitStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.020f6003</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomStripewrapped_AVCNALUnitStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomPESwrapped_AVCNALUnitStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.020f6004</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomPESwrapped_AVCNALUnitStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCNALUnitStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.020f6005</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCNALUnitStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomSplicewrapped_AVCNALUnitStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.020f6006</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomSplicewrapped_AVCNALUnitStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCNALUnitStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.020f6007</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCNALUnitStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomSlavewrapped_AVCNALUnitStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.020f6008</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomSlavewrapped_AVCNALUnitStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Fieldwrapped_AVCNALUnitStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010d.0d010301.020f6009</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Fieldwrapped_AVCNALUnitStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCNALUnitStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.020f607f</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCNALUnitStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_AVCByteStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.02106001</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Framewrapped_AVCByteStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID_Bogus">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.0d010301.02106002</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID_Bogus</DefinitionObjectName>
+          </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Clipwrapped_AVCbytestream_VideoStream0_SID">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.02106002</DefinitionObjectIdentification>
             <DefinitionObjectDescription/>
-            <DefinitionObjectName>ContainerDef_MXFGC_Clipwrapped_AVCbytestream_VideoStream0_SID</DefinitionObjectName>
+            <DefinitionObjectName>ContainerDef_MXFGC_Clipwrapped_AVCByteStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomStripewrapped_AVCByteStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.02106003</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomStripewrapped_AVCByteStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomPESwrapped_AVCByteStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.02106004</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomPESwrapped_AVCByteStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCByteStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.02106005</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomFixedAudioSizewrapped_AVCByteStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomSplicewrapped_AVCByteStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.02106006</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomSplicewrapped_AVCByteStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCByteStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.02106007</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomClosedGOPwrapped_AVCByteStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomSlavewrapped_AVCByteStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.02106008</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomSlavewrapped_AVCByteStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Fieldwrapped_AVCByteStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010d.0d010301.02106009</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_Fieldwrapped_AVCByteStream_VideoStream0_SID</DefinitionObjectName>
+          </ContainerDefinition>
+          <ContainerDefinition aaf:uid="ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCByteStream_VideoStream0_SID">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.0210607f</DefinitionObjectIdentification>
+            <DefinitionObjectDescription/>
+            <DefinitionObjectName>ContainerDef_MXFGC_CustomUnconstrainedwrapped_AVCByteStream_VideoStream0_SID</DefinitionObjectName>
           </ContainerDefinition>
           <ContainerDefinition aaf:uid="ContainerDef_MXFGC_Framewrapped_VC3">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.0401010a.0d010301.02110100</DefinitionObjectIdentification>
@@ -894,6 +1169,16 @@
             <DefinitionObjectDescription>Timecode data</DefinitionObjectDescription>
             <DefinitionObjectName>DataDef_Timecode</DefinitionObjectName>
           </DataDefinition>
+          <DataDefinition aaf:uid="urn:smpte:ul:060e2b34.04010101.01030201.02000000">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.01030201.02000000</DefinitionObjectIdentification>
+            <DefinitionObjectDescription>SMPTE 12M Timecode track with active user bits</DefinitionObjectDescription>
+            <DefinitionObjectName>DataDef_SMPTE12MTimecodeTrackActiveUserBits</DefinitionObjectName>
+          </DataDefinition>
+          <DataDefinition aaf:uid="urn:smpte:ul:060e2b34.04010101.01030201.03000000">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.01030201.03000000</DefinitionObjectIdentification>
+            <DefinitionObjectDescription>SMPTE 12M Timecode track with active user bits</DefinitionObjectDescription>
+            <DefinitionObjectName>DataDef_SMPTE309MTimecodeTrackDatecodeUserBits</DefinitionObjectName>
+          </DataDefinition>
           <DataDefinition aaf:uid="DataDef_DescriptiveMetadata">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.01030201.10000000</DefinitionObjectIdentification>
             <DefinitionObjectDescription>Descriptive metadata</DefinitionObjectDescription>
@@ -908,6 +1193,11 @@
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.01030202.02000000</DefinitionObjectIdentification>
             <DefinitionObjectDescription>Sound data</DefinitionObjectDescription>
             <DefinitionObjectName>DataDef_Sound</DefinitionObjectName>
+          </DataDefinition>
+          <DataDefinition aaf:uid="urn:smpte:ul:060e2b34.04010101.01030202.03000000">
+            <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010101.01030202.03000000</DefinitionObjectIdentification>
+            <DefinitionObjectDescription>Data Essence data</DefinitionObjectDescription>
+            <DefinitionObjectName>DataDef_Data</DefinitionObjectName>
           </DataDefinition>
           <DataDefinition aaf:uid="DataDef_Auxiliary">
             <DefinitionObjectIdentification>urn:smpte:ul:060e2b34.04010105.01030203.01000000</DefinitionObjectIdentification>
@@ -957,7 +1247,7 @@
     <ContentStorageObject>
       <ContentStorage>
         <Packages>
-          <SourcePackage>
+          <SourcePackage aaf:uid="urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1906.cb2f0022">
             <this:AppCode>0</this:AppCode>
             <this:MobAttributeList>
               <TaggedValue>
@@ -1014,7 +1304,7 @@
             <PackageName>Audio file</PackageName>
             <PackageID>urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1906.cb2f0022</PackageID>
           </SourcePackage>
-          <SourcePackage>
+          <SourcePackage aaf:uid="urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1906.cb300022">
             <this:AppCode>0</this:AppCode>
             <this:MobAttributeList>
               <TaggedValue>
@@ -1071,7 +1361,7 @@
             <PackageName>Audio file</PackageName>
             <PackageID>urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1906.cb300022</PackageID>
           </SourcePackage>
-          <SourcePackage>
+          <SourcePackage aaf:uid="urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1906.cb310022">
             <this:AppCode>0</this:AppCode>
             <this:MobAttributeList>
               <TaggedValue>
@@ -1120,7 +1410,7 @@
                 <SampledHeight>288</SampledHeight>
                 <StoredWidth>720</StoredWidth>
                 <StoredHeight>288</StoredHeight>
-                <PictureCompression>CompressionDef_LegacyDV</PictureCompression>
+                <PictureCompression>urn:uuid:edb35390-6d30-11d3-a036-006094eb75cb</PictureCompression>
                 <ContainerFormat>ContainerDef_OMF</ContainerFormat>
                 <Codec>CodecDef_CDCI</Codec>
                 <EssenceLength>196</EssenceLength>
@@ -1161,7 +1451,7 @@
             <PackageName>Video file</PackageName>
             <PackageID>urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1906.cb310022</PackageID>
           </SourcePackage>
-          <SourcePackage>
+          <SourcePackage aaf:uid="urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1715.3464001b">
             <this:AppCode>0</this:AppCode>
             <this:MobAttributeList>
               <TaggedValue>
@@ -1218,7 +1508,7 @@
             <PackageName>Audio file</PackageName>
             <PackageID>urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1715.3464001b</PackageID>
           </SourcePackage>
-          <SourcePackage>
+          <SourcePackage aaf:uid="urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1715.3465001b">
             <this:AppCode>0</this:AppCode>
             <this:MobAttributeList>
               <TaggedValue>
@@ -1275,7 +1565,7 @@
             <PackageName>Audio file</PackageName>
             <PackageID>urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1715.3465001b</PackageID>
           </SourcePackage>
-          <SourcePackage>
+          <SourcePackage aaf:uid="urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1715.3466001b">
             <this:AppCode>0</this:AppCode>
             <this:MobAttributeList>
               <TaggedValue>
@@ -1324,7 +1614,7 @@
                 <SampledHeight>288</SampledHeight>
                 <StoredWidth>720</StoredWidth>
                 <StoredHeight>288</StoredHeight>
-                <PictureCompression>CompressionDef_LegacyDV</PictureCompression>
+                <PictureCompression>urn:uuid:edb35390-6d30-11d3-a036-006094eb75cb</PictureCompression>
                 <ContainerFormat>ContainerDef_OMF</ContainerFormat>
                 <Codec>CodecDef_CDCI</Codec>
                 <EssenceLength>307</EssenceLength>
@@ -1365,8 +1655,8 @@
             <PackageName>Video file</PackageName>
             <PackageID>urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1715.3466001b</PackageID>
           </SourcePackage>
-          <MaterialPackage>
-            <this:ConvertFrameRate>false</this:ConvertFrameRate>
+          <MaterialPackage aaf:uid="urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1217.b5260007">
+            <this:ConvertFrameRate>False</this:ConvertFrameRate>
             <this:AppCode>0</this:AppCode>
             <this:MobAttributeList>
               <TaggedValue>
@@ -1473,7 +1763,7 @@
             <PackageName>Philip's Desk</PackageName>
             <PackageID>urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f1217.b5260007</PackageID>
           </MaterialPackage>
-          <SourcePackage>
+          <SourcePackage aaf:uid="urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d75ef21.1bd7006d">
             <this:AppCode>0</this:AppCode>
             <this:MobAttributeList>
               <TaggedValue>
@@ -1739,7 +2029,7 @@
                   <Sequence>
                     <ComponentObjects>
                       <Timecode>
-                        <DropFrame>false</DropFrame>
+                        <DropFrame>False</DropFrame>
                         <FramesPerSecond>25</FramesPerSecond>
                         <StartTimecode>0</StartTimecode>
                         <ComponentLength>10800000</ComponentLength>
@@ -1760,8 +2050,8 @@
             <PackageName>Philips first tape</PackageName>
             <PackageID>urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d75ef21.1bd7006d</PackageID>
           </SourcePackage>
-          <MaterialPackage>
-            <this:ConvertFrameRate>false</this:ConvertFrameRate>
+          <MaterialPackage aaf:uid="urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f124d.86970008">
+            <this:ConvertFrameRate>False</this:ConvertFrameRate>
             <this:AppCode>0</this:AppCode>
             <this:MobAttributeList>
               <TaggedValue>
@@ -1868,7 +2158,7 @@
             <PackageName>Davids Desk</PackageName>
             <PackageID>urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f124d.86970008</PackageID>
           </MaterialPackage>
-          <CompositionPackage>
+          <CompositionPackage aaf:uid="urn:smpte:umid:060c2b34.02051101.01041000.13000000.060e2b34.7f7f2a80.3d7f3488.3ee6008e">
             <this:AppCode>0</this:AppCode>
             <this:MobAttributeList>
               <TaggedValue>
@@ -1906,7 +2196,7 @@
                 <EditRate>25/1</EditRate>
                 <TrackSegment>
                   <Timecode>
-                    <DropFrame>false</DropFrame>
+                    <DropFrame>False</DropFrame>
                     <FramesPerSecond>25</FramesPerSecond>
                     <StartTimecode>750</StartTimecode>
                     <ComponentLength>202</ComponentLength>
@@ -2206,7 +2496,7 @@
         <ApplicationSupplierName>Avid Technology, Inc.</ApplicationSupplierName>
       </Identification>
     </IdentificationList>
-    <FileLastModified>2008-05-03T05:30:00.00Z</FileLastModified>
+    <FileLastModified>2019-09-19T13:11:42.00Z</FileLastModified>
     <ByteOrder>LittleEndian</ByteOrder>
   </Preface>
 </AAF>
