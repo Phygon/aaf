@@ -59,7 +59,9 @@ int testExampleFiles()
     aafUInt8 byte = *((aafUInt8*)&longWord);
     if (byte == 0x12) 
     {
-        exampleFiles = exampleFilesBE;
+        printf("Skipping test because example files need to be generated on and for big endian hosts\n");
+        return 1;
+        //exampleFiles = exampleFilesBE;
     }
     else
     {
