@@ -2835,6 +2835,59 @@ AAFRESULT ImplAAFMetaDictionary::MergeBuiltinClassDefs()
 	    break;
 	  }
 	}
+	else
+	{
+	  // Replace incompatible property definition in file's dictionary
+	  // with corresponding definition from AAF SDK's built-in dictionary.
+
+	  // The following code deals with the issue of PrimaryMob property
+	  // definition registered in the file's dictionary using invalid
+	  // property local tag (PID). MAJ API (specific version is unknown)
+	  // defines the PrimaryMob property using non-standard type and
+	  // dynamic local tag. The dynamic PID conflicts with the standard
+	  // static PID (0x3b08) in the AAF SDK built-in property definition
+	  // which results in uninitialized property definition pointer in
+	  // OMProperty. This triggers access violation during save and makes
+	  // it impossible to modify the file with AAF SDK.
+	  //
+	  // Such files were handled successfully with older AAF SDK versions
+	  // that didn't have PrimaryMob support.
+	  //
+	  // The workaround here is to replace the property definition in the
+	  // file's dictionary with the one from the SDK's built-in dictionary.
+	  //
+	  // If the file does include PrimaryMob property that uses non-standard
+	  // definition the behavior is unknown.
+
+	  ImplAAFSmartPointer<ImplAAFPropertyDef> spTmp;
+	  if (pBuiltInModelPropDef->pid() == PID_Header_PrimaryMob &&
+		  pFileClassDef->LookupPropertyDefbyOMPid(pBuiltInModelPropDef->pid(), &spTmp) == AAFRESULT_NO_MORE_OBJECTS)
+	  {
+		// The property definition is registered with a non-standard PID.
+		// Re-register it with the same parameters as in the built-in dictionary.
+		AAFRESULT hr = pFileClassDef->pvtUnregisterPropertyDef(*pBuiltInModelPropDef->id());
+		ASSERTU( AAFRESULT_SUCCESS == hr );
+		if ( AAFRESULT_SUCCESS != hr )
+		{
+		  result = hr;
+		  break;
+		}
+
+		hr = pFileClassDef->pvtRegisterPropertyDef( *pBuiltInModelPropDef->id(),
+								pBuiltInModelPropDef->name(),
+								*pBuiltInModelPropDef->typeId(),
+								pBuiltInModelPropDef->required() ? kAAFFalse : kAAFTrue,
+								pBuiltInModelPropDef->uid() ? kAAFTrue : kAAFFalse,
+								&spTmp );
+
+		ASSERTU( AAFRESULT_SUCCESS == hr );
+		if ( AAFRESULT_SUCCESS != hr )
+		{
+		  result = hr;
+		  break;
+		}
+	  }
+	}
 
       }
     }

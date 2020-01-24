@@ -918,6 +918,21 @@ ImplAAFClassDef::pvtRegisterExistingPropertyDef
 }
 
 
+AAFRESULT STDMETHODCALLTYPE
+    ImplAAFClassDef::pvtUnregisterPropertyDef (
+      const aafUID_t & id)
+{
+  if (PvtIsPropertyDefRegistered(id))
+  {
+	ImplAAFPropertyDef* propDef = _Properties.remove(*reinterpret_cast<const OMUniqueObjectIdentification*>(&id));
+	if (propDef)
+	  propDef->ReleaseReference();
+  }
+
+  return AAFRESULT_SUCCESS;
+}
+
+
 //
 // Implementations of private class
 //

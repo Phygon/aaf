@@ -292,6 +292,13 @@ public:
 		 ImplAAFPropertyDef * pPropDef);
 
 
+  // Unregister a specified property definition.
+  // Should not be used if there are already existing instances of this class definition.
+  AAFRESULT STDMETHODCALLTYPE
+    pvtUnregisterPropertyDef
+        (const aafUID_t & id);
+
+
   //****************
   // LookupPropertyDefbyOMPid()
   //
