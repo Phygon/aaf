@@ -56,7 +56,6 @@
 #include "aafErr.h"
 #include "ImplAAFObjectCreation.h"
 #include "ImplAAFDictionary.h"
-#include "ImplAAFTypeDefExtEnum.h"
 
 extern "C" const aafClassID_t CLSID_EnumAAFPluginLocators;
 
@@ -169,15 +168,7 @@ AAFRESULT STDMETHODCALLTYPE
     ImplAAFPluginDef::SetCategoryClass (
       const aafUID_t & categoryClass)
 {
-  const OMType* type = _categoryClass.definition()->type();
-  const ImplAAFTypeDefExtEnum* extEnumType = dynamic_cast<const ImplAAFTypeDefExtEnum*>(type);
-  if (!extEnumType)
-	  return AAFRESULT_INTERNAL_ERROR;
-  if (!extEnumType->isValidValue(*reinterpret_cast<const OMUniqueObjectIdentification*>(&categoryClass)))
-	  return AAFRESULT_ILLEGAL_VALUE;
-
   _categoryClass = categoryClass;
- 
   return AAFRESULT_SUCCESS;
 }
 
