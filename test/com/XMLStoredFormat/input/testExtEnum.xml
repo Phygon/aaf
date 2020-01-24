@@ -8,10 +8,10 @@ c) extension of baseline
 d) extension of non-baseline
     
 -->
-<AAF xmlns="http://www.smpte-ra.org/schemas/2001-2/2013/aaf"
-    xmlns:aaf="http://www.smpte-ra.org/schemas/2001-2/2013/aaf"
+<AAF xmlns="http://www.amwa.tv/aafx/v2.0/20200101"
+    xmlns:aaf="http://www.amwa.tv/aafx/v2.0/20200101"
     xmlns:this="urn:uuid:8b6886f6-c6ac-4a5a-8158-309a238c1a08"
-    version="1.1">
+    version="2.0">
   <Extensions>
     <Extension>
         <SchemeID>urn:uuid:8b6886f6-c6ac-4a5a-8158-309a238c1a08</SchemeID>

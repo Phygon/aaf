@@ -100,10 +100,10 @@ static const OMPropertyId typeDefsTargetPath[3] = {0x0001, 0x0004, 0x0000};
 
 
 const wchar_t* OMSymbolspace::_baselineURI = 
-    L"http://www.smpte-ra.org/schemas/2001-2/2013/aaf";
+    L"http://www.amwa.tv/aafx/v2.0/20200101";
 const OMUniqueObjectIdentification OMSymbolspace::_baselineId =
-{0x696aa72c, 0x7c41, 0x4fa7, {0x84, 0x99, 0x30, 0xfe, 0x83, 0xe3, 0xdb, 0x12}};
-const wchar_t* OMSymbolspace::_baselineVersion = L"1.1";
+{0xc1b002f2, 0x80cf, 0x5cc0, {0x84, 0x9d, 0x1a, 0x08, 0xc8, 0xfb, 0x04, 0x7f}};
+const wchar_t* OMSymbolspace::_baselineVersion = L"2.0";
     
 
 class EnumForReg : public TypeDefForReg

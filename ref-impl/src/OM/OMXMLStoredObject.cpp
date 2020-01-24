@@ -3279,7 +3279,7 @@ OMXMLStoredObject::restoreString(OMByteArray& bytes, const OMList<OMXMLAttribute
     PRECONDITION("Valid type", type != 0);
 
     return restoreString(bytes, attributes, str, type, type->elementType());
-    }
+}
 
 void 
 OMXMLStoredObject::restoreString(OMByteArray& bytes, const OMList<OMXMLAttribute*>* attributes,

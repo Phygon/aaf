@@ -7,7 +7,7 @@
 <!ENTITY stream_2 SYSTEM "axExample_stream2" NDATA DataStream_0>
 <!ENTITY stream_3 SYSTEM "axExample_stream3" NDATA DataStream_0>
 ]>
-<AAF xmlns="http://www.smpte-ra.org/schemas/2001-2/2013/aaf" xmlns:aaf="http://www.smpte-ra.org/schemas/2001-2/2013/aaf" xmlns:this="urn:uuid:5aa56821-69de-11d2-b6bc-fcab70ff7331" version="1.1">
+<AAF xmlns="http://www.amwa.tv/aafx/v2.0/20200101" xmlns:aaf="http://www.amwa.tv/aafx/v2.0/20200101" xmlns:this="urn:uuid:5aa56821-69de-11d2-b6bc-fcab70ff7331" version="2.0">
   <Extensions>
     <Extension>
       <SchemeID>urn:uuid:5aa56821-69de-11d2-b6bc-fcab70ff7331</SchemeID>
