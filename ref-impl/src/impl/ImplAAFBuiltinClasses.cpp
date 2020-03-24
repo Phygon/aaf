@@ -232,6 +232,11 @@ AAFRESULT ImplAAFBuiltinClasses::MapOmPid
   return E_FAIL;
 }
 
+OMSetIterator<aafUID_t, OMPropertyId> ImplAAFBuiltinClasses::MappedOmPids() const
+{
+  return OMSetIterator<aafUID_t, OMPropertyId>(_dynamicPropertyIDs, OMBefore);
+}
+
 ImplAAFClassDef * ImplAAFBuiltinClasses::LookupAxiomaticClass
 (const aafUID_t & classId)
 {

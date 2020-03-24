@@ -933,6 +933,9 @@ private:
   bool pvtLookupAxiomaticClassDef (const aafUID_t & classID,
 								   ImplAAFClassDef ** ppClassDef);
 
+  // Record a specified dynamic property ID as being used (see _pidSegments).
+  void UseDynamicPid(OMPropertyId pid);
+
   OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFOperationDef>			_operationDefinitions;
   OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFParameterDef>			_parameterDefinitions;
   OMStrongReferenceSetProperty<OMUniqueObjectIdentification, ImplAAFDataDef>				_dataDefinitions;

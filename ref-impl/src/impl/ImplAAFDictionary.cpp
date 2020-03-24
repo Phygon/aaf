@@ -2225,6 +2225,14 @@ AAFRESULT ImplAAFDictionary::GenerateOmPid
             // make sure it is clear in case there was a previous (failed) attempt
             _pidSegments.clear();
             
+            // add the dynamic pids already assigned in the file to the vector of pid segments
+            OMSetIterator<aafUID_t, OMPropertyId> iter = _pBuiltinClasses->MappedOmPids();
+            while (++iter)
+            {
+                OMPropertyId pid = iter.value();
+                UseDynamicPid(pid);
+            }
+
             ImplEnumAAFClassDefsSP enumClassDefs;
             hr = GetClassDefs(&enumClassDefs);
             if (AAFRESULT_FAILED(hr))
@@ -2253,6 +2261,67 @@ AAFRESULT ImplAAFDictionary::GenerateOmPid
                     }
                     
                     // add the dynamic pid to the vector of pid segments
+                    UseDynamicPid(pid);
+                }
+            }
+            
+            _pidSegmentsInitialised = true;
+        }
+      
+        // generate a new pid 
+        
+        if (_pidSegments.count() == 0)
+        {
+            // this is the first dynamic pid; we start from the top
+            rOutPid = 0xffff;
+            
+            PIDSegment newSegment;
+            newSegment.firstPid = rOutPid;
+            newSegment.lastPid = rOutPid;
+            _pidSegments.append(newSegment);
+        }
+        else
+        {
+            // extend the last segment with a new pid
+            
+            OMVectorIterator<PIDSegment> iter(_pidSegments, OMAfter);
+            --iter;
+            PIDSegment& lastSegment = iter.value();
+            if (lastSegment.lastPid < 0xffff)
+            {
+                // the new pid becomes one above the last pid in the last segment
+                lastSegment.lastPid++;
+                rOutPid = lastSegment.lastPid;
+            }
+            else
+            {
+                // the new pid becomes one below the first pid in the last segment
+                lastSegment.firstPid--;
+                rOutPid = lastSegment.firstPid;
+                
+                // check whether the segment must be merged with the previous one
+                if (--iter)
+                {
+                    PIDSegment& prevSegment = iter.value();
+                    if (prevSegment.lastPid + 1 >= lastSegment.firstPid)
+                    {
+                        // merge the segments and remove the previous segment
+                        lastSegment.firstPid = prevSegment.firstPid;
+                        _pidSegments.removeAt(iter.index());
+                    }
+                }
+            }
+        }
+        
+        ASSERTU(rOutPid >= 0x8000);
+    }
+    
+    return AAFRESULT_SUCCESS;
+}
+
+void ImplAAFDictionary::UseDynamicPid(OMPropertyId pid)
+{
+    // add the dynamic pid to the vector of pid segments
                     bool haveProcessedPid = false;
                     OMVectorIterator<PIDSegment> iter(_pidSegments, OMBefore);
                     while (++iter)
@@ -2313,61 +2382,6 @@ AAFRESULT ImplAAFDictionary::GenerateOmPid
                         newSegment.lastPid = pid;
                         _pidSegments.append(newSegment);
                     }
-                }
-            }
-            
-            _pidSegmentsInitialised = true;
-        }
-      
-        // generate a new pid 
-        
-        if (_pidSegments.count() == 0)
-        {
-            // this is the first dynamic pid; we start from the top
-            rOutPid = 0xffff;
-            
-            PIDSegment newSegment;
-            newSegment.firstPid = rOutPid;
-            newSegment.lastPid = rOutPid;
-            _pidSegments.append(newSegment);
-        }
-        else
-        {
-            // extend the last segment with a new pid
-            
-            OMVectorIterator<PIDSegment> iter(_pidSegments, OMAfter);
-            --iter;
-            PIDSegment& lastSegment = iter.value();
-            if (lastSegment.lastPid < 0xffff)
-            {
-                // the new pid becomes one above the last pid in the last segment
-                lastSegment.lastPid++;
-                rOutPid = lastSegment.lastPid;
-            }
-            else
-            {
-                // the new pid becomes one below the first pid in the last segment
-                lastSegment.firstPid--;
-                rOutPid = lastSegment.firstPid;
-                
-                // check whether the segment must be merged with the previous one
-                if (--iter)
-                {
-                    PIDSegment& prevSegment = iter.value();
-                    if (prevSegment.lastPid + 1 >= lastSegment.firstPid)
-                    {
-                        // merge the segments and remove the previous segment
-                        lastSegment.firstPid = prevSegment.firstPid;
-                        _pidSegments.removeAt(iter.index());
-                    }
-                }
-            }
-        }
-        
-        ASSERTU(rOutPid >= 0x8000);
-    }
-    
-    return AAFRESULT_SUCCESS;
 }
 
 void ImplAAFDictionary::pvtAttemptBuiltinSizeRegistration

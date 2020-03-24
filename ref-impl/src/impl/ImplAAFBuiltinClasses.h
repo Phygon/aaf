@@ -87,6 +87,9 @@ public:
   AAFRESULT MapOmPid(const aafUID_t & rAuid,
                      OMPropertyId pid);
 
+  // Access mapping of property definition AUIDs to dynamic OM PIDs.
+  OMSetIterator<aafUID_t, OMPropertyId> MappedOmPids() const;
+
   // Returns the axiomatic class definition corresponding to the given
   // class ID.  If not found, returns null.
   ImplAAFClassDef * LookupAxiomaticClass (const aafUID_t & classId);
