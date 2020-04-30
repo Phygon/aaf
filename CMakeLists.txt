@@ -42,8 +42,8 @@ set(AAFSDK_ROOT "${CURRENT_DIR_ABS}" CACHE STRING "Path to AAF-SDK root director
 list(APPEND CMAKE_MODULE_PATH "${AAFSDK_ROOT}/build")
 
 set(AAFSDK_VERSION_MAJOR 1 CACHE STRING "Specify the major version of AAF-SDK")
-set(AAFSDK_VERSION_MINOR 1 CACHE STRING "Specify the minor version of AAF-SDK")
-set(AAFSDK_VERSION_PATCH 6 CACHE STRING "Specify the patch version of AAF-SDK")
+set(AAFSDK_VERSION_MINOR 2 CACHE STRING "Specify the minor version of AAF-SDK")
+set(AAFSDK_VERSION_PATCH 0 CACHE STRING "Specify the patch version of AAF-SDK")
 set(AAFSDK_VERSION_BUILD 0 CACHE STRING "Specify the build number of AAF-SDK")
 
 set(AAFSDK_VERSION_RELEASE "kAAFVersionBeta" CACHE STRING "Specify the release stage of AAF-SDK")
