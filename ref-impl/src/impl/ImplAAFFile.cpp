@@ -600,7 +600,7 @@ ImplAAFFile::OpenExistingModify (const aafCharacter * pFileName,
 	return stat;
 }
 
-aafVersionType_t theVersion = { 1,1};
+aafVersionType_t theVersion = { 1,2};
 
 AAFRESULT STDMETHODCALLTYPE
 ImplAAFFile::OpenNewModify (const aafCharacter * pFileName,
