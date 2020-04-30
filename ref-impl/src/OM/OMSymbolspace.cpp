@@ -3407,7 +3407,7 @@ OMSymbolspace::createBaselineSymbolspace(OMXMLStorage* store)
     TRACE("OMSymbolspace::createBaselineSymbolspace(OMXMLStorage)");
 
     OMSymbolspace* ss = new OMSymbolspace(store, _baselineId, _baselineURI, L"aaf", 
-        L"AAF version 1.1 baseline symbolspace");
+        L"AAF version 1.2 baseline symbolspace");
     ss->_version = wideCharacterStringDup(_baselineVersion);
         
     //
