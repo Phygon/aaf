@@ -178,7 +178,7 @@ static char    *localErrorStrings[300];
 const char *aafGetErrorString(
 		aafErr_t code)
 {
-	if (code < 300 && code >= 0 && localErrorStrings[0] != '\0')
+	if (code >= 0 && code < 300 && localErrorStrings[code] != NULL)
 		return (localErrorStrings[code]);
 	else
 		return ("AAF_ERR: Unknown error code");

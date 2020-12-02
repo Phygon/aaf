@@ -82,7 +82,7 @@ void throwUsage()
 //-----------------------------------------------------------------------------
 void DotExport( AxHeader& axHeader,
 		string dotOutFilename,
-		InstanceMapperProfile profile ) 
+		InstanceMapperProfile profile )
 {
    DotFactory dotFactory;
 
@@ -90,11 +90,11 @@ void DotExport( AxHeader& axHeader,
    DotGraph *graph = dotFactory.CreateGraph( "MyGraph", dotFactory.CreateGraphUID() );
 
    // create the mapper
-   if ( profile.GetDebug() ) 
+   if ( profile.GetDebug() )
    {
       Logging::SetDebugLogStream( &cout );
    }
-   else 
+   else
    {
       Logging::SetNullDebugLogStream();
    }
@@ -108,15 +108,15 @@ void DotExport( AxHeader& axHeader,
    auto_ptr< AxBaseObjIterPrtcl > axHeaderIter(
       new AxBaseSolitaryObjIter<AxHeader>(axHeader) );
    AxBaseObjRecIterExt recIter( axHeaderIter, &mapper );
-   pair<bool,auto_ptr<AxBaseObj> > next;
+   auto_ptr<AxBaseObj> next;
    int level;
-   for( next.first = recIter.NextOne( next.second, level ); next.first;
-	next.first = recIter.NextOne( next.second, level ) )
+   for(bool hasNext = recIter.NextOne( next, level ); hasNext;
+	hasNext = recIter.NextOne( next, level ) )
    {
-      if ( dynamic_cast< AxObject* >( next.second.get() ) ) 
+      if ( dynamic_cast< AxObject* >( next.get() ) )
       {
 	 auto_ptr< AxObject > obj(
-	    dynamic_cast< AxObject* >( next.second.release() ) );
+	    dynamic_cast< AxObject* >( next.release() ) );
 			
 	 bool popStack;
 	 mapper.MapAAFObject( *obj, popStack );
@@ -126,10 +126,10 @@ void DotExport( AxHeader& axHeader,
 	 }
       }
 
-      else if ( dynamic_cast< AxProperty* >( next.second.get() ) ) 
+      else if ( dynamic_cast< AxProperty* >( next.get() ) )
       {
-	 auto_ptr< AxProperty > prop( 
-	    dynamic_cast< AxProperty* >( next.second.release() ) );
+	 auto_ptr< AxProperty > prop(
+	    dynamic_cast< AxProperty* >( next.release() ) );
 			
 	 bool popStack;
 	 mapper.MapAAFProperty( *prop, popStack );
@@ -139,10 +139,10 @@ void DotExport( AxHeader& axHeader,
 	 }
       }
 
-      else if ( dynamic_cast< AxPropertyValue* >( next.second.get() ) ) 
+      else if ( dynamic_cast< AxPropertyValue* >( next.get() ) )
       {
 	 auto_ptr< AxPropertyValue > propVal(
-	    dynamic_cast< AxPropertyValue* >( next.second.release() ) );
+	    dynamic_cast< AxPropertyValue* >( next.release() ) );
 			
 	 bool popStack;
 	 mapper.MapAAFPropertyValue( *propVal, popStack );
@@ -153,20 +153,20 @@ void DotExport( AxHeader& axHeader,
 
       }
       
-      else if ( dynamic_cast< AxBaseObjAny< AxRecordIterator::Pair >* >( next.second.get() ) )
+      else if ( dynamic_cast< AxBaseObjAny< AxRecordIterator::Pair >* >( next.get() ) )
       {
 	  
 	 auto_ptr< AxBaseObjAny< AxRecordIterator::Pair > > recPair(
-	    dynamic_cast< AxBaseObjAny< AxRecordIterator::Pair >* >( next.second.release() ) );
+	    dynamic_cast< AxBaseObjAny< AxRecordIterator::Pair >* >( next.release() ) );
 	  
-	 // records implemented on a case-by-case basis at the property iteration level 
+	 // records implemented on a case-by-case basis at the property iteration level
 	 recIter.PopStack();
       }
 		
-      else if ( dynamic_cast< AxBaseObjAny< AxExHResult >* >( next.second.get() ) ) 
+      else if ( dynamic_cast< AxBaseObjAny< AxExHResult >* >( next.get() ) )
       {
 	 auto_ptr< AxBaseObjAny< AxExHResult > > ex (
-	    dynamic_cast< AxBaseObjAny< AxExHResult >* >( next.second.release() ) );
+	    dynamic_cast< AxBaseObjAny< AxExHResult >* >( next.release() ) );
 	  
 	 // 'any' objects not implemented
 	 recIter.PopStack();
@@ -236,18 +236,18 @@ int renamePeskyOpaques( AxDictionary& axDict,
 {
    using namespace std;
 
-   pair<bool, auto_ptr< AxBaseObj > > next;
+   auto_ptr< AxBaseObj > next;
 
    int count = 0;
    int level;
-   for( next.first = recIter.NextOne( next.second, level );
-	next.first;
-	next.first = recIter.NextOne( next.second, level ) ) {
+   for(bool hasNext = recIter.NextOne( next, level );
+	hasNext;
+	hasNext = recIter.NextOne( next, level ) ) {
 
-      if ( dynamic_cast<AxPropertyValue*>( next.second.get() ) ) {
+      if ( dynamic_cast<AxPropertyValue*>( next.get() ) ) {
 
 	 auto_ptr<AxPropertyValue> propVal(
-	    dynamic_cast<AxPropertyValue*>( next.second.release() ) );
+	    dynamic_cast<AxPropertyValue*>( next.release() ) );
 
 	 AxPropValueRenamePeskyOpaques axPropValueRenamePeskyOpaques( axDict );
 
@@ -289,7 +289,7 @@ int main( int argc, char** argv )
 	 throwUsage();
       }
       pair<bool, const char*> dotOutFilenameArg = args.get( dotOutOpArg.second + 1 );
-      if ( !dotOutFilenameArg.first ) 
+      if ( !dotOutFilenameArg.first )
       {
 	 throwUsage();
       }
@@ -306,13 +306,13 @@ int main( int argc, char** argv )
       else
       {
 	 profileOp = args.get( "-nodatadefrefs", 0 );
-	 if ( profileOp.first ) 
+	 if ( profileOp.first )
 	 {
 	    profile.SetDataDefRefs( false );
 	 }
       }
       profileOp = args.get( "-notaggedvalues", 0 );
-      if ( profileOp.first ) 
+      if ( profileOp.first )
       {
 	 profile.SetTaggedValues( false );
       }
@@ -322,13 +322,13 @@ int main( int argc, char** argv )
 	 profile.SetKLVData( false );
       }
       profileOp = args.get( "-noessencedata", 0 );
-      if ( profileOp.first ) 
+      if ( profileOp.first )
       {
 	 profile.SetEssenceData( false );
       }
 
       profileOp = args.get( "-concentrate", 0 );
-      if ( profileOp.first ) 
+      if ( profileOp.first )
       {
 	 profile.SetConcentrate( true );
       }
